@@ -1,0 +1,31 @@
+# Mission Lab task contract. One file per task: docs/backlog/tasks/ML-TASK-NNN.yaml
+# A task is READY only when every field is filled and acceptance criteria are testable.
+task_id: ML-TASK-NNN
+title: ""
+status: proposed            # proposed | ready | in_progress | in_review | done | blocked
+requirement_ids: []         # ML-FR-xxx / ML-NFR-xxx / ML-UX-xxx
+owner_role: ""              # systems-architect | astrodynamics-engineer | frontend-engineer | verification-engineer | docs-release
+reviewer_role: ""           # must differ from owner_role
+dependencies: []            # ML-TASK-NNN
+affected_paths: []          # the only paths the owner role may modify
+objective: ""
+scope: []
+out_of_scope: []
+inputs: []                  # ADRs, contract sections, references the agent must read
+acceptance_criteria: []     # each one checkable; cite VT-/VI-/VE- ids where applicable
+test_requirements: []
+deliverables: []
+human_approval_required: false   # true = contains a decision reserved to the owner
+
+# Filled in by the agent on completion (the task report).
+report:
+  files_changed: []
+  summary: ""
+  tests_executed: []        # command + result, verbatim
+  reference_data_used: []
+  not_verified: []          # anything claimed but not checked
+  known_limitations: []
+  documentation_changes: []
+  risks_or_blockers: []
+  review_artifact: ""       # PR URL
+  recommended_next_action: ""
