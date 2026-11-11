@@ -2,8 +2,8 @@
 
 **Date:** 2026-11-11 · **Prepared by:** Coordinator · **Decision owner:** Product Owner
 **Status:** **APPROVED** by the owner on 2026-11-11 ("lo apruebo todo"). D-1…D-9 accepted as
-recommended. Still to be chosen by the owner before G1: which option of D-5 (external reference
-source). D-6 executed on 2026-11-11 (repository moved out of the synced folder).
+recommended. D-5 chosen by the owner on 2026-11-11: option (a), Python + Orekit; the owner also has
+Wakker, "Fundamentals of Astrodynamics", as a possible textbook source to assess (not yet reviewed). D-6 executed on 2026-11-11 (repository moved out of the synced folder).
 
 Owner direction recorded with the approval: escape, impact, interplanetary, deep-space and
 launch/landing capabilities are wanted in later releases. Added to the roadmap in ML-SYS-001
