@@ -1,0 +1,98 @@
+task_id: ML-TASK-004
+title: "Normative simulation contracts v1.0 in packages/contracts (types + zod runtime schemas)"
+status: in_review
+requirement_ids: [ML-FR-002, ML-FR-004, ML-FR-005, ML-FR-006, ML-FR-011, ML-FR-012, ML-NFR-004]
+owner_role: systems-architect
+reviewer_role: astrodynamics-engineer   # also frontend-engineer and verification-engineer (backlog)
+dependencies: [ML-TASK-003]
+affected_paths:
+  - packages/contracts/
+  - docs/architecture/contracts-v1.md
+  - docs/backlog/tasks/ML-TASK-004.yaml
+objective: >
+  The normative simulation contracts v1.0 in packages/contracts: TypeScript types plus zod 4
+  runtime schemas for Scenario, SimulationRequest, TrajectorySegment, ManeuverEvent, Diagnostic,
+  SimulationResult and their parts, matching approved architecture §4, with normative prose in
+  docs/architecture/contracts-v1.md.
+scope:
+  - Types derived from schemas (single source of truth).
+  - Schema for the persisted Scenario file (schemaVersion "1.0").
+  - "Structural validation, each rule traceable to a requirement or ADR: finite numbers, eccentricity in [0,1),
+    maneuvers length <= 1, duration_s > 0, outputStep_s > 0, maneuver time within [0, duration_s]."
+  - Typed-array fields validated for type and consistent lengths (N, 3N).
+  - Stable machine-readable diagnostic/validation code list.
+  - Precise requestId definition; hashing implementation may be deferred to ML-TASK-017 if non-trivial.
+out_of_scope:
+  - Any physics (element/Cartesian conversion, constants values), engine, UI.
+  - Changes to architecture; ambiguities go to "Open questions for the owner".
+  - New dependencies or lockfile changes.
+inputs:
+  - AGENTS.md
+  - docs/architecture/proposed-architecture.md (§2, §3, §4)
+  - docs/architecture/adr/ADR-002, ADR-004, ADR-005
+  - docs/requirements/m1-requirements.md
+  - docs/product/ML-SYS-001.md Appendix A (A.2)
+  - docs/verification/m1-verification-plan.md
+  - eslint.config.js
+acceptance_criteria:
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0."
+  - "Schema tests cover: valid scenario round-trip; each validation rule rejecting with its code; unknown
+    schemaVersion rejected; non-finite numbers rejected; typed-array length mismatch rejected."
+  - "packages/contracts imports nothing internal and nothing but zod."
+  - "Every physical field name carries its unit suffix."
+test_requirements:
+  - Vitest schema tests in packages/contracts/src/*.test.ts.
+deliverables:
+  - packages/contracts schemas, types, validators, canonical requestId payload, code registry, tests.
+  - docs/architecture/contracts-v1.md.
+human_approval_required: true   # open questions OQ-1..OQ-8 and deviations D-1..D-5 need owner decisions
+
+report:
+  files_changed:
+    - "packages/contracts/src/codes.ts (new): code registry (structural, semantic, runtime)"
+    - "packages/contracts/src/primitives.ts (new): SCHEMA_VERSION, finite number, Vec3, id, Epoch"
+    - "packages/contracts/src/scenario.ts (new): Scenario, KeplerianElements, ImpulsiveManeuver, M1_MAX_MANEUVERS"
+    - "packages/contracts/src/request.ts (new): SimulationRequest, CartesianState, requestId format"
+    - "packages/contracts/src/result.ts (new): TrajectorySegment, ManeuverEvent, Diagnostic, ResultModel, SimulationResult + invariants R1-R9"
+    - "packages/contracts/src/validate.ts (new): validateScenario/Request/Result, zod issue -> code mapping"
+    - "packages/contracts/src/canonical.ts (new): canonicalRequestPayload (requestId pre-image)"
+    - "packages/contracts/src/index.ts (rewritten): public exports"
+    - "packages/contracts/src/test-fixtures.ts (new): structural placeholder fixtures (no physical values)"
+    - "packages/contracts/src/{scenario,request,result,canonical,index}.test.ts (new / rewritten)"
+    - "docs/architecture/contracts-v1.md (new): normative prose"
+    - "docs/backlog/tasks/ML-TASK-004.yaml (new): this contract"
+  summary: >
+    Contract v1.0 implemented as zod 4 strict schemas with inferred types. Validators never throw and
+    return {code, path, message} issues with stable codes. Result schema checks typed-array class,
+    N/3N lengths, finiteness, ordering and segment/event/status invariants. requestId is specified
+    (SHA-256 of a canonical JSON payload); the canonical payload is implemented and tested, the
+    SHA-256 step is deferred to ML-TASK-017 (contracts-v1.md §7.3). Five additive deviations from
+    §4 and eight open questions are documented in contracts-v1.md §10-§11.
+  tests_executed:
+    - "pnpm install --frozen-lockfile: exit 0, lockfile up to date"
+    - "pnpm lint: exit 0"
+    - "pnpm typecheck: exit 0"
+    - "pnpm test: exit 0, 9 files / 120 tests passed (contracts: 5 files / 116 tests)"
+    - "pnpm format:check in the worktree: exit 1 on 43 files, all because core.autocrlf=true checks files out as CRLF (git ls-files --eol: i/lf w/crlf), including untouched scaffold files; pre-existing, not caused by this task"
+    - "prettier --check . on the staged tree exported with core.autocrlf=false (LF, as stored in git): exit 0, 'All matched files use Prettier code style!'"
+    - "npx prettier --check packages/contracts (worktree): only package.json and tsconfig.json flagged, both untouched by this task (CRLF checkout)"
+    - "pnpm check:boundaries: exit 0, 12/12 fixtures reported"
+    - "Negative control: eccentricity rule temporarily weakened to e <= 1 -> 'rejects eccentricity = 1' failed; reverted"
+  reference_data_used: []
+  not_verified:
+    - "SHA-256 hashing of the canonical payload is not implemented; requestId format only."
+    - "Cross-realm typed arrays (instanceof Float64Array across iframes) not tested; worker structured clone assumed to create arrays in the receiving realm."
+    - "Date.parse/toISOString round-trip for epochs relies on the ECMAScript Date Time String Format; tested on Node 24 only, not in browsers."
+    - "Reviews by Astrodynamics, Frontend and Verification Engineers (backlog acceptance) have not happened."
+  known_limitations:
+    - "Result validation is O(total samples) (finiteness and ordering scan)."
+    - "Leap-second epochs (second 60) cannot be represented (OQ-7)."
+    - "Boundary position equality is not schema-enforced (OQ-3)."
+  documentation_changes:
+    - "docs/architecture/contracts-v1.md (new, status Proposed)"
+  risks_or_blockers:
+    - "Owner decisions OQ-1..OQ-8 / D-1..D-5 may change the schema before dependent tasks (013-017, 021) start."
+  review_artifact: ""
+  recommended_next_action: >
+    Owner answers contracts-v1.md §11; AE, FE and VE review the PR; then ML-TASK-010/011/013 and 021 can
+    start against the contract.
