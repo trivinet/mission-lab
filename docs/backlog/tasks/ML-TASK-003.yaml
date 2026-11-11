@@ -72,13 +72,45 @@ deliverables:
 human_approval_required: false
 
 report:
-  files_changed: []
-  summary: ""
-  tests_executed: []
+  files_changed:
+    - "root: package.json, pnpm-workspace.yaml, pnpm-lock.yaml, .nvmrc, .npmrc, .gitignore (extended), .prettierrc.json, .prettierignore, .editorconfig, eslint.config.js, tsconfig.base.json, tsconfig.json, vitest.config.ts"
+    - "packages/{astrodynamics,contracts,simulation}/: package.json, tsconfig.json, src/index.ts, src/index.test.ts"
+    - "verification/: package.json, tsconfig.json, src/index.ts, src/index.test.ts"
+    - "apps/web/: package.json, tsconfig.json, vite.config.ts, index.html, playwright.config.ts, src/{main.tsx,App.tsx,index.css,index.test.ts}, e2e/smoke.spec.ts"
+    - "test-data/reference-cases/README.md"
+    - "tools/boundary-fixtures/: check.mjs, tsconfig.json, 12 illegal-import fixtures"
+  summary: >
+    pnpm monorepo scaffold with exact pins from tech-baseline.md; placeholder packages with one Vitest
+    test each; ESLint 10 typed flat config with eslint-plugin-boundaries (works on ESLint 10.13.0 once
+    eslint-import-resolver-typescript is configured as import/resolver) and 12 illegal-import
+    fixtures checked by `pnpm check:boundaries`; neutral Vite/React/Tailwind 4 shell with one
+    Playwright (Chromium) smoke test.
+  tests_executed:
+    - "pnpm install --frozen-lockfile (clean node_modules): exit 0, +190 packages"
+    - "pnpm lint: exit 0"
+    - "pnpm typecheck: exit 0 (root tooling + 5 workspace projects)"
+    - "pnpm test: exit 0, 5 files / 5 tests passed (vitest 5.0.5)"
+    - "pnpm build: exit 0 (vite build of apps/web)"
+    - "pnpm format:check: exit 0"
+    - "pnpm check:boundaries: exit 0, 12/12 fixtures reported"
+    - "pnpm test:e2e (Playwright Chromium smoke, against vite preview of the built app): 1 passed"
+    - "Negative proof: with 'boundaries/dependencies' set to level 0 (temporary, reverted) check:boundaries exits 1, 6/12 fixtures reported"
+    - "Positive control: temporary file in packages/simulation importing contracts (relative), @mission-lab/astrodynamics, zod and a sibling file: eslint exit 0 (removed)"
   reference_data_used: []
-  not_verified: []
-  known_limitations: []
+  not_verified:
+    - "Name-style (@mission-lab/*) illegal imports are not covered by fixtures; fixtures use relative paths into the real packages. Undeclared workspace deps are additionally blocked by pnpm isolation and TS resolution."
+    - "No build scripts were run or allowed; `pnpm ignored-builds` printed no list. Not independently audited."
+    - "Transitive licences, pnpm audit, and a fresh clone on another machine were not checked."
+    - "Playwright was run against the preview server only, not the dev server; only Chromium."
+  known_limitations:
+    - "No TypeScript project references; each package typechecks independently with noEmit (packages export TS source)."
+    - "vitest.workspace.ts not created: Vitest 5 uses test.projects in vitest.config.ts instead."
+    - "Typed lint covers apps/web/e2e and playwright config through apps/web/tsconfig.json, which therefore also lists node types."
+    - "three, @react-three/fiber, zustand, @types/three are in the baseline but not installed (no 3D/store in scope)."
+    - "Prettier ignores *.md and docs/."
+    - "TS 6.0 notes applied: explicit types array (default is now []), explicit target/module/moduleResolution bundler, strict already default, noEmit so no rootDir/baseUrl."
   documentation_changes: []
-  risks_or_blockers: []
+  risks_or_blockers:
+    - "eslint-plugin-boundaries resolves no .ts imports without the typescript import resolver; without it the rule silently passes. check:boundaries guards this."
   review_artifact: ""
-  recommended_next_action: ""
+  recommended_next_action: "Systems Architect review of the boundary policy; then ML-TASK-004 (contracts) and ML-TASK-005 (CI)."

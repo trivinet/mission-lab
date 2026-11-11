@@ -1,0 +1,16 @@
+{
+  "name": "@mission-lab/simulation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@mission-lab/astrodynamics": "workspace:*",
+    "@mission-lab/contracts": "workspace:*"
+  }
+}

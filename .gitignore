@@ -14,3 +14,5 @@ Thumbs.db
 *.log
 .claude/settings.local.json
 .claude/worktrees/
+.eslintcache
+playwright/.cache/
