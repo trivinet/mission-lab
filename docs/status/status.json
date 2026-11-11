@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-11",
   "phase": "Phase 0b — Scaffold",
-  "headline": "Repository public on GitHub. Node 24.22.2 and pnpm 12.16.1 installed. PRs #1 and #2 wait for the owner's merge; then the scaffold (ML-TASK-003) starts.",
+  "headline": "Scaffold delivered and re-checked by the Coordinator; PR #3 waits for the owner's review and merge. Next: contracts (ML-TASK-004) and CI (ML-TASK-005).",
   "gates": [
     {
       "id": "G0",
@@ -32,9 +32,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-5",
-      "text": "Review and merge PR #1 (tech baseline) and PR #2 (status board, D-5) at github.com/trivinet/mission-lab/pulls. Only the owner merges to `main`.",
-      "blocking": "ML-TASK-003 branches from `main` with the baseline"
+      "id": "OA-7",
+      "text": "Review and merge PR #3 (ML-TASK-003 scaffold) at github.com/trivinet/mission-lab/pull/3.",
+      "blocking": "ML-TASK-004, 005, 006, 020"
     },
     {
       "id": "OA-3",
@@ -66,7 +66,7 @@
           "title": "Select and pin toolchain and library versions",
           "role": "Systems Architect",
           "model": "opus",
-          "status": "in_review",
+          "status": "done",
           "approval": true
         },
         {
@@ -74,7 +74,7 @@
           "title": "Monorepo scaffold, lint boundaries, test runners, empty app shell",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
+          "status": "in_review",
           "deps": "002"
         },
         {
@@ -355,6 +355,21 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-11",
+      "who": "Frontend",
+      "text": "ML-TASK-003 delivered: pnpm monorepo, 5 workspaces, typed ESLint with package boundaries proven by 12 illegal-import fixtures, Vite/React/Tailwind shell, Playwright smoke test. Coordinator re-ran install, lint, typecheck, test, build, format and boundary checks: all pass. PR #3 open."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "ML-TASK-003 started: Frontend Engineer (sonnet) on branch `chore/ml-task-003-scaffold`, contract in `docs/backlog/tasks/ML-TASK-003.yaml`."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "PR #1 and PR #2 merged to `main` on the owner's explicit instruction for this occasion. ML-TASK-002 done."
+    },
     {
       "date": "2026-11-11",
       "who": "Coordinator",

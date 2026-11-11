@@ -1,0 +1,32 @@
+{
+  "name": "mission-lab",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=24.22.2 <25"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json && pnpm -r run typecheck",
+    "test": "vitest run",
+    "test:e2e": "pnpm --filter @mission-lab/web run test:e2e",
+    "build": "pnpm -r --if-present run build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:boundaries": "node tools/boundary-fixtures/check.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
+    "eslint": "10.13.0",
+    "eslint-import-resolver-typescript": "4.4.5",
+    "eslint-plugin-boundaries": "7.3.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0",
+    "vitest": "5.0.5"
+  }
+}
