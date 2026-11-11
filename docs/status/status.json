@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-11",
   "phase": "Phase 0b — Scaffold",
-  "headline": "Scaffold delivered and re-checked by the Coordinator; PR #3 waits for the owner's review and merge. Next: contracts (ML-TASK-004) and CI (ML-TASK-005).",
+  "headline": "Scaffold merged. In parallel: contracts (ML-TASK-004), coding standards (006) and spec v0.3 (007) with agents; CI pipeline (005) in PR #4, first run in progress.",
   "gates": [
     {
       "id": "G0",
@@ -31,11 +31,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-7",
-      "text": "Review and merge PR #3 (ML-TASK-003 scaffold) at github.com/trivinet/mission-lab/pull/3.",
-      "blocking": "ML-TASK-004, 005, 006, 020"
-    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -74,7 +69,7 @@
           "title": "Monorepo scaffold, lint boundaries, test runners, empty app shell",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
+          "status": "done",
           "deps": "002"
         },
         {
@@ -82,7 +77,7 @@
           "title": "Normative simulation contracts v1.0",
           "role": "Systems Architect",
           "model": "opus",
-          "status": "todo",
+          "status": "in_progress",
           "deps": "003",
           "approval": true
         },
@@ -91,7 +86,7 @@
           "title": "CI pipeline, PR/issue templates, branch protection",
           "role": "Coordinator",
           "model": "session",
-          "status": "todo",
+          "status": "in_review",
           "deps": "003"
         },
         {
@@ -99,7 +94,7 @@
           "title": "Coding standards and contributor guide",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "todo",
+          "status": "in_progress",
           "deps": "003"
         },
         {
@@ -107,7 +102,7 @@
           "title": "Fold approved amendments into ML-SYS-001 body (v0.3)",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "todo",
+          "status": "in_progress",
           "approval": true
         }
       ]
@@ -355,6 +350,21 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "ML-TASK-005: CI workflow (checks, e2e, audit), PR/issue templates and LF line endings in PR #4. Found and fixed: Windows checkout failed the format check (CRLF); lint picked up agent worktrees."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "Started in isolated worktrees: ML-TASK-004 (Systems Architect, opus), ML-TASK-006 and ML-TASK-007 (Docs & Release, haiku)."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "PR #3 merged to `main` on the owner's explicit instruction. ML-TASK-003 done."
+    },
     {
       "date": "2026-11-11",
       "who": "Frontend",
