@@ -1,0 +1,159 @@
+<title>Mission Lab Control</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Layout: one column console. Gate track on top, owner queue + live work side by side, then the phase ledger and the log. */
+:root {
+  color-scheme: dark;
+  --bg: #0b0f14; --panel: #121821; --line: #223040; --fg: #dde6ee; --muted: #8496a8;
+  --accent: #5cc8ff; --ok: #4fd18b; --warn: #f2b84b; --bad: #ff6b6b; --idle: #5b6b7c;
+  --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  color-scheme: light;
+  --bg: #f3f6f9; --panel: #ffffff; --line: #d3dce5; --fg: #14202c; --muted: #5a6b7c;
+  --accent: #0a6fb0; --ok: #1a8a52; --warn: #a86a00; --bad: #c43a3a; --idle: #8b99a8;
+} }
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f6f9; --panel: #ffffff; --line: #d3dce5; --fg: #14202c; --muted: #5a6b7c;
+  --accent: #0a6fb0; --ok: #1a8a52; --warn: #a86a00; --bad: #c43a3a; --idle: #8b99a8;
+}
+body { background: var(--bg); color: var(--fg); font: 14px/1.5 var(--body); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 28px; }
+h1, h2 { font-family: var(--display); margin: 0; text-wrap: balance; }
+h1 { font-size: 26px; font-weight: 600; }
+h2 { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+code, .mono { font-family: var(--mono); font-size: 12.5px; }
+code { background: var(--line); padding: 1px 5px; border-radius: 3px; }
+.head { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; justify-content: space-between; }
+.head p { margin: 6px 0 0; color: var(--muted); max-width: 65ch; }
+.meta { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+.phase { color: var(--accent); font-family: var(--mono); font-size: 13px; }
+
+.gates { display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
+.gates::before { content: ""; position: absolute; left: 10%; right: 10%; top: 9px; height: 2px; background: var(--line); }
+.gate { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; position: relative; min-width: 0; }
+.dot { width: 20px; height: 20px; border-radius: 50%; background: var(--bg); border: 2px solid var(--idle); box-sizing: border-box; }
+.gate.passed .dot { background: var(--ok); border-color: var(--ok); }
+.gate.next .dot { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
+.gate b { font-family: var(--mono); font-weight: 500; }
+.gate span { color: var(--muted); font-size: 12px; }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.panel.owner { border-color: var(--warn); }
+.item { display: flex; gap: 10px; }
+.item .tag { font-family: var(--mono); font-size: 12px; color: var(--warn); flex: none; padding-top: 1px; }
+.item.work .tag { color: var(--accent); }
+.item small { display: block; color: var(--muted); }
+.empty { color: var(--muted); }
+
+.bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--line); }
+.bar i { display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.legend b { color: var(--fg); font-weight: 600; }
+.sw { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; }
+
+.ledger { display: flex; flex-direction: column; gap: 22px; }
+.ph-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 4px; }
+.ph-head strong { font-family: var(--display); font-size: 15px; font-weight: 600; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 640px; }
+td { padding: 7px 10px 7px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent); vertical-align: top; }
+td.id { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+td.role { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+td.st { text-align: right; padding-right: 0; white-space: nowrap; }
+tr.done td.title { color: var(--muted); }
+.chip { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line); border-radius: 3px; padding: 0 5px; color: var(--muted); margin-left: 6px; }
+.own { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 50%, transparent); }
+.deps { color: var(--muted); font-size: 12px; font-family: var(--mono); }
+.pill { font-family: var(--mono); font-size: 11px; padding: 2px 8px; border-radius: 10px; border: 1px solid currentColor; }
+.s-done { color: var(--ok); } .s-in_progress { color: var(--accent); } .s-in_review { color: var(--accent); }
+.s-blocked { color: var(--bad); } .s-todo { color: var(--idle); }
+.log { display: flex; flex-direction: column; gap: 8px; }
+.log div { display: grid; grid-template-columns: 92px 96px 1fr; gap: 10px; }
+.log .d, .log .w { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+@media (max-width: 560px) { .log div { grid-template-columns: 1fr; gap: 0; } .gate span { font-size: 11px; } }
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div>
+      <h1>Mission Lab Control</h1>
+      <p id="headline">Loading project status…</p>
+    </div>
+    <div style="text-align:right">
+      <div class="phase" id="phase"></div>
+      <div class="meta" id="updated"></div>
+    </div>
+  </header>
+
+  <section aria-label="Gates"><div class="gates" id="gates"></div></section>
+
+  <section class="cols">
+    <div class="panel owner"><h2>Waiting on the owner</h2><div id="owner"></div></div>
+    <div class="panel"><h2>In progress now</h2><div id="now"></div></div>
+  </section>
+
+  <section class="panel">
+    <h2>M1 task progress</h2>
+    <div class="bar" id="bar"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section><div class="ledger" id="ledger"></div></section>
+
+  <section class="panel"><h2>Activity log</h2><div class="log" id="log"></div></section>
+</div>
+
+<script>
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const rich = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+const LABEL = { done: "done", in_progress: "in progress", in_review: "in review", blocked: "blocked", todo: "to do" };
+const COLOR = { done: "var(--ok)", in_progress: "var(--accent)", in_review: "var(--accent)", blocked: "var(--bad)", todo: "var(--idle)" };
+const $ = id => document.getElementById(id);
+
+function render(s) {
+  $("headline").textContent = s.headline;
+  $("phase").textContent = s.phase;
+  $("updated").textContent = "updated " + s.updated;
+
+  $("gates").innerHTML = s.gates.map(g =>
+    `<div class="gate ${esc(g.state)}"><div class="dot"></div><b>${esc(g.id)}</b><span>${esc(g.name)}${g.date ? "<br>" + esc(g.date) : ""}</span></div>`).join("");
+
+  $("owner").innerHTML = s.ownerActions.length
+    ? s.ownerActions.map(a => `<div class="item"><span class="tag">${esc(a.id)}</span><div>${rich(a.text)}<small>Blocks: ${esc(a.blocking)}</small></div></div>`).join("")
+    : `<div class="empty">Nothing is waiting on the owner.</div>`;
+
+  const all = s.phases.flatMap(p => p.tasks);
+  const live = all.filter(t => t.status === "in_progress" || t.status === "in_review");
+  $("now").innerHTML = live.length
+    ? live.map(t => `<div class="item work"><span class="tag">${esc(t.id.replace("ML-TASK-", "T-"))}</span><div>${esc(t.title)}<small>${esc(t.role)} · model ${esc(t.model)} · ${LABEL[t.status]}</small></div></div>`).join("")
+    : `<div class="empty">No task is running.</div>`;
+
+  const order = ["done", "in_progress", "in_review", "blocked", "todo"];
+  const count = Object.fromEntries(order.map(k => [k, all.filter(t => t.status === k).length]));
+  $("bar").innerHTML = order.filter(k => count[k]).map(k => `<i style="width:${100 * count[k] / all.length}%;background:${COLOR[k]}"></i>`).join("");
+  $("legend").innerHTML = order.filter(k => count[k]).map(k => `<span><span class="sw" style="background:${COLOR[k]}"></span><b>${count[k]}</b> ${LABEL[k]}</span>`).join("") + `<span><b>${all.length}</b> tasks</span>`;
+
+  $("ledger").innerHTML = s.phases.map(p => {
+    const d = p.tasks.filter(t => t.status === "done").length;
+    return `<div><div class="ph-head"><strong>${esc(p.name)}</strong><span class="meta">${d}/${p.tasks.length} done${p.gate && p.gate !== "—" ? " · exit gate " + esc(p.gate) : ""}</span></div>
+      <div class="scroll"><table>${p.tasks.map(t => `<tr class="${esc(t.status)}">
+        <td class="id">${esc(t.id)}</td>
+        <td class="title">${esc(t.title)}${t.approval ? '<span class="chip own" title="Needs owner approval">owner</span>' : ""}${t.deps ? `<div class="deps">after ${esc(t.deps)}</div>` : ""}</td>
+        <td class="role">${esc(t.role)}<span class="chip">${esc(t.model)}</span></td>
+        <td class="st"><span class="pill s-${esc(t.status)}">${LABEL[t.status] || esc(t.status)}</span></td></tr>`).join("")}</table></div></div>`;
+  }).join("");
+
+  $("log").innerHTML = s.log.map(e => `<div><span class="d">${esc(e.date)}</span><span class="w">${esc(e.who)}</span><span>${rich(e.text)}</span></div>`).join("");
+}
+
+fetch("status.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(render)
+  .catch(() => { $("headline").textContent = "The status file could not be loaded. Ask the Coordinator to republish the board."; });
+</script>

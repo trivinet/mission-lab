@@ -1,0 +1,96 @@
+{
+  "updated": "2026-11-11",
+  "phase": "Phase 0b — Scaffold",
+  "headline": "Baseline approved at G0. Toolchain versions are being selected before any code is written.",
+  "gates": [
+    { "id": "G0", "name": "Baseline", "state": "passed", "date": "2026-11-11" },
+    { "id": "G1", "name": "Engine verified", "state": "next" },
+    { "id": "G2", "name": "Workspace usable", "state": "pending" },
+    { "id": "G3", "name": "M1 flow complete", "state": "pending" },
+    { "id": "G4", "name": "Release M1", "state": "pending" }
+  ],
+  "ownerActions": [
+    { "id": "OA-1", "text": "Sign in to GitHub CLI: run `gh auth login` in a terminal (browser flow). Needed to create the public repository, issues, PRs, CI and branch protection.", "blocking": "Publishing the repository; ML-TASK-005" },
+    { "id": "OA-2", "text": "Choose the external reference source for verification (decision D-5): Python + Orekit, GMAT, or a textbook (Vallado / Curtis).", "blocking": "ML-TASK-012, required before G1" },
+    { "id": "OA-3", "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.", "blocking": "Nothing in Mission Lab" }
+  ],
+  "phases": [
+    {
+      "name": "Phase 0a — Baseline",
+      "gate": "G0",
+      "tasks": [
+        { "id": "ML-TASK-001", "title": "Assessment, architecture, requirements, verification plan, backlog", "role": "Coordinator", "model": "session", "status": "done", "approval": true }
+      ]
+    },
+    {
+      "name": "Phase 0b — Scaffold",
+      "gate": "—",
+      "tasks": [
+        { "id": "ML-TASK-002", "title": "Select and pin toolchain and library versions", "role": "Systems Architect", "model": "opus", "status": "in_progress", "approval": true },
+        { "id": "ML-TASK-003", "title": "Monorepo scaffold, lint boundaries, test runners, empty app shell", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "002" },
+        { "id": "ML-TASK-004", "title": "Normative simulation contracts v1.0", "role": "Systems Architect", "model": "opus", "status": "todo", "deps": "003", "approval": true },
+        { "id": "ML-TASK-005", "title": "CI pipeline, PR/issue templates, branch protection", "role": "Coordinator", "model": "session", "status": "blocked", "deps": "003, OA-1" },
+        { "id": "ML-TASK-006", "title": "Coding standards and contributor guide", "role": "Docs & Release", "model": "haiku", "status": "todo", "deps": "003" },
+        { "id": "ML-TASK-007", "title": "Fold approved amendments into ML-SYS-001 body (v0.3)", "role": "Docs & Release", "model": "haiku", "status": "todo", "approval": true }
+      ]
+    },
+    {
+      "name": "Phase 1 — Astrodynamics foundation",
+      "gate": "G1",
+      "tasks": [
+        { "id": "ML-TASK-010", "title": "Tolerance derivation and record", "role": "Verification Engineer", "model": "opus", "status": "todo", "deps": "004", "approval": true },
+        { "id": "ML-TASK-011", "title": "Independent reference implementations and datasets", "role": "Verification Engineer", "model": "opus", "status": "todo", "deps": "004" },
+        { "id": "ML-TASK-012", "title": "External references (Orekit / GMAT / textbook)", "role": "Verification Engineer", "model": "opus", "status": "blocked", "deps": "OA-2", "approval": true },
+        { "id": "ML-TASK-013", "title": "Constants, units, vector math", "role": "Astrodynamics Engineer", "model": "opus", "status": "todo", "deps": "004" },
+        { "id": "ML-TASK-014", "title": "Element ↔ Cartesian conversion, degenerate cases", "role": "Astrodynamics Engineer", "model": "opus", "status": "todo", "deps": "013" },
+        { "id": "ML-TASK-015", "title": "Universal-variable Kepler propagator", "role": "Astrodynamics Engineer", "model": "opus", "status": "todo", "deps": "013" },
+        { "id": "ML-TASK-016", "title": "RSW basis and impulsive maneuver", "role": "Astrodynamics Engineer", "model": "opus", "status": "todo", "deps": "013" },
+        { "id": "ML-TASK-017", "title": "Simulation runner: validation, segments, events, diagnostics", "role": "Astrodynamics Engineer", "model": "opus", "status": "todo", "deps": "014–016" },
+        { "id": "ML-TASK-018", "title": "Numerical suite in CI and G1 verification report", "role": "Verification Engineer", "model": "opus", "status": "todo", "deps": "011, 017", "approval": true }
+      ]
+    },
+    {
+      "name": "Phase 2 — Interactive workspace",
+      "gate": "G2",
+      "tasks": [
+        { "id": "ML-TASK-020", "title": "Visual direction: layout and design tokens mock-up", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "003", "approval": true },
+        { "id": "ML-TASK-021", "title": "Scenario store, result states, worker host", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "004" },
+        { "id": "ML-TASK-022", "title": "Scenario editor with validation", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "020, 021" },
+        { "id": "ML-TASK-023", "title": "3D scene: Earth, trajectory, markers, camera", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "020, 021" },
+        { "id": "ML-TASK-024", "title": "Timeline and playback", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "023" },
+        { "id": "ML-TASK-025", "title": "Model & assumptions panel", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "017, 021" },
+        { "id": "ML-TASK-026", "title": "Integration with real engine; performance envelope", "role": "Frontend + Verification", "model": "sonnet / opus", "status": "todo", "deps": "017, 022–024", "approval": true }
+      ]
+    },
+    {
+      "name": "Phase 3 — Analysis and comparison",
+      "gate": "G3",
+      "tasks": [
+        { "id": "ML-TASK-030", "title": "Charting library spike and ADR-008", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "026", "approval": true },
+        { "id": "ML-TASK-031", "title": "Analysis module: histories and comparison", "role": "Astrodynamics Engineer", "model": "opus", "status": "todo", "deps": "017" },
+        { "id": "ML-TASK-032", "title": "Plots and comparison UI", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "030, 031" },
+        { "id": "ML-TASK-033", "title": "Persistence: format, validation, save/load", "role": "Astrodynamics + Frontend", "model": "opus / sonnet", "status": "todo", "deps": "004, 022" },
+        { "id": "ML-TASK-034", "title": "Presets and CSV export", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "033" },
+        { "id": "ML-TASK-035", "title": "Acceptance scenario end-to-end test", "role": "Verification Engineer", "model": "opus", "status": "todo", "deps": "032, 033", "approval": true }
+      ]
+    },
+    {
+      "name": "Phase 4 — Stabilisation and release",
+      "gate": "G4",
+      "tasks": [
+        { "id": "ML-TASK-040", "title": "Full regression, accessibility and error-path review", "role": "Verification Engineer", "model": "opus", "status": "todo", "deps": "035" },
+        { "id": "ML-TASK-041", "title": "User guide, developer guide, traceability, release notes", "role": "Docs & Release", "model": "haiku", "status": "todo", "deps": "035" },
+        { "id": "ML-TASK-042", "title": "Hosting decision and deployment setup", "role": "Coordinator", "model": "session", "status": "todo", "deps": "040", "approval": true },
+        { "id": "ML-TASK-043", "title": "Release v1.0.0 checklist and tag", "role": "Coordinator", "model": "session", "status": "todo", "deps": "040–042", "approval": true }
+      ]
+    }
+  ],
+  "log": [
+    { "date": "2026-11-11", "who": "Coordinator", "text": "ML-TASK-002 started: Systems Architect selecting toolchain and library versions." },
+    { "date": "2026-11-11", "who": "Coordinator", "text": "Baseline committed to main (644b1af). GitHub CLI installed; waiting for owner sign-in to publish." },
+    { "date": "2026-11-11", "who": "Coordinator", "text": "Repository moved from the OneDrive folder to C:\\dev\\mission-lab (decision D-6)." },
+    { "date": "2026-11-11", "who": "Owner", "text": "Gate G0 approved: decisions D-1 to D-9. Roadmap extended with escape/impact inputs, interplanetary, deep space, launch and landing." },
+    { "date": "2026-11-11", "who": "Coordinator", "text": "Phase 0 package delivered: legacy assessment, architecture, 7 ADRs, M1 requirements, verification plan, backlog, 5 agent roles." },
+    { "date": "2026-11-11", "who": "Coordinator", "text": "Satellite Viewer audited read-only. Verdict: no reusable code; greenfield repository." }
+  ]
+}
