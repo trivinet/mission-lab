@@ -1,0 +1,89 @@
+task_id: ML-TASK-007
+title: "Fold Appendix A amendments into the body of ML-SYS-001 (v0.3), no change of meaning"
+status: in_review            # proposed | ready | in_progress | in_review | done | blocked
+requirement_ids: []         # none: the task changes the specification text itself (ML-SYS-001 v0.2 Appendix A, F-01..F-18, A.2)
+owner_role: docs-release
+reviewer_role: systems-architect
+dependencies: [ML-TASK-001]
+affected_paths:
+  - docs/product/ML-SYS-001.md
+  - docs/backlog/tasks/ML-TASK-007.yaml   # report section only
+objective: >
+  Produce ML-SYS-001 v0.3 by stating every Appendix A amendment (review findings F-01..F-18 and
+  roadmap additions A.2) in the body text of docs/product/ML-SYS-001.md, without adding, strengthening,
+  weakening or reinterpreting anything beyond the amendments, and replace Appendix A with a
+  traceability table.
+scope:
+  - Edit only the body sections affected by an amendment.
+  - Bump the version to 0.3 and add a change log entry.
+  - Replace Appendix A with a traceability table (one row per F-01..F-18 and per A.2 item, mapped to
+    the body section(s)). The v0.2 wording is recoverable from git history (commit 644b1af).
+  - Items whose application is ambiguous, or that conflict with another source, are left unchanged and
+    listed as open questions in the task report.
+out_of_scope:
+  - Any change to code, tests, ADRs, tolerances, verification reports or other documents.
+  - Deciding the open questions listed in the report.
+  - Editing text that no amendment affects.
+inputs:
+  - AGENTS.md
+  - docs/product/ML-SYS-001.md (v0.2, commit 644b1af)
+  - docs/product/ML-SYS-001-review.md (F-01..F-18 and their resolutions)
+  - docs/agents/task-template.yaml
+  - docs/architecture/proposed-architecture.md (§2 and §4, cited by F-09 and F-10)
+  - docs/releases/G0-review.md (decisions D-1..D-9, used to confirm approval of amendments)
+acceptance_criteria:
+  - Every F-01..F-18 resolution and every A.2 item is stated in the body of ML-SYS-001.md (VT: none; documentary check).
+  - Appendix A contains one traceability row per F-01..F-18 and per A.2 item, each mapped to a body section (26 rows).
+  - Version is 0.3 and a change log entry exists.
+  - The diff against v0.2 changes only the body sections affected by an amendment, the version/status header, the change log and Appendix A.
+  - Items not folded or conflicting are listed in the report, not decided.
+test_requirements:
+  - Re-read the final file and check each traceability row against the body text.
+deliverables:
+  - docs/product/ML-SYS-001.md (v0.3)
+  - docs/backlog/tasks/ML-TASK-007.yaml (this file, report filled)
+human_approval_required: true   # the spec text is owner-approved baseline material; the owner reviews the diff before v0.3 is treated as authority
+
+# Filled in by the agent on completion (the task report).
+report:
+  files_changed:
+    - docs/product/ML-SYS-001.md
+    - docs/backlog/tasks/ML-TASK-007.yaml
+  summary: >
+    ML-SYS-001 folded from v0.2 to v0.3. All 18 review findings and all A.2 roadmap items were written
+    into the body sections they affect. Version, status and change log were updated. Appendix A is now
+    a 26-row traceability table. F-10 is folded only partly (see not_verified and risks_or_blockers).
+    Status of v0.3 is set to Proposed pending owner review. No code, test or other document changed.
+    Changes are committed on branch docs/ml-task-007-spec-v0.3 (not pushed).
+  tests_executed:
+    - "grep -c \"^| F-[0-9][0-9] \\|^| A.2\" docs/product/ML-SYS-001.md -> 26 (traceability rows present)"
+    - "git diff main -- docs/product/ML-SYS-001.md -> 104 insertions, 59 deletions; reviewed hunk by hunk"
+    - "Grep of 35 anchor phrases in the final file (one per amendment and A.2 item) -> matched, except 'Module-to-package mapping' (sentence starts lower case, so the case-sensitive grep missed it) and the Phase 3 spike line and OD-009 note (not in the pattern). Those three were confirmed in git diff."
+  reference_data_used: []
+  not_verified:
+    - "F-10 modelVersion: not verified as defined anywhere; proposed-architecture §4 names model.engineVersion only. Not folded."
+    - "Consistency with ADR-001, ADR-004 and ADR-005 text: cited by number only; those ADRs were not read."
+    - "Markdown rendering of the edited file was not checked (no renderer run)."
+    - "Whether the v0.2 Appendix A text in commit 644b1af is the exact wording approved at G0 was not compared with docs/releases/G0-review.md beyond D-8."
+  known_limitations:
+    - "Phrases such as 'never silently accepted or crashed' and 'illustrative orientation' are carried over from the review resolutions without independent reading of ADR-004/005."
+    - "F-10 partial: modelVersion not folded."
+  documentation_changes:
+    - "docs/product/ML-SYS-001.md: version 0.3; header status; change log; body sections §2.1, §2.2, §2.3, §2.5, §3, §4.2, §5.2 to §5.7, §6 (ML-FR-002, 009, 010), §8.1, §8.4, §10.1, §10.2, §10.4, §11.8, §12, §13 (R-001, OD-001, OD-006, OD-009, closing sentence); Appendix A replaced by traceability table."
+  risks_or_blockers:
+    - "OPEN 1 (F-10): modelVersion has no definition in proposed-architecture §4 (only model.engineVersion, around line 133). Not folded; owner or Systems Architect to define."
+    - "OPEN 2 (F-05 vs §7): ML-SYS-001.md line ~511 'Numerical outputs shall reject non-finite or physically invalid results' conflicts with F-05 (post-maneuver escape or sub-surface perigee is propagated and flagged, not rejected). §7 left unchanged. Appendix A prevails only by the header rule, which v0.3 removes."
+    - "OPEN 3 (F-03 vs ARCH-004): ML-SYS-001.md line ~208 requires frame, central body and epoch on every state vector; F-03 (line ~440) declares frame, epoch and units once per trajectory segment. Folded as written; confirm the segment wording is acceptable under ARCH-004."
+    - "OPEN 4 (F-12 vs §13): line ~910 says all open decisions are resolved before dependent implementation; F-12 fixes the tolerance numbers in Phase 1 and approval at G1 (end of Phase 1 per docs/backlog/backlog.md line 31). OD-009 (line ~908) carries the F-12 note. Closing sentence changed only for OD-006. Unresolved."
+    - "OPEN 5 (F-01, legacy premise left unchanged): ML-SYS-001.md line ~91 'Existing repository assessment' (§2.1); line ~250 'Retain the existing framework if its assessment supports continued use' (§4.1); lines ~799-801 Phase 0a deliverables 'Repository audit', 'Existing functionality inventory', 'Code reuse assessment'. F-01 does not say whether these change. Left as is."
+    - "OPEN 6 (F-02): Phase 0b exit gate is not defined in any source (line ~815 says so). The mapping of 'Development environment' to Phase 0b is my choice; confirm. M0 is not explicitly mapped to 0a and 0b beyond the §2.1 note."
+    - "OPEN 7 (F-07): ML-FR-010 (line ~476) rewritten to 'coast run and maneuvered run of one scenario'. Confirm this is the intended requirement text; it replaces the word 'baseline'."
+    - "OPEN 8 (F-11): §10.4 item 'The human owner approves integration where required' left unchanged, although F-11 states the owner's merge is the approval. Confirm whether 'where required' stays."
+    - "OPEN 9 (status): v0.3 header status set to Proposed. The owner decides whether v0.3 becomes the approved baseline."
+    - "OPEN 10 (inconsistency outside this task's files): ML-SYS-001.md §8.2 (line ~556) lists 11 mandatory numerical test families; docs/releases/G0-review.md line 34 says 19 numerical test families. Not changed here."
+    - "OPEN 11 (cited decision): F-05 says 'Owner to confirm (decision D-4)'. D-4 exists in docs/releases/G0-review.md (line 48, recommendation Approve). Treated as covered by G0 approval of Appendix A. Not an open point unless the owner says otherwise."
+  review_artifact: ""       # PR URL. None opened: branch is local and not pushed, per task instructions.
+  recommended_next_action: >
+    Owner reviews the diff of docs/product/ML-SYS-001.md against docs/product/ML-SYS-001.md at commit
+    644b1af, and decides OPEN 1 to OPEN 9. After that, push branch docs/ml-task-007-spec-v0.3 and open
+    a PR. Then update docs/status/status.json and the board.
