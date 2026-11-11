@@ -19,7 +19,7 @@
 |---|---|---|
 | 0.1 | 2026-11-11 | Preliminary specification, as received. |
 | 0.2 | 2026-11-11 | Approved at gate G0. Appendix A added: review amendments F-01 to F-18 and roadmap additions A.2. |
-| 0.3 | 2026-11-11 | Appendix A amendments folded into the body text, with no intended change of meaning. Appendix A replaced by a traceability table. Proposed, pending owner review. |
+| 0.3 | 2026-11-11 | Appendix A amendments folded into the body text, with no intended change of meaning. Appendix A replaced by a traceability table. Eight inconsistencies found while folding were resolved by owner decision on 2026-11-11 (see A.3). Proposed, pending owner review. |
 
 ---
 
@@ -88,7 +88,7 @@ The application shall also pass the agreed numerical verification tests.
 
 Deliverables:
 
-- Existing repository assessment.
+- Existing repository assessment (completed: `docs/architecture/legacy-assessment.md`; outcome: greenfield repository, ADR-001).
 - Architecture proposal and approved decisions.
 - Dependency and security assessment.
 - Coding standards.
@@ -207,7 +207,7 @@ All public interfaces carrying physical quantities shall document their units. T
 
 **ARCH-004 — Explicit reference frames**
 
-All state vectors shall be associated with a declared reference frame, central body and epoch.
+All state vectors shall be associated with a declared reference frame, central body and epoch. The association is declared once per trajectory segment and applies to every sample in it; it is not repeated for each state vector (§5.6).
 
 **ARCH-005 — Reproducibility**
 
@@ -247,7 +247,7 @@ Launch and landing need atmosphere, thrust and Earth-fixed frames. They will req
 
 **Frontend:** React + TypeScript.
 
-**Application framework:** Retain the existing framework if its assessment supports continued use; otherwise evaluate Next.js versus a simpler React/Vite application.
+**Application framework:** React with Vite (ADR-006). The legacy framework is not retained: the assessment found no reusable code (ADR-001).
 
 **3D rendering:** Three.js, potentially through React Three Fiber.
 
@@ -452,7 +452,7 @@ Every simulation output shall identify:
 - Calculation configuration.
 - Model limitations.
 
-Each result also carries `requestId`, a deterministic hash of the physical inputs that is present in both the request and the result; `ManeuverEvent` records; and `SimulationDiagnostics`, as defined in proposed-architecture §4.
+Each result also carries the engine version as `model.engineVersion` (this is the model version; no separate `modelVersion` field exists), `requestId`, a deterministic hash of the physical inputs that is present in both the request and the result; `ManeuverEvent` records; and `SimulationDiagnostics`, as defined in proposed-architecture §4.
 
 No result shall be presented as suitable for operational spacecraft navigation without appropriate independent qualification.
 
@@ -508,7 +508,7 @@ These requirements are preliminary. Their acceptance criteria shall be detailed 
 
 - Invalid inputs shall not cause silent failures.
 - Failed simulations shall return meaningful diagnostics.
-- Numerical outputs shall reject non-finite or physically invalid results.
+- Numerical outputs shall reject non-finite results: a non-finite value is an error diagnostic, never a sample. Escape and surface-intersection trajectories that result from a maneuver are not rejected; they are propagated and flagged in diagnostics (§5.3).
 
 ## Maintainability
 
@@ -555,17 +555,7 @@ These requirements are preliminary. Their acceptance criteria shall be detailed 
 
 ## 8.2 Mandatory Numerical Test Families
 
-- Circular and elliptical orbit propagation.
-- Orbital element to Cartesian conversion and round-trip consistency.
-- Two-body specific mechanical energy conservation.
-- Two-body angular momentum conservation.
-- Propagation over complete orbital periods.
-- Zero-magnitude maneuver equivalence.
-- Impulsive velocity change correctness.
-- RSW basis orthogonality and orientation.
-- Maneuver frame transformation correctness.
-- Degenerate orbital element cases.
-- Scenario serialization round-trip.
+The mandatory numerical test families are VT-01 to VT-19, defined in the M1 verification plan (`docs/verification/m1-verification-plan.md` §3), which is the single normative list. They include the families originally listed here: circular and elliptical propagation, element/Cartesian conversion and round trip, energy and angular-momentum conservation, full-period propagation, zero-magnitude maneuver equivalence, impulsive velocity change, RSW basis orthogonality and orientation, maneuver frame transformation, degenerate element cases and scenario serialization round trip.
 
 ## 8.3 Independent Reference Sources
 
@@ -675,7 +665,6 @@ A task is complete when:
 - Documentation has been updated.
 - The pull request includes a summary and verification evidence.
 - Required review has been completed: a Verification or Architecture agent report is recorded in the pull request, and the owner merges (the merge is the approval).
-- The human owner approves integration where required.
 
 ## 10.5 Architectural Decision Records
 
@@ -796,9 +785,7 @@ Phases are gated, not time-boxed. Gates G0 to G4 remain. No calendar duration is
 
 Deliverables:
 
-- Repository audit.
-- Existing functionality inventory.
-- Code reuse assessment.
+- Repository audit, existing functionality inventory and code reuse assessment of the legacy Satellite Viewer (completed: `docs/architecture/legacy-assessment.md`; outcome: no code reused, ADR-001).
 - Technical risks.
 - Initial approved architecture.
 - Requirements baseline.
@@ -812,7 +799,7 @@ Deliverables:
 - Repository tooling, CI pipeline and an empty application shell.
 - Development environment.
 
-Exit gate: not defined in this version.
+**Exit criterion (no numbered gate):** CI passes on `main`, `main` is protected, and the normative contracts v1.0 are approved by the owner.
 
 ## Phase 1 — Astrodynamics Foundation
 
@@ -907,7 +894,7 @@ Deliverables:
 
 **OD-009:** Define release acceptance tolerances and reference datasets. *Method fixed in §8.4; numerical values approved by the owner at G1.*
 
-All open decisions shall be resolved before dependent implementation work begins, except OD-006, which is resolved as stated above.
+All open decisions shall be resolved before dependent implementation work begins, except OD-006 and OD-009, which are resolved as stated above: for OD-009 the tolerance derivation method is fixed before implementation (§8.4) and the numerical values are approved by the owner at G1.
 
 ---
 
@@ -963,7 +950,7 @@ and their resolutions remain in [ML-SYS-001-review.md](ML-SYS-001-review.md).
 | F-07 | M1 comparison is coast run versus maneuvered run within one scenario; arbitrary comparison is M3 | §2.2 (scenario comparison); §6 ML-FR-010 |
 | F-08 | Illustrative Earth orientation (Earth Rotation Angle, UT1 ≈ UTC); no authoritative Earth-fixed output in M1 | §5.2 |
 | F-09 | Module-to-package mapping; one-directional dependencies; `packages/visualization` deferred | §4.2 (introductory paragraph) |
-| F-10 | `requestId`, `ManeuverEvent` and `SimulationDiagnostics` defined by contract. Partial: `modelVersion` has no definition in proposed-architecture §4 and is not folded | §5.7 |
+| F-10 | `requestId`, `ManeuverEvent` and `SimulationDiagnostics` defined by contract; the model version is `model.engineVersion` (owner decision, 2026-11-11) | §5.7 |
 | F-11 | Protection is PR, required CI checks and no direct push; agent review recorded in PR; owner merge is approval | §10.1; §10.4 |
 | F-12 | Tolerance derivation method fixed now; numerical values approved by owner at G1 | §8.4; §13 OD-009 |
 | F-13 | Visual regression limited to 2D layout screenshots; 3D scene verified by scene-state hook | §8.1 |
@@ -980,3 +967,16 @@ and their resolutions remain in [ML-SYS-001-review.md](ML-SYS-001-review.md).
 | A.2 M4 | Launch and ascent to orbit | §2.5 |
 | A.2 M4 | Descent and landing | §2.5 |
 | A.2 | Architectural consequence, effective now: no M1 interface assumes Earth, a closed orbit or a single central body except through explicit versioned fields | §3 (Roadmap consequence) |
+
+## A.3 Inconsistencies resolved by owner decision (2026-11-11)
+
+| # | Inconsistency | Resolution | Section |
+|---|---|---|---|
+| 1 | F-10 named `modelVersion`, undefined in the architecture | `model.engineVersion` is the model version | §5.7 |
+| 2 | "Reject physically invalid results" versus flagged escape/impact | Only non-finite results are rejected; escape and surface intersection are flagged | §7 |
+| 3 | ARCH-004 per state vector versus F-03 per segment | Declared once per segment | §3 ARCH-004 |
+| 4 | All open decisions resolved before implementation versus OD-009 values at G1 | OD-009 added as an exception: method fixed, values at G1 | §13 |
+| 5 | Remaining wording that presumed reuse of the legacy application | Rewritten as a completed assessment with outcome greenfield | §2.1; §4.1; §12 Phase 0a |
+| 6 | Phase 0b had no exit criterion | CI passing on `main`, `main` protected, contracts v1.0 approved | §12 Phase 0b |
+| 7 | "Owner approves integration where required" next to "the merge is the approval" | First statement removed | §10.4 |
+| 8 | §8.2 listed 11 test families; the verification plan defines 19 | §8.2 refers to the verification plan | §8.2 |
