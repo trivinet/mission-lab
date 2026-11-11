@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-11",
   "phase": "Phase 0b — Scaffold",
-  "headline": "Contracts v1.0 (PR #7): all three role reviews done, each 'approve with changes'. Nine owner decisions are needed before the Architect revises the contract. CI and branch protection are live.",
+  "headline": "Owner approved the nine contract decisions. The Systems Architect is revising contracts v1.0 (PR #7). CI and branch protection are live on `main`.",
   "gates": [
     {
       "id": "G0",
@@ -31,11 +31,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-11",
-      "text": "Decide the nine contract questions consolidated from the three reviews of PR #7 (constants in the request, sampling grid, semantic errors, degenerate angles, bit-exact maneuver boundary, interim stale detection, array ownership, hash number encoding, UI error state).",
-      "blocking": "Revision of ML-TASK-004; all of Phase 1"
-    },
     {
       "id": "OA-12",
       "text": "Merge PR #8 (status and spec v0.3 header) once CI passes.",
@@ -87,7 +82,7 @@
           "title": "Normative simulation contracts v1.0",
           "role": "Systems Architect",
           "model": "opus",
-          "status": "in_review",
+          "status": "in_progress",
           "deps": "003",
           "approval": true
         },
@@ -360,6 +355,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-11",
+      "who": "Owner",
+      "text": "Approved the nine contract decisions as recommended (constants in the request, normative sampling grid, semantic errors as validation issues, degenerate angles, bit-exact maneuver boundary enforced in v1.0, interim stale detection, array ownership, bit-pattern number encoding for the request id, fifth UI state). ML-UX-001 amended. Architect started the revision."
+    },
     {
       "date": "2026-11-11",
       "who": "Reviewers",

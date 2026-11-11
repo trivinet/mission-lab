@@ -127,7 +127,11 @@ accounts, cloud storage; mobile layout.
 
 ## 3. Workspace state requirements (from ML-SYS-001 §9.2)
 
-- **ML-UX-001** The UI distinguishes four result states: none, computing, current, stale. **E**
+- **ML-UX-001** The UI distinguishes five result states: none, computing, current, stale, error.
+  A run that returns `status: "failed"` puts the UI in the error state and shows its diagnostics;
+  validation issues prevent the run and are shown at the fields; a successful result with warning
+  diagnostics is current, with the warnings listed. (Amended by owner decision, 2026-11-11: fifth
+  state added after the contract review, PR #7.) **E**
 - **ML-UX-002** Editing a physical parameter marks the result stale; it does not silently
   recompute or silently keep showing the old result as current. **E**
 - **ML-UX-003** Computation runs off the main thread; the UI stays interactive meanwhile. **E**
