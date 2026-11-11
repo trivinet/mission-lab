@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-11",
   "phase": "Phase 0b — Scaffold",
-  "headline": "Contracts v1.0 delivered (PR #7) and under review by the Astrodynamics, Verification and Frontend engineers. PRs #4 (CI), #5 (standards) and #6 (spec v0.3) wait for the owner's merge.",
+  "headline": "CI and branch protection are live on `main`. Contracts v1.0 (PR #7): Frontend and Astrodynamics reviews done (approve with changes), Verification review running. Owner decisions on the contract come next.",
   "gates": [
     {
       "id": "G0",
@@ -31,16 +31,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-9",
-      "text": "Review the diff of PR #6 (ML-SYS-001 v0.3) and merge it at github.com/trivinet/mission-lab/pull/6. The eight open questions are already resolved as approved (Appendix A.3).",
-      "blocking": "Approval of spec v0.3"
-    },
-    {
-      "id": "OA-8",
-      "text": "Review PR #5 (ML-TASK-006: coding standards and contributor guide) at github.com/trivinet/mission-lab/pull/5.",
-      "blocking": "Nothing yet"
-    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -96,7 +86,7 @@
           "title": "CI pipeline, PR/issue templates, branch protection",
           "role": "Coordinator",
           "model": "session",
-          "status": "in_review",
+          "status": "done",
           "deps": "003"
         },
         {
@@ -104,7 +94,7 @@
           "title": "Coding standards and contributor guide",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "in_review",
+          "status": "done",
           "deps": "003"
         },
         {
@@ -112,7 +102,7 @@
           "title": "Fold approved amendments into ML-SYS-001 body (v0.3)",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "in_review",
+          "status": "done",
           "approval": true
         }
       ]
@@ -360,6 +350,26 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-11",
+      "who": "Reviewers",
+      "text": "PR #7 reviews recorded: Frontend (3 blocking: semantic-error routing, stale detection before the hash exists, typed-array ownership) and Astrodynamics (2 blocking: constants in the request, exact sampling grid). Both approve with changes."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "`main` protected: pull request required, checks `checks` and `e2e` required, admins included, no force push. A direct push test was rejected by GitHub. ML-TASK-005 done."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "PRs #4, #5 and #6 merged on the owner's explicit instruction. ML-TASK-006 and ML-TASK-007 done; ML-SYS-001 v0.3 is the approved spec."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "CI green on PR #4 after replacing the Chromium install step (first run failed on a runner DNS error fetching apt packages). The three contract reviewers stalled without output and were relaunched."
+    },
     {
       "date": "2026-11-11",
       "who": "Coordinator",

@@ -3,7 +3,7 @@
 
 **Document ID:** ML-SYS-001
 **Version:** 0.3 — v0.2 with the Appendix A amendments folded into the body (see Change Log)
-**Status:** Proposed (v0.3), pending owner review. v0.2 was the approved baseline (owner, 2026-11-11). Appendix A is a traceability table for the folded amendments.
+**Status:** Approved (v0.3) by the owner on 2026-11-11 (merge of PR #6). v0.2 was the previous approved baseline. Appendix A is a traceability table for the folded amendments.
 **Project owner:** Human Product Owner & Technical Lead
 **Project type:** Personal R&D / Web Application
 **Primary language:** English for technical specifications and code
