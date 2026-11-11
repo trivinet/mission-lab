@@ -92,7 +92,40 @@ report:
     - "docs/architecture/contracts-v1.md (new, status Proposed)"
   risks_or_blockers:
     - "Owner decisions OQ-1..OQ-8 / D-1..D-5 may change the schema before dependent tasks (013-017, 021) start."
-  review_artifact: ""
+  review_artifact: "PR #7 comments: Frontend, Astrodynamics and Verification Engineer reviews (2026-11-11)"
   recommended_next_action: >
-    Owner answers contracts-v1.md §11; AE, FE and VE review the PR; then ML-TASK-010/011/013 and 021 can
-    start against the contract.
+    Owner approves revision 2 of contracts-v1.md and answers §12 NQ-1..NQ-3; then ML-TASK-010/011/013
+    and 021 can start against the contract.
+
+  revision_2:   # owner decisions of 2026-11-11 and role reviews
+    files_changed:
+      - "packages/contracts/src/codes.ts: 4 new structural codes (SEGMENT_TIME_SPAN_MISMATCH, VELOCITY_INCREMENT_MISMATCH, TYPED_ARRAY_BUFFER_NOT_OWNED, DIAGNOSTIC_SEVERITY_MISMATCH); DIAGNOSTIC_SEVERITIES, DIAGNOSTIC_CODE_SEVERITY"
+      - "packages/contracts/src/request.ts: physicalConstantsSchema; request.constants replaces mu_m3ps2 (decision 1)"
+      - "packages/contracts/src/result.ts: R8 bit-exact boundary, R10 span, R11 buffer ownership, R12 velocity increment, R13 severity; SemVer 2.0.0 regex from semver.org; constants schema shared with request"
+      - "packages/contracts/src/canonical.ts: numbers as binary64 bit patterns (binary64Hex), decision 8"
+      - "packages/contracts/src/validate.ts: doc comments (throwing scope, realm)"
+      - "packages/contracts/src/index.ts: new exports"
+      - "packages/contracts/src/test-fixtures.ts: constants object"
+      - "packages/contracts/src/test-doubles.ts (new): nextUp/nextDown from bit patterns, test only"
+      - "packages/contracts/src/{canonical,request,result,scenario,validate}.test.ts: new and tightened tests"
+      - "docs/architecture/contracts-v1.md: revision 2 (decisions 1-9 in §11, new §5.2 grid, §6.2, §7.4, §12, §14)"
+    tests_executed:
+      - "pnpm install --frozen-lockfile: exit 0 (lockfile unchanged)"
+      - "pnpm lint: exit 0; pnpm typecheck: exit 0"
+      - "pnpm test: exit 0, 10 files / 338 tests (contracts: 6 files / 334 tests)"
+      - "pnpm format:check: exit 0 locally (after re-checking out pre-.gitattributes CRLF working copies as LF; no content change)"
+      - "pnpm check:boundaries: exit 0, 12/12 fixtures reported"
+      - "Negative control: Object.is replaced by === in the R8/R12 comparisons -> the two -0 boundary tests failed; reverted"
+    independent_test_vectors:
+      - "binary64Hex: 0, -0, 1, -1, 2, 0.5, 1.5, 3, 4, 5, 6, 10, 100, 1000, Number.MIN_VALUE, +-Number.MAX_VALUE, 1+Number.EPSILON: bit patterns derived by hand from the IEEE-754 binary64 layout"
+      - "canonicalRequestPayload fixture string: assembled by hand from §7.2 and the vectors above"
+      - "SemVer accept/reject cases: derived from semver.org 2.0.0 items 2, 9, 10"
+      - "adjacent doubles (next to 1, pi, 2*pi, 3, 100, 1000, duration) computed in the tests from bit patterns; helper cross-checked against Number.EPSILON"
+    not_applied:
+      - "RSW_FRAME_UNDEFINED not registered: unreachable in v1.0 (single maneuver on a closed input orbit with non-zero angular momentum); to be added in the minor version lifting the maneuver limit (contracts-v1.md §8.3, NQ-2)"
+      - "degToRad / normalizeAngle_rad not added to contracts (arithmetic in the contract package); recorded as NQ-3"
+      - "deltaV_magnitude_mps value not schema-checked (not definable bit-exactly without fixing evaluation order and sqrt rounding); VT-13"
+    not_verified:
+      - "SHA-256 still not implemented (ML-TASK-017)."
+      - "Typed-array and buffer checks not tested across realms or in browsers."
+      - "The engine-side obligations (grid, backstop, constants copy) are specified, not implemented."
