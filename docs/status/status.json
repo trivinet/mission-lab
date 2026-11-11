@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-11",
   "phase": "Phase 0b — Scaffold",
-  "headline": "Scaffold delivered and re-checked by the Coordinator; PR #3 waits for the owner's review and merge. Next: contracts (ML-TASK-004) and CI (ML-TASK-005).",
+  "headline": "Contracts v1.0 delivered (PR #7) and under review by the Astrodynamics, Verification and Frontend engineers. PRs #4 (CI), #5 (standards) and #6 (spec v0.3) wait for the owner's merge.",
   "gates": [
     {
       "id": "G0",
@@ -32,9 +32,14 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-7",
-      "text": "Review and merge PR #3 (ML-TASK-003 scaffold) at github.com/trivinet/mission-lab/pull/3.",
-      "blocking": "ML-TASK-004, 005, 006, 020"
+      "id": "OA-9",
+      "text": "Review the diff of PR #6 (ML-SYS-001 v0.3) and merge it at github.com/trivinet/mission-lab/pull/6. The eight open questions are already resolved as approved (Appendix A.3).",
+      "blocking": "Approval of spec v0.3"
+    },
+    {
+      "id": "OA-8",
+      "text": "Review PR #5 (ML-TASK-006: coding standards and contributor guide) at github.com/trivinet/mission-lab/pull/5.",
+      "blocking": "Nothing yet"
     },
     {
       "id": "OA-3",
@@ -74,7 +79,7 @@
           "title": "Monorepo scaffold, lint boundaries, test runners, empty app shell",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
+          "status": "done",
           "deps": "002"
         },
         {
@@ -82,7 +87,7 @@
           "title": "Normative simulation contracts v1.0",
           "role": "Systems Architect",
           "model": "opus",
-          "status": "todo",
+          "status": "in_review",
           "deps": "003",
           "approval": true
         },
@@ -91,7 +96,7 @@
           "title": "CI pipeline, PR/issue templates, branch protection",
           "role": "Coordinator",
           "model": "session",
-          "status": "todo",
+          "status": "in_review",
           "deps": "003"
         },
         {
@@ -99,7 +104,7 @@
           "title": "Coding standards and contributor guide",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "todo",
+          "status": "in_review",
           "deps": "003"
         },
         {
@@ -107,7 +112,7 @@
           "title": "Fold approved amendments into ML-SYS-001 body (v0.3)",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "todo",
+          "status": "in_review",
           "approval": true
         }
       ]
@@ -355,6 +360,46 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "Started the three role reviews of PR #7 required by the backlog: Astrodynamics (opus), Verification (opus), Frontend (sonnet), all read-only."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Architect",
+      "text": "ML-TASK-004 delivered: zod schemas and types for Scenario, Request and Result, code registry, `contracts-v1.md`; 120 tests pass (re-run by the Coordinator). 5 additive deviations and 8 open questions for the owner. PR #7 open."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Owner",
+      "text": "Approved the Coordinator's resolutions for the eight inconsistencies found in ML-SYS-001; applied to PR #6 and recorded in Appendix A.3."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Docs",
+      "text": "ML-TASK-007 delivered: amendments F-01…F-18 and A.2 folded into ML-SYS-001 v0.3 with a 26-row traceability table; 8 open questions left for the owner. Coordinator read the full diff. PR #6 open."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Docs",
+      "text": "ML-TASK-006 delivered: coding standards and contributor guide, sourced rule by rule, with explicit 'Not yet decided' lists. Coordinator reviewed and updated three stale statements. PR #5 open."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "ML-TASK-005: CI workflow (checks, e2e, audit), PR/issue templates and LF line endings in PR #4. Found and fixed: Windows checkout failed the format check (CRLF); lint picked up agent worktrees."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "Started in isolated worktrees: ML-TASK-004 (Systems Architect, opus), ML-TASK-006 and ML-TASK-007 (Docs & Release, haiku)."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "PR #3 merged to `main` on the owner's explicit instruction. ML-TASK-003 done."
+    },
     {
       "date": "2026-11-11",
       "who": "Frontend",

@@ -2,8 +2,8 @@
 ## Preliminary Product & Engineering Specification
 
 **Document ID:** ML-SYS-001
-**Version:** 0.2 — v0.1 text as received on 2026-11-11, plus Appendix A (amendments approved at gate G0)
-**Status:** Approved baseline (owner, 2026-11-11). Where Appendix A conflicts with the body, Appendix A prevails.
+**Version:** 0.3 — v0.2 with the Appendix A amendments folded into the body (see Change Log)
+**Status:** Proposed (v0.3), pending owner review. v0.2 was the approved baseline (owner, 2026-11-11). Appendix A is a traceability table for the folded amendments.
 **Project owner:** Human Product Owner & Technical Lead
 **Project type:** Personal R&D / Web Application
 **Primary language:** English for technical specifications and code
@@ -12,6 +12,14 @@
 > Review findings and proposed amendments to this version are tracked in
 > [ML-SYS-001-review.md](ML-SYS-001-review.md). This file is not edited except through an
 > owner-approved version bump.
+
+# Change Log
+
+| Version | Date | Change |
+|---|---|---|
+| 0.1 | 2026-11-11 | Preliminary specification, as received. |
+| 0.2 | 2026-11-11 | Approved at gate G0. Appendix A added: review amendments F-01 to F-18 and roadmap additions A.2. |
+| 0.3 | 2026-11-11 | Appendix A amendments folded into the body text, with no intended change of meaning. Appendix A replaced by a traceability table. Eight inconsistencies found while folding were resolved by owner decision on 2026-11-11 (see A.3). Proposed, pending owner review. |
 
 ---
 
@@ -80,7 +88,7 @@ The application shall also pass the agreed numerical verification tests.
 
 Deliverables:
 
-- Existing repository assessment.
+- Existing repository assessment (completed: `docs/architecture/legacy-assessment.md`; outcome: greenfield repository, ADR-001).
 - Architecture proposal and approved decisions.
 - Dependency and security assessment.
 - Coding standards.
@@ -88,7 +96,7 @@ Deliverables:
 - CI pipeline.
 - Documentation structure.
 - Initial backlog.
-- Baseline working application.
+- Baseline working application, delivered in two parts: Phase 0a (documents only, ends at G0) and Phase 0b (repository tooling, CI and an empty application shell, starts after G0). See §12.
 
 M0 must be completed before substantial new feature development.
 
@@ -100,17 +108,17 @@ Functional scope:
 
 - Earth-centered orbital scenarios.
 - Configurable initial epoch.
-- Keplerian initial conditions.
+- Keplerian initial conditions, restricted to closed orbits as input (0 ≤ e < 1, perigee radius above the Earth reference radius).
 - Conversion between Keplerian and Cartesian states.
-- Keplerian two-body propagation.
-- Single instantaneous impulsive maneuver.
+- Keplerian two-body propagation with a universal-variable formulation valid for all conic sections. Escape and surface-intersection trajectories that result from a maneuver are propagated, displayed and flagged in diagnostics, never silently accepted or crashed.
+- Single instantaneous impulsive maneuver. The maneuver list is an ordered list in the contract; the M1 validator rejects more than one maneuver with an explicit diagnostic.
 - Maneuver components in the local RSW frame.
 - Interactive 3D visualization.
 - Playback and timeline control.
 - Initial and resulting orbit visualization.
-- Orbital parameter evolution.
+- Orbital parameter evolution: time histories of quantities that vary between maneuvers (radius, altitude, speed, true and mean anomaly, flight-path angle), plus element step changes across each maneuver. Elements that are constant between maneuvers are plotted as flat histories on purpose, as a visible conservation check.
 - Maneuver delta-v display.
-- Scenario comparison.
+- Scenario comparison within one scenario: the coast run (no maneuver) against the maneuvered run, over the same time span. Comparing arbitrary scenarios is M3.
 - Save/load using versioned JSON files.
 - Explicit model and assumption metadata.
 
@@ -135,10 +143,12 @@ Candidate capabilities:
 - Multiple sequential maneuvers.
 - Spacecraft mass and propulsion parameters.
 - Optional finite-duration thrust.
-- Alternative reference frames.
+- Alternative reference frames (a VNC/NTW maneuver frame is a candidate).
 - Ground tracks and geographic visualization.
 - Enhanced plots and trajectory analysis.
 - Import/export of selected orbital data formats.
+- Parabolic and hyperbolic initial orbits as direct inputs.
+- Impact handling as a simulation event (stop condition, impact point), once an Earth-fixed frame exists.
 
 Features shall be implemented incrementally, with separate requirements and verification cases.
 
@@ -170,6 +180,10 @@ Long-term research directions:
 - Cislunar mission design.
 - Import/export interoperability.
 - Automated optimization.
+- Other central bodies and multi-planetary scenarios.
+- Interplanetary transfers (patched conics, Lambert targeting) and deep-space trajectories.
+- Launch and ascent to orbit.
+- Descent and landing.
 
 These are exploratory directions, not commitments for the initial releases.
 
@@ -193,7 +207,7 @@ All public interfaces carrying physical quantities shall document their units. T
 
 **ARCH-004 — Explicit reference frames**
 
-All state vectors shall be associated with a declared reference frame, central body and epoch.
+All state vectors shall be associated with a declared reference frame, central body and epoch. The association is declared once per trajectory segment and applies to every sample in it; it is not repeated for each state vector (§5.6).
 
 **ARCH-005 — Reproducibility**
 
@@ -219,6 +233,12 @@ Backend services, authentication and databases shall not be introduced until jus
 
 No AI agent may unilaterally change product scope, approved architecture, scientific assumptions or deployment policy.
 
+**Roadmap consequence (effective now)**
+
+No M1 interface may assume Earth, a closed orbit or a single central body, except through explicit, versioned fields: `centralBody`, `mu_m3ps2`, `frame`, `dynamicsModel` and `propagator`.
+
+Launch and landing need atmosphere, thrust and Earth-fixed frames. They will require a force-model interface and numerical propagation, and are not reachable by extending the analytical M1 propagator (see §2.5).
+
 ---
 
 # 4. Proposed Software Architecture
@@ -227,7 +247,7 @@ No AI agent may unilaterally change product scope, approved architecture, scient
 
 **Frontend:** React + TypeScript.
 
-**Application framework:** Retain the existing framework if its assessment supports continued use; otherwise evaluate Next.js versus a simpler React/Vite application.
+**Application framework:** React with Vite (ADR-006). The legacy framework is not retained: the assessment found no reusable code (ADR-001).
 
 **3D rendering:** Three.js, potentially through React Three Fiber.
 
@@ -250,6 +270,8 @@ No AI agent may unilaterally change product scope, approved architecture, scient
 Specific library versions must be reviewed, selected and pinned during M0.
 
 ## 4.2 Functional Modules
+
+The module-to-package mapping is defined in proposed-architecture §2 (docs/architecture/proposed-architecture.md). Dependencies between modules are one-directional. The separate `packages/visualization` package is deferred until a second consumer exists; until then the Visualization Engine lives in `apps/web`.
 
 ### A. Scenario Manager
 
@@ -362,6 +384,8 @@ The chosen frame convention shall be defined precisely before implementation. Th
 
 The UI shall distinguish orbital geometry from Earth-surface visualization.
 
+M1 may show a rotating, textured Earth using one documented simplification: rotation about the inertial Z axis by the Earth Rotation Angle, with UT1 approximated by UTC. This orientation is illustrative and shall be labelled as such. M1 derives no authoritative output from it: no ground track and no latitude or longitude (see ADR-004).
+
 Earth rotation and ground-track calculations, if introduced, must use documented time and frame conventions.
 
 ## 5.3 Orbital Elements
@@ -377,17 +401,21 @@ The initial interface shall support:
 
 The application shall validate physically meaningful input ranges and identify degenerate element configurations.
 
+M1 accepts closed orbits only as initial input (0 ≤ e < 1, perigee radius above the Earth reference radius). Parabolic and hyperbolic initial orbits are M2 candidates (§2.3).
+
 For circular and equatorial orbits, the product shall document the ambiguity of classical orbital elements and either use a defined convention or provide an alternative state representation.
 
 ## 5.4 Impulsive Maneuvers
 
 M1 shall represent an impulsive maneuver as an instantaneous change in inertial velocity at a defined epoch.
 
-The maneuver input shall support radial, along-track and cross-track components in a documented RSW convention.
+The maneuver input shall support radial, along-track and cross-track components in a documented RSW convention. In RSW the along-track axis S lies in the orbit plane, perpendicular to R. It coincides with the velocity direction only for circular orbits, so along-track is not always prograde. The UI help and the maneuver model documentation shall state this. A VNC/NTW frame is an M2 candidate (§2.3).
 
 The local maneuver vector shall be transformed into the selected inertial frame at the maneuver epoch.
 
 Position shall remain continuous across the instantaneous maneuver, while velocity changes discontinuously.
+
+The maneuver list is ordered. The M1 validator shall reject a list with more than one maneuver, with an explicit diagnostic. M2 lifts this limit (ML-FR-017).
 
 ## 5.5 Propagation and Sampling
 
@@ -399,15 +427,17 @@ Trajectory samples shall be produced at configurable times. Rendering frame rate
 
 Maneuver discontinuities shall be preserved in the result model.
 
+Trajectory samples carry `t_s` only: elapsed seconds from the scenario epoch. The M1 propagator uses a universal-variable formulation valid for all conic sections (ADR-005). Post-maneuver escape and surface-intersection trajectories are propagated and flagged in diagnostics, never silently accepted or crashed.
+
 ## 5.6 Time and Units
 
 Internal physical calculations shall use seconds, metres, kilograms and radians.
 
 Displayed values may use kilometres, kilometres per second and degrees.
 
-Epochs shall use an explicitly declared time scale. Conversion between civil UTC timestamps and simulation time shall be centralized.
+Epochs shall use an explicitly declared time scale. An epoch is an object `{ scale, iso }`, not a bare string. Conversion between civil UTC timestamps and simulation time shall be centralized.
 
-Every externally supplied state shall include a reference frame and epoch.
+Every externally supplied state shall include a reference frame and epoch. Frame, epoch and units are declared once per trajectory segment, not repeated for each sample.
 
 ## 5.7 Model Limitations
 
@@ -422,6 +452,8 @@ Every simulation output shall identify:
 - Calculation configuration.
 - Model limitations.
 
+Each result also carries the engine version as `model.engineVersion` (this is the model version; no separate `modelVersion` field exists), `requestId`, a deterministic hash of the physical inputs that is present in both the request and the result; `ManeuverEvent` records; and `SimulationDiagnostics`, as defined in proposed-architecture §4.
+
 No result shall be presented as suitable for operational spacecraft navigation without appropriate independent qualification.
 
 ---
@@ -433,15 +465,15 @@ All requirements shall receive permanent identifiers and traceability links.
 | ID | Requirement | Priority |
 |---|---|---|
 | ML-FR-001 | Create a new orbital scenario | MUST |
-| ML-FR-002 | Configure and validate Keplerian elements | MUST |
+| ML-FR-002 | Configure and validate Keplerian elements (closed orbits only as input in M1) | MUST |
 | ML-FR-003 | Convert Keplerian elements to Cartesian states | MUST |
 | ML-FR-004 | Propagate an orbit with the two-body model | MUST |
 | ML-FR-005 | Configure an impulsive RSW maneuver | MUST |
 | ML-FR-006 | Execute maneuver propagation | MUST |
 | ML-FR-007 | Display orbital trajectories in 3D | MUST |
 | ML-FR-008 | Control simulation playback | MUST |
-| ML-FR-009 | Visualize orbital parameter histories | MUST |
-| ML-FR-010 | Compare baseline and maneuver scenarios | MUST |
+| ML-FR-009 | Visualize time histories of varying orbital quantities and element step changes across maneuvers; element histories that are flat between maneuvers are retained as a conservation check | MUST |
+| ML-FR-010 | Compare the coast run and the maneuvered run of one scenario over the same time span | MUST |
 | ML-FR-011 | Save and load scenario configurations | MUST |
 | ML-FR-012 | Display active physical models and assumptions | MUST |
 | ML-FR-013 | Provide predefined example scenarios | SHOULD |
@@ -476,7 +508,7 @@ These requirements are preliminary. Their acceptance criteria shall be detailed 
 
 - Invalid inputs shall not cause silent failures.
 - Failed simulations shall return meaningful diagnostics.
-- Numerical outputs shall reject non-finite or physically invalid results.
+- Numerical outputs shall reject non-finite results: a non-finite value is an error diagnostic, never a sample. Escape and surface-intersection trajectories that result from a maneuver are not rejected; they are propagated and flagged in diagnostics (§5.3).
 
 ## Maintainability
 
@@ -519,21 +551,11 @@ These requirements are preliminary. Their acceptance criteria shall be detailed 
 
 **End-to-end tests:** Confirm that a user can configure, run, inspect and save a scenario.
 
-**Visual regression tests:** Protect critical interface layouts and basic rendering behavior.
+**Visual regression tests:** Limited to deterministic 2D layout screenshots. The 3D scene is verified through a non-visual scene-state test hook that compares object positions in scene units with engine output.
 
 ## 8.2 Mandatory Numerical Test Families
 
-- Circular and elliptical orbit propagation.
-- Orbital element to Cartesian conversion and round-trip consistency.
-- Two-body specific mechanical energy conservation.
-- Two-body angular momentum conservation.
-- Propagation over complete orbital periods.
-- Zero-magnitude maneuver equivalence.
-- Impulsive velocity change correctness.
-- RSW basis orthogonality and orientation.
-- Maneuver frame transformation correctness.
-- Degenerate orbital element cases.
-- Scenario serialization round-trip.
+The mandatory numerical test families are VT-01 to VT-19, defined in the M1 verification plan (`docs/verification/m1-verification-plan.md` §3), which is the single normative list. They include the families originally listed here: circular and elliptical propagation, element/Cartesian conversion and round trip, energy and angular-momentum conservation, full-period propagation, zero-magnitude maneuver equivalence, impulsive velocity change, RSW basis orthogonality and orientation, maneuver frame transformation, degenerate element cases and scenario serialization round trip.
 
 ## 8.3 Independent Reference Sources
 
@@ -547,7 +569,7 @@ A reference comparison is only valid when dynamics, constants, frames, epochs an
 
 Every scientific requirement shall have explicit pass/fail criteria.
 
-Numerical tolerances shall be justified according to the algorithm, floating-point precision, duration and reference model.
+Numerical tolerances shall be justified according to the algorithm, floating-point precision, duration and reference model. Tolerances are derived by the Verification Engineer from a float64 error analysis, before implementation results are examined. Each tolerance is recorded with its justification and approved by the owner at G1. The derivation method is fixed in this version; the numerical values are fixed in Phase 1.
 
 No fixed numerical tolerance shall be invented solely to make an implementation pass.
 
@@ -600,7 +622,7 @@ Visual polish is a product requirement, but not justification for weakening scie
 ## 10.1 Source Control
 
 - Git repository as the source of truth.
-- Protected `main` branch where supported.
+- Protected `main` branch: pull request required, required CI status checks, no direct pushes. Agent reviews are recorded in the pull request (see §10.4); the owner's merge is the approval.
 - Short-lived feature branches.
 - Pull requests for integration.
 - Descriptive commit history.
@@ -610,7 +632,7 @@ Visual polish is a product requirement, but not justification for weakening scie
 
 Each implementation task shall include:
 
-- Unique task ID.
+- Unique task ID in the form `ML-TASK-NNN`.
 - Parent requirement or issue.
 - Objective.
 - Scope and exclusions.
@@ -642,8 +664,7 @@ A task is complete when:
 - The code follows architectural constraints.
 - Documentation has been updated.
 - The pull request includes a summary and verification evidence.
-- Required review has been completed.
-- The human owner approves integration where required.
+- Required review has been completed: a Verification or Architecture agent report is recorded in the pull request, and the owner merges (the merge is the approval).
 
 ## 10.5 Architectural Decision Records
 
@@ -752,24 +773,33 @@ Responsibilities:
 - No agent may commit secrets or confidential third-party material.
 - External services and code must comply with applicable licensing.
 - Human approval is required for scope changes, major architectural changes and production releases.
+- `AGENTS.md` is the tool-neutral source of agent instructions. `CLAUDE.md` imports it.
 
 ---
 
 # 12. Preliminary Delivery Phases
 
-## Phase 0 — Discovery and Baseline
+Phases are gated, not time-boxed. Gates G0 to G4 remain. No calendar duration is specified (owner instruction, 2026-11-11).
+
+## Phase 0a — Baseline (documents only; ends at G0)
 
 Deliverables:
 
-- Repository audit.
-- Existing functionality inventory.
-- Code reuse assessment.
+- Repository audit, existing functionality inventory and code reuse assessment of the legacy Satellite Viewer (completed: `docs/architecture/legacy-assessment.md`; outcome: no code reused, ADR-001).
 - Technical risks.
 - Initial approved architecture.
 - Requirements baseline.
+
+**Exit gate (G0):** human approval of proposed architecture and M1 scope.
+
+## Phase 0b — Scaffold (starts only after G0)
+
+Deliverables:
+
+- Repository tooling, CI pipeline and an empty application shell.
 - Development environment.
 
-**Exit gate:** human approval of proposed architecture and M1 scope.
+**Exit criterion (no numbered gate):** CI passes on `main`, `main` is protected, and the normative contracts v1.0 are approved by the owner.
 
 ## Phase 1 — Astrodynamics Foundation
 
@@ -800,6 +830,7 @@ Deliverables:
 
 Deliverables:
 
+- Time-boxed charting-library spike at the start of the phase (resolves OD-006).
 - Orbital parameter plots.
 - Pre/post-maneuver comparison.
 - Maneuver metrics.
@@ -827,7 +858,7 @@ Deliverables:
 
 ## Key Risks
 
-**R-001:** Legacy architecture may not support the proposed separation of concerns.
+**R-001:** Legacy architecture may not support the proposed separation of concerns. *Closed: greenfield repository (ADR-001).*
 
 **R-002:** Reference frame or time conventions may be implemented inconsistently.
 
@@ -845,7 +876,7 @@ Deliverables:
 
 ## Open Decisions
 
-**OD-001:** Reuse or replace the existing Satellite Viewer codebase.
+**OD-001:** Reuse or replace the existing Satellite Viewer codebase. *Resolved: greenfield repository (ADR-001).*
 
 **OD-002:** Confirm the final frontend framework and visualization stack.
 
@@ -855,15 +886,15 @@ Deliverables:
 
 **OD-005:** Select canonical time representations and conversion rules.
 
-**OD-006:** Choose the charting library after representative testing.
+**OD-006:** Choose the charting library after representative testing. *Resolved by a time-boxed spike at the start of Phase 3; blocks only plotting tasks.*
 
 **OD-007:** Determine whether M1 requires any browser-local database beyond JSON files.
 
 **OD-008:** Select the AI agent execution and orchestration environment.
 
-**OD-009:** Define release acceptance tolerances and reference datasets.
+**OD-009:** Define release acceptance tolerances and reference datasets. *Method fixed in §8.4; numerical values approved by the owner at G1.*
 
-All open decisions shall be resolved before dependent implementation work begins.
+All open decisions shall be resolved before dependent implementation work begins, except OD-006 and OD-009, which are resolved as stated above: for OD-009 the tolerance derivation method is fixed before implementation (§8.4) and the numerical values are approved by the owner at G1.
 
 ---
 
@@ -901,37 +932,51 @@ These extensions shall preserve a consistent architecture and scientific foundat
 
 ---
 
-# Appendix A — Amendments approved at gate G0 (v0.2, 2026-11-11)
+# Appendix A — Traceability of v0.2 amendments (folded in v0.3)
 
-## A.1 Review amendments
+The amendments approved at gate G0 are folded into the body of this document in v0.3. Each row
+maps one item to the section(s) where it now lives. The original v0.2 wording of Appendix A is
+recoverable from git history: `git show 644b1af:docs/product/ML-SYS-001.md`. The review findings
+and their resolutions remain in [ML-SYS-001-review.md](ML-SYS-001-review.md).
 
-Findings F-01 to F-18 of [ML-SYS-001-review.md](ML-SYS-001-review.md) are adopted with their
-proposed resolutions. They are normative and are detailed in the approved architecture, ADR-001
-to ADR-007, the M1 requirements and the M1 verification plan. Folding them into the body text is
-tracked as ML-TASK-007.
+| Item | Amendment (short form) | Where it now lives (v0.3) |
+|---|---|---|
+| F-01 | Greenfield repository; R-001 closed | §13 Key Risks (R-001); §13 Open Decisions (OD-001) |
+| F-02 | Phase 0a Baseline (documents) and Phase 0b Scaffold (after G0) | §2.1 (M0); §12 Phase 0a and Phase 0b |
+| F-03 | Epoch as `{ scale, iso }`; samples carry `t_s`; frame, epoch and units declared once per segment | §5.5; §5.6 |
+| F-04 | Ordered maneuver list; M1 validator rejects more than one maneuver | §2.2 (single impulsive maneuver); §5.4 |
+| F-05 | Closed-orbit inputs only; universal-variable propagator; escape and surface-intersection results flagged | §2.2 (Keplerian initial conditions; propagation); §5.3; §5.5; §6 ML-FR-002 |
+| F-06 | ML-FR-009 covers varying quantities and element step changes; flat element histories kept | §2.2 (orbital parameter evolution); §6 ML-FR-009 |
+| F-07 | M1 comparison is coast run versus maneuvered run within one scenario; arbitrary comparison is M3 | §2.2 (scenario comparison); §6 ML-FR-010 |
+| F-08 | Illustrative Earth orientation (Earth Rotation Angle, UT1 ≈ UTC); no authoritative Earth-fixed output in M1 | §5.2 |
+| F-09 | Module-to-package mapping; one-directional dependencies; `packages/visualization` deferred | §4.2 (introductory paragraph) |
+| F-10 | `requestId`, `ManeuverEvent` and `SimulationDiagnostics` defined by contract; the model version is `model.engineVersion` (owner decision, 2026-11-11) | §5.7 |
+| F-11 | Protection is PR, required CI checks and no direct push; agent review recorded in PR; owner merge is approval | §10.1; §10.4 |
+| F-12 | Tolerance derivation method fixed now; numerical values approved by owner at G1 | §8.4; §13 OD-009 |
+| F-13 | Visual regression limited to 2D layout screenshots; 3D scene verified by scene-state hook | §8.1 |
+| F-14 | Task identifier format `ML-TASK-NNN` | §10.2 |
+| F-15 | `AGENTS.md` is the tool-neutral source; `CLAUDE.md` imports it | §11.8 |
+| F-16 | No deadline; gates G0 to G4 remain; no week-based schedule | §12 (introduction) |
+| F-17 | OD-006 resolved by a time-boxed spike at the start of Phase 3; blocks only plotting tasks | §12 Phase 3; §13 OD-006; §13 closing sentence |
+| F-18 | RSW along-track is not always prograde; UI help and maneuver model state it; VNC/NTW is an M2 candidate | §5.4; §2.3 |
+| A.2 M1 | Escape and surface-intersection trajectories from a maneuver are propagated, displayed and flagged; only initial orbit input is limited to closed orbits | §2.2; §5.3 |
+| A.2 M2 | Parabolic and hyperbolic initial orbits as direct inputs | §2.3 |
+| A.2 M2 | Impact handling as a simulation event, once an Earth-fixed frame exists | §2.3 |
+| A.2 M4 | Other central bodies and multi-planetary scenarios | §2.5 |
+| A.2 M4 | Interplanetary transfers and deep-space trajectories | §2.5 |
+| A.2 M4 | Launch and ascent to orbit | §2.5 |
+| A.2 M4 | Descent and landing | §2.5 |
+| A.2 | Architectural consequence, effective now: no M1 interface assumes Earth, a closed orbit or a single central body except through explicit versioned fields | §3 (Roadmap consequence) |
 
-## A.2 Roadmap additions (owner direction, 2026-11-11)
+## A.3 Inconsistencies resolved by owner decision (2026-11-11)
 
-The owner intends Mission Lab to grow, over later releases, toward a general mission laboratory.
-The following are added as roadmap items. None is in M1 scope.
-
-**M1 (unchanged, clarified):** escape and surface-intersection trajectories that *result from a
-maneuver* are propagated, displayed and flagged. Only the *initial orbit input* is limited to
-closed orbits.
-
-**M2 candidates (added):**
-- Parabolic and hyperbolic initial orbits as direct inputs.
-- Impact handling as a simulation event (stop condition, impact point), once an Earth-fixed
-  frame exists.
-
-**M4 / long-term directions (added):**
-- Other central bodies and multi-planetary scenarios.
-- Interplanetary transfers (patched conics, Lambert targeting) and deep-space trajectories.
-- Launch and ascent to orbit.
-- Descent and landing.
-
-Architectural consequence, effective now: no M1 interface may assume Earth, a closed orbit or a
-single central body except through explicit, versioned fields (`centralBody`, `mu_m3ps2`,
-`frame`, `dynamicsModel`, `propagator`). Launch and landing need atmosphere, thrust and
-Earth-fixed frames and will require a force-model interface and numerical propagation; they are
-not reachable by extending the analytical M1 propagator.
+| # | Inconsistency | Resolution | Section |
+|---|---|---|---|
+| 1 | F-10 named `modelVersion`, undefined in the architecture | `model.engineVersion` is the model version | §5.7 |
+| 2 | "Reject physically invalid results" versus flagged escape/impact | Only non-finite results are rejected; escape and surface intersection are flagged | §7 |
+| 3 | ARCH-004 per state vector versus F-03 per segment | Declared once per segment | §3 ARCH-004 |
+| 4 | All open decisions resolved before implementation versus OD-009 values at G1 | OD-009 added as an exception: method fixed, values at G1 | §13 |
+| 5 | Remaining wording that presumed reuse of the legacy application | Rewritten as a completed assessment with outcome greenfield | §2.1; §4.1; §12 Phase 0a |
+| 6 | Phase 0b had no exit criterion | CI passing on `main`, `main` protected, contracts v1.0 approved | §12 Phase 0b |
+| 7 | "Owner approves integration where required" next to "the merge is the approval" | First statement removed | §10.4 |
+| 8 | §8.2 listed 11 test families; the verification plan defines 19 | §8.2 refers to the verification plan | §8.2 |
