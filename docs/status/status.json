@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-11",
   "phase": "Phase 0b — Scaffold",
-  "headline": "Scaffold merged. In parallel: contracts (ML-TASK-004), coding standards (006) and spec v0.3 (007) with agents; CI pipeline (005) in PR #4, first run in progress.",
+  "headline": "Contracts v1.0 delivered (PR #7) and under review by the Astrodynamics, Verification and Frontend engineers. PRs #4 (CI), #5 (standards) and #6 (spec v0.3) wait for the owner's merge.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,16 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-9",
+      "text": "Review the diff of PR #6 (ML-SYS-001 v0.3) and merge it at github.com/trivinet/mission-lab/pull/6. The eight open questions are already resolved as approved (Appendix A.3).",
+      "blocking": "Approval of spec v0.3"
+    },
+    {
+      "id": "OA-8",
+      "text": "Review PR #5 (ML-TASK-006: coding standards and contributor guide) at github.com/trivinet/mission-lab/pull/5.",
+      "blocking": "Nothing yet"
+    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -77,7 +87,7 @@
           "title": "Normative simulation contracts v1.0",
           "role": "Systems Architect",
           "model": "opus",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "003",
           "approval": true
         },
@@ -94,7 +104,7 @@
           "title": "Coding standards and contributor guide",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "003"
         },
         {
@@ -102,7 +112,7 @@
           "title": "Fold approved amendments into ML-SYS-001 body (v0.3)",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "in_progress",
+          "status": "in_review",
           "approval": true
         }
       ]
@@ -350,6 +360,31 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "Started the three role reviews of PR #7 required by the backlog: Astrodynamics (opus), Verification (opus), Frontend (sonnet), all read-only."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Architect",
+      "text": "ML-TASK-004 delivered: zod schemas and types for Scenario, Request and Result, code registry, `contracts-v1.md`; 120 tests pass (re-run by the Coordinator). 5 additive deviations and 8 open questions for the owner. PR #7 open."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Owner",
+      "text": "Approved the Coordinator's resolutions for the eight inconsistencies found in ML-SYS-001; applied to PR #6 and recorded in Appendix A.3."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Docs",
+      "text": "ML-TASK-007 delivered: amendments F-01…F-18 and A.2 folded into ML-SYS-001 v0.3 with a 26-row traceability table; 8 open questions left for the owner. Coordinator read the full diff. PR #6 open."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Docs",
+      "text": "ML-TASK-006 delivered: coding standards and contributor guide, sourced rule by rule, with explicit 'Not yet decided' lists. Coordinator reviewed and updated three stale statements. PR #5 open."
+    },
     {
       "date": "2026-11-11",
       "who": "Coordinator",

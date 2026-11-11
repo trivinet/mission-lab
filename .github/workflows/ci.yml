@@ -48,7 +48,9 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @mission-lab/web exec playwright install --with-deps chromium
+      # No --with-deps: the first run failed fetching apt font packages (DNS failure on the
+      # runner mirror). The ubuntu-24.04 image already carries the system libraries Chromium needs.
+      - run: pnpm --filter @mission-lab/web exec playwright install chromium
       - run: pnpm test:e2e
 
   audit:
