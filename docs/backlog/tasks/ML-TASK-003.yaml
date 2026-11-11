@@ -1,0 +1,84 @@
+task_id: ML-TASK-003
+title: "Monorepo scaffold: workspaces, TS config, lint boundaries, test runners, empty packages, empty app shell"
+status: in_progress
+requirement_ids: [ML-NFR-001, ML-NFR-005, ML-NFR-007]
+owner_role: frontend-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-002]
+affected_paths:
+  - package.json
+  - pnpm-workspace.yaml
+  - pnpm-lock.yaml
+  - .nvmrc
+  - .npmrc
+  - .gitignore
+  - .prettierrc.json
+  - .prettierignore
+  - .editorconfig
+  - eslint.config.js
+  - tsconfig.base.json
+  - tsconfig.json
+  - vitest.config.ts
+  - vitest.workspace.ts
+  - packages/astrodynamics/
+  - packages/contracts/
+  - packages/simulation/
+  - apps/web/
+  - verification/
+  - test-data/reference-cases/
+  - tools/boundary-fixtures/
+  - docs/backlog/tasks/ML-TASK-003.yaml   # report section only
+objective: >
+  Create the pnpm monorepo skeleton defined by ADR-002 and proposed-architecture §2 and §6, with the
+  exact versions of docs/architecture/tech-baseline.md, so that later tasks only add code.
+scope:
+  - Root workspace with scripts `lint`, `typecheck`, `test`, `build`, `format`, `format:check`, `check:boundaries`.
+  - Packages `@mission-lab/astrodynamics` (zero runtime dependencies), `@mission-lab/contracts` (zod),
+    `@mission-lab/simulation`; app `apps/web` (Vite + React + TypeScript + Tailwind); top-level
+    `verification/` workspace; `test-data/reference-cases/` with a README.
+  - Each package exports a placeholder only (e.g. a package name/version constant) and has one trivial
+    passing Vitest test proving the runner is wired. No domain code.
+  - Strict TypeScript shared base config. Check the TypeScript 6.0 release notes for changed defaults
+    and deprecated options (tech-baseline §7).
+  - ESLint 10 flat config with typed linting and eslint-plugin-boundaries enforcing the one-way
+    dependencies of proposed-architecture §2, including "astrodynamics and simulation never import
+    React, three, DOM/browser APIs or apps/web" and "verification never imports astrodynamics".
+  - Proof of the boundary rules: fixtures with deliberately illegal imports that are excluded from the
+    normal `lint` and linted by `check:boundaries`, which succeeds only if every fixture is reported.
+  - Empty app shell: one page with the title "Mission Lab" and a placeholder workspace layout region.
+    No 3D scene, no store, no worker yet. Playwright configured (Chromium) with one smoke test that
+    loads the shell.
+out_of_scope:
+  - Any physics, contracts types/schemas (ML-TASK-004), CI workflow (ML-TASK-005), coding-standards docs (ML-TASK-006).
+  - Visual design decisions (ML-TASK-020). Keep the shell neutral.
+  - Dependencies not listed in tech-baseline.md. If one is needed, stop and report it.
+inputs:
+  - AGENTS.md
+  - docs/architecture/tech-baseline.md
+  - docs/architecture/proposed-architecture.md (§2, §5, §6)
+  - docs/architecture/adr/ADR-002, ADR-006
+  - docs/requirements/m1-requirements.md (ML-NFR-001, 005, 007)
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile` succeeds from a clean checkout on Node 24.22.2 / pnpm 12.16.1."
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` and `pnpm format:check` exit 0."
+  - "`pnpm check:boundaries` exits 0 only when every illegal-import fixture is reported; removing the rule makes it fail."
+  - "Every dependency version equals the pin in tech-baseline.md (exact versions, no ranges)."
+  - "`packages/astrodynamics/package.json` has no `dependencies`."
+  - "The Playwright smoke test passes against the built or dev app."
+test_requirements:
+  - One trivial unit test per package; one Playwright smoke test; the boundary fixture check.
+deliverables:
+  - The scaffold, the lockfile, and the report section of this file.
+human_approval_required: false
+
+report:
+  files_changed: []
+  summary: ""
+  tests_executed: []
+  reference_data_used: []
+  not_verified: []
+  known_limitations: []
+  documentation_changes: []
+  risks_or_blockers: []
+  review_artifact: ""
+  recommended_next_action: ""
