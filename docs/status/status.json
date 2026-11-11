@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-11",
   "phase": "Phase 0b — Scaffold",
-  "headline": "Repository public on GitHub. Tech baseline and D-5 (Orekit) approved; PRs #1 and #2 wait for the owner's merge. Next: install Node 24, then the scaffold (ML-TASK-003).",
+  "headline": "Repository public on GitHub. Node 24.22.2 and pnpm 12.16.1 installed. PRs #1 and #2 wait for the owner's merge; then the scaffold (ML-TASK-003) starts.",
   "gates": [
     {
       "id": "G0",
@@ -35,11 +35,6 @@
       "id": "OA-5",
       "text": "Review and merge PR #1 (tech baseline) and PR #2 (status board, D-5) at github.com/trivinet/mission-lab/pulls. Only the owner merges to `main`.",
       "blocking": "ML-TASK-003 branches from `main` with the baseline"
-    },
-    {
-      "id": "OA-6",
-      "text": "Decide how Node 24.22.2 is installed: upgrade the system Node (currently 22.20.0) or a portable copy used only by Mission Lab.",
-      "blocking": "ML-TASK-003 (scaffold)"
     },
     {
       "id": "OA-3",
@@ -360,6 +355,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "Dev machine provisioned: Node 24.22.2 (official MSI, SHA-256 checked against nodejs.org) replaced 22.20.0; pnpm 12.16.1 installed with npm."
+    },
     {
       "date": "2026-11-11",
       "who": "Coordinator",
