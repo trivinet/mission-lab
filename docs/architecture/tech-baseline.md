@@ -1,11 +1,12 @@
 # Technology Baseline — Mission Lab M1 (Phase 0b scaffold)
 
-**Status:** Proposed — pending owner approval · **Task:** ML-TASK-002 · **Author role:** Systems Architect
+**Status:** Accepted — owner approval 2026-11-11 (D-1 Node 24, D-2 TypeScript 6.0.3, D-3 actions
+pinned by commit SHA, D-4 not enabled) · **Task:** ML-TASK-002 · **Author role:** Systems Architect
 · **Date of verification:** 2026-11-11 · **Implements:** ADR-002, ADR-006, proposed-architecture §5–§6,
 ML-NFR-001, ML-NFR-005, ML-NFR-007
 
 This document proposes the exact toolchain and library versions to pin when the Phase 0b scaffold is
-created. It is not authority until the owner approves it. Nothing has been installed; no manifest
+created. Approved by the owner on 2026-11-11. Nothing has been installed yet; no manifest
 exists yet.
 
 ## 1. Selection rules applied
@@ -205,6 +206,8 @@ installed first, then setup-node with `cache: 'pnpm'`) → `pnpm install --froze
 type-check, test, build. Actions referenced by full commit SHA with the tag in a comment.
 
 ## 6. Owner decisions
+
+Resolved by the owner on 2026-11-11 ("Apruebo versiones"): every decision below as proposed.
 
 - **D-1 Node line.** Proposed: **Node 24** (Maintenance LTS, EOL 2028-04-30). Alternative: Node 26
   (Active LTS since 2026-10-28, EOL 2029-04-30; one more year of support, but only 14 days in LTS).
