@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-11",
   "phase": "Phase 0b — Scaffold",
-  "headline": "CI and branch protection are live on `main`. Contracts v1.0 (PR #7): Frontend and Astrodynamics reviews done (approve with changes), Verification review running. Owner decisions on the contract come next.",
+  "headline": "Contracts v1.0 (PR #7): all three role reviews done, each 'approve with changes'. Nine owner decisions are needed before the Architect revises the contract. CI and branch protection are live.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,16 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-11",
+      "text": "Decide the nine contract questions consolidated from the three reviews of PR #7 (constants in the request, sampling grid, semantic errors, degenerate angles, bit-exact maneuver boundary, interim stale detection, array ownership, hash number encoding, UI error state).",
+      "blocking": "Revision of ML-TASK-004; all of Phase 1"
+    },
+    {
+      "id": "OA-12",
+      "text": "Merge PR #8 (status and spec v0.3 header) once CI passes.",
+      "blocking": "Nothing"
+    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -350,6 +360,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-11",
+      "who": "Reviewers",
+      "text": "Verification review of PR #7 recorded: approve with changes, 4 blocking (sampling grid, semantic rejections, degenerate angles, reference radius) and a list of untested boundaries. The three reviews agree on the main points."
+    },
     {
       "date": "2026-11-11",
       "who": "Reviewers",
