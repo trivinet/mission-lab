@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-11",
   "phase": "Phase 0b — Scaffold",
-  "headline": "Baseline approved at G0. Toolchain versions are being selected before any code is written.",
+  "headline": "Baseline approved at G0. Toolchain versions are proposed and wait for owner approval before the scaffold starts.",
   "gates": [
     { "id": "G0", "name": "Baseline", "state": "passed", "date": "2026-11-11" },
     { "id": "G1", "name": "Engine verified", "state": "next" },
@@ -11,6 +11,7 @@
   ],
   "ownerActions": [
     { "id": "OA-1", "text": "Sign in to GitHub CLI: run `gh auth login` in a terminal (browser flow). Needed to create the public repository, issues, PRs, CI and branch protection.", "blocking": "Publishing the repository; ML-TASK-005" },
+    { "id": "OA-4", "text": "Approve the tech baseline (`docs/architecture/tech-baseline.md`, branch `docs/ml-task-002-tech-baseline`): Node 24 LTS, TypeScript 6.0.3 instead of 7, CI actions pinned by commit SHA.", "blocking": "ML-TASK-003 (scaffold)" },
     { "id": "OA-2", "text": "Choose the external reference source for verification (decision D-5): Python + Orekit, GMAT, or a textbook (Vallado / Curtis).", "blocking": "ML-TASK-012, required before G1" },
     { "id": "OA-3", "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.", "blocking": "Nothing in Mission Lab" }
   ],
@@ -26,7 +27,7 @@
       "name": "Phase 0b — Scaffold",
       "gate": "—",
       "tasks": [
-        { "id": "ML-TASK-002", "title": "Select and pin toolchain and library versions", "role": "Systems Architect", "model": "opus", "status": "in_progress", "approval": true },
+        { "id": "ML-TASK-002", "title": "Select and pin toolchain and library versions", "role": "Systems Architect", "model": "opus", "status": "in_review", "approval": true },
         { "id": "ML-TASK-003", "title": "Monorepo scaffold, lint boundaries, test runners, empty app shell", "role": "Frontend Engineer", "model": "sonnet", "status": "todo", "deps": "002" },
         { "id": "ML-TASK-004", "title": "Normative simulation contracts v1.0", "role": "Systems Architect", "model": "opus", "status": "todo", "deps": "003", "approval": true },
         { "id": "ML-TASK-005", "title": "CI pipeline, PR/issue templates, branch protection", "role": "Coordinator", "model": "session", "status": "blocked", "deps": "003, OA-1" },
@@ -86,6 +87,7 @@
     }
   ],
   "log": [
+    { "date": "2026-11-11", "who": "Architect", "text": "ML-TASK-002 delivered: tech-baseline.md proposes pinned versions, checked against the npm registry. Coordinator spot-checked 10 packages and two peer ranges. Awaiting owner approval." },
     { "date": "2026-11-11", "who": "Coordinator", "text": "ML-TASK-002 started: Systems Architect selecting toolchain and library versions." },
     { "date": "2026-11-11", "who": "Coordinator", "text": "Baseline committed to main (644b1af). GitHub CLI installed; waiting for owner sign-in to publish." },
     { "date": "2026-11-11", "who": "Coordinator", "text": "Repository moved from the OneDrive folder to C:\\dev\\mission-lab (decision D-6)." },
