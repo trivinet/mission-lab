@@ -36,6 +36,10 @@ export const STRUCTURAL_VALIDATION_CODES = [
   'SEGMENT_INDEX_MISMATCH',
   'SEGMENT_COUNT_MISMATCH',
   'SEGMENT_BOUNDARY_MISMATCH',
+  'SEGMENT_TIME_SPAN_MISMATCH',
+  'VELOCITY_INCREMENT_MISMATCH',
+  'TYPED_ARRAY_BUFFER_NOT_OWNED',
+  'DIAGNOSTIC_SEVERITY_MISMATCH',
   'RESULT_STATUS_INCONSISTENT',
 ] as const;
 
@@ -68,6 +72,32 @@ export type SemanticValidationCode = (typeof SEMANTIC_VALIDATION_CODES)[number];
 export type ValidationCode = StructuralValidationCode | SemanticValidationCode;
 export type RuntimeDiagnosticCode = (typeof RUNTIME_DIAGNOSTIC_CODES)[number];
 export type DiagnosticCode = (typeof DIAGNOSTIC_CODES)[number];
+
+/** Severities of a diagnostic, in increasing order of gravity. */
+export const DIAGNOSTIC_SEVERITIES = ['info', 'warning', 'error'] as const;
+export type DiagnosticSeverity = (typeof DIAGNOSTIC_SEVERITIES)[number];
+
+function allWithSeverity<const C extends string>(
+  codes: readonly C[],
+  severity: DiagnosticSeverity,
+): Record<C, DiagnosticSeverity> {
+  return Object.fromEntries(codes.map((code) => [code, severity])) as Record<C, DiagnosticSeverity>;
+}
+
+/**
+ * The only severity a `Diagnostic` with a given code may carry (contracts-v1.md §8). A validation
+ * code reported as a diagnostic is always an error. Enforced by `diagnosticSchema`.
+ */
+export const DIAGNOSTIC_CODE_SEVERITY: Readonly<Record<DiagnosticCode, DiagnosticSeverity>> =
+  Object.freeze({
+    ...allWithSeverity(STRUCTURAL_VALIDATION_CODES, 'error'),
+    ...allWithSeverity(SEMANTIC_VALIDATION_CODES, 'error'),
+    PROPAGATOR_NOT_CONVERGED: 'error',
+    NON_FINITE_STATE: 'error',
+    ESCAPE_TRAJECTORY: 'warning',
+    REFERENCE_SPHERE_INTERSECTION: 'warning',
+    INTERNAL_ERROR: 'error',
+  });
 
 const structuralCodeSet: ReadonlySet<string> = new Set(STRUCTURAL_VALIDATION_CODES);
 

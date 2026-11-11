@@ -19,10 +19,11 @@ export type { ImpulsiveManeuver, KeplerianElements, Scenario } from './scenario'
 export {
   REQUEST_ID_PATTERN,
   cartesianStateSchema,
+  physicalConstantsSchema,
   requestIdSchema,
   simulationRequestSchema,
 } from './request';
-export type { CartesianState, SimulationRequest } from './request';
+export type { CartesianState, PhysicalConstants, SimulationRequest } from './request';
 export {
   diagnosticCodeSchema,
   diagnosticSchema,
@@ -34,7 +35,6 @@ export {
 } from './result';
 export type {
   Diagnostic,
-  DiagnosticSeverity,
   ManeuverEvent,
   ResultModel,
   SimulationResult,
@@ -47,4 +47,4 @@ export {
   validateSimulationResult,
 } from './validate';
 export type { ValidationIssue, ValidationResult } from './validate';
-export { canonicalRequestPayload } from './canonical';
+export { binary64Hex, canonicalRequestPayload } from './canonical';

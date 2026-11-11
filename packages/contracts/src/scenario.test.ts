@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ValidationCode } from './codes';
 import type { Scenario } from './scenario';
+import { nextDown, nextUp } from './test-doubles';
 import { validScenario } from './test-fixtures';
 import { validateScenario } from './validate';
 
@@ -262,12 +263,10 @@ describe('Scenario v1.0', () => {
     const input = mutated((s) =>
       s.maneuvers.push({ id: 'm1', t_s: 200, frame: 'RSW', deltaV_mps: [0, 0, 0] }),
     );
-    expect(issuesOf(input)).toEqual(
-      expect.arrayContaining([
-        { code: 'MANEUVER_COUNT_EXCEEDED', path: 'maneuvers' },
-        { code: 'ID_DUPLICATE', path: 'maneuvers.1.id' },
-      ]),
-    );
+    expect(issuesOf(input)).toEqual([
+      { code: 'MANEUVER_COUNT_EXCEEDED', path: 'maneuvers' },
+      { code: 'ID_DUPLICATE', path: 'maneuvers.1.id' },
+    ]);
   });
 
   describe('non-finite numbers', () => {
@@ -322,8 +321,7 @@ describe('Scenario v1.0', () => {
   it.each([[null], [[]], ['scenario'], [42]])(
     'rejects non-object input %j without throwing',
     (input) => {
-      const result = validateScenario(input);
-      expect(result.ok).toBe(false);
+      expect(issuesOf(input)).toEqual([{ code: 'TYPE_MISMATCH', path: '' }]);
     },
   );
 
@@ -332,11 +330,140 @@ describe('Scenario v1.0', () => {
       s.duration_s = 0;
       s.outputStep_s = 0;
     });
-    expect(issuesOf(input)).toEqual(
-      expect.arrayContaining([
-        { code: 'DURATION_NOT_POSITIVE', path: 'duration_s' },
-        { code: 'OUTPUT_STEP_NOT_POSITIVE', path: 'outputStep_s' },
-      ]),
-    );
+    // Refinement failures do not suppress cross-field rules: the maneuver at 100 s is also
+    // after the 0 s duration.
+    expect(issuesOf(input)).toEqual([
+      { code: 'DURATION_NOT_POSITIVE', path: 'duration_s' },
+      { code: 'OUTPUT_STEP_NOT_POSITIVE', path: 'outputStep_s' },
+      { code: 'MANEUVER_TIME_OUT_OF_RANGE', path: 'maneuvers.0.t_s' },
+    ]);
+  });
+
+  it('suppresses cross-field rules while the object has a type error', () => {
+    const input = mutated((s) => {
+      (s as Record<string, unknown>).duration_s = '50';
+      s.maneuvers.push({ id: 'm1', t_s: 200, frame: 'RSW', deltaV_mps: [0, 0, 0] });
+    });
+    // Neither MANEUVER_TIME_OUT_OF_RANGE nor ID_DUPLICATE is reported. Issues follow the
+    // schema's field order (maneuvers before duration_s).
+    expect(issuesOf(input)).toEqual([
+      { code: 'MANEUVER_COUNT_EXCEEDED', path: 'maneuvers' },
+      { code: 'TYPE_MISMATCH', path: 'duration_s' },
+    ]);
+  });
+
+  describe('boundary doubles (computed from bit patterns, not typed)', () => {
+    const accepted: [string, (s: Mutable) => void][] = [
+      ['eccentricity just below 1', (s) => (s.initialOrbit.elements.eccentricity = nextDown(1))],
+      ['eccentricity -0', (s) => (s.initialOrbit.elements.eccentricity = -0)],
+      ['inclination -0', (s) => (s.initialOrbit.elements.inclination_rad = -0)],
+      [
+        'inclination just below π',
+        (s) => (s.initialOrbit.elements.inclination_rad = nextDown(Math.PI)),
+      ],
+      ['RAAN just below 2π', (s) => (s.initialOrbit.elements.raan_rad = nextDown(2 * Math.PI))],
+      ['RAAN -0', (s) => (s.initialOrbit.elements.raan_rad = -0)],
+      ['arg. periapsis -0', (s) => (s.initialOrbit.elements.argPeriapsis_rad = -0)],
+      [
+        'true anomaly just below 2π',
+        (s) => (s.initialOrbit.elements.trueAnomaly_rad = nextDown(2 * Math.PI)),
+      ],
+      [
+        'semi-major axis Number.MIN_VALUE',
+        (s) => (s.initialOrbit.elements.semiMajorAxis_m = Number.MIN_VALUE),
+      ],
+      [
+        'semi-major axis Number.MAX_VALUE',
+        (s) => (s.initialOrbit.elements.semiMajorAxis_m = Number.MAX_VALUE),
+      ],
+      ['duration Number.MAX_VALUE', (s) => (s.duration_s = Number.MAX_VALUE)],
+      ['output step Number.MIN_VALUE', (s) => (s.outputStep_s = Number.MIN_VALUE)],
+      [
+        'maneuver at t_s = -0',
+        (s) => (s.maneuvers[0] = { id: 'm1', t_s: -0, frame: 'RSW', deltaV_mps: [0, 0, 0] }),
+      ],
+      [
+        'Δv components at ±Number.MAX_VALUE',
+        (s) =>
+          (s.maneuvers[0] = {
+            id: 'm1',
+            t_s: 1,
+            frame: 'RSW',
+            deltaV_mps: [Number.MAX_VALUE, -Number.MAX_VALUE, 0],
+          }),
+      ],
+    ];
+
+    it.each(accepted)('accepts %s', (_label, change) => {
+      expect(issuesOf(mutated(change))).toEqual([]);
+    });
+
+    const rejected: [string, (s: Mutable) => void, ValidationCode, string][] = [
+      [
+        'eccentricity -Number.MIN_VALUE',
+        (s) => (s.initialOrbit.elements.eccentricity = -Number.MIN_VALUE),
+        'ECCENTRICITY_OUT_OF_RANGE',
+        'initialOrbit.elements.eccentricity',
+      ],
+      [
+        'inclination just above π',
+        (s) => (s.initialOrbit.elements.inclination_rad = nextUp(Math.PI)),
+        'INCLINATION_OUT_OF_RANGE',
+        'initialOrbit.elements.inclination_rad',
+      ],
+      [
+        'arg. periapsis exactly 2π',
+        (s) => (s.initialOrbit.elements.argPeriapsis_rad = 2 * Math.PI),
+        'ANGLE_OUT_OF_RANGE',
+        'initialOrbit.elements.argPeriapsis_rad',
+      ],
+      [
+        'true anomaly -Number.MIN_VALUE',
+        (s) => (s.initialOrbit.elements.trueAnomaly_rad = -Number.MIN_VALUE),
+        'ANGLE_OUT_OF_RANGE',
+        'initialOrbit.elements.trueAnomaly_rad',
+      ],
+      [
+        'semi-major axis -0',
+        (s) => (s.initialOrbit.elements.semiMajorAxis_m = -0),
+        'SEMI_MAJOR_AXIS_NOT_POSITIVE',
+        'initialOrbit.elements.semiMajorAxis_m',
+      ],
+      ['output step -0', (s) => (s.outputStep_s = -0), 'OUTPUT_STEP_NOT_POSITIVE', 'outputStep_s'],
+      [
+        'maneuver one ulp after duration_s',
+        (s) =>
+          (s.maneuvers[0] = {
+            id: 'm1',
+            t_s: nextUp(s.duration_s),
+            frame: 'RSW',
+            deltaV_mps: [0, 0, 0],
+          }),
+        'MANEUVER_TIME_OUT_OF_RANGE',
+        'maneuvers.0.t_s',
+      ],
+      [
+        'maneuver at -Number.MIN_VALUE',
+        (s) =>
+          (s.maneuvers[0] = {
+            id: 'm1',
+            t_s: -Number.MIN_VALUE,
+            frame: 'RSW',
+            deltaV_mps: [0, 0, 0],
+          }),
+        'MANEUVER_TIME_OUT_OF_RANGE',
+        'maneuvers.0.t_s',
+      ],
+    ];
+
+    it.each(rejected)('rejects %s', (_label, change, code, path) => {
+      expect(issuesOf(mutated(change))).toEqual([{ code, path }]);
+    });
+
+    it('the helper agrees with Number.EPSILON, defined by ECMA-262 as the gap above 1', () => {
+      expect(nextUp(1)).toBe(1 + Number.EPSILON);
+      expect(nextDown(1)).toBeLessThan(1);
+      expect(nextUp(nextDown(1))).toBe(1);
+    });
   });
 });

@@ -38,7 +38,7 @@ export function validRequest(): SimulationRequest {
     requestId: `sha256:${'0'.repeat(64)}`,
     schemaVersion: '1.0',
     centralBody: 'EARTH',
-    mu_m3ps2: 1,
+    constants: { mu_m3ps2: 1, referenceRadius_m: 0.5, source: 'placeholder' },
     dynamicsModel: 'TWO_BODY',
     frame: 'GCRF',
     epoch: { scale: 'UTC', iso: '2030-01-02T03:04:05.678Z' },
@@ -63,7 +63,7 @@ export function validResult(): SimulationResult {
       epoch: { scale: 'UTC', iso: '2030-01-02T03:04:05.678Z' },
       timeConvention: 'placeholder',
       sampling: { duration_s: 1000, outputStep_s: 10 },
-      constants: { mu_m3ps2: 1, referenceRadius_m: 1, source: 'placeholder' },
+      constants: { mu_m3ps2: 1, referenceRadius_m: 0.5, source: 'placeholder' },
       limitations: ['placeholder'],
     },
     segments: [

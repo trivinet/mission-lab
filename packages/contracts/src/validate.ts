@@ -47,7 +47,7 @@ function codeOf(issue: Issue): ValidationCode {
   }
 }
 
-/** Maps zod issues to contract validation issues. Never throws. */
+/** Maps zod issues to contract validation issues. */
 export function toValidationIssues(error: z.ZodError): ValidationIssue[] {
   return error.issues.flatMap((issue): ValidationIssue[] => {
     const path = toPath(issue.path);
@@ -94,17 +94,20 @@ function run<T>(schema: z.ZodType<T>, input: unknown, versioned: boolean): Valid
     : { ok: false, issues: toValidationIssues(parsed.error) };
 }
 
-/** Structural validation of a Scenario (e.g. a loaded file). Never throws. */
+/** Structural validation of a Scenario (e.g. a loaded file). Throwing scope: contracts-v1.md §6. */
 export function validateScenario(input: unknown): ValidationResult<Scenario> {
   return run(scenarioSchema, input, true);
 }
 
-/** Structural validation of a SimulationRequest. Never throws. */
+/** Structural validation of a SimulationRequest. Throwing scope: contracts-v1.md §6. */
 export function validateSimulationRequest(input: unknown): ValidationResult<SimulationRequest> {
   return run(simulationRequestSchema, input, true);
 }
 
-/** Structural validation of a SimulationResult. Never throws. */
+/**
+ * Structural validation of a SimulationResult. Must run in the realm that created the typed
+ * arrays (class and buffer checks use instanceof). Throwing scope: contracts-v1.md §6.
+ */
 export function validateSimulationResult(input: unknown): ValidationResult<SimulationResult> {
   return run(simulationResultSchema, input, false);
 }
