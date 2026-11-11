@@ -1,0 +1,98 @@
+# Mission Lab task contract. One file per task: docs/backlog/tasks/ML-TASK-NNN.yaml
+# A task is READY only when every field is filled and acceptance criteria are testable.
+task_id: ML-TASK-006
+title: "Coding standards and contributor guide (docs/engineering/)"
+status: in_review            # proposed | ready | in_progress | in_review | done | blocked
+requirement_ids: [ML-NFR-001, ML-NFR-002, ML-NFR-005, ML-NFR-007]   # agent-selected mapping; owner/coordinator to confirm
+owner_role: docs-release
+reviewer_role: systems-architect
+dependencies: [ML-TASK-003]
+affected_paths:
+  - docs/engineering/coding-standards.md
+  - docs/engineering/contributing.md
+  - docs/backlog/tasks/ML-TASK-006.yaml
+objective: >
+  Write the coding standards and the contributor guide for the Phase 0b scaffold, documenting only
+  what the repository and the approved documents establish. Everything else is listed as not yet
+  decided.
+scope:
+  - Naming with unit suffixes (_m, _mps, _s, _rad), frame and time-scale rules.
+  - Error handling: the engine returns diagnostics and does not throw for user-reachable conditions.
+  - Package boundaries and what each package may import.
+  - Test layout and the three verification evidence layers.
+  - How to run each check locally, using the script names in package.json.
+  - Branch, commit and PR conventions: one task = one ML-TASK-NNN = one branch = one PR; only the
+    owner merges to main.
+  - Provisioning a development machine: Node 24.22.2, pnpm 12.16.1.
+out_of_scope:
+  - Any code, test, configuration or package.json change.
+  - CI workflow, PR and issue templates, branch protection (ML-TASK-005).
+  - Normative contract definitions (ML-TASK-004).
+  - Changes to README.md or CHANGELOG.md (not in affected_paths; see report).
+  - Decisions on technical disagreements between documents (report them instead).
+inputs:
+  - AGENTS.md
+  - docs/architecture/proposed-architecture.md (§1, §3, §4, §6)
+  - docs/architecture/adr/ADR-002, ADR-003, ADR-004, ADR-007
+  - docs/architecture/tech-baseline.md (§2, §3, §5)
+  - docs/agents/task-template.yaml
+  - docs/backlog/tasks/ML-TASK-003.yaml
+  - docs/backlog/backlog.md (ML-TASK-006 row)
+  - docs/requirements/m1-requirements.md (ML-NFR-001, 002, 003, 005, 006, 007)
+  - docs/verification/m1-verification-plan.md (§1, §2, §3, §6, §7)
+  - Repository files: package.json, eslint.config.js, tsconfig.base.json, vitest.config.ts,
+    .prettierrc.json, .prettierignore, .editorconfig, .npmrc, .nvmrc, tools/boundary-fixtures/check.mjs,
+    apps/web/playwright.config.ts, apps/web/package.json
+acceptance_criteria:
+  - "docs/engineering/coding-standards.md covers unit suffixes, frame and time-scale rules, error handling, package boundaries, test layout and the three evidence layers, each non-obvious statement citing its source."
+  - "docs/engineering/contributing.md lists every local check with the real script name from package.json, and gives the Node 24.22.2 and pnpm 12.16.1 provisioning steps."
+  - "Both files end with a 'Not yet decided' section listing every gap instead of filling it."
+  - "Every relative link in both files resolves to an existing file."
+  - "Each file is under about 200 lines."
+test_requirements:
+  - "Link check of both files (relative targets exist)."
+  - "Script-name check: every `pnpm <script>` in contributing.md exists in the root or apps/web package.json."
+  - "Owner-facing review: reviewer checks each statement against its cited source."
+deliverables:
+  - docs/engineering/coding-standards.md
+  - docs/engineering/contributing.md
+  - This task contract with the report section filled.
+human_approval_required: false
+
+# Filled in by the agent on completion (the task report).
+report:
+  files_changed:
+    - docs/engineering/coding-standards.md
+    - docs/engineering/contributing.md
+    - docs/backlog/tasks/ML-TASK-006.yaml
+  summary: >
+    Two guide documents written from the repository and approved documents only. Each rule cites its
+    source. Gaps (naming beyond unit suffixes, commit format, PR template, merge method, test
+    categories, CI details, release process and others) are listed under 'Not yet decided' in each file.
+    No code, configuration or other document was changed.
+  tests_executed:
+    - "Relative link check, docs/engineering/*.md (10 distinct targets): all exist."
+    - "Script-name check: lint, typecheck, test, build, format, format:check, check:boundaries, test:e2e exist in root package.json; test:e2e and dev exist in apps/web/package.json (dev is a workspace script, used with --filter)."
+    - "Not run: pnpm install, lint, typecheck, test, build, format:check, check:boundaries, test:e2e. Docs-only change; the worktree has no node_modules. Prettier ignores docs/ and *.md, so format:check would not check these files."
+  reference_data_used: []
+  not_verified:
+    - "Diagnostic shape in coding-standards.md §3 is illustrative (proposed-architecture §4 header); normative version pending ML-TASK-004."
+    - "μ and reference-radius values are cited only as proposed in proposed-architecture §3; not checked against a primary source (VT-19)."
+    - "Effect of .npmrc engine-strict=true was not verified."
+    - "eslint-plugin-boundaries behaviour and the browser-global list were read from eslint.config.js only; the rules were not run in this task."
+    - "Windows-specific behaviour of the scripts was not tested."
+    - "Node and pnpm installation steps were taken from tech-baseline §5; not performed on a machine."
+  known_limitations:
+    - "Documents describe the scaffold as merged at 963948a; they will be stale after ML-TASK-004 and ML-TASK-005."
+    - "Markdown is not format-checked (.prettierignore)."
+  documentation_changes:
+    - "Added docs/engineering/coding-standards.md and docs/engineering/contributing.md."
+  risks_or_blockers:
+    - "README.md line 7 says 'No application code exists yet'. This is no longer true after the ML-TASK-003 scaffold. README.md is owned by docs-release but is outside this task's affected_paths; not changed. Needs a separate task or owner instruction."
+    - "docs/backlog/tasks/ML-TASK-003.yaml line 22 lists vitest.workspace.ts in affected_paths; line 107 states it was not created. Not reconciled here."
+    - "docs/backlog/tasks/ML-TASK-003.yaml line 3 has status in_progress; its report describes completed work and the status board (docs/status/status.json, ML-TASK-003 entry) lists it under review. Not reconciled here."
+    - "docs/status/status.json ML-TASK-006 status is 'todo'. This task sets in_review in its contract; the coordinator must update the status board."
+    - "ML-NFR-005 requires integration and numerical runs in CI; vitest.config.ts has one project per package and no separate integration or numerical configuration. Noted in coding-standards.md §9; not a document conflict."
+    - "requirement_ids in this contract are an agent selection, not stated in backlog.md. Coordinator to confirm."
+  review_artifact: ""
+  recommended_next_action: "Systems Architect review of the two guides against the cited sources; coordinator to decide on README.md and status.json updates; ML-TASK-004 and ML-TASK-005 will add content to 'Not yet decided' sections."
