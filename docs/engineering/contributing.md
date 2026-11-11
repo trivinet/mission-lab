@@ -101,7 +101,7 @@ format:check, check:boundaries, test:e2e.
 
 Evidence limits:
 
-- No CI workflow exists yet. `.github/` is absent. A local run is not CI evidence.
+- CI is defined in `.github/workflows/ci.yml` (ML-TASK-005): jobs `checks`, `e2e` and `audit`. A local run is not CI evidence.
   ML-NFR-005 requires lint, type-check, unit, integration, numerical and build on every PR.
 - `pnpm test` covers unit tests only as configured. Integration and numerical runs are not
   separated in the configuration (see section 8).

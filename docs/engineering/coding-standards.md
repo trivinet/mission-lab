@@ -83,7 +83,7 @@ then the task contract.
   (ML-TASK-003 `out_of_scope`).
 - `packages/astrodynamics` declares no `dependencies`. It must not list `contracts` or `zod`
   (tech-baseline.md §3.7; ADR-002).
-- Dependency audit runs in CI (ML-NFR-006). No CI workflow exists in the repository yet.
+- Dependency audit runs in CI (ML-NFR-006): the `audit` job of `.github/workflows/ci.yml` (ML-TASK-005).
 
 ## 6. Package boundaries
 
@@ -133,7 +133,7 @@ only against all of them.
 
 - L2 methods: classical elements with Newton solution of Kepler's equation; fixed-step
   Runge–Kutta integration with step-halving check; direct rotation-matrix construction.
-- L3 is not available yet. It needs owner input (decision D-5, m1-verification-plan.md §2).
+- L3 source: Python + Orekit (owner decision D-5, 2026-11-11, `docs/releases/G0-review.md`). No L3 dataset exists yet (ML-TASK-012).
 - Tolerances are derived before the engine's results are seen, and the owner approves them.
   The method is fixed; the values are fixed at G1 (ADR-003; m1-verification-plan.md §4).
 - Test families VT-01…VT-19, VI-01…VI-03 and VE-01…VE-02 are defined in
