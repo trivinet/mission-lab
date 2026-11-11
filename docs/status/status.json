@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-11",
   "phase": "Phase 0b — Scaffold",
-  "headline": "Owner approved the nine contract decisions. The Systems Architect is revising contracts v1.0 (PR #7). CI and branch protection are live on `main`.",
+  "headline": "Contracts v1.0 revision 2 delivered (PR #7): nine owner decisions applied, 338 tests pass locally. GitHub Actions has not started any run since 20:22 UTC, so PRs #7 and #8 cannot be merged yet.",
   "gates": [
     {
       "id": "G0",
@@ -32,9 +32,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-12",
-      "text": "Merge PR #8 (status and spec v0.3 header) once CI passes.",
-      "blocking": "Nothing"
+      "id": "OA-13",
+      "text": "Approve contracts v1.0 (PR #7, `docs/architecture/contracts-v1.md` revision 2) and merge it and PR #8 once CI has run. Three small new questions are in §12 of the document.",
+      "blocking": "Phase 0b exit; all of Phase 1"
     },
     {
       "id": "OA-3",
@@ -82,7 +82,7 @@
           "title": "Normative simulation contracts v1.0",
           "role": "Systems Architect",
           "model": "opus",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "003",
           "approval": true
         },
@@ -355,6 +355,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "CI blocked on GitHub's side: eight workflow runs queued since 20:22 UTC with no jobs created, although GitHub's status page reports Actions operational. Earlier runs (16:30 UTC) completed normally. Not polling; will re-trigger."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Architect",
+      "text": "ML-TASK-004 revision 2: nine owner decisions and the reviewers' non-blocking items applied; test count 120 → 338. Coordinator re-ran install, lint, typecheck, test, format and boundary checks: all pass."
+    },
     {
       "date": "2026-11-11",
       "who": "Owner",
