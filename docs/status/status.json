@@ -1,7 +1,7 @@
 {
-  "updated": "2026-11-11",
+  "updated": "2026-11-12",
   "phase": "Phase 0b — Scaffold",
-  "headline": "Contracts v1.0 delivered (PR #7) and under review by the Astrodynamics, Verification and Frontend engineers. PRs #4 (CI), #5 (standards) and #6 (spec v0.3) wait for the owner's merge.",
+  "headline": "GitHub Actions is back: PRs #8 and #9 pass CI; PR #7 (contracts) re-triggered. Python 3.13, JDK 21 and Orekit 13.1 are installed, so the Orekit reference dataset (ML-TASK-012 part B) can start. Owner decisions pending on the contract, the mock-up and the textbook.",
   "gates": [
     {
       "id": "G0",
@@ -32,14 +32,19 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-9",
-      "text": "Review the diff of PR #6 (ML-SYS-001 v0.3) and merge it at github.com/trivinet/mission-lab/pull/6. The eight open questions are already resolved as approved (Appendix A.3).",
-      "blocking": "Approval of spec v0.3"
+      "id": "OA-15",
+      "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
+      "blocking": "Publishing the textbook assessment"
     },
     {
-      "id": "OA-8",
-      "text": "Review PR #5 (ML-TASK-006: coding standards and contributor guide) at github.com/trivinet/mission-lab/pull/5.",
-      "blocking": "Nothing yet"
+      "id": "OA-14",
+      "text": "Open the workspace mock-up at claude.ai/artifact/DvtuJBRU1kxkHeTxyHqqQM and decide three things: panel arrangement, accent colour, how the result state is shown.",
+      "blocking": "ML-TASK-022, 023 (editor and 3D scene)"
+    },
+    {
+      "id": "OA-13",
+      "text": "Approve contracts v1.0 (PR #7, `docs/architecture/contracts-v1.md` revision 2) and merge it and PR #8 once CI has run. Three small new questions are in §12 of the document.",
+      "blocking": "Phase 0b exit; all of Phase 1"
     },
     {
       "id": "OA-3",
@@ -96,7 +101,7 @@
           "title": "CI pipeline, PR/issue templates, branch protection",
           "role": "Coordinator",
           "model": "session",
-          "status": "in_review",
+          "status": "done",
           "deps": "003"
         },
         {
@@ -104,7 +109,7 @@
           "title": "Coding standards and contributor guide",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "in_review",
+          "status": "done",
           "deps": "003"
         },
         {
@@ -112,7 +117,7 @@
           "title": "Fold approved amendments into ML-SYS-001 body (v0.3)",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "in_review",
+          "status": "done",
           "approval": true
         }
       ]
@@ -143,8 +148,8 @@
           "title": "External references (Orekit / GMAT / textbook)",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "todo",
-          "deps": "004; Orekit (D-5)",
+          "status": "in_progress",
+          "deps": "D-5 (Orekit part needs Python + Java)",
           "approval": true
         },
         {
@@ -207,7 +212,7 @@
           "title": "Visual direction: layout and design tokens mock-up",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
+          "status": "in_review",
           "deps": "003",
           "approval": true
         },
@@ -360,6 +365,71 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-12",
+      "who": "Coordinator",
+      "text": "GitHub Actions recovered. CI passes on PR #8 and PR #9; PR #7 re-triggered with an empty commit because its run stayed stuck."
+    },
+    {
+      "date": "2026-11-12",
+      "who": "Coordinator",
+      "text": "Owner approved the install. Dev machine: Python 3.13.17 (user scope) and Eclipse Temurin JDK 21.0.13 via winget; virtual environment at `C:devmission-lab-toolsorekit-venv` with `orekit-jpype` 13.1.9.0 and JPype1 1.7.1. Smoke test: JVM starts and Orekit classes load. No orbit computed yet."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Verification",
+      "text": "ML-TASK-012 part A delivered: Wakker's textbook assessed from its text layer only (formulas and figures not readable). Verdict: good citation source for closed-form relations, weak L3 (few examples, 3–5 significant digits). Committed locally, not pushed pending the owner's decision on publishing book values."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Frontend",
+      "text": "ML-TASK-020 delivered: static workspace mock-up with five result states, design tokens with computed contrast ratios, three owner choices. Not yet rendered in a browser by the team; published privately for the owner."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "Started in isolated worktrees, independent of the CI outage: ML-TASK-020 visual direction mock-up (Frontend, sonnet) and ML-TASK-012 part A, assessment of Wakker's textbook as an L3 source (Verification, opus). Remote Control enabled so the owner can follow from the phone."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "CI blocked by a GitHub incident: githubstatus.com reports a major outage of Actions (\"Impact across multiple GitHub products including Actions, Pages, and Copilot\"). Rerun, force-cancel and reopening PR #8 had no effect. Nine runs queued since 20:22 UTC. To be re-triggered when GitHub recovers."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Architect",
+      "text": "ML-TASK-004 revision 2: nine owner decisions and the reviewers' non-blocking items applied; test count 120 → 338. Coordinator re-ran install, lint, typecheck, test, format and boundary checks: all pass."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Owner",
+      "text": "Approved the nine contract decisions as recommended (constants in the request, normative sampling grid, semantic errors as validation issues, degenerate angles, bit-exact maneuver boundary enforced in v1.0, interim stale detection, array ownership, bit-pattern number encoding for the request id, fifth UI state). ML-UX-001 amended. Architect started the revision."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Reviewers",
+      "text": "Verification review of PR #7 recorded: approve with changes, 4 blocking (sampling grid, semantic rejections, degenerate angles, reference radius) and a list of untested boundaries. The three reviews agree on the main points."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Reviewers",
+      "text": "PR #7 reviews recorded: Frontend (3 blocking: semantic-error routing, stale detection before the hash exists, typed-array ownership) and Astrodynamics (2 blocking: constants in the request, exact sampling grid). Both approve with changes."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "`main` protected: pull request required, checks `checks` and `e2e` required, admins included, no force push. A direct push test was rejected by GitHub. ML-TASK-005 done."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "PRs #4, #5 and #6 merged on the owner's explicit instruction. ML-TASK-006 and ML-TASK-007 done; ML-SYS-001 v0.3 is the approved spec."
+    },
+    {
+      "date": "2026-11-11",
+      "who": "Coordinator",
+      "text": "CI green on PR #4 after replacing the Chromium install step (first run failed on a runner DNS error fetching apt packages). The three contract reviewers stalled without output and were relaunched."
+    },
     {
       "date": "2026-11-11",
       "who": "Coordinator",
