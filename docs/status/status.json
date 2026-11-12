@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-12",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Phase 0b complete: contracts v1.0 approved and merged, CI green, `main` protected. Phase 1 started: tolerance derivation (ML-TASK-010) and constants/vector math (ML-TASK-013) are with the agents.",
+  "headline": "First engine code delivered: Earth constants and vector math (ML-TASK-013, PR #11), constants confirmed against an NGA document. Tolerance derivation (ML-TASK-010) still with the Verification Engineer.",
   "gates": [
     {
       "id": "G0",
@@ -152,7 +152,7 @@
           "title": "Constants, units, vector math",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "004"
         },
         {
@@ -360,6 +360,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-12",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-013 delivered: constants with cited source and 3-vector / 3×3 math, 37 new tests. Coordinator re-ran all checks (375 tests pass) and independently read GM and the semi-major axis in the cited NGA document. The WGS 84 standard itself (TR8350.2) was not reachable, so VT-19 stays open. PR #11."
+    },
     {
       "date": "2026-11-12",
       "who": "Coordinator",
