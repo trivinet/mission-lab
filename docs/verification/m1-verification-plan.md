@@ -38,7 +38,7 @@ IDs are permanent. "Grid" = the orbit test grid of §5.
 | VT-01 | Vector/matrix utilities | — | L1 | Identities: orthogonality, norm, triple product |
 | VT-02 | Elements → Cartesian | FR-003 AC1 | L2c, L3 | Position/velocity vs reference |
 | VT-03 | Round trip state ↔ elements | FR-003 AC2 | L1 | Round-trip error over the grid |
-| VT-04 | Degenerate elements | FR-002 AC3, FR-003 AC2 | L1, L2 | Convention applied; state round trip still holds |
+| VT-04 | Degenerate elements | FR-002 AC3, FR-003 AC2 | L1, L2 | Convention applied (ADR-008); state round trip still holds |
 | VT-05 | Circular and elliptical propagation | FR-004 AC1 | L2a, L2b, L3 | State vs reference at fractional and multi-period times |
 | VT-06 | Energy conservation | FR-004 AC2 | L1 | Relative deviation of specific energy on all samples |
 | VT-07 | Angular momentum conservation | FR-004 AC2 | L1 | Relative deviation of **h** (vector) on all samples |
@@ -47,7 +47,7 @@ IDs are permanent. "Grid" = the orbit test grid of §5.
 | VT-10 | Determinism | FR-004 AC5 | — | Bit-identical repeated runs |
 | VT-11 | RSW basis | FR-006 AC1 | L1 | Orthonormality, handedness, R ∥ r, W ∥ r × v |
 | VT-12 | Maneuver frame transformation | FR-006 AC2 | L2c | Inertial Δv vs reference |
-| VT-13 | Impulsive velocity change | FR-006 AC3 | L1 | Position continuity; v⁺ − v⁻ = Δv |
+| VT-13 | Impulsive velocity change | FR-006 AC3 | L1 | Position continuity; v⁺ = fl(v⁻ + Δv) per component, bit-exact, as defined by contract R12 (contracts-v1.md §5.5) |
 | VT-14 | Zero-magnitude maneuver | FR-006 AC4 | L1 | Equivalence with coast run |
 | VT-15 | Post-maneuver orbit | FR-006 AC5, FR-010 AC3 | L1, L2 | Elements after burn vs closed form (e.g. tangential burn at apsis via vis-viva) and reference |
 | VT-16 | Escape / surface intersection | FR-006 AC6 | L2b | Correct propagation and warning present |
@@ -60,7 +60,7 @@ Non-numerical verification:
 | ID | Level | Scope |
 |---|---|---|
 | VI-01 | Integration | Request → result structure, segments and events, metadata completeness |
-| VI-02 | Integration | Scene-state hook: rendered vertices equal scaled engine samples (FR-007 AC2) |
+| VI-02 | Integration | Scene-state hook: rendered vertices equal scaled engine samples (FR-007 AC2; exact, `Math.fround(x * s)`) |
 | VI-03 | Integration | Analysis outputs equal values recomputed from the result |
 | VE-01 | End-to-end | The 13-step release acceptance scenario (ML-SYS-001 §14) |
 | VE-02 | End-to-end | Result-state transitions: none → computing → current → stale |

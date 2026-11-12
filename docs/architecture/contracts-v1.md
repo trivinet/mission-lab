@@ -1,6 +1,12 @@
 # Simulation Contracts v1.0
 
-**Document ID:** ML-ARCH-003 · **Date:** 2026-11-11 · **Author:** Systems Architect (ML-TASK-004) · **Revision:** 2 (owner decisions of 2026-11-11 and role reviews incorporated) · **Status:** Proposed — awaiting owner approval of this revision
+**Document ID:** ML-ARCH-003 · **Date:** 2026-11-12 · **Author:** Systems Architect (ML-TASK-004, ML-TASK-008) · **Revision:** 3 · **Status:** Accepted. Revision 2 content accepted by the owner's merge of PR #7 (2026-11-12); the revision 3 changes (§5.2 initial sample, §9 versioning note, §11.2, §12 NQ-4, §13, §14) record owner decisions of 2026-11-12 and are approved by them
+
+| Revision | Date | Change |
+|---|---|---|
+| 1 | 2026-11-11 | First version (ML-TASK-004). |
+| 2 | 2026-11-11 | Owner decisions of 2026-11-11 and role reviews (§11.1). |
+| 3 | 2026-11-12 | Owner decisions of 2026-11-12 (§11.2): first sample of every segment bit-identical to the segment's initial state (§5.2); degenerate-element detail moved to ADR-008. No schema or code change; `schemaVersion` stays `"1.0"` (§9). |
 
 Normative prose for `packages/contracts` (`@mission-lab/contracts`). It refines the approved
 draft contract v0.2 of [proposed-architecture.md §4](proposed-architecture.md#4-simulation-contract-draft-v02--replaces-the-illustrative-sample).
@@ -8,8 +14,8 @@ The zod schemas in `packages/contracts/src` are the single source of truth for t
 types (`z.infer`); this document gives the meaning those schemas cannot express. Where this
 document and the schemas disagree, that is a defect to be reported, not resolved silently.
 
-Deviations from §4 are listed in §10, the owner decisions of 2026-11-11 in §11 and the questions
-still open in §12. Non-normative guidance for consumers is in §14.
+Deviations from §4 are listed in §10, the owner decisions of 2026-11-11 and 2026-11-12 in §11
+and the questions still open in §12. Non-normative guidance for consumers is in §14.
 
 ## 1. Scope
 
@@ -76,7 +82,9 @@ conventions of architecture §3 (circular: ω := 0; equatorial: Ω := 0; both: �
 apply only to state→elements, i.e. to the derived element view of a computed state, with the
 circular/equatorial thresholds taken from the tolerance record. "Equatorial" means i = 0 or
 i = π. The rotation formulas are physics and are specified, with a cited source, by
-ML-TASK-013/014 in `packages/astrodynamics`; this contract gives none.
+ML-TASK-013/014 in `packages/astrodynamics`; this contract gives none. In the derived view,
+eccentricity and inclination are always the computed values and are never set to zero; the
+convention assigns only the undefined angles (ADR-008, owner decision, 2026-11-12).
 
 **Semantic rules not checked here (owner decision 3).** Perigee radius a(1 − e) must exceed the
 reference radius (ML-FR-002 AC2), and the sample count of §5.2 must not exceed the ML-NFR-004
@@ -192,6 +200,25 @@ and nowhere else. A maneuver at 0 makes segment 0 the single sample [0]; a maneu
 the last segment the single sample [D]. "Common time" in §4 of the architecture means
 bit-identical `t_s`.
 
+**Initial sample of a segment (normative engine obligation, owner decision, 2026-11-12; revision
+3).** The first sample of every segment is bit-identical to that segment's initial state, all six
+components (`Object.is`, §2):
+
+- segment 0: `position_m[0..2]` = `request.initialState.position_m` and `velocity_mps[0..2]` =
+  `request.initialState.velocity_mps`;
+- segment n + 1 (after event n): position = `events[n].position_m` and velocity =
+  `events[n].velocityAfter_mps`, which is already required by R8.
+
+The engine obtains that sample by copying the initial state, not by evaluating the propagator at
+Δt = 0. This refines ADR-005 ("each output sample is computed directly from the segment's initial
+state at Δt = t − t₀") for the single case Δt = 0, where the exact result is the initial state
+itself and an evaluation could differ from it by rounding. Every other sample is unchanged. The
+rule applies to `status: "ok"` results; a failed result has no segments (R9).
+
+Enforcement: for segments after a maneuver the obligation is the R8 boundary rule and is
+schema-checked. For segment 0 it is checked by VI-01 (§13), not by the result schema: the result
+does not carry the request, and no field is added to make it checkable (§12, NQ-4).
+
 The sample count checked by `SAMPLE_COUNT_EXCEEDED` (§3) is the sum of N over all segments of
 this grid (boundary samples counted once per segment). The candidates are strictly increasing in
 j while j < 2⁵¹: the exact products differ by h, the spacing of binary64 values at that magnitude
@@ -260,7 +287,8 @@ R10 compares the first sample with `=== 0`, so −0 is accepted there (it occurs
 maneuver at −0, §5.2). R8 and R10 read sample values and run only when every segment satisfies
 R2, R3 and R5.
 
-Checked elsewhere, not by the schema: the sample times themselves against the §5.2 grid and
+Checked elsewhere, not by the schema: the sample times themselves against the §5.2 grid,
+the first sample of segment 0 against `request.initialState` (§5.2, revision 3) and
 `result.model.constants` / `model.sampling` / `model.epoch` against the request (VI-01, which sees
 both); `deltaV_magnitude_mps` and the physical correctness of every state (VT-13 and the
 reference tests).
@@ -501,6 +529,18 @@ follow a maneuver that produced a rectilinear state).
   `maneuvers` length. No v1.0 type assumes Earth, a closed orbit or a single body except through
   those fields (the closed-orbit rule is a v1.0 validation rule on `eccentricity`, not a type).
 
+**Revision 3 and `schemaVersion`.** Revision 3 adds an engine obligation (§5.2 initial sample)
+and changes no schema: no field, type, unit, frame, enum, code or validation rule of `Scenario`,
+`SimulationRequest` or `SimulationResult` is added, removed or changed, and the canonical payload
+and `requestId` (§7) are unchanged. Every `1.0` file stays valid and keeps its meaning, so none
+of the minor or major triggers above applies and `schemaVersion` stays `"1.0"`. It does narrow
+which results a conforming engine may produce (a first sample of segment 0 that differs from the
+initial state by rounding was not excluded before), which is why it needs this revision and owner
+approval. It does not affect stored data: results are not persisted (§11.1, OQ-8), and the
+`requestId` ⇒ result relation is scoped to one engine build (§7.1), so an engine adopting the
+obligation does so with its own `engineVersion`. No conforming engine exists yet (ML-TASK-016/017
+not started), so no produced result is invalidated.
+
 ## 10. Deviations from architecture §4 (draft v0.2)
 
 All accepted by the owner on 2026-11-11 (§11).
@@ -516,7 +556,9 @@ All accepted by the owner on 2026-11-11 (§11).
 
 No field of §4 was given another unit or meaning; `mu_m3ps2` moved into `constants` (D-6).
 
-## 11. Owner decisions, 2026-11-11
+## 11. Owner decisions
+
+### 11.1 Owner decisions, 2026-11-11
 
 Decisions taken by the owner on the role reviews of PR #7 (Astrodynamics, Frontend, Verification
 Engineers) and on the questions of revision 1.
@@ -547,6 +589,23 @@ Also accepted as proposed in revision 1:
 | OQ-7 Leap-second epochs | Not representable (`EPOCH_INVALID`), consistent with ADR-004. |
 | OQ-8 `schemaVersion` on results | Not added; add only if results are ever persisted or exchanged across builds. |
 
+### 11.2 Owner decisions, 2026-11-12
+
+Decisions taken by the owner after the review of the tolerance record (PR #12, items O-3, O-6,
+O-8, O-10). Decisions 1, 2 and 4 are recorded outside this contract and listed here for
+traceability.
+
+| # | Decision | Where |
+|---|---|---|
+| 1 | Near-circular and near-equatorial orbits: e and i are always reported as computed, never set to zero; the degenerate convention only assigns the undefined angles (architecture §3), applies only to state→elements (decision 4 of 2026-11-11), and the Cartesian state stays authoritative. | ADR-008; §3 (one sentence); ML-FR-003 AC2 |
+| 2 | The accuracy of derived angles is set by an owner-approved angular accuracy target, independent of UI display formatting. Its value and the degenerate thresholds are approved with the tolerance record (ML-TASK-010). | ADR-008; ML-REQ-001 §2 preamble |
+| 3 | Contract revision 3: the first sample of every segment is bit-identical to the segment's initial state; for segment 0 that is `request.initialState`. The engine copies the state instead of evaluating the propagator at Δt = 0. | §5.2, §5.5, §9, §13 |
+| 4 | The 3D scene coordinate of an engine sample is one binary64 multiplication by the scene scale followed by one rounding to binary32, `Math.fround(x * s)`, so the scene-state check is exact. | ML-FR-007 AC2; §14 (note) |
+
+Resolved by these decisions: review items O-3 (decision 1), O-6 (decision 2), O-8 (decision 4)
+and O-10 (decision 3) of PR #12, and the plan wording item C-2 (VT-13 now uses the R12 form,
+verification plan §3).
+
 ## 12. Open questions for the owner
 
 | # | Question | Implemented now | Recommendation |
@@ -554,6 +613,7 @@ Also accepted as proposed in revision 1:
 | NQ-1 | −0 is accepted where a rule says `≥ 0` (angles, eccentricity, inclination, maneuver `t_s`, vector components). `JSON.stringify` writes −0 as `0`, but `JSON.parse("-0")` yields −0 (both checked on Node 24), so a hand-edited file can carry it, and it changes the `requestId` (decision 8). Should the request builder (ML-TASK-017) map −0 to +0 in inputs where the sign of zero has no physical meaning? | Accepted unchanged; the grid (§5.2) and R10 handle a maneuver at −0. | Leave the contract as is; let the request builder normalise −0 to +0 in every input field so equal-looking scenarios get equal ids. Decide in ML-TASK-017. |
 | NQ-2 | `RSW_FRAME_UNDEFINED` (§8.3 note). | Not registered. | Register it in the minor version that lifts the one-maneuver limit. |
 | NQ-3 | Who owns the degree/radian and angle-normalisation helpers requested by the Frontend review? | Not in contracts. | A tested formatting module in `apps/web` (or a small UI-free package), assigned by the Coordinator before ML-TASK-022. |
+| NQ-4 | Should the result echo the initial state (e.g. `model.initialState`), so that the segment-0 rule of §5.2 becomes schema-checkable without the request? | Not added (revision 3). Segment 0 is checked by VI-01, which sees request and result. | Do not add it in v1.0. It would duplicate data the receiver already has (the UI holds the request it sent) and would be a new result field for a check that VI-01 and the worker host, which also hold both objects, can make. Reconsider only if results are ever persisted or exchanged without their request (same trigger as OQ-8). |
 
 ## 13. Verification hooks
 
@@ -562,7 +622,9 @@ Also accepted as proposed in revision 1:
 - VI-01 (request → result structure) uses `validateSimulationResult` (R1–R13) and additionally
   checks against the request: `result.model.constants` bit-identical to `request.constants`;
   `model.sampling`, `model.epoch` equal to the request; sample times equal to the §5.2 grid;
-  `events[n].maneuverId` and `t_s` equal to the maneuver's.
+  `events[n].maneuverId` and `t_s` equal to the maneuver's; for an `ok` result, the first sample
+  of segment 0 (position and velocity) bit-identical to `request.initialState` (§5.2, revision 3;
+  the first sample of later segments is covered by R8).
 - VT-13 checks `deltaV_magnitude_mps` and the post-maneuver state within tolerance.
 - VT-17 (serialisation round trip) relies on: no transforms, unknown fields rejected, canonical
   epoch text.
@@ -581,3 +643,8 @@ Also accepted as proposed in revision 1:
   `code` + `path` (or `code` + `t_s`) to its own wording.
 - **Validation placement.** Full result validation runs in the worker before transfer; the main
   thread may do a cheap shape check only (§6, realm).
+- **Scene coordinates.** The renderer converts an engine sample component x to a scene
+  coordinate as `Math.fround(x * s)`: one binary64 multiplication by the scene scale `s`, then
+  one rounding to binary32 (ML-FR-007 AC2, owner decision, 2026-11-12). The scene-state check
+  (VI-02) compares with that expression exactly. The value of `s` is a UI choice, not part of this
+  contract.

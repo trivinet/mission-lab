@@ -1,0 +1,97 @@
+task_id: ML-TASK-008
+title: "Record owner decisions of 2026-11-12: contract revision 3, ADR-008, requirement amendments"
+status: in_review
+requirement_ids: [ML-FR-002, ML-FR-003, ML-FR-004, ML-FR-006, ML-FR-007, ML-FR-009]
+owner_role: systems-architect
+reviewer_role: verification-engineer
+dependencies: [ML-TASK-004]
+affected_paths:
+  - docs/architecture/contracts-v1.md
+  - packages/contracts/
+  - docs/architecture/adr/ADR-008-*.md
+  - docs/requirements/m1-requirements.md
+  - docs/verification/m1-verification-plan.md   # VT-13 wording and cross-references only
+  - docs/backlog/tasks/ML-TASK-008.yaml
+objective: >
+  Record the four owner decisions of 2026-11-12, taken after the review of the tolerance record
+  (PR #12), in the contract (revision 3), a new ADR-008 and minimal requirement amendments, without
+  deciding any numeric value that belongs to the tolerance record.
+scope:
+  - "Decision 1: e and i always reported as computed, never zeroed; the degenerate convention assigns only undefined angles, state->elements only; Cartesian state authoritative (ADR-008, ML-FR-003 AC2, contract §3 sentence)."
+  - "Decision 2: angular accuracy target owner-approved and independent of display formatting; value and thresholds deferred to the tolerance record (ADR-008, ML-REQ-001 preamble with an Open note on display precision)."
+  - "Decision 3: contract revision 3, first sample of every segment bit-identical to its initial state; engine copies instead of evaluating at dt = 0 (contract §5.2, §5.5, §9, §13)."
+  - "Decision 4: scene coordinate = Math.fround(x * s) (ML-FR-007 AC2, contract §14 note, plan VI-02 cross-reference)."
+  - "Verification plan VT-13 wording to the R12 form v+ = fl(v- + dv)."
+out_of_scope:
+  - "Numeric values of the angular accuracy target and of the degenerate thresholds (ML-TASK-010)."
+  - "Display precision of UI values (left open)."
+  - "Any physics, engine, UI or test code outside packages/contracts."
+  - "Amending ADR-005 (outside affected_paths); the Δt = 0 refinement is stated in the contract."
+  - "New dependencies or lockfile changes."
+inputs:
+  - AGENTS.md
+  - docs/architecture/contracts-v1.md (revision 2)
+  - docs/architecture/proposed-architecture.md §3
+  - docs/architecture/adr/ADR-004, ADR-005
+  - docs/requirements/m1-requirements.md (ML-FR-002, 003, 007, 009)
+  - docs/verification/m1-verification-plan.md §3
+  - packages/contracts/src (result.ts, validate.ts, codes.ts and tests)
+  - PR #12 review comment (technical input)
+  - Owner decisions 1-4 of 2026-11-12 (Coordinator brief)
+acceptance_criteria:
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0."
+  - "Each decision is recorded where stated in scope and cited as 'owner decision, 2026-11-12'."
+  - "No number is written as decided for the angular accuracy target or the thresholds."
+  - "contracts-v1.md states the versioning consequence of revision 3 per its §9."
+  - "Lockfile unchanged; no new dependency."
+test_requirements:
+  - "Existing packages/contracts tests pass; new tests only if schema or code changes."
+deliverables:
+  - docs/architecture/contracts-v1.md revision 3
+  - docs/architecture/adr/ADR-008-degenerate-elements-and-angular-accuracy.md
+  - docs/requirements/m1-requirements.md amendments
+  - docs/verification/m1-verification-plan.md VT-13 wording
+  - this task contract with report
+human_approval_required: true   # records owner decisions; NQ-4 open
+
+report:
+  files_changed:
+    - "docs/architecture/contracts-v1.md: revision 3 (status Accepted; revision table; §3 one sentence; §5.2 initial-sample obligation; §5.5 checked-elsewhere list; §9 versioning note; §11 split into 11.1 / 11.2; §12 NQ-4; §13 VI-01 check; §14 scene-coordinate note)"
+    - "docs/architecture/adr/ADR-008-degenerate-elements-and-angular-accuracy.md (new, Accepted by owner decision 2026-11-12)"
+    - "docs/requirements/m1-requirements.md: preamble paragraph (decision 2) and Open note on display precision; ML-FR-003 AC2 (decision 1); ML-FR-007 AC2 (decision 4)"
+    - "docs/verification/m1-verification-plan.md: VT-13 check wording (R12 form); cross-references in VT-04 (ADR-008) and VI-02 (Math.fround)"
+    - "docs/backlog/tasks/ML-TASK-008.yaml (new)"
+  summary: >
+    Decisions 1 and 2 are in ADR-008 with minimal requirement amendments. Decision 3 is a normative
+    engine obligation in contract §5.2: schema-enforced for segments after a maneuver through the
+    existing R8, checked by VI-01 for segment 0 (the result does not carry the request; echoing the
+    initial state is left as open question NQ-4, not added). No schema or code change, so no test
+    change. Revision 3 keeps schemaVersion "1.0": it changes no field, type, rule, code or canonical
+    payload; it only narrows the results a conforming engine may produce, and no engine exists yet.
+    Decision 4 defines the scene coordinate as Math.fround(x * s) in ML-FR-007 AC2.
+  tests_executed:
+    - "pnpm install --frozen-lockfile: exit 0 (lockfile unchanged)"
+    - "pnpm lint: exit 0"
+    - "pnpm typecheck: exit 0"
+    - "pnpm test: exit 0, 10 files / 338 tests passed (unchanged count; no code change)"
+    - "pnpm format:check: exit 0, 'All matched files use Prettier code style!'"
+    - "pnpm check:boundaries: exit 0, 12/12 fixtures reported"
+  reference_data_used: []
+  not_verified:
+    - "The segment-0 initial-sample rule is specified, not tested: no engine exists (ML-TASK-016/017 todo) and VI-01 is not written."
+    - "Math.fround(x * s) exactness of VI-02 not exercised: no renderer or scene hook exists yet."
+    - "Review by the Verification Engineer (reviewer_role) has not happened."
+  known_limitations:
+    - "Segment 0's initial-sample rule is not checkable by validateSimulationResult alone (no request in the result); see contract §12 NQ-4."
+    - "Angular accuracy target value and degenerate thresholds remain undecided until the tolerance record (ML-TASK-010) is approved."
+    - "Display precision of UI values is undefined (requirements Open note)."
+  documentation_changes:
+    - "contracts-v1.md revision 3; ADR-008 new; ML-REQ-001 amendments (preamble, FR-003 AC2, FR-007 AC2); ML-VER-001 VT-13 wording and VT-04/VI-02 cross-references"
+  risks_or_blockers:
+    - "ADR-005 says each sample is computed from the segment's initial state at dt = t - t0; the copy at dt = 0 (decision 3) is stated in contract §5.2 as a refinement of that case. ADR-005 itself is not edited (outside affected_paths); the owner may want a one-line note there."
+    - "proposed-architecture.md §3 'Classical elements' row does not yet mention that e and i are never zeroed; ADR-008 refines it. Not edited (outside affected_paths)."
+  review_artifact: ""   # no PR opened by this task run (Coordinator opens it)
+  recommended_next_action: >
+    Verification Engineer review; owner answers NQ-4 (recommendation: do not echo the initial
+    state in v1.0); ML-TASK-010 records the angular accuracy target and thresholds referencing
+    ADR-008; ML-TASK-014/016/017 contracts cite ADR-008 and contract §5.2 revision 3.
