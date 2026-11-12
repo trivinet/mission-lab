@@ -17,7 +17,7 @@ A document marked *Proposed* is not yet authority.
 
 ## Current state
 
-Gate G0 was approved by the owner on 2026-11-11. Phase 0b (scaffold) is in progress; see
+Gate G0 was approved by the owner on 2026-11-11. Phase 0b (scaffold, CI, contracts v1.0) was completed on 2026-11-12 and Phase 1 is in progress; see
 `docs/status/status.json` and `docs/backlog/backlog.md`. Phase 1 feature work starts only on
 tasks marked *ready*. Each later gate (G1–G4) needs owner approval before the next phase.
 
