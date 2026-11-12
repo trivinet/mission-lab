@@ -1,6 +1,6 @@
 # Simulation Contracts v1.0
 
-**Document ID:** ML-ARCH-003 · **Date:** 2026-11-11 · **Author:** Systems Architect (ML-TASK-004) · **Revision:** 2 (owner decisions of 2026-11-11 and role reviews incorporated) · **Status:** Proposed — awaiting owner approval of this revision
+**Document ID:** ML-ARCH-003 · **Date:** 2026-11-11 · **Author:** Systems Architect (ML-TASK-004) · **Revision:** 2 (owner decisions of 2026-11-11 and role reviews incorporated) · **Status:** Accepted — owner approval 2026-11-12 (merge of PR #7)
 
 Normative prose for `packages/contracts` (`@mission-lab/contracts`). It refines the approved
 draft contract v0.2 of [proposed-architecture.md §4](proposed-architecture.md#4-simulation-contract-draft-v02--replaces-the-illustrative-sample).

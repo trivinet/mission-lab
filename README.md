@@ -4,7 +4,7 @@ An interactive, browser-based laboratory for exploring orbital mechanics and pre
 spacecraft mission design: configure an orbit, simulate it, apply a maneuver, and analyse the
 result.
 
-**Status:** Phase 0 — baseline under review (gate G0). No application code exists yet.
+**Status:** Phase 1 — astrodynamics foundation (towards gate G1). The repository holds the monorepo scaffold and the approved simulation contracts v1.0; there is no physics engine or user interface yet. Live task status: `docs/status/status.json`.
 
 Mission Lab is a personal R&D project. It is not flight-qualified and must not be used for
 operational mission planning.

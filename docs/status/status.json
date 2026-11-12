@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-12",
-  "phase": "Phase 0b — Scaffold",
-  "headline": "GitHub Actions is back: PRs #8 and #9 pass CI; PR #7 (contracts) re-triggered. Python 3.13, JDK 21 and Orekit 13.1 are installed, so the Orekit reference dataset (ML-TASK-012 part B) can start. Owner decisions pending on the contract, the mock-up and the textbook.",
+  "phase": "Phase 1 — Astrodynamics foundation",
+  "headline": "Phase 0b complete: contracts v1.0 approved and merged, CI green, `main` protected. Phase 1 started: tolerance derivation (ML-TASK-010) and constants/vector math (ML-TASK-013) are with the agents.",
   "gates": [
     {
       "id": "G0",
@@ -40,11 +40,6 @@
       "id": "OA-14",
       "text": "Open the workspace mock-up at claude.ai/artifact/DvtuJBRU1kxkHeTxyHqqQM and decide three things: panel arrangement, accent colour, how the result state is shown.",
       "blocking": "ML-TASK-022, 023 (editor and 3D scene)"
-    },
-    {
-      "id": "OA-13",
-      "text": "Approve contracts v1.0 (PR #7, `docs/architecture/contracts-v1.md` revision 2) and merge it and PR #8 once CI has run. Three small new questions are in §12 of the document.",
-      "blocking": "Phase 0b exit; all of Phase 1"
     },
     {
       "id": "OA-3",
@@ -92,7 +87,7 @@
           "title": "Normative simulation contracts v1.0",
           "role": "Systems Architect",
           "model": "opus",
-          "status": "in_review",
+          "status": "done",
           "deps": "003",
           "approval": true
         },
@@ -131,7 +126,7 @@
           "title": "Tolerance derivation and record",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "todo",
+          "status": "in_progress",
           "deps": "004",
           "approval": true
         },
@@ -157,7 +152,7 @@
           "title": "Constants, units, vector math",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "todo",
+          "status": "in_progress",
           "deps": "004"
         },
         {
@@ -365,6 +360,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-12",
+      "who": "Coordinator",
+      "text": "Phase 1 started in isolated worktrees: ML-TASK-010 tolerance derivation (Verification, opus) and ML-TASK-013 constants, units and vector math (Astrodynamics, opus)."
+    },
+    {
+      "date": "2026-11-12",
+      "who": "Owner",
+      "text": "Instructed the merge of PRs #7, #8 and #9 after CI passed. Contracts v1.0 approved. Phase 0b exit criterion met: CI passing, `main` protected, contracts approved."
+    },
     {
       "date": "2026-11-12",
       "who": "Coordinator",
