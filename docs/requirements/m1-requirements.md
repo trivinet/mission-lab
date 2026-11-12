@@ -10,6 +10,15 @@ Refines ML-SYS-001 §6 for release M1. Requirement IDs are permanent. Each accep
 Numeric tolerances are not stated here. "Within tolerance" means the tolerance recorded for that
 test family in the verification plan, derived and approved as described there.
 
+The accuracy required of derived angles (i, Ω, ω, ν and the angles assigned by the degenerate
+convention) is set by an owner-approved angular accuracy target that is independent of how the UI
+formats or rounds values for display (ADR-008). Its value is approved with the tolerance record.
+(Amended by owner decision, 2026-11-12.)
+
+**Open:** the display precision of numeric values in the UI (decimal places or significant
+digits per quantity) is not defined by these requirements. It is not a source of accuracy
+requirements.
+
 ## 1. In scope / out of scope
 
 **In:** one spacecraft; Earth; two-body dynamics; closed input orbits; zero or one impulsive RSW
@@ -43,7 +52,9 @@ accounts, cloud storage; mobile layout.
 ### ML-FR-003 — Convert Keplerian elements to Cartesian states (MUST)
 - AC1 Elements → state matches independent references within tolerance. **N**
 - AC2 State → elements → state round trip holds within tolerance over the test grid, including
-  degenerate cases under the documented convention. **N**
+  degenerate cases under the documented convention (ADR-008): eccentricity and inclination are
+  reported as computed and never set to zero; the convention assigns only the undefined angles.
+  (Amended by owner decision, 2026-11-12.) **N**
 - AC3 The output state declares frame, central body and epoch (ARCH-004). **U**
 
 ### ML-FR-004 — Propagate an orbit with the two-body model (MUST)
@@ -79,7 +90,10 @@ accounts, cloud storage; mobile layout.
 - AC1 Earth, the trajectory, the spacecraft marker and the maneuver point are displayed; camera
   orbit, zoom and reset work. **E**
 - AC2 Every rendered trajectory vertex equals the engine sample scaled by the single
-  scene-unit conversion; verified through the scene-state test hook, not by image. **I**
+  scene-unit conversion; verified through the scene-state test hook, not by image. The scene
+  coordinate of a sample component x is one binary64 multiplication by the scene scale s followed
+  by one rounding to binary32, `Math.fround(x * s)`, so "equals" is exact. (Amended by owner
+  decision, 2026-11-12.) **I**
 - AC3 The inertial axes can be shown; the Earth orientation is labelled illustrative. **E, R**
 - AC4 Changing a display option does not trigger a new simulation. **I**
 
