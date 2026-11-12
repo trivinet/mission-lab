@@ -1,0 +1,70 @@
+task_id: ML-TASK-020
+title: "Visual direction: workspace layout and design tokens (mock-up for owner approval)"
+status: in_review
+requirement_ids: [ML-UX-001, ML-UX-002, ML-UX-003, ML-UX-004, ML-FR-007, ML-FR-012]
+owner_role: frontend-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-003]
+affected_paths:
+  - docs/design/mockups/workspace.html
+  - docs/design/design-tokens.md
+  - docs/design/visual-direction.md
+  - docs/backlog/tasks/ML-TASK-020.yaml
+objective: >
+  Propose, as a static mock-up, the M1 workspace layout and dark-first design tokens so the owner can
+  approve or redirect the visual direction before UI feature work starts.
+scope:
+  - One self-contained static HTML mock-up of the M1 workspace with a five-state result switcher.
+  - Design tokens with WCAG 2.x contrast ratios computed by script.
+  - One-page visual direction with explicit owner choices.
+out_of_scope:
+  - Any change to apps/web, Tailwind configuration, dependencies, contracts or simulation.
+  - Real physics, real values, real 3D rendering, charting library choice (OD-006).
+inputs:
+  - AGENTS.md
+  - docs/product/ML-SYS-001.md (§2.2, §9)
+  - docs/requirements/m1-requirements.md
+  - docs/architecture/proposed-architecture.md (§5)
+  - docs/architecture/adr/ADR-006-frontend-stack.md
+acceptance_criteria:
+  - "The mock-up shows editor, 3D placeholder, timeline, plots placeholder, comparison, model panel, save/load and result-state indicator."
+  - "The five result states, a field validation error and a warning diagnostic can be toggled."
+  - "Every displayed number carries a unit and is labelled as a placeholder."
+  - "Every token text pair meets 4.5:1 and non-text pairs 3:1, computed by script."
+  - "pnpm format:check and pnpm lint exit 0."
+test_requirements:
+  - Contrast script run; pnpm format:check and pnpm lint.
+deliverables:
+  - The three design documents and the report section of this file.
+human_approval_required: true
+
+report:
+  files_changed:
+    - docs/design/mockups/workspace.html
+    - docs/design/design-tokens.md
+    - docs/design/visual-direction.md
+    - docs/backlog/tasks/ML-TASK-020.yaml
+  summary: >
+    Static mock-up (about 340 lines, inline CSS, a short vanilla JS state switcher, no external
+    requests), token set with scripted contrast table (all pairs pass), and a visual-direction page
+    with three owner choices (panel arrangement, accent colour, result-state presentation).
+  tests_executed:
+    - "contrast script (Node, WCAG 2.x formula): 45 pairs, all PASS; output in design-tokens.md"
+    - "static checks on workspace.html: inline script parses (new Function), no duplicate ids, no http(s) URLs other than SVG namespace"
+    - "pnpm install --frozen-lockfile: ok; pnpm format:check: 'All matched files use Prettier code style!'; pnpm lint (eslint .): no output, no errors (exit codes read from output, not captured separately)"
+  reference_data_used: []
+  not_verified:
+    - "Rendering in a real browser was not checked (browser pane could not open the file); layout, overflow and the five states are unseen."
+    - "Keyboard operation, tab order and focus visibility checked only by reading the markup."
+    - "No screen reader test; no colour-blindness simulation."
+    - "Contrast of the dimmed viewport (opacity) and of text over SVG fills was not measured."
+  known_limitations:
+    - "Unicode glyphs used as icons may render differently across fonts."
+    - "Mock-up toggles the field-error example by also rewriting the e input value."
+    - "Delta-v displayed in m/s per ML-FR-005; the task brief mentioned km/s display units."
+  documentation_changes:
+    - "New docs/design/ directory."
+  risks_or_blockers:
+    - "m1-requirements ML-UX-001 still says four states; the mock-up assumes the pending amendment to five."
+  review_artifact: ""
+  recommended_next_action: "Owner reviews the mock-up in a browser and decides the three choices in visual-direction.md; then Systems Architect review."
