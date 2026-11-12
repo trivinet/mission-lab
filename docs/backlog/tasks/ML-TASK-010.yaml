@@ -1,0 +1,93 @@
+task_id: ML-TASK-010
+title: "Tolerance derivation and record (docs/verification/tolerances.md)"
+status: in_review
+requirement_ids: [ML-FR-002, ML-FR-003, ML-FR-004, ML-FR-006, ML-FR-007, ML-FR-009, ML-FR-010]
+owner_role: verification-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-004]
+affected_paths:
+  - docs/verification/tolerances.md
+  - docs/backlog/tasks/ML-TASK-010.yaml
+objective: >
+  Derive and record, before any engine result exists, the tolerance of every numerical test family
+  VT-01..VT-19 and the numeric parts of VI-01..VI-03, following the method fixed in
+  m1-verification-plan.md §4 (quantity, measure, error model, reference accuracy, tolerance formula
+  and evaluated value, margin), and state which checks are exact under contract v1.0.
+scope:
+  - Float64 error analysis (u = 2^-53) with operation counts of the canonical formulations.
+  - Conditioning (along-track growth through mean-motion sensitivity, energy cancellation, e -> 0/1,
+    i -> 0/pi, acos vs atan2), solver criterion expressed symbolically, reference accuracy (L1/L2/L3).
+  - Tolerance formulas in scenario scales, evaluated at stated evaluation scales with arithmetic shown.
+  - Exact (bit-identical) checks implied by contract v1.0 (R8, R10, R12, §5.2 grid, determinism).
+  - Numerical lower bound for the circular/equatorial thresholds requested by contract §3.
+  - Open items and conflicts.
+out_of_scope:
+  - Reading packages/astrodynamics or packages/simulation; any engine run or numerical experiment
+    standing in for the engine (ADR-003 independence).
+  - Writing reference implementations or datasets (ML-TASK-011), external references (ML-TASK-012).
+  - Changing requirements, contracts, ADRs or the plan.
+inputs:
+  - AGENTS.md
+  - docs/verification/m1-verification-plan.md (§2, §3, §4, §5)
+  - docs/architecture/adr/ADR-003, ADR-004, ADR-005
+  - docs/architecture/contracts-v1.md (revision 2)
+  - docs/architecture/proposed-architecture.md §3
+  - docs/requirements/m1-requirements.md
+  - docs/product/ML-SYS-001.md §5.3-§5.5, §8
+  - docs/engineering/coding-standards.md
+acceptance_criteria:
+  - "tolerances.md has a record for every family VT-01..VT-19 and VI-01..VI-03 (numeric part or 'exact')."
+  - "Each record gives quantity, measure (absolute/relative, why), error model, reference accuracy, formula, evaluated value where scales are fixed, and margin with reason."
+  - "Non-elementary bounds are cited; unconfirmed citations and assumptions are marked 'to be confirmed'."
+  - "No physical constant written from memory; mu taken as written in proposed-architecture §3."
+  - "Exact checks listed; open items and conflicts listed; status Proposed pending owner approval."
+test_requirements:
+  - None executable. The evaluated numbers are reproducible from the formulas and the scale table.
+deliverables:
+  - docs/verification/tolerances.md (status Proposed)
+  - docs/backlog/tasks/ML-TASK-010.yaml
+human_approval_required: true   # tolerances, margins and thresholds need owner approval at G1
+
+report:
+  files_changed:
+    - "docs/verification/tolerances.md (new): tolerance record ML-VER-002, status Proposed"
+    - "docs/backlog/tasks/ML-TASK-010.yaml (new): this contract and report"
+  summary: >
+    Tolerance record for VT-01..VT-19 and VI-01..VI-03. Exact checks (no tolerance): maneuver
+    boundary (R8), velocity increment in the R12 form, sample grid, time span, constants/metadata
+    copy, determinism, serialisation, invalid-input codes, constants as decimal literals (VT-19),
+    zero-Δv transformation and increment, special vector identities. Propagation families use a
+    three-term model (bounded rounding; along-track growth through mean-motion sensitivity
+    (15/2)κ_E u and time/phase rounding; solver time residual ε_t), evaluated at five evaluation
+    scales for 10 periods with margin M = 4. Examples: VT-05 vs L2a 1.5e-5 m (LEO) to 4.7e-4 m
+    (Molniya-like); VT-06 8.5e-13 to 3.1e-11 relative; VT-02 2.1e-7 m to 1.9e-6 m; RSW basis
+    1.6e-14. L2b and L3 tolerances are formulas whose reference term (step-halving E_RK, Orekit A6,
+    textbook print resolution) is recorded per dataset. Degenerate thresholds: numerical lower bound
+    derived, provisional 1e-5, owner decision.
+  tests_executed:
+    - "None. No engine or reference code exists or was run. Formula evaluation only: node tol.mjs (scratch directory, not committed), Node v24.22.2, output transcribed into §4, §6.5 and §7."
+  reference_data_used:
+    - "mu = 3.986004418e14 m^3/s^2 as written in docs/architecture/proposed-architecture.md §3 (to be confirmed by VT-19)."
+  not_verified:
+    - "Citations to IEEE 754-2019, ECMA-262, Higham (2002), Curtis, Vallado, Hairer et al.: clause, lemma, equation and page numbers not checked against the texts (marked 'to be confirmed')."
+    - "Assumption A2 (Math.sqrt correctly rounded under ECMA-262) and A3 (transcendental functions within 1 ulp on the CI Node version) not confirmed."
+    - "Assumption A6 (Orekit propagation accuracy comparable to the engine model) not confirmed."
+    - "Operation counts are for the canonical textbook formulations, not the engine code (independence rule); the margin covers the difference but this is not verified."
+    - "The bound that an f/g evaluation from one χ stays on the exact orbit (used for VT-06/VT-07) is a property of the method, not checked against the engine."
+  known_limitations:
+    - "Bounds are worst-case first-order; typical errors are expected to be 1-3 orders smaller, so the tests detect gross and moderate defects but cannot detect defects below the bounds."
+    - "L2b and L3 resolving power depends on reference accuracy measured or recorded later (ML-TASK-011/012)."
+    - "Near-parabolic post-maneuver arcs have no derived tolerance (excluded from the grid)."
+  documentation_changes:
+    - "docs/verification/tolerances.md (new)"
+  risks_or_blockers:
+    - "O-1: the propagation tolerances assume the solver converges to rounding level (ε_t = 8u); ADR-005 fixes no criterion."
+    - "O-2: an acos-based element extraction will fail VT-03/VT-04 by design (sqrt(u) loss)."
+    - "O-3: degenerate thresholds and the near-degenerate round-trip term need an owner decision (conflict C-3 with FR-003 AC2)."
+    - "C-1: contracts-v1.md header still says Proposed although PR #7 is merged."
+    - "C-4: FR-007 AC2 'equals' vs Float32 render buffers."
+  review_artifact: "Not opened (task brief: commit only, no push, no PR). Branch docs/ml-task-010-tolerances."
+  recommended_next_action: >
+    Systems Architect reviews; owner decides O-1 (solver criterion), O-3 (thresholds), O-6 (display
+    resolution) and C-1; ML-TASK-011 confirms A2/A3 and records E_RK per dataset; ML-TASK-012
+    confirms the citations it can reach and A6.
