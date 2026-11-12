@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-12",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Tolerance record delivered (ML-TASK-010, PR #12) and under Systems Architect review before it goes to the owner. Constants and vector math (PR #11) await review and merge.",
+  "headline": "Tolerance record reviewed by the Architect: arithmetic confirmed, three required changes; the Verification Engineer is revising it (PR #12). Four owner decisions are queued from that review. PRs #10 and #11 await merge.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-16",
+      "text": "Decide four points raised by the tolerance review: (1) near-circular / near-equatorial orbits keep e and i as computed, never forced to zero; (2) an angular accuracy target for derived angles, independent of display formatting; (3) contract revision: the first sample of every segment is bit-identical to its initial state; (4) scene coordinates defined as one multiplication plus one Float32 rounding so the 3D check is exact.",
+      "blocking": "Approval of the tolerance record; ML-TASK-014, 015"
+    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -126,7 +131,7 @@
           "title": "Tolerance derivation and record",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_review",
+          "status": "in_progress",
           "deps": "004",
           "approval": true
         },
@@ -360,6 +365,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-12",
+      "who": "Architect",
+      "text": "Review of PR #12: approve with changes. About 20 evaluated tolerances recomputed and matched. Blocking: the solver residual budget is assumed rather than derived and leaves VT-06/07 with little real margin; re-evaluation rules must respect ADR-003; VI-03 must not use the module under test as its own reference. Revision started."
+    },
     {
       "date": "2026-11-12",
       "who": "Verification",
