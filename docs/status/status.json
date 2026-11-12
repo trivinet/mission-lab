@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-12",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "First engine code delivered: Earth constants and vector math (ML-TASK-013, PR #11), constants confirmed against an NGA document. Tolerance derivation (ML-TASK-010) still with the Verification Engineer.",
+  "headline": "Tolerance record delivered (ML-TASK-010, PR #12) and under Systems Architect review before it goes to the owner. Constants and vector math (PR #11) await review and merge.",
   "gates": [
     {
       "id": "G0",
@@ -126,7 +126,7 @@
           "title": "Tolerance derivation and record",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "004",
           "approval": true
         },
@@ -360,6 +360,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-12",
+      "who": "Verification",
+      "text": "ML-TASK-010 delivered: tolerance record with error models, formulas and evaluated values for VT-01…VT-16 and VI-02/03, margin 4; ten open items (solver criterion, atan2 extraction, degenerate thresholds, display resolution…) and four requirement-wording conflicts. Citations unconfirmed. PR #12; Architect review started."
+    },
     {
       "date": "2026-11-12",
       "who": "Astrodynamics",
