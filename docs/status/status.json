@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-12",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Owner approved four decisions from the tolerance review. In progress: tolerance record revision (ML-TASK-010) and contract revision 3 with ADR-008 (ML-TASK-008). PRs #10 and #11 await merge.",
+  "headline": "Contract revision 3, ADR-008 and requirement amendments delivered (PR #13). Tolerance record revision still in progress. PRs #10, #11 and #13 await the owner's merge.",
   "gates": [
     {
       "id": "G0",
@@ -126,7 +126,7 @@
           "title": "Contract revision 3, ADR-008 (degenerate elements) and requirement amendments",
           "role": "Systems Architect",
           "model": "opus",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "004, 010 review",
           "approval": true
         },
@@ -369,6 +369,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-12",
+      "who": "Architect",
+      "text": "ML-TASK-008 delivered: ADR-008, contract revision 3 (no schema change, `schemaVersion` stays 1.0), amendments to ML-FR-003 and ML-FR-007, VT-13 wording. PR #13."
+    },
     {
       "date": "2026-11-12",
       "who": "Owner",
