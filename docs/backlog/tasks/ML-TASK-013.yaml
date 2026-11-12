@@ -1,0 +1,100 @@
+task_id: ML-TASK-013
+title: "Constants, units and 3-vector / 3x3 math in packages/astrodynamics"
+status: in_review
+requirement_ids: [ML-NFR-002, ML-NFR-003]
+owner_role: astrodynamics-engineer
+reviewer_role: verification-engineer
+dependencies: [ML-TASK-004]
+affected_paths:
+  - packages/astrodynamics/
+  - docs/backlog/tasks/ML-TASK-013.yaml
+objective: >
+  Provide the Earth constants (gravitational parameter, reference radius) with a documented
+  source, shaped like the contract's `constants` record, and pure, documented 3-vector and 3x3
+  matrix operations that ML-TASK-014/015/016 build on. VT-01 unit tests.
+scope:
+  - "Constants module: EARTH_GM_m3ps2, EARTH_REFERENCE_RADIUS_m, EARTH_CONSTANTS { mu_m3ps2, referenceRadius_m, source }, each with a cited source."
+  - "Vec3 operations on readonly tuples: add, subtract, scale, dot, cross, norm, normalize (zero-vector behaviour defined, no NaN)."
+  - "Mat3 operations: matrix-vector product, transpose, matrix-matrix product."
+  - "Vitest unit tests for VT-01 identities, exact cases and edge cases, with explicitly derived provisional bounds."
+out_of_scope:
+  - Any other physical constant (Earth rotation angle coefficients, J2, flattening).
+  - Degree/radian conversion and angle normalisation (owner open: contracts-v1 NQ-3).
+  - Display unit conversion (km, km/s, deg): UI formatting layer.
+  - Official tolerances (ML-TASK-010) and VT-19 reference confirmation (Verification Engineer).
+  - New dependencies or lockfile changes; any edit to verification/ or test-data/.
+inputs:
+  - AGENTS.md
+  - docs/engineering/coding-standards.md
+  - docs/architecture/proposed-architecture.md (§2, §3)
+  - docs/architecture/adr/ADR-002, ADR-004, ADR-005
+  - docs/architecture/contracts-v1.md (§4 constants, §11 OQ-1, §12 NQ-3)
+  - docs/requirements/m1-requirements.md
+  - docs/verification/m1-verification-plan.md (§3 VT-01, VT-19)
+  - eslint.config.js
+acceptance_criteria:
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0."
+  - "packages/astrodynamics/package.json declares no `dependencies`; lockfile unchanged."
+  - "Each constant documents its value source (document, section/table, URL, access date)."
+  - "Every public function documents units, frame assumptions, evaluation order and source (ML-NFR-002)."
+  - "normalizeVec3 of a zero or non-finite vector returns a tagged failure, never NaN."
+  - "VT-01 tests: cross orthogonality, anticommutativity, Lagrange and triple-product identities, unit norm after normalize, transpose involution, orthogonal matrix preserving norm; exact cases compared with toBe; inexact identities with a bound derived in the test."
+test_requirements:
+  - Vitest unit tests in packages/astrodynamics/src/*.test.ts.
+deliverables:
+  - packages/astrodynamics/src/constants.ts, vector3.ts, index.ts exports.
+  - packages/astrodynamics/src/constants.test.ts, vector3.test.ts.
+human_approval_required: false
+
+report:
+  files_changed:
+    - "packages/astrodynamics/src/constants.ts (new): EARTH_GM_m3ps2, EARTH_REFERENCE_RADIUS_m, EARTH_CONSTANTS_SOURCE, CentralBodyConstants, EARTH_CONSTANTS (frozen)"
+    - "packages/astrodynamics/src/vector3.ts (new): Vec3, Mat3, addVec3, subVec3, scaleVec3, dotVec3, crossVec3, normVec3, normalizeVec3 (+ result types), mulMat3Vec3, transposeMat3, mulMat3"
+    - "packages/astrodynamics/src/index.ts (modified): public exports"
+    - "packages/astrodynamics/src/constants.test.ts (new): 5 tests"
+    - "packages/astrodynamics/src/vector3.test.ts (new): 32 tests (VT-01)"
+    - "docs/backlog/tasks/ML-TASK-013.yaml (new): this contract and report"
+  summary: >
+    Constants: GM = 3.986004418e14 m^3/s^2 (WGS 84 defining parameter, mass of the atmosphere
+    included; not the GPS value 3.9860050e14) and reference radius = WGS 84 semi-major axis
+    6378137 m, both read from an NGA-authored publication of the four WGS 84 defining parameters
+    (NGA, "World Geodetic System 1984", UN ICG reference-frame description, 2012, p. 2,
+    defining-parameters table, https://www.unoosa.org/pdf/icg/2012/template/WGS_84.pdf, accessed
+    2026-11-12). NGA.STND.0036 / NIMA TR8350.2 itself was not reachable (earth-info.nga.mil timed
+    out; an archived copy returned HTTP 429), so confirmation against that text remains open for
+    VT-19. Values match proposed-architecture §3 and are exact binary64 integers.
+    Vector math: pure functions on readonly tuples with a fixed, documented evaluation order
+    (no FMA in ECMAScript, so results are bit-reproducible). normVec3 uses the naive
+    sqrt((x*x + y*y) + z*z) when the sum of squares lies in [2^-1000, 2^1000] and otherwise
+    rescales by an exact power of two (2^-600 / 2^600) to avoid overflow and underflow; Math.hypot
+    is not used because its algorithm is implementation-defined. normalizeVec3 returns
+    { ok: true, unit } or { ok: false, reason: 'ZERO_VECTOR' | 'NON_FINITE_NORM' } and never NaN.
+    Other primitives propagate IEEE 754 non-finite values; finiteness checks belong to the caller.
+  tests_executed:
+    - "pnpm exec vitest run --project astrodynamics -> exit 0; 3 files, 38 tests passed (1 placeholder, 5 constants, 32 vector3)"
+    - "pnpm lint -> exit 0"
+    - "pnpm typecheck -> exit 0 (root + all 5 workspaces)"
+    - "pnpm test -> exit 0; 12 files, 375 tests passed"
+    - "pnpm format:check -> exit 0"
+    - "pnpm check:boundaries -> exit 0; 12/12 fixtures reported"
+  reference_data_used:
+    - "NGA, World Geodetic System 1984, UN ICG reference-frame description (2012), p. 2, defining-parameters table: https://www.unoosa.org/pdf/icg/2012/template/WGS_84.pdf (accessed 2026-11-12)"
+  not_verified:
+    - "VT-19: the constants against NGA.STND.0036 / NIMA TR8350.2 (primary standard not reached). The source read is an NGA-authored summary that cites TR8350.2."
+    - "VT-01 against the approved tolerance record: the bounds in vector3.test.ts are the implementer's provisional derivations (standard model, u = 2^-53, gamma(k) = k u / (1 - k u)); they must be replaced by the ML-TASK-010 record. Bound constants: orthogonality gamma(3)/gamma(2) termwise; parallel cross (gamma(2) + u/(1-u)) t_i; Lagrange 32u |a|^2|b|^2; triple product 16u |a||b||c|; unit norm gamma(9); rotation norm 16u|v|; rotation product orthogonality 24u, norm 32u|v|."
+    - "No independent (L2) or external (L3) check of VT-01 exists yet; the tests here are L1 by the implementer."
+    - "Math.sqrt correct rounding is assumed (IEEE 754, hardware sqrt); the ECMAScript text was not checked for this guarantee."
+    - "The gamma(k) accumulation lemma is the standard one (Higham, Accuracy and Stability of Numerical Algorithms, 2nd ed., ch. 3); the citation was not checked against the book in this task."
+  known_limitations:
+    - "normVec3 of a finite vector whose true norm exceeds Number.MAX_VALUE returns +Infinity (normalizeVec3 reports NON_FINITE_NORM)."
+    - "Signed zeros follow IEEE 754 and are not normalised (e.g. the identity matrix maps -0 to +0)."
+  documentation_changes:
+    - "None outside the code and this task file."
+  risks_or_blockers:
+    - "VT-19 source: if the owner or Verification Engineer requires NGA.STND.0036 / TR8350.2 itself, the constants remain unconfirmed until someone retrieves it. Changing EARTH_CONSTANTS_SOURCE later changes every requestId (contracts-v1 §4, §7)."
+    - "Angle helpers (degToRad, normalizeAngle_rad) are unassigned (contracts-v1 NQ-3). Recommendation: radian-domain normalisation into [0, 2π) is needed by the engine for derived elements (ML-TASK-014) and fits packages/astrodynamics; degree conversion is display and belongs to the UI formatting module. Not implemented pending the Coordinator's assignment."
+  review_artifact: ""
+  recommended_next_action: >
+    Verification Engineer: confirm the constants against NGA.STND.0036 / TR8350.2 (VT-19) and
+    replace the provisional VT-01 bounds with the ML-TASK-010 record. Coordinator: assign the
+    angle-normalisation helper (NQ-3) before ML-TASK-014.
