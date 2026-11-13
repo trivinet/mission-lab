@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Engine core under way: element conversion (ML-TASK-014) and the propagator (ML-TASK-015) are with the Astrodynamics Engineer; the tolerance record revision (ML-TASK-010) continues. All three were paused by a usage limit and resumed.",
+  "headline": "Tolerance record revision 2 delivered (PR #12): solver budget derived, tolerances loosened where revision 1 undercounted. It awaits the owner's decision on re-review and approval. Element conversion (014) and propagator (015) in progress.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-17",
+      "text": "Tolerance record revision 2 (PR #12): decide whether it gets a second Architect review before approval, then approve it together with two values: angular accuracy target 1e-5 rad and degenerate thresholds 1e-5.",
+      "blocking": "ML-TASK-011, 018; G1"
+    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -135,7 +140,7 @@
           "title": "Tolerance derivation and record",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "004",
           "approval": true
         },
@@ -369,6 +374,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Verification",
+      "text": "ML-TASK-010 revision 2: solver residual budget derived (24.8u to 74.6u at ten periods); an undercounted off-orbit error found and added; propagation tolerances loosened (VT-05 at LEO 1.47e-5 → 2.60e-5 m); break-even table shows margins of ×4.5 to ×10 over the budget. Not yet re-reviewed."
+    },
     {
       "date": "2026-11-13",
       "who": "Coordinator",
