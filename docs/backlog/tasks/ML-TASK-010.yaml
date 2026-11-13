@@ -91,3 +91,45 @@ report:
     Systems Architect reviews; owner decides O-1 (solver criterion), O-3 (thresholds), O-6 (display
     resolution) and C-1; ML-TASK-011 confirms A2/A3 and records E_RK per dataset; ML-TASK-012
     confirms the citations it can reach and A6.
+  revision_2:
+    date: "2026-11-13"
+    trigger: "Systems Architect review on PR #12 (approve with changes: B1-B3 blocking, N1-N9)."
+    files_changed:
+      - "docs/verification/tolerances.md: revision 2 (status still Proposed, approval tables empty)"
+      - "docs/backlog/tasks/ML-TASK-010.yaml: this entry"
+    summary: >
+      B1: solver budget derived from a first-order rounding bound of the canonical universal-variable
+      time equation: noise floor delta_t_eval <= u[(12+32e)|dt| + (6+56e+64e^2)/n]; budget (floor x2 plus
+      chi spacing) eps_t = u[(25+65e)|dt| + (12+114e+130e^2)/n], equivalent 24.8u (e=0) to 74.6u (C5)
+      at 10T. Also derived the off-orbit effect of forming g from the requested dt (g-formation noise
+      u[17.5|dt| + (2+35e)/n], velocity through r with factor 2(1+e)), which revision 1 had undercounted;
+      C_t = 7.5 kappa_E + 4. All propagation tolerances re-evaluated (mostly 2x-9x larger: VT-05 C1
+      1.47e-5 -> 2.60e-5 m, C5 4.74e-4 -> 7.75e-4 m; VT-06 C1 8.5e-13 -> 7.4e-12, C5 3.15e-11 ->
+      9.06e-10; VT-07 C1 4.2e-13 -> 3.7e-12; VT-08 C1 1.32e-5 -> 2.45e-5 m; L3 Orekit C1 2.3e-5 -> 5.7e-5 m;
+      VT-15 1.5e-12 -> 9.1e-12 relative; VT-14 moved to C1 (6.8e-4 m) because the transport factor is
+      derived only for e=0). Break-even table added (effective margin 4.5x-10x, Orekit ~20x). O-1
+      rewritten: ML-TASK-015 states its criterion and demonstrates the residual by a black-box
+      high-precision residual check; no number in ADR-005.
+      B2: section 4.1 commit-before-run rule; loosenings go to a new section 15 table; applied to
+      E_RK, VT-16, VI-03 per-sample values, Orekit A6 fallback, c_f updates.
+      B3: VI-03 split into exact plumbing check (FR-009 AC3) and toleranced independent recomputation;
+      angle rows derived (i, Omega, omega, nu).
+      N1 wording fixed; N2 VT-03 angle budget derived ((6 kappa_h + 55)u); N3 exact convention bounds
+      (2e r_a/(1-e), 2 sqrt2 e v_p/(1+e), 4 sin(i'/2)); N4 engine-only energy term in VT-14/VT-15; N5
+      off-orbit g derived; N6 reference-accuracy line per family; N7 FR-008 AC3 and FR-014 AC1 exact
+      checks, FR-002 AC4 derived quantities; N8 thresholds as a function of delta-theta and span
+      (eps=1e-5 holds to ~10 periods at 1e-6 rad, ~105 at 1e-5 rad; revision 1's "~100 periods" was
+      wrong); N9 "typical errors smaller" marked as expectation. Open items restructured with who
+      decides and recommended resolution; O-11 added (VT-14 transport factor for e>0); C-1 resolved;
+      C-6 added (FR-014 formatting).
+    tests_executed:
+      - "None. Formula evaluation only: Node v24.22.2 script in a scratch directory (not committed); each evaluated number is the printed formula at the section 4 scale row (section 6.6 says how)."
+    not_verified:
+      - "All revision-1 items still open (citations, A2, A3, A6, operation counts vs engine code)."
+      - "The time-equation noise bound counts the canonical textbook formulation; an engine using another arrangement is covered only by M."
+      - "Clohessy-Wiltshire coefficient sums for VT-14 read off the standard solution; citation not checked; e>0 not derived (O-11)."
+      - "The L2a solver bound (section 6.4) is to be confirmed by ML-TASK-011's own high-precision residual check."
+      - "The break-even table is arithmetic on the formulas, not a measurement of any engine."
+    disagreements_with_review:
+      - "None blocking. Positions differ in emphasis only: on O-3 I agree with keeping e and i but note it doubles the VT-04(b) convention term versus zeroing; on O-1 I state that passing VT-05..VT-09 is not acceptable evidence of the budget."
+    commit: "see git log (docs(ML-TASK-010): revision 2)"
