@@ -73,3 +73,13 @@ export type {
   StateIntegralsFailure,
   StateIntegralsResult,
 } from './orbit-quantities';
+
+export { rswBasis, rswToInertial } from './rsw';
+export type { RswBasis, RswBasisFailure, RswBasisResult } from './rsw';
+
+export { applyImpulsiveManeuver } from './maneuver';
+export type {
+  ImpulsiveManeuverApplication,
+  ImpulsiveManeuverFailure,
+  ImpulsiveManeuverResult,
+} from './maneuver';
