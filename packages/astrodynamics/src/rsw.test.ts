@@ -142,16 +142,19 @@ describe('rswBasis: invariants with derived rounding bounds', () => {
       const epsR = 4 * U;
       const epsW = (6 * kappaH + 4) * U;
       const epsS = (6 * kappaH + 11) * U;
-      const vecs = [b.radial, b.alongTrack, b.crossTrack] as const;
-      const eps = [epsR, epsS, epsW] as const;
+      const columns: { vec: Vec3; eps: number }[] = [
+        { vec: b.radial, eps: epsR },
+        { vec: b.alongTrack, eps: epsS },
+        { vec: b.crossTrack, eps: epsW },
+      ];
 
       // (BᵀB − I)_jk: engine ≤ ε_j + ε_k; test dot 3u; +1u.
-      for (let j = 0; j < 3; j += 1) {
-        for (let k = 0; k < 3; k += 1) {
-          const value = dotVec3(vecs[j], vecs[k]) - (j === k ? 1 : 0);
-          expect(Math.abs(value)).toBeLessThanOrEqual(eps[j] + eps[k] + 4 * U);
-        }
-      }
+      columns.forEach((cj, j) => {
+        columns.forEach((ck, k) => {
+          const value = dotVec3(cj.vec, ck.vec) - (j === k ? 1 : 0);
+          expect(Math.abs(value)).toBeLessThanOrEqual(cj.eps + ck.eps + 4 * U);
+        });
+      });
 
       // Handedness |R × S − W|: engine ε_R + ε_S + ε_W; test cross 3u; +1u.
       const handedness = normVec3(subVec3(crossVec3(b.radial, b.alongTrack), b.crossTrack));

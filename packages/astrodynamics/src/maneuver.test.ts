@@ -59,9 +59,7 @@ function expectR12(m: ImpulsiveManeuverApplication): void {
   for (let i = 0; i < 3; i += 1) {
     const before = m.velocityBefore_mps[i] ?? Number.NaN;
     const dv = m.deltaV_inertial_mps[i] ?? Number.NaN;
-    expect(Object.is(m.velocityAfter_mps[i], before + dv), `R12 component ${String(i)}`).toBe(
-      true,
-    );
+    expect(Object.is(m.velocityAfter_mps[i], before + dv), `R12 component ${String(i)}`).toBe(true);
   }
 }
 
