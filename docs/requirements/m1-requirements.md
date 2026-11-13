@@ -83,8 +83,11 @@ accounts, cloud storage; mobile layout.
   maneuver; both sides are present in the result. **N**
 - AC4 A zero-magnitude maneuver produces the same trajectory as no maneuver within tolerance. **N**
 - AC5 Post-maneuver orbital elements match independent references within tolerance. **N**
-- AC6 A post-maneuver orbit that escapes (e ≥ 1) or intersects the reference sphere is propagated
-  and reported with a warning diagnostic. **N, U**
+- AC6 A post-maneuver orbit that escapes (specific orbital energy not negative, within its
+  rounding uncertainty) or that reaches the reference sphere within the simulated span is
+  propagated and reported with a warning diagnostic; the precise semantics are in contracts-v1.md
+  §8.3 and §11.3. (Amended by owner decision, 2026-11-13: energy criterion instead of e ≥ 1;
+  intersection limited to the simulated span.) **N, U**
 
 ### ML-FR-007 — Display orbital trajectories in 3D (MUST)
 - AC1 Earth, the trajectory, the spacecraft marker and the maneuver point are displayed; camera

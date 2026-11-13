@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "RSW basis, impulsive maneuver and trajectory flags delivered (ML-TASK-016, PR #20): 729 tests pass, self-consistency only. Eight design choices on escape and surface intersection need the owner's approval before the simulation runner uses them.",
+  "headline": "Simulation runner delivered (ML-TASK-017, PR #23): the engine now produces a full contract-conforming result; 829 tests pass, self-checks only. One engine defect found and filed (issue #24). Owner decisions P1–P10 pending.",
   "gates": [
     {
       "id": "G0",
@@ -32,9 +32,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-22",
-      "text": "Approve the escape and surface-intersection semantics of PR #20 (design choices D1–D8), then merge it.",
-      "blocking": "ML-TASK-017 (simulation runner)"
+      "id": "OA-23",
+      "text": "Merge PR #22 (contract revision 4), then decide the runner's points P1–P10 in PR #23 and merge it. Decide how issue #24 is handled (propagator returns states through the centre on a rectilinear fall instead of failing).",
+      "blocking": "Conformance run of VT-10, VT-16, VT-18, VI-01; G1"
     },
     {
       "id": "OA-15",
@@ -190,7 +190,7 @@
           "title": "RSW basis and impulsive maneuver",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_review",
+          "status": "done",
           "deps": "013"
         },
         {
@@ -198,7 +198,7 @@
           "title": "Simulation runner: validation, segments, events, diagnostics",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "todo",
+          "status": "in_review",
           "deps": "014–016"
         },
         {
@@ -374,6 +374,21 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-017 delivered: semantic validation, request builder with in-repo SHA-256 (constants computed from their definition, NIST vectors), normative sampling grid, runner with segments, maneuver event, warnings and metadata; 100 new tests. Coordinator re-ran all checks (829 pass) and reproduced an engine defect the agent reported: a rectilinear fall is propagated through the centre with status ok (issue #24). PR #23."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Coordinator",
+      "text": "ML-TASK-017 started (Astrodynamics, opus): simulation runner in `packages/simulation`."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Owner",
+      "text": "Approved the eight escape / surface-intersection design choices (D1–D8) and instructed the merge of PRs #20 and #21 after CI passed. Recorded as contract revision 4 (§8.3, §11.3) and an amendment to ML-FR-006 AC6. `main` passes 729 tests."
+    },
     {
       "date": "2026-11-13",
       "who": "Astrodynamics",
