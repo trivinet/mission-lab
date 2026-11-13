@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Propagator delivered (ML-TASK-015, PR #16) alongside element conversion (PR #15). Both pass their own tests; neither has independent verification yet. Tolerance record revision 2 awaits the owner.",
+  "headline": "Tolerance record revision 2 is under a bounded second Architect review (owner's choice). Element conversion (PR #15) and propagator (PR #16) await independent verification.",
   "gates": [
     {
       "id": "G0",
@@ -33,7 +33,7 @@
   "ownerActions": [
     {
       "id": "OA-17",
-      "text": "Tolerance record revision 2 (PR #12): decide whether it gets a second Architect review before approval, then approve it together with two values: angular accuracy target 1e-5 rad and degenerate thresholds 1e-5.",
+      "text": "After the bounded Architect review of the tolerance record (PR #12): approve it together with two values — angular accuracy target 1e-5 rad and degenerate thresholds 1e-5.",
       "blocking": "ML-TASK-011, 018; G1"
     },
     {
@@ -374,6 +374,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Owner",
+      "text": "Chose a bounded second review of the tolerance record before approval. Architect (opus) started: solver budget derivation, recomputation of changed values, and whether the record still holds for the propagator's consistent g form."
+    },
     {
       "date": "2026-11-13",
       "who": "Astrodynamics",
