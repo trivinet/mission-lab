@@ -1,0 +1,117 @@
+{
+  "id": "vt-04/d5-elliptical-equatorial-prograde",
+  "version": 1,
+  "family": "VT-04 Degenerate elements (ML-FR-002 AC3, ML-FR-003 AC2; ADR-008)",
+  "description": "Elliptical, prograde equatorial (i = 0) with Ω ≠ 0 given",
+  "gridCase": "C3",
+  "kind": "exact",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "constants": {
+      "mu_m3ps2": 398600441800000,
+      "referenceRadius_m": 6378137,
+      "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+    },
+    "elements": {
+      "semiMajorAxis_m": 10000000,
+      "eccentricity": 0.3,
+      "inclination_rad": 0,
+      "raan_rad": 0.4,
+      "argPeriapsis_rad": 1.1,
+      "trueAnomaly_rad": 2
+    },
+    "state": {
+      "position_m": [-9737414.07315405, -3647495.484081722, 0],
+      "velocity_mps": [341.0736832265928, -6057.327588480642, 0]
+    }
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors and angles)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s / Δt: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-011), verification/src/datasets/build.ts",
+    "references": ["L1 (original state)", "L2c (element view with convention)"],
+    "codeRevision": "5e44e1ce2b8f",
+    "date": "2026-11-13",
+    "runtime": "Node.js v24.22.2",
+    "independence": "Engine source (packages/astrodynamics) not read and engine not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value (ECMA-262 Number::toString); JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0)."
+  },
+  "method": {
+    "stateFromElements": "Regular map, no special cases (contracts-v1.md §3): p = a(1 − e²), r = p/(1 + e cos ν), perifocal r = r(cos ν, sin ν, 0), v = √(μ/p)(−sin ν, e + cos ν, 0), rotated by Q = Rz(Ω)·Rx(i)·Rz(ω) formed as explicit products of the three active elementary rotation matrices.",
+    "elementView": "In-plane polar formulation: h = r × v; i = atan2(√(h_x² + h_y²), h_z); Ω = atan2(h_x, −h_y); u = atan2(r·m̂, r·n̂) with n̂ = ẑ × h/|ẑ × h|, m̂ = ĥ × n̂; e cos ν = h²/(μr) − 1, e sin ν = h(r·v)/(μr); e = √(…); ν = atan2(e sin ν, e cos ν); ω = u − ν; a = 1/(2/r − v²/μ). atan2 only, no acos.",
+    "convention": {
+      "rule": "ADR-008 / architecture §3: circular (e < ε_e): ω := 0, ν := argument of latitude; equatorial (i < ε_i or π − i < ε_i): Ω := 0, ω := longitude of periapsis; both: Ω := 0, ω := 0, ν := true longitude. e and i are always the computed values.",
+      "thresholds": {
+        "epsilon_e": 0.00001,
+        "epsilon_i": 0.00001,
+        "source": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §15"
+      },
+      "substituteAngles": "OPEN CONVENTION (not fixed by any approved document; chosen by this reference, flagged for the Coordinator): substitute angles are measured from +x positively in the sense of motion, i.e. right-handed about the angular momentum ĥ. Prograde: ϖ = Ω + ω, λ = Ω + u (counter-clockwise seen from +z). Retrograde (i near π): ϖ = ω − Ω, λ = u − Ω (clockwise seen from +z). With this choice the regular element→state map with Ω = 0 (and ω = 0) reproduces the state of an exactly equatorial orbit, including i = π. When h_x = h_y = 0 exactly the node axis is +x."
+    }
+  },
+  "outputs": {
+    "classification": {
+      "circular": false,
+      "equatorial": true,
+      "retrograde": false
+    },
+    "elementView": {
+      "semiMajorAxis_m": 10000000.000000002,
+      "eccentricity": 0.3000000000000001,
+      "inclination_rad": 0,
+      "raan_rad": 0,
+      "argPeriapsis_rad": 1.4999999999999991,
+      "trueAnomaly_rad": 2.000000000000001
+    },
+    "roundTripExpected": {
+      "position_m": [-9737414.07315405, -3647495.484081722, 0],
+      "velocity_mps": [341.0736832265928, -6057.327588480642, 0]
+    }
+  },
+  "referenceAccuracy": {
+    "classification": "Discrete; cases are outside the factor-2 band around each threshold (§7 VT-04).",
+    "roundTrip": "Exact (the input state).",
+    "elementView": "L2c; validated by its own VT-04 round trip (verification/src/ref/elements.test.ts)."
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §7 VT-04",
+    "classification": "exact (discrete)",
+    "measure": "Euclidean norm of the difference between the round-trip state (elements view → regular map) and the input state",
+    "formula": "‖Δr‖ ≤ M·B_rt·u·r_a + r_a(2e_c/(1 − e_c) + 4 sin(i_c/2)), ‖Δv‖ ≤ M·B_vt·u·v_p + v_p(2√2 e_c/(1 + e_c) + 4 sin(i_c/2)); convention term without margin",
+    "evaluatedAt": {
+      "mu_m3ps2": 398600441800000,
+      "a_m": 10000000,
+      "e": 0.3,
+      "r_a_m": 13000000,
+      "v_p_mps": 8603.824517869116,
+      "g_p_mps2": 8.13470289387755,
+      "n_radps": 0.0006313481145928924,
+      "T_s": 9952.014050491189,
+      "kappa_E": 4.714285714285714,
+      "kappa_h": 1.0482848367219182,
+      "u": 1.1102230246251565e-16,
+      "M": 4,
+      "B_rt": 249.3446540752766,
+      "B_vt": 233.13036836099087,
+      "e_c": 0,
+      "e_c_reason": "not circular: no e convention term",
+      "i_c_rad": 0,
+      "i_c_reason": "i = 0 exactly: computed i′ = 0 exactly (h_x = h_y = 0), term 0 (§7 VT-04(a))"
+    },
+    "position_m": 0.0000014395065153121481,
+    "velocity_mps": 8.907598122061663e-10,
+    "eccentricity_abs": 2.6645352591003757e-14,
+    "inclination_abs_rad": 1.2174816530844844e-14,
+    "elementRowsSource": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §8 VI-03(b) rows for e and i (computed values, never zeroed)",
+    "substituteAngles": "No approved tolerance for Ω, ω, ν under the convention (ϖ, λ, u). Not derived by the record; listed as a needed addition in docs/verification/l2-references-report.md.",
+    "layers": "L1 (round trip); L2c (convention, element view)"
+  }
+}

@@ -190,9 +190,12 @@ describe('reference datasets (test-data/reference-cases)', () => {
       walkNumbers(parse(f.text), (n) => {
         expect(Number.isFinite(n), f.rel).toBe(true);
       });
-      // Every numeric token of the file text is the shortest round-trip form of its value.
+      // Every numeric token of the file text (outside string literals) is the shortest round-trip
+      // form of its value.
+      const noStrings = f.text.replace(/"(?:[^"\\]|\\.)*"/g, '""');
       const tokens =
-        f.text.match(/(?<=[\s[:,])-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(?=[\s,\]}])/g) ?? [];
+        noStrings.match(/(?<=[\s[:,])-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?(?=[\s,\]}])/g) ?? [];
+      expect(tokens.length, f.rel).toBeGreaterThan(0);
       for (const tok of tokens) {
         const v = Number(tok);
         expect(String(v) === tok || JSON.stringify(v) === tok, `${f.rel}: ${tok}`).toBe(true);
