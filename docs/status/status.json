@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Engine core and independent references are all on `main` (542 tests pass). The first run of the engine against the reference datasets (ML-TASK-018) is next; until it passes, no verification test has been met.",
+  "headline": "Engine core and independent references are all on `main` (542 tests pass). Before the engine can be run against the reference datasets, the owner must decide where those comparison tests live: no approved package may import both the engine and the verification code.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,16 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-20",
+      "text": "Decide where the engine-versus-reference tests live. Recommended: a new workspace `conformance/` allowed to import the engine, the contracts and the verification code, with nothing importing it (recorded as ADR-009).",
+      "blocking": "ML-TASK-018 (first engine-vs-reference run)"
+    },
+    {
+      "id": "OA-21",
+      "text": "Merge PR #18 (ADR-008 values and retrograde convention; status).",
+      "blocking": "Nothing"
+    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -201,7 +211,7 @@
           "title": "Numerical suite in CI and G1 verification report",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_progress",
+          "status": "blocked",
           "deps": "011, 017",
           "approval": true
         }
@@ -372,7 +382,7 @@
     {
       "date": "2026-11-13",
       "who": "Coordinator",
-      "text": "ML-TASK-018 started (first part): Verification Engineer runs the engine against the 55 reference datasets and the solver check, with tolerances already fixed."
+      "text": "ML-TASK-018 not started: the approved package boundaries leave no place for tests that import both the engine and the verification code (`verification/` may import only contracts; the engine imports nothing). Raised to the owner instead of working around it."
     },
     {
       "date": "2026-11-13",
