@@ -231,6 +231,21 @@ importers:
         specifier: 8.3.7
         version: 8.3.7(@types/node@24.19.2)(jiti@2.7.0)
 
+  conformance:
+    dependencies:
+      '@mission-lab/astrodynamics':
+        specifier: workspace:*
+        version: link:../packages/astrodynamics
+      '@mission-lab/contracts':
+        specifier: workspace:*
+        version: link:../packages/contracts
+      '@mission-lab/simulation':
+        specifier: workspace:*
+        version: link:../packages/simulation
+      '@mission-lab/verification':
+        specifier: workspace:*
+        version: link:../verification
+
   packages/astrodynamics: {}
 
   packages/contracts:

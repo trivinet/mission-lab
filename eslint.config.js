@@ -11,6 +11,7 @@ const elementDirs = {
   simulation: 'packages/simulation',
   web: 'apps/web',
   verification: 'verification',
+  conformance: 'conformance',
 };
 
 const elements = Object.entries(elementDirs).map(([type, dir]) => ({
@@ -35,6 +36,9 @@ const dependencyPolicies = [
   allowDependency('simulation', 'contracts', 'astrodynamics'),
   allowDependency('web', 'simulation', 'contracts'),
   allowDependency('verification', 'contracts'),
+  // ADR-009: the conformance workspace compares the engine with the references. It may import
+  // both sides; no element lists it as a target, so nothing may import conformance.
+  allowDependency('conformance', 'astrodynamics', 'simulation', 'contracts', 'verification'),
   // Third-party and Node built-in modules are governed by package manifests and by
   // no-restricted-imports below, not by this rule.
   { allow: { to: { module: { origin: ['external', 'core'] } } } },
@@ -71,7 +75,8 @@ const browserGlobals = [
 const nonWebFiles = [
   'packages/**/*.{ts,tsx}',
   'verification/**/*.{ts,tsx}',
-  'tools/boundary-fixtures/{astrodynamics,contracts,simulation,verification}/**/*.{ts,tsx}',
+  'conformance/**/*.{ts,tsx}',
+  'tools/boundary-fixtures/{astrodynamics,contracts,simulation,verification,conformance}/**/*.{ts,tsx}',
 ];
 
 export default tseslint.config(
@@ -104,7 +109,10 @@ export default tseslint.config(
     languageOptions: { globals: { process: 'readonly', console: 'readonly' } },
   },
   {
-    files: ['{packages,apps,verification}/**/*.{ts,tsx}', 'tools/boundary-fixtures/**/*.{ts,tsx}'],
+    files: [
+      '{packages,apps,verification,conformance}/**/*.{ts,tsx}',
+      'tools/boundary-fixtures/**/*.{ts,tsx}',
+    ],
     plugins: { boundaries },
     settings: {
       'boundaries/elements': elements,

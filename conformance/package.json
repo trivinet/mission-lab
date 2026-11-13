@@ -1,0 +1,15 @@
+{
+  "name": "@mission-lab/conformance",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@mission-lab/astrodynamics": "workspace:*",
+    "@mission-lab/contracts": "workspace:*",
+    "@mission-lab/simulation": "workspace:*",
+    "@mission-lab/verification": "workspace:*"
+  }
+}

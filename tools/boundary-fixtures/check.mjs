@@ -1,6 +1,8 @@
 // Proves the architecture boundary rules work: every fixture under tools/boundary-fixtures/ is a
 // deliberately illegal file whose first line is `// expect: <ruleId>`. This script exits 0 only if
 // ESLint reports that rule for every fixture (and there is at least one fixture).
+// A fixture whose first line is `// expect: clean` is a positive check (ADR-009): a permitted
+// import that must lint with no message at all.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,6 +47,17 @@ for (const fixture of fixtures) {
   if (parseError !== undefined) {
     console.error(`FAIL ${rel}: parse error: ${parseError.message}`);
     failures += 1;
+    continue;
+  }
+  if (expected === 'clean') {
+    // Positive fixture: a permitted import must lint without any message.
+    if (messages.length === 0) {
+      console.log(`ok   ${rel} -> clean`);
+    } else {
+      const seen = messages.map((message) => message.ruleId ?? 'none').join(', ');
+      console.error(`FAIL ${rel}: expected no messages, got: ${seen}`);
+      failures += 1;
+    }
     continue;
   }
   const hit = messages.some((message) => message.ruleId?.startsWith(expected) ?? false);
