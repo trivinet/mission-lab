@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Tolerance record revision 2 is under a bounded second Architect review (owner's choice). Element conversion (PR #15) and propagator (PR #16) await independent verification.",
+  "headline": "Second review of the tolerance record: arithmetic and derivation confirmed, no tolerance value changes; one substantive correction to the solver acceptance check is being applied by the Verification Engineer. Owner approval follows.",
   "gates": [
     {
       "id": "G0",
@@ -140,7 +140,7 @@
           "title": "Tolerance derivation and record",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_review",
+          "status": "in_progress",
           "deps": "004",
           "approval": true
         },
@@ -374,6 +374,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Architect",
+      "text": "Bounded second review of PR #12: every recomputed value matches; B1–B3 resolved; the record stays a valid conservative standard for the propagator's consistent g form. One substantive correction (the O-1 solver check would also measure a separately budgeted error and could fail a correct engine at high eccentricity) and three wording fixes. Verification Engineer resumed for revision 3."
+    },
     {
       "date": "2026-11-13",
       "who": "Owner",
