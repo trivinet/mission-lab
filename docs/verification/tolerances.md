@@ -1,10 +1,10 @@
 # M1 Tolerance Record
 
-**Document ID:** ML-VER-002 · **Date:** 2026-11-12 · **Author:** Verification Engineer (ML-TASK-010) · **Revision:** 3 (Systems Architect reviews of PR #12: B1–B3, N1–N9; F1–F4) · **Status:** Proposed — owner approval required (values are fixed at G1, verification plan §4)
+**Document ID:** ML-VER-002 · **Date:** 2026-11-12 · **Author:** Verification Engineer (ML-TASK-010) · **Revision:** 3 (Systems Architect reviews of PR #12: B1–B3, N1–N9; F1–F4) · **Status:** Approved by the owner on 2026-11-13 (revision 3; see §15). Changes follow §4.1: any loosening needs owner sign-off before the engine is run against it
 
 Implements the tolerance policy of the [verification plan](m1-verification-plan.md) §4 (method fixed
 there) for the numerical families VT-01…VT-19 and the numeric parts of VI-01…VI-03. Nothing in this
-document is approved until the owner signs §15.
+document was approved until the owner signed §15 (2026-11-13).
 
 **Changes in revision 3** (second, bounded Systems Architect review of PR #12). No tolerance value
 changed. The O-1 acceptance check now evaluates the time equation entirely in high precision and
@@ -1136,14 +1136,14 @@ confirmed).
 
 | Item | Decision | Owner | Date |
 |---|---|---|---|
-| Method and formulas §2–§9 | | | |
-| Derived solver budget ε_t (§6.1) | | | |
-| O-1 acceptance threshold ε_t + δt_α (§6.1, §12) — revision 3 **correction of the O-1 check threshold**, not a loosening of any VT tolerance | | | |
-| Margin M = 4, M_book = 2 | | | |
-| Angular accuracy target δθ (O-6) | | | |
-| Thresholds ε_e, ε_i (§10) | | | |
-| Re-evaluation rule §4.1 | | | |
-| Open items O-1…O-11 | | | |
+| Method and formulas §2–§9 | Approved | Owner | 2026-11-13 |
+| Derived solver budget ε_t (§6.1) | Approved | Owner | 2026-11-13 |
+| O-1 acceptance threshold ε_t + δt_α (§6.1, §12) — revision 3 **correction of the O-1 check threshold**, not a loosening of any VT tolerance | Approved | Owner | 2026-11-13 |
+| Margin M = 4, M_book = 2 | Approved | Owner | 2026-11-13 |
+| Angular accuracy target δθ (O-6) | Approved: δθ = 1e-5 rad, independent of display formatting (ADR-008) | Owner | 2026-11-13 |
+| Thresholds ε_e, ε_i (§10) | Approved: ε_e = ε_i = 1e-5; e and i never set to zero (ADR-008) | Owner | 2026-11-13 |
+| Re-evaluation rule §4.1 | Approved | Owner | 2026-11-13 |
+| Open items O-1…O-11 | Acknowledged as open. Already decided by the owner on 2026-11-12: O-3 (keep e and i), O-6 (principle), O-8 (scene coordinate), O-10 (contract revision 3). The others stay open with the owners named in §12 | Owner | 2026-11-13 |
 
 **Loosenings** (§4.1 item 3; each needs owner sign-off before the engine is run against it):
 
