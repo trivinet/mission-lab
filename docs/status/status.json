@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Element/state conversion delivered (ML-TASK-014, PR #15): 454 tests pass, but the independent verification tests VT-02…VT-04 do not exist yet. Propagator (ML-TASK-015) in progress. Tolerance record revision 2 awaits the owner.",
+  "headline": "Propagator delivered (ML-TASK-015, PR #16) alongside element conversion (PR #15). Both pass their own tests; neither has independent verification yet. Tolerance record revision 2 awaits the owner.",
   "gates": [
     {
       "id": "G0",
@@ -182,7 +182,7 @@
           "title": "Universal-variable Kepler propagator",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "013"
         },
         {
@@ -374,6 +374,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-015 delivered: Stumpff functions and universal-variable propagator, no warm start, noise-floor stopping criterion with diagnostics; 45 new tests (self-consistency only). Agent-measured time residual at most 7.5 % of the proposed solver budget. Coordinator re-ran all checks: 420 tests pass. PR #16."
+    },
     {
       "date": "2026-11-13",
       "who": "Astrodynamics",
