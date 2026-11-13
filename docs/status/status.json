@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "First conformance run: the engine passes all 124 comparisons against the independent references (element conversion, degenerate cases, propagation, period closure, solver residual). Orekit evidence, invariants and maneuvers are still to come.",
+  "headline": "Conformance suite is on `main` (666 tests, 124 engine-vs-reference). The RSW basis and impulsive maneuver (ML-TASK-016) are with the Astrodynamics Engineer. Then: simulation runner, Orekit dataset, remaining test families.",
   "gates": [
     {
       "id": "G0",
@@ -185,7 +185,7 @@
           "title": "RSW basis and impulsive maneuver",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "todo",
+          "status": "in_progress",
           "deps": "013"
         },
         {
@@ -369,6 +369,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Coordinator",
+      "text": "PRs #18 and #19 merged on the owner's instruction after CI passed; `main` passes 666 tests and 20/20 boundary fixtures. ML-TASK-016 started (Astrodynamics, opus), one Opus task at a time from now on because of the usage limit."
+    },
     {
       "date": "2026-11-13",
       "who": "Verification",
