@@ -1,0 +1,124 @@
+task_id: ML-TASK-014
+title: "Keplerian elements <-> Cartesian state, degenerate-element convention, derived orbit quantities"
+status: in_review
+requirement_ids: [ML-FR-002, ML-FR-003, ML-FR-009, ML-FR-010, ML-NFR-002, ML-NFR-003]
+owner_role: astrodynamics-engineer
+reviewer_role: verification-engineer
+dependencies: [ML-TASK-013]
+affected_paths:
+  - packages/astrodynamics/
+  - docs/backlog/tasks/ML-TASK-014.yaml
+objective: >
+  Provide pure, documented conversions between classical elements and the Cartesian state in
+  packages/astrodynamics: element->state with the regular perifocal map (no special-casing, no
+  re-normalisation), state->elements with the degenerate-element convention of architecture §3 as
+  refined by ADR-008 (e and i always computed, convention flag in the output, atan2-based angle
+  extraction), defined behaviour for open (e >= 1) states, angle normalisation to [0, 2π), and the
+  derived quantities of ML-FR-002 AC4 / ML-FR-010 AC2.
+scope:
+  - "normalizeAngle_rad: [0, 2 * Math.PI), result rounding to 2π mapped to +0, −0 to +0, tagged failure for non-finite input (contracts-v1 §11 OQ-1)."
+  - "elementsToState: regular map for 0 <= e < 1, 0 <= i <= π, fixed evaluation order, result object on visible precondition failure."
+  - "stateToElements: thresholds as explicit parameters (no default), convention flag NONE | CIRCULAR | EQUATORIAL | CIRCULAR_EQUATORIAL, conic flag ELLIPTIC | HYPERBOLIC, atan2-based angles, documented retrograde-equatorial choice."
+  - "closedOrbitQuantities (r_p, r_a, T, n, ξ, |h| for closed orbits; explicit NOT_CLOSED_ORBIT otherwise) and stateIntegrals (ξ, |h| for any state)."
+  - "Unit tests: exact cases, invariants and round trips over the verification-plan §5 grid shapes, with provisional bounds derived in the test files."
+out_of_scope:
+  - Approved thresholds and tolerances (ML-TASK-010); independent references and VT-02/VT-03/VT-04 (Verification Engineer).
+  - Degree conversion and any display formatting (UI layer).
+  - Kepler propagation (ML-TASK-015), maneuvers, escape/surface flags and simulation runner (ML-TASK-016/017).
+  - Alternative (non-singular) element sets (ADR-008 option C).
+  - Any edit to verification/, test-data/, tolerances, or package dependencies.
+inputs:
+  - AGENTS.md
+  - docs/engineering/coding-standards.md
+  - docs/architecture/proposed-architecture.md (§2, §3)
+  - docs/architecture/adr/ADR-002, ADR-004, ADR-005, ADR-008
+  - docs/architecture/contracts-v1.md revision 3 (§3, §8.3, §11, §12)
+  - docs/requirements/m1-requirements.md (ML-FR-002, ML-FR-003, ML-FR-009, ML-FR-010)
+  - docs/verification/m1-verification-plan.md (§3 VT-02..VT-04, §5 grid)
+  - packages/astrodynamics/src/vector3.ts, constants.ts
+acceptance_criteria:
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0."
+  - "packages/astrodynamics/package.json declares no `dependencies`; lockfile unchanged."
+  - "Every public function documents units, frame, valid domain, evaluation order and source (ML-NFR-002); formulas either from a source opened (title, section, URL, access date) or derived in comments."
+  - "Element->state applies the regular map to the given elements with no special-casing and no angle re-normalisation (contracts-v1 §3, ADR-008)."
+  - "State->elements reports e and i as computed, assigns only the undefined angles, flags the convention applied, takes thresholds as parameters with no approved default (ADR-008)."
+  - "Every extracted angle uses an atan2 form; no acos/asin of a ratio (tolerance-review criterion)."
+  - "No function returns NaN or ±Infinity as data; failures are tagged result objects."
+test_requirements:
+  - Vitest unit tests in packages/astrodynamics/src/*.test.ts with bounds derived in the test (operation count × 2^-53 × scale), marked provisional.
+deliverables:
+  - packages/astrodynamics/src/angles.ts, elements.ts, orbit-quantities.ts and their tests; export lines appended to src/index.ts.
+human_approval_required: false
+
+report:
+  files_changed:
+    - "packages/astrodynamics/src/angles.ts (new): TWO_PI_rad, normalizeAngle_rad, NormalizeAngleResult; internal normalizeFiniteAngle_rad (not exported from index)"
+    - "packages/astrodynamics/src/elements.ts (new): KeplerianElements, CartesianState, elementsToState, stateToElements, DegeneracyThresholds, DegenerateConvention, ConicType, result/failure types"
+    - "packages/astrodynamics/src/orbit-quantities.ts (new): closedOrbitQuantities, stateIntegrals, result/failure types"
+    - "packages/astrodynamics/src/index.ts (modified, export lines appended only)"
+    - "packages/astrodynamics/src/angles.test.ts (new): 9 tests"
+    - "packages/astrodynamics/src/elements.test.ts (new): 51 tests"
+    - "packages/astrodynamics/src/orbit-quantities.test.ts (new): 19 tests"
+    - "docs/backlog/tasks/ML-TASK-014.yaml (new): this contract and report"
+  summary: >
+    Element->state: P and Q are columns 1 and 2 of R_z(Ω) R_x(i) R_z(ω); p = (a(1 − e))(1 + e);
+    r = p/(1 + e cos ν); position = (r cos ν) P + (r sin ν) Q; velocity = sqrt(μ/p)[(−sin ν) P +
+    (e + cos ν) Q]. Order fixed and documented. No special-casing; angles not reduced; i = Math.PI
+    gives a z component of relative size sin(Math.PI) ≈ 1.2e-16.
+    State->elements: h = r × v, N = (−h_y, h_x, 0), e⃗ = ((v·v − μ/|r|) r − (r·v) v)/μ,
+    ξ = v·v/2 − μ/|r|, a = −μ/(2ξ), e = |e⃗|. Angles (all atan2, then reduced to [0, 2π)):
+    i = atan2(|N|, h_z); Ω = atan2(h_x, −h_y); ω = atan2((ref × e⃗)·ĥ, ref·e⃗) with ref = N
+    (or +x when equatorial); ν = atan2((e⃗ × r)·ĥ, e⃗·r); circular: ω := 0 and
+    ν := atan2((ref × r)·ĥ, ref·r) (argument of latitude, or true longitude when also
+    equatorial); equatorial: Ω := 0. Detection: circular iff e = 0 or e < ε_e; equatorial iff
+    |N| = 0 or min(i, π − i) < ε_i; thresholds are required parameters. e and i are never
+    changed. Retrograde equatorial: substitute angles measured from the in-plane projection of +x
+    positively about ĥ (direction of motion), which makes the round trip through the regular map
+    with Ω := 0, i ≈ π consistent (no reflection). Open states: ξ > 0 returns a < 0, e, i, Ω, ω,
+    ν (hyperbolic true anomaly) with conic 'HYPERBOLIC'; ξ = 0 exactly or overflowing |a| returns
+    SEMI_MAJOR_AXIS_UNDEFINED; h = 0 exactly returns ZERO_ANGULAR_MOMENTUM.
+    Derived quantities: r_p = a(1 − e), r_a = a(1 + e), T = 2π a sqrt(a/μ), n = (1/sqrt(a/μ))/a,
+    ξ = −μ/(2a), |h| = sqrt(μ a(1 − e)(1 + e)) for closed orbits only (NOT_CLOSED_ORBIT
+    otherwise); stateIntegrals gives ξ and |h| for any finite state with r ≠ 0.
+    Sources: Wikipedia "Perifocal coordinate system" (perifocal r, v and the R_z(Ω)R_x(i)R_z(ω)
+    matrix entries) and Wikipedia "Eccentricity vector" (section "Calculation"), both opened
+    2026-11-13; everything else (orbit equation, vis-viva, node vector, inclination, periapsis /
+    apoapsis, period, mean motion) derived in comments (D1–D7) from h = r × v, the eccentricity
+    vector and the energy integral. Vallado (COE2RV/RV2COE) cited only as "not opened, not
+    confirmed". No new physical constant.
+  tests_executed:
+    - "pnpm exec vitest run --project astrodynamics -> exit 0; 6 files, 117 tests passed (9 angles, 51 elements, 19 orbit-quantities, 32 vector3, 5 constants, 1 placeholder)"
+    - "pnpm lint -> exit 0"
+    - "pnpm typecheck -> exit 0 (root + all workspaces)"
+    - "pnpm test -> exit 0; 15 files, 454 tests passed"
+    - "pnpm format:check -> exit 0"
+    - "pnpm check:boundaries -> exit 0; 12/12 fixtures reported"
+  reference_data_used:
+    - "None. No reference dataset created or used; grid element values in the tests are inputs spanning m1-verification-plan §5 shapes, not reference values."
+  not_verified:
+    - "VT-02, VT-03, VT-04 are NOT passed or run: only own self-consistency tests (round trips, invariants) exist. Independent L2/L3 comparison is the Verification Engineer's."
+    - "Bounds in the tests are provisional, first-order operation-count bounds with margin ≥ 2; on the grid the observed errors used at most ~2.6% of the round-trip bound and < 1% of the element bounds (measured once with a throwaway script, not kept)."
+    - "Thresholds ε_e = ε_i = 1e-5 used in the tests are the unapproved proposal of the ML-TASK-010 tolerance record; not exported from the package."
+    - "Accuracy of Math.sin/cos/atan2 (assumed ≤ 1 ulp) is not verified here."
+    - "Exactness of ECMAScript `%` (Number::remainder) relied on by normalizeAngle_rad: not confirmed against the spec text; covered by behavioural tests only."
+    - "Primary textbook sources (Vallado, Curtis, Bate-Mueller-White) not opened; the opened sources are encyclopedia articles."
+    - "The near-equatorial convention displacement bound (4 sin(i'/2) + i'²) takes the commutator part from the tolerance-record proposal; the i'² term is my own derivation, not reviewed."
+  known_limitations:
+    - "Nearly rectilinear states (h tiny but non-zero) return elements with ill-conditioned angles; only h = 0 exactly fails."
+    - "Near e = 1 the conic flag follows the sign of ξ, and the computed e may lie on the other side of 1 by rounding."
+    - "Exact parabola (ξ = 0) is unsupported (SEMI_MAJOR_AXIS_UNDEFINED); no semi-latus-rectum based element set is offered."
+    - "Periapsis radius of an open orbit is not provided (closedOrbitQuantities returns NOT_CLOSED_ORBIT); ML-TASK-016 may need p/(1 + e) for the sub-surface flag."
+    - "normalizeAngle_rad reduces modulo the binary64 2 * Math.PI, not the real 2π (difference ≈ |x| × 3.9e-17)."
+  documentation_changes:
+    - "docs/backlog/tasks/ML-TASK-014.yaml (this file)."
+  risks_or_blockers:
+    - "Ambiguity: contracts-v1 §12 NQ-3 recommends the angle-normalisation helper live in a formatting module in apps/web or a small UI-free package; the Coordinator assigned normalizeAngle_rad to packages/astrodynamics in this task. Not resolved here; flagged for the owner/architect."
+    - "Ambiguity: 'longitude of periapsis' and 'true longitude' for retrograde equatorial orbits are not defined by architecture §3 / ADR-008; the direction-of-motion convention chosen here differs in sign from an 'eastward Ω + ω' definition. Needs confirmation so that the Verification Engineer's L2 reference uses the same convention."
+    - "Ambiguity: strict vs non-strict threshold comparison is not fixed by ADR-008; implemented as strict (e < ε_e, i' < ε_i) plus exact zero, matching the tolerance-record proposal wording '0 < e < ε_e'."
+    - "Ambiguity: ML-FR-002 AC4 asks for perigee/apogee altitude; this task provides radii only (altitude = radius − reference radius is left to the caller)."
+  review_artifact: "Not opened (task instruction: no push, no PR). Branch feat/ml-task-014-elements, local commit only."
+  recommended_next_action: >
+    Coordinator: push and open the PR; route to the Verification Engineer for VT-02/03/04 with
+    the convention notes above (retrograde equatorial sense, strict thresholds); owner to approve
+    thresholds and the angular accuracy target (ML-TASK-010) and to settle NQ-3 ownership of
+    normalizeAngle_rad.

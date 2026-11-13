@@ -1,0 +1,126 @@
+{
+  "id": "vt-03/c5-molniya",
+  "version": 1,
+  "family": "VT-03 Round trip state → elements → state (ML-FR-003 AC2)",
+  "description": "Highly elliptical, Molniya-like (conditioning near perigee). Input state produced by L2c from the grid elements.",
+  "gridCase": "C5",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "constants": {
+      "mu_m3ps2": 398600441800000,
+      "referenceRadius_m": 6378137,
+      "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+    },
+    "state": {
+      "position_m": [-3271491.8218852445, 381241.34203022276, -5969452.061539402],
+      "velocity_mps": [-4507.506981845436, -8968.526380194644, 920.0639984865521]
+    },
+    "gridElements": {
+      "semiMajorAxis_m": 26000000,
+      "eccentricity": 0.74,
+      "inclination_rad": 1.1,
+      "raan_rad": 4.2,
+      "argPeriapsis_rad": 4.7,
+      "trueAnomaly_rad": 0.2
+    }
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors and angles)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s / Δt: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-011), verification/src/datasets/build.ts",
+    "references": ["L1 (original state)", "L2c"],
+    "codeRevision": "5e44e1ce2b8f",
+    "date": "2026-11-13",
+    "runtime": "Node.js v24.22.2",
+    "independence": "Engine source (packages/astrodynamics) not read and engine not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value (ECMA-262 Number::toString); JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0)."
+  },
+  "method": {
+    "roundTrip": "L1: the expected round-trip state is the input state itself (exact).",
+    "referenceElements": "In-plane polar formulation: h = r × v; i = atan2(√(h_x² + h_y²), h_z); Ω = atan2(h_x, −h_y); u = atan2(r·m̂, r·n̂) with n̂ = ẑ × h/|ẑ × h|, m̂ = ĥ × n̂; e cos ν = h²/(μr) − 1, e sin ν = h(r·v)/(μr); e = √(…); ν = atan2(e sin ν, e cos ν); ω = u − ν; a = 1/(2/r − v²/μ). atan2 only, no acos.",
+    "convention": {
+      "rule": "ADR-008 / architecture §3: circular (e < ε_e): ω := 0, ν := argument of latitude; equatorial (i < ε_i or π − i < ε_i): Ω := 0, ω := longitude of periapsis; both: Ω := 0, ω := 0, ν := true longitude. e and i are always the computed values.",
+      "thresholds": {
+        "epsilon_e": 0.00001,
+        "epsilon_i": 0.00001,
+        "source": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §15"
+      },
+      "substituteAngles": "OPEN CONVENTION (not fixed by any approved document; chosen by this reference, flagged for the Coordinator): substitute angles are measured from +x positively in the sense of motion, i.e. right-handed about the angular momentum ĥ. Prograde: ϖ = Ω + ω, λ = Ω + u (counter-clockwise seen from +z). Retrograde (i near π): ϖ = ω − Ω, λ = u − Ω (clockwise seen from +z). With this choice the regular element→state map with Ω = 0 (and ω = 0) reproduces the state of an exactly equatorial orbit, including i = π. When h_x = h_y = 0 exactly the node axis is +x."
+    }
+  },
+  "outputs": {
+    "roundTripExpected": {
+      "position_m": [-3271491.8218852445, 381241.34203022276, -5969452.061539402],
+      "velocity_mps": [-4507.506981845436, -8968.526380194644, 920.0639984865521]
+    },
+    "referenceElements": {
+      "elementsRegular": {
+        "semiMajorAxis_m": 26000000.00000003,
+        "eccentricity": 0.7400000000000005,
+        "inclination_rad": 1.1,
+        "raan_rad": 4.2,
+        "argPeriapsis_rad": 4.7,
+        "trueAnomaly_rad": 0.1999999999999999
+      },
+      "argumentOfLatitude_rad": 4.9,
+      "nodeUndefined": false,
+      "elementView": {
+        "semiMajorAxis_m": 26000000.00000003,
+        "eccentricity": 0.7400000000000005,
+        "inclination_rad": 1.1,
+        "raan_rad": 4.2,
+        "argPeriapsis_rad": 4.7,
+        "trueAnomaly_rad": 0.1999999999999999
+      },
+      "classification": {
+        "circular": false,
+        "equatorial": false,
+        "retrograde": false
+      }
+    }
+  },
+  "referenceAccuracy": {
+    "roundTrip": "Exact (the input state; tolerances.md §7 VT-03 \"Reference accuracy: L1\").",
+    "referenceElements": "L2c extraction, validated by its own round trip within this tolerance (verification/src/ref/elements.test.ts). Informative for VI-03-type element comparisons."
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §7 VT-03",
+    "measure": "Euclidean norm of the difference between the round-trip state and the input state",
+    "formula": "‖Δr‖ ≤ M·B_rt(e)·u·r_a, ‖Δv‖ ≤ M·B_vt(e)·u·v_p; B_rt = 5κ_E + 90/(1 − e) + (6κ_h + 55) + 31 + 2/(1 − e²) + (1 + 3e)/(1 − e); B_vt = 2.5κ_E + 90/(1 − e) + (6κ_h + 55) + 25 + 1/(1 − e²) + 7/(1 + e)",
+    "evaluatedAt": {
+      "mu_m3ps2": 398600441800000,
+      "a_m": 26000000,
+      "e": 0.74,
+      "r_a_m": 45240000,
+      "v_p_mps": 10129.083797156703,
+      "g_p_mps2": 8.722568401841672,
+      "n_radps": 0.00015059441505178189,
+      "T_s": 41722.565242669276,
+      "kappa_E": 14.384615384615383,
+      "kappa_h": 1.4867525836251314,
+      "u": 1.1102230246251565e-16,
+      "M": 4,
+      "B_rt": 529.8029204531211,
+      "B_vt": 477.2693218677985
+    },
+    "position_m": 0.000010644056356889565,
+    "velocity_mps": 2.146860891288276e-9,
+    "elementRows": {
+      "source": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §8 VI-03(b) rows (two-sided, M = 4), at κ_h, e, sin i of the grid elements; null where the element is undefined or the row does not apply",
+      "eccentricity": 2.6645352591003757e-14,
+      "inclination_rad": 1.3849398170140916e-14,
+      "raan_rad": 1.1966832185583432e-14,
+      "argPeriapsis_rad": 6.80396962552462e-14,
+      "trueAnomaly_rad": 6.166838811377356e-14
+    },
+    "layers": "L1 (round trip); L2c for the element values"
+  }
+}

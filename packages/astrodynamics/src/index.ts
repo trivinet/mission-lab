@@ -47,3 +47,29 @@ export type {
   KeplerTimeEquationData,
   LagrangeCoefficients,
 } from './kepler-universal';
+export { normalizeAngle_rad, TWO_PI_rad } from './angles';
+export type { NormalizeAngleResult } from './angles';
+
+export { elementsToState, stateToElements } from './elements';
+export type {
+  CartesianState,
+  ConicType,
+  DegeneracyThresholds,
+  DegenerateConvention,
+  ElementsToStateFailure,
+  ElementsToStateResult,
+  KeplerianElements,
+  StateToElementsFailure,
+  StateToElementsResult,
+  StateToElementsSuccess,
+} from './elements';
+
+export { closedOrbitQuantities, stateIntegrals } from './orbit-quantities';
+export type {
+  ClosedOrbitQuantities,
+  ClosedOrbitQuantitiesFailure,
+  ClosedOrbitQuantitiesResult,
+  StateIntegrals,
+  StateIntegralsFailure,
+  StateIntegralsResult,
+} from './orbit-quantities';
