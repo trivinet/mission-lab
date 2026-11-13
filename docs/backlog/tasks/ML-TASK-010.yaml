@@ -133,3 +133,30 @@ report:
     disagreements_with_review:
       - "None blocking. Positions differ in emphasis only: on O-3 I agree with keeping e and i but note it doubles the VT-04(b) convention term versus zeroing; on O-1 I state that passing VT-05..VT-09 is not acceptable evidence of the budget."
     commit: "see git log (docs(ML-TASK-010): revision 2)"
+  revision_3:
+    date: "2026-11-13"
+    trigger: "Second, bounded Systems Architect review on PR #12 (ready after corrections F1-F4 and scope statements)."
+    files_changed:
+      - "docs/verification/tolerances.md: revision 3 (status still Proposed, approval tables empty)"
+      - "docs/backlog/tasks/ML-TASK-010.yaml: this entry"
+    summary: >
+      No tolerance value changed. F2: O-1 acceptance check redefined to evaluate the time equation with
+      alpha, sigma0 and r0 formed in high precision from the exact binary64 inputs, passing when
+      |t(chi) - dt| <= eps_t + dt_alpha; dt_alpha derived from dF/dalpha at fixed chi:
+      dt_alpha <= 5u kappa_E [(1+2e)|dt| + (4e+4e^2)/n]. The |dt| coefficient agrees exactly with the
+      reviewer's estimate; the constant term is larger by 5 kappa_E 2e u/n (below 1% at ten periods).
+      Threshold at ten periods (equivalent): C1/C2 39.6u, C3 82.4u, C4 102.6u, C5 256.0u, C6 39.6u.
+      Listed in section 15 as a correction of the O-1 check threshold for owner sign-off. F1: argument
+      formation restated as a shift of E by <= 2.5uX with state effects <= 2.5u v_p L and 2.5u g_p L
+      (proved for all e < 1). F3: delta_t_eval described as an upper bound on noise, not a floor on
+      attainable residual. F4: delta_t_eval stated relative to exact sigma0, r0 with computed alpha.
+      Scope statement added to section 6.1 (canonical-formulation budgets, valid for any formulation
+      with no larger error per term, not re-derived or tightened per engine; g-noise kept). Section 6.7
+      notes the textbook-g assumption and that with a consistent g the O-1 check is the only control on
+      the solver residual. O-1 and section 6.1 now state the same budget expression (seconds).
+    tests_executed:
+      - "None. Formula evaluation only (Node v24.22.2, scratch directory, not committed)."
+    not_verified:
+      - "As revision 2. The dt_alpha bound is first order and uses the same canonical delta-alpha count (5u(4a/r0 - 1)/a)."
+    disagreements_with_review:
+      - "None. Only the constant term of dt_alpha differs slightly from the reviewer's rough estimate (explained in section 6.1)."

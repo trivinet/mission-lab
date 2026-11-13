@@ -1,10 +1,18 @@
 # M1 Tolerance Record
 
-**Document ID:** ML-VER-002 · **Date:** 2026-11-12 · **Author:** Verification Engineer (ML-TASK-010) · **Revision:** 2 (Systems Architect review of PR #12: B1–B3, N1–N9) · **Status:** Proposed — owner approval required (values are fixed at G1, verification plan §4)
+**Document ID:** ML-VER-002 · **Date:** 2026-11-12 · **Author:** Verification Engineer (ML-TASK-010) · **Revision:** 3 (Systems Architect reviews of PR #12: B1–B3, N1–N9; F1–F4) · **Status:** Proposed — owner approval required (values are fixed at G1, verification plan §4)
 
 Implements the tolerance policy of the [verification plan](m1-verification-plan.md) §4 (method fixed
 there) for the numerical families VT-01…VT-19 and the numeric parts of VI-01…VI-03. Nothing in this
 document is approved until the owner signs §15.
+
+**Changes in revision 3** (second, bounded Systems Architect review of PR #12). No tolerance value
+changed. The O-1 acceptance check now evaluates the time equation entirely in high precision and
+accepts \|t(χ̂) − Δt\| ≤ ε_t + δt_α, with the α data error δt_α derived in §6.1 (F2; listed in §15
+for owner sign-off as a correction of the check threshold). Wording corrected for the
+argument-formation shift (F1), the meaning of the noise bound (F3) and the reference of δt_eval
+(F4). Scope of the budgets stated (§6.1), and the textbook-g assumption of the break-even table
+(§6.7). O-1 and §6.1 now state the same budget expression.
 
 **Changes in revision 2.** The solver budget ε_t is now derived from a rounding-error bound of the
 universal-variable time equation (§6.1, review B1), and the off-orbit effect of forming g from the
@@ -241,13 +249,21 @@ The computed state differs from the exact one by four kinds of error.
      ≤ (15/2) κ_E u · v_p · Δt. This is a data error (the propagation is exact for a slightly
      different orbit); it is **not** part of the time-equation noise below.
    - *Argument formation.* ψ = αχ² (2u relative), √ψ (+u): the Stumpff argument √ψ = ΔE carries an
-     absolute error ≤ 2.5uX; used consistently in f, ḟ, ġ this is a phase shift ≤ 2.5u n L.
+     absolute error ≤ 2.5uX; used consistently in f, ḟ, ġ this is a shift of the eccentric
+     anomaly by ≤ 2.5uX (revision 3 wording; review F1). Its effect on the state is bounded for
+     every e < 1: ‖∂r/∂E‖ = v r/(n a) ≤ a (v r = h/cos φ ≤ √(μa)) and X ≤ n\|Δt\| + 2e ≤
+     (1 + e)(n\|Δt\| + 1), with a(1 + e) ≤ v_p/n, so the position shift is ≤ 2.5u·v_p·L;
+     ‖∂v/∂E‖ = μ/(r n a) ≤ (1 − e) g_p/n and (1 − e)·2e ≤ 1, so the velocity shift is
+     ≤ 2.5u·g_p·L. (Revision 2 wrote "phase shift ≤ 2.5u n L", which as an angle statement fails
+     for e > 0.5 because X can exceed n L; the state bounds used below were not affected.)
    - *Time formation.* Δt = t − t₀ is one rounded subtraction (exact for segment 0): a phase
      shift ≤ u\|Δt\|.
    Together: **C_t = (15/2)κ_E + 4** (2.5 + 1 rounded up to 4). Trigonometric evaluation errors are
    absolute (≤ c_f u, A3) and enter the bounded term.
 3. **Solver residual.** Let χ̂ be the returned root and t(χ̂) the **exact** value of the time
-   equation at χ̂ (with the computed α, σ₀, r₀). The residual δt_res = \|t(χ̂) − Δt\| has a
+   equation at χ̂ with the **computed α̂** and the **exact** σ₀ and r₀ of the binary64 input state
+   (the rounding of σ₀ and r₀ is part of δt_eval below; the error of α̂ is the data error of item
+   2, budgeted in C_t; review F4). The residual δt_res = \|t(χ̂) − Δt\| has a
    **derived budget** (below). The state formed from f, ḟ, ġ at χ̂ is a point of the orbit at time
    t(χ̂): a phase error ≤ v_p δt_res in position and ≤ g_p δt_res in velocity.
 4. **Off-orbit time-like error from g** (derived in revision 2; review N5). The textbook g uses the
@@ -258,10 +274,21 @@ The computed state differs from the exact one by four kinds of error.
    ‖δr_off‖ ≤ v₀ δt_off ≤ v_p δt_off. The velocity is affected only through r = ‖r‖ in ḟ and ġ:
    the r-dependent part of v is ḟ r₀ + (ġ − 1)v₀ = v − v₀ (norm ≤ 2v_p), scaled by r/r̂, so
    ‖δv_off‖ ≤ 2v_p · v_p δt_off / r_p = 2(1 + e) g_p δt_off. If the engine forms g consistently
-   with χ̂ (for example g = t̂(χ̂) − χ̂³S/√μ, or any form whose error does not grow with Δt), term 4
-   vanishes except for its bounded part; the bounds below remain valid (they are upper bounds).
+   with χ̂ (for example g = t̂(χ̂) − χ̂³S/√μ, or any form whose error does not grow with Δt), the
+   residual part of term 4 vanishes; a g rounding that grows like a few u\|Δt\| remains in the
+   consistent form too (it subtracts two quantities of size ≈ \|Δt\|), so the δt_g term is kept
+   for every formulation. The bounds below remain valid (they are upper bounds).
 
-**Time-equation evaluation noise (derived; review B1).** Fix χ and the data α̂, σ̂₀, r̂₀. The computed
+**Scope of these budgets (revision 3).** ε_t, δt_g, C_t and C_b are derived from operation counts
+of the **canonical textbook formulation** written above. They are acceptance bounds for that
+formulation and for any formulation whose error in each term is no larger — for example one that
+forms g consistently with χ̂, or evaluates the Stumpff functions by series near ψ = 0. They are not
+re-derived for, and not tightened to, a particular engine: the engine's source is not read when
+deriving them (ADR-003), and a tighter engine simply has more margin.
+
+**Time-equation evaluation noise (derived; review B1).** Fix χ and the data α̂, σ̂₀, r̂₀; the bound
+is taken relative to F evaluated with the **computed α̂** and the **exact** σ₀, r₀ (review F4): the
+rounding of σ₀ and r₀ is in the table, the error of α̂ is not. The computed
 F̂(χ) of F(χ) = √μ t(χ) differs from F(χ) by (first order, B1–B7, units of a^(3/2), i.e. radians of
 mean anomaly):
 
@@ -280,21 +307,67 @@ Sum: \|F̂(χ) − F(χ)\| ≤ u a^(3/2) [(12 + 32e) X + 6 + 32e]. With X ≤ n\
 
     δt_eval ≤ u [ A_e |Δt| + B_e / n ],   A_e = 12 + 32e,   B_e = 6 + 56e + 64e²
 
-**Floor.** For every χ the computed residual F̂(χ) − √μΔt differs from the exact one by up to
-√μ δt_eval. No stopping test on the computed residual can therefore certify a true residual below
-δt_eval, and at the representable χ nearest the root the computed residual can still be as large
-as δt_eval plus the spacing term (dt/dχ)·u\|χ\| ≤ (r_a/√μ)u√a X = (1 + e)uX/n. The attainable true
-residual of **any** Newton (or other) solve of this equation in this form is floored by δt_eval;
-an engine cannot be required to do better, and this record does not assume it does.
+**What the noise bound means (revision 3 wording; review F3).** δt_eval is an **upper bound** on the
+evaluation noise, not a floor on what a solver reaches: the actual noise at a given χ may be much
+smaller, and a solver may well end with a true residual far below δt_eval. What the bound does
+say is that the computed residual F̂(χ) − √μΔt can differ from the exact one by up to √μ δt_eval,
+so a stopping test on the computed residual **cannot guarantee** a true residual below δt_eval;
+and at the representable χ nearest the root the computed residual can still be as large as the
+actual noise plus the spacing term (dt/dχ)·u\|χ\| ≤ (r_a/√μ)u√a X = (1 + e)uX/n. A budget below
+δt_eval therefore could not be required of an engine of this form; this record does not require
+it.
 
 **Solver residual budget.** A solve that stops when the computed residual is at the noise level
 (computed \|F̂ − √μΔt\| ≤ √μ δt_eval) or at stagnation has a true residual ≤ (computed) + δt_eval +
 spacing term:
 
-    δt_res ≤ ε_t := u [ A_s |Δt| + B_s / n ],   A_s = 2A_e + (1 + e) = 25 + 65e,
-                                                B_s = 2B_e + 2e(1 + e) = 12 + 114e + 130e²
+    δt_res ≤ ε_t(Δt) := u [ A_s |Δt| + B_s / n ]   (seconds),
+    A_s = 2A_e + (1 + e) = 25 + 65e,   B_s = 2B_e + 2e(1 + e) = 12 + 114e + 130e²
 
-This is the budget used in every propagation tolerance. It depends on e only through the bounded
+This is the budget used in every propagation tolerance, and the **same** expression is the solver
+part of the O-1 acceptance threshold (§12; revision 3 reconciles the two texts). Here δt_res is
+measured against t(χ̂) with the computed α̂ (item 3). A check that evaluates t(χ̂) entirely in high
+precision from the exact binary64 inputs — the only check possible without reading the engine —
+also sees the α̂ data error at fixed χ, which is budgeted in C_t (item 2), not in ε_t. That part is
+derived next and added to the O-1 threshold only; it changes no propagation tolerance.
+
+**α data error at fixed χ (δt_α; revision 3, review F2).** With χ, σ₀ and r₀ fixed,
+
+    ∂F/∂α = σ₀ χ⁴ C′(ψ) − r₀ χ³ S(ψ) + (1 − α r₀) χ⁵ S′(ψ),
+
+and with x = ΔE = √ψ, χ = √a x, σ₀ = √a e sin E₀, r₀ = a(1 − e cos E₀),
+C′ = sin x/(2x³) − (1 − cos x)/x⁴, S′ = (1 − cos x)/(2x⁴) − 3(x − sin x)/(2x⁵):
+
+    ∂F/∂α = a^(5/2) { e sin E₀ [x sin x/2 − (1 − cos x)] − (x − sin x)
+                      − (e cos E₀/2)(x − sin x) + (e cos E₀/2) x(1 − cos x) }
+
+Bounding each bracket for X = \|x\| (\|x sin x\| ≤ X, 1 − cos x ≤ 2, 0 ≤ \|x − sin x\| ≤ X,
+\|x(1 − cos x)\| ≤ 2X): \|∂F/∂α\| ≤ a^(5/2)[(1 + 2e)X + 2e]. With \|δα\| ≤ 5u(4a/r₀ − 1)/a ≤
+5uκ_E/a (item 2), X ≤ n\|Δt\| + 2e and division by √μ:
+
+    δt_α ≤ 5u κ_E [ (1 + 2e) |Δt| + (4e + 4e²) / n ]
+
+(κ_E may be replaced by the smaller 4a/r₀ − 1 of the case's exact initial state.) Check at e = 0:
+∂F/∂α = −r₀χ³S = −a^(5/2)(x − sin x), so δt_α ≈ 5uκ_E\|Δt\|, the same order as the C_t phase term
+(3/2)·5uκ_E·\|Δt\|, as it must be. Comparison with the review's estimate 5κ_E(1 + 2e)u(\|Δt\| +
+2e/n): the coefficient of \|Δt\| agrees exactly; the constant term here is 5κ_E(4e + 4e²)u/n
+against the review's 5κ_E(2e + 4e²)u/n, larger by 5κ_E·2e·u/n because X ≤ n\|Δt\| + 2e is also
+used in the bounded bracket term 2e. The difference is below 1 % of δt_α at ten periods.
+
+O-1 acceptance threshold, ε_t + δt_α, as equivalent coefficients at Δt = 10T (L = 10T + 1/n;
+ε = (A·10T + B/n)/L, units of u):
+
+| Case | e | κ_E | ε_t | δt_α | ε_t + δt_α | in seconds at 10T | review estimate of δt_α |
+|---|---|---|---|---|---|---|---|
+| C1/C2 | 0 | 3.000 | 24.8u | 14.8u | **39.6u** | 2.60e-10 | 14.8u |
+| C3 | 0.3 | 4.714 | 44.7u | 37.7u | **82.4u** | 9.25e-10 | 37.5u |
+| C4 | 0.4 | 5.667 | 51.4u | 51.2u | **102.6u** | 1.51e-9 | 50.8u |
+| C5 | 0.74 | 14.385 | 74.6u | 181.4u | **256.0u** | 1.21e-8 | 179.7u |
+| C6 | 0 | 3.000 | 24.8u | 14.8u | **39.6u** | 3.82e-9 | 14.8u |
+| (e = 0.95, a = 2.6e7, for O-1 random cases) | 0.95 | 79.0 | 89.1u | 1173u | 1262u | 5.94e-8 | 1162u |
+
+At high e the α term dominates; without it a correct engine could fail the O-1 check, which is
+the point of review F2. It depends on e only through the bounded
 quantities of the canonical form; it has the same status as C_t (derived from operation counts of
 the canonical formulation; implementation differences are what M covers). ADR-005 gets **no
 number**: the requirement on ML-TASK-015 is to state its criterion and show it meets this budget
@@ -425,6 +498,14 @@ residual exceeds ε* can fail even if otherwise correct. The derived budget lies
 values of 52–62u for VT-06/07 (review), i.e. the 8u assumption left a factor 6.5–7.8 — but an
 engine at the derived floor (≈ 12–36u evaluation noise alone) would already have used most of it.
 This table is arithmetic on the formulas; it is not a measurement of any engine.
+
+**Assumption of this table (revision 3).** The break-even values assume the textbook g (formed
+from the requested Δt, §6.1 item 4), through which the solver residual enters VT-06 and VT-07 as
+an off-orbit term. For an engine that forms g consistently with χ̂, the residual is a pure phase
+error: it does not enter VT-06/VT-07 at first order (their break-even becomes unbounded), and it
+enters VT-05/VT-08 only through the phase term v_p δt_res. VT-06/VT-07 then give no control on
+the solver residual, and the O-1 residual check (§12) is the only control on it. The tolerances
+are unchanged in that case (they remain valid upper bounds, §6.1 scope).
 
 ## 7. Per-family records
 
@@ -986,7 +1067,7 @@ The review's table (PR #12) was the input; where this record's position differs 
 
 | # | Item | Decides | Recommended resolution | Effect until resolved |
 |---|---|---|---|---|
-| O-1 | Solver stopping criterion. ADR-005 fixes none; the propagation tolerances use the **derived** budget ε_t = u[(25 + 65e)\|Δt\| + (12 + 114e + 130e²)/n] (§6.1). | Astrodynamics Engineer (ML-TASK-015) proposes; Verification Engineer accepts the evidence; Systems Architect reviews | ML-TASK-015 **states its stopping criterion** in the task report and in the solver's public documentation (ML-NFR-002), and **demonstrates** that the true residual \|t(χ̂) − Δt\| of the returned χ̂ is within ε_t. Acceptable evidence that does not require the verifier to read the implementation: (1) **black-box residual check** (preferred): the solver, or an exported function returning χ̂ for (r₀, v₀, Δt, μ), is part of the documented interface; the Verification Engineer evaluates t(χ̂) in higher precision (Python `mpmath`, on the exact binary64 inputs) over the test grid plus random cases (e up to 0.95, Δt up to 100 periods, negative Δt) and records max \|t(χ̂) − Δt\|/ε_t ≤ 1; (2) the engineer's own test doing the same with an extended-precision evaluator, with the evaluator and the case list in the PR, reviewed by the verifier; (3) not sufficient alone: a step criterion \|Δχ\| ≤ ε_χ\|χ\| (bounds the residual only via ε_t = (1 + e)·max(1, 2e)·ε_χ and only if the step bounds the error), or passing VT-05…VT-09 (the break-even table, §6.7, shows a correct engine passes with residuals up to 4.5–10× ε_t, so passing does not prove the budget). A criterion below the noise floor δt_eval needs a stagnation exit and an iteration cap (it may otherwise not terminate). **No number goes into ADR-005**; a looser engine criterion does not loosen these tolerances without owner approval (§4.1). | Propagation tolerances assume δt_res ≤ ε_t |
+| O-1 | Solver stopping criterion. ADR-005 fixes none; the propagation tolerances use the **derived** budget ε_t(Δt) = u[(25 + 65e)|Δt| + (12 + 114e + 130e²)/n] seconds (§6.1, same expression). | Astrodynamics Engineer (ML-TASK-015) proposes; Verification Engineer accepts the evidence; Systems Architect reviews; owner signs the acceptance threshold (§15) | ML-TASK-015 **states its stopping criterion** in the task report and in the solver's public documentation (ML-NFR-002), and **demonstrates** that its residual is within budget. **Acceptance check (revision 3, review F2):** the time equation is evaluated in high precision at the returned χ̂ with α, σ₀ and r₀ **also formed in high precision from the exact binary64 inputs**, and the check passes when |t(χ̂) − Δt| ≤ ε_t(Δt) + δt_α(Δt), δt_α = 5uκ_E[(1 + 2e)|Δt| + (4e + 4e²)/n] (§6.1; κ_E may be taken as 4a/r₀ − 1 of the exact input). The δt_α part is the α data error already budgeted in C_t; it is part of the check threshold only and changes no propagation tolerance. At ten periods the threshold is 39.6u (C1), 82.4u (C3), 102.6u (C4), 256.0u (C5) equivalent (§6.1 table). Acceptable evidence that does not require the verifier to read the implementation: (1) **black-box residual check** (preferred): the solver, or an exported function returning χ̂ for (r₀, v₀, Δt, μ), is part of the documented interface; the Verification Engineer evaluates the check above (Python `mpmath`) over the test grid plus random cases (e up to 0.95, Δt up to 100 periods, negative Δt) and records max |t(χ̂) − Δt|/(ε_t + δt_α) ≤ 1; (2) the engineer's own test doing the same with an extended-precision evaluator, with the evaluator and the case list in the PR, reviewed by the verifier; (3) not sufficient alone: a step criterion |Δχ| ≤ ε_χ|χ| (it bounds the residual by ε_χ(1 + e)(|Δt| + 2e/n), which must then be ≤ ε_t(Δt) for every case, and only if the step bounds the error), or passing VT-05…VT-09 (the break-even table, §6.7, shows a correct engine passes with residuals up to 4.5–10× ε_t, and for an engine forming g consistently with χ̂ VT-06/VT-07 do not see the residual at all). A criterion below the noise bound δt_eval needs a stagnation exit and an iteration cap. **No number goes into ADR-005**; a looser engine criterion does not loosen these tolerances without owner approval (§4.1). | Propagation tolerances assume δt_res ≤ ε_t |
 | O-2 | Element extraction must be well conditioned (atan2 forms, B8); acos near ±1 fails VT-03/VT-04 by design. | Systems Architect (ML-TASK-014 contract), Astrodynamics Engineer | Agree with the review: add "angles extracted with atan2-grade conditioning (no acos/asin of a quantity that can approach ±1)" to the **acceptance criteria of ML-TASK-014**. It is a requirement on the algorithm, not a tolerance question. | VT-03/VT-04 may fail on an acos-based implementation |
 | O-3 | Degenerate convention: thresholds ε_e, ε_i; whether near-degenerate inputs below them are in VT-04 with the convention term; whether e and i are zeroed or kept. | **Owner** (product); convention detail via a Proposed ADR by the Systems Architect | Agree with the review: **keep e and i as computed, never zero them**, and record the convention (including ϖ = Ω ± ω) in a Proposed ADR. Consequences: (a) VT-04(a) exact-degenerate inputs carry a computed ê ≤ 30u and î' ≤ (6κ_h + 2)u, so their tolerance includes the convention term at those values (§7, adds ≈ 6 × 10⁻⁸ m at LEO, inside the existing scale); (b) VT-04(b): the convention term is 2e r_a/(1 − e) and 2√2 e v_p/(1 + e) (vs ≈ a e and √2 e √(μ/a) if e were zeroed) — about twice as large, up to 140 m per element at ε = 10⁻⁵; (c) thresholds: their lower bound (§10) is unaffected, but because e and i stay continuous across the threshold only the angle convention switches, which makes the near-threshold exclusion rule of VT-04/VI-03 sufficient. I also recommend that FR-003 AC2's "within tolerance" be read, for near-degenerate inputs, as "within the numerical tolerance plus the convention term" (C-3), with ε_e = ε_i = 10⁻⁵ (§10). | VT-04(b) not runnable; FR-002 AC3 thresholds undefined |
 | O-4 | Does a sample depend only on (segment initial state, segment start time, `t_s`, constants)? | Astrodynamics Engineer (ML-TASK-015); Systems Architect if made a contract rule | Agree with the review: require it (no warm start across samples, no step-dependent caching). Then **VT-09 is exact** (§1). It costs little: each sample is an independent solve from the segment start (already ADR-005's structure). | VT-09 uses the fallback tolerance (§7) |
@@ -1057,6 +1138,7 @@ confirmed).
 |---|---|---|---|
 | Method and formulas §2–§9 | | | |
 | Derived solver budget ε_t (§6.1) | | | |
+| O-1 acceptance threshold ε_t + δt_α (§6.1, §12) — revision 3 **correction of the O-1 check threshold**, not a loosening of any VT tolerance | | | |
 | Margin M = 4, M_book = 2 | | | |
 | Angular accuracy target δθ (O-6) | | | |
 | Thresholds ε_e, ε_i (§10) | | | |
