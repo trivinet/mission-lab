@@ -160,3 +160,48 @@ export function keplerResidual(E: number, e: number, M0: number, n: number, dt: 
   const f = sub(sub(B(E), mul(B(e), sincos(B(E), p).sin, p), p), M, p);
   return toNumber(abs(f));
 }
+
+/**
+ * Element → state in BigFloat arithmetic with the closed-form perifocal unit vectors
+ * P = (cΩcω − sΩsω ci, sΩcω + cΩsω ci, sω si), Q = (−cΩsω − sΩcω ci, −sΩsω + cΩcω ci, cω si),
+ * i.e. the columns of Rz(Ω)Rx(i)Rz(ω) multiplied out by hand. A different evaluation path from
+ * the binary64 L2c matrix product, used to measure L2c's own error (tolerance record §7 VT-02).
+ */
+export function hpElementsToState(
+  el: {
+    readonly semiMajorAxis_m: number;
+    readonly eccentricity: number;
+    readonly inclination_rad: number;
+    readonly raan_rad: number;
+    readonly argPeriapsis_rad: number;
+    readonly trueAnomaly_rad: number;
+  },
+  mu_m3ps2: number,
+  p = 200,
+): HpState {
+  const one = fromInt(1);
+  const a = B(el.semiMajorAxis_m);
+  const e = B(el.eccentricity);
+  const mu = B(mu_m3ps2);
+  const { sin: sO, cos: cO } = sincos(B(el.raan_rad), p);
+  const { sin: si, cos: ci } = sincos(B(el.inclination_rad), p);
+  const { sin: sw, cos: cw } = sincos(B(el.argPeriapsis_rad), p);
+  const { sin: sn, cos: cn } = sincos(B(el.trueAnomaly_rad), p);
+  const P: B3 = [
+    sub(mul(cO, cw, p), mul(mul(sO, sw, p), ci, p), p),
+    add(mul(sO, cw, p), mul(mul(cO, sw, p), ci, p), p),
+    mul(sw, si, p),
+  ];
+  const Q: B3 = [
+    sub(neg(mul(cO, sw, p)), mul(mul(sO, cw, p), ci, p), p),
+    add(neg(mul(sO, sw, p)), mul(mul(cO, cw, p), ci, p), p),
+    mul(cw, si, p),
+  ];
+  const sl = mul(a, sub(one, mul(e, e, p), p), p);
+  const r = div(sl, add(one, mul(e, cn, p), p), p);
+  const k = sqrt(div(mu, sl, p), p);
+  return {
+    position_m: lin(mul(r, cn, p), P, mul(r, sn, p), Q, p),
+    velocity_mps: lin(neg(mul(k, sn, p)), P, mul(k, add(e, cn, p), p), Q, p),
+  };
+}
