@@ -1,0 +1,84 @@
+{
+  "id": "vt-02/c7-near-polar-retrograde",
+  "version": 1,
+  "family": "VT-02 Elements → Cartesian (ML-FR-003 AC1)",
+  "description": "Near-polar retrograde (i > 90°), near-circular (quadrant handling)",
+  "gridCase": "C7",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "constants": {
+      "mu_m3ps2": 398600441800000,
+      "referenceRadius_m": 6378137,
+      "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+    },
+    "elements": {
+      "semiMajorAxis_m": 7000000,
+      "eccentricity": 0.01,
+      "inclination_rad": 1.7,
+      "raan_rad": 5,
+      "argPeriapsis_rad": 3,
+      "trueAnomaly_rad": 6.2
+    }
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors and angles)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s / Δt: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-011), verification/src/datasets/build.ts",
+    "references": ["L2c"],
+    "codeRevision": "5e44e1ce2b8f",
+    "date": "2026-11-13",
+    "runtime": "Node.js v24.22.2",
+    "independence": "Engine source (packages/astrodynamics) not read and engine not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value (ECMA-262 Number::toString); JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0)."
+  },
+  "method": {
+    "reference": "L2c (verification/src/ref/elements.ts)",
+    "elementToState": "Regular map, no special cases (contracts-v1.md §3): p = a(1 − e²), r = p/(1 + e cos ν), perifocal r = r(cos ν, sin ν, 0), v = √(μ/p)(−sin ν, e + cos ν, 0), rotated by Q = Rz(Ω)·Rx(i)·Rz(ω) formed as explicit products of the three active elementary rotation matrices.",
+    "stateToElements": "In-plane polar formulation: h = r × v; i = atan2(√(h_x² + h_y²), h_z); Ω = atan2(h_x, −h_y); u = atan2(r·m̂, r·n̂) with n̂ = ẑ × h/|ẑ × h|, m̂ = ĥ × n̂; e cos ν = h²/(μr) − 1, e sin ν = h(r·v)/(μr); e = √(…); ν = atan2(e sin ν, e cos ν); ω = u − ν; a = 1/(2/r − v²/μ). atan2 only, no acos.",
+    "used": "elementToState"
+  },
+  "outputs": {
+    "position_m": [-2107241.153733146, 6421938.7572791735, 1531804.7889012066],
+    "velocity_mps": [438.00541258687883, 1894.7464538973172, -7369.357567713278]
+  },
+  "referenceAccuracy": {
+    "bound": "Same budget as the engine side (tolerances.md §7 VT-02): ‖δr‖ ≤ η_r(e)·u·r_a, ‖δv‖ ≤ η_v(e)·u·v_p",
+    "bound_position_m": 2.6719412316808045e-8,
+    "bound_velocity_mps": 2.7866047771782646e-11,
+    "measured_position_m": 1.423796321030971e-9,
+    "measured_velocity_mps": 1.2188965513960848e-12,
+    "measuredAgainst": "The same map in 200-bit arithmetic with closed-form perifocal unit vectors (verification/src/hp/hp-kepler.ts hpElementsToState), from the same binary64 inputs."
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §7 VT-02",
+    "measure": "Euclidean norm of the difference, position and velocity separately",
+    "formula": "‖Δr‖ ≤ M·2η_r(e)·u·r_a, ‖Δv‖ ≤ M·2η_v(e)·u·v_p; η_r(e) = 31 + 2/(1 − e²) + (1 + 3e)/(1 − e), η_v(e) = 25 + 1/(1 − e²) + 7/(1 + e)",
+    "evaluatedAt": {
+      "mu_m3ps2": 398600441800000,
+      "a_m": 7000000,
+      "e": 0.01,
+      "r_a_m": 7070000,
+      "v_p_mps": 7621.894927282826,
+      "g_p_mps2": 8.299870313108409,
+      "n_radps": 0.001078007612872506,
+      "T_s": 5828.516637686015,
+      "kappa_E": 3.0404040404040407,
+      "kappa_h": 1.0000500037503126,
+      "u": 1.1102230246251565e-16,
+      "M": 4,
+      "eta_r": 34.04060406040604,
+      "eta_v": 32.93079307930793
+    },
+    "position_m": 2.1375529853446436e-7,
+    "velocity_mps": 2.2292838217426117e-10,
+    "layers": "L2c (algorithmic independence partial, open item O-7; L3 Orekit in ML-TASK-012)"
+  }
+}

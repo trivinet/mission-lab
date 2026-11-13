@@ -1,0 +1,103 @@
+# Mission Lab task contract. One file per task: docs/backlog/tasks/ML-TASK-NNN.yaml
+task_id: ML-TASK-011
+title: "Independent reference implementations (L2) and reference datasets; constants check (VT-19)"
+status: in_review
+requirement_ids: [ML-FR-002, ML-FR-003, ML-FR-004]
+owner_role: verification-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-004, ML-TASK-010]
+affected_paths:
+  - verification/**
+  - test-data/reference-cases/**
+  - docs/verification/l2-references-report.md
+  - docs/backlog/tasks/ML-TASK-011.yaml
+objective: >
+  Build verification layer L2 (plan §2: L2a classical elements + Newton-Kepler, L2b fixed-step
+  Runge-Kutta with step halving, L2c direct rotation-matrix construction) without reading or
+  running the engine, validate each reference first, and commit reference datasets with their
+  evaluated tolerances (tolerances.md §4.1) before any engine run.
+scope:
+  - L2a, L2b, L2c in verification/src with their own error bounds and validation.
+  - Datasets for VT-02, VT-03, VT-04, VT-05 (vs L2a and L2b with E_RK) and VT-08 over the plan §5 grid, spans up to ten periods.
+  - Reference-vs-reference cross-checks and dataset checks as Vitest tests.
+  - High-precision evaluator for the O-1 solver acceptance check (not run against the engine).
+  - A2/A3 measurement of Math accuracy; VT-19 primary-source check as far as reachable.
+out_of_scope:
+  - Reading packages/astrodynamics, the engine branches or their PR discussions; running the engine.
+  - Editing tolerances.md, the plan, contracts, ADRs (needed changes are listed in the report).
+  - L3 (ML-TASK-012), engine comparison (ML-TASK-018), VT-12/VT-15/VT-16 datasets, VT-14 for e > 0.
+  - New npm dependencies.
+inputs:
+  - AGENTS.md, docs/engineering/coding-standards.md
+  - docs/verification/m1-verification-plan.md (§2, §3, §5, §6, §7)
+  - docs/verification/tolerances.md (revision 3, approved 2026-11-13)
+  - docs/architecture/adr/ADR-003, ADR-004, ADR-008
+  - docs/architecture/contracts-v1.md (revision 3)
+  - docs/architecture/proposed-architecture.md §3
+  - packages/contracts
+acceptance_criteria:
+  - "L2a, L2b, L2c exist in verification/src, import only @mission-lab/contracts, and use algorithms different from the universal-variable method."
+  - "L2a states its stopping criterion and error bound; the tolerance record's L2a bound P_A, V_A, δt_A is confirmed or corrected by measurement."
+  - "L2b E_RK is recorded per output time and per case, with the §9.2 ratio test."
+  - "Datasets in test-data/reference-cases/<family>/<case>.json in the plan §6 format, inputs validated with the contracts validators, numbers shortest round-trip, provenance, reference accuracy and evaluated tolerance with formula and inputs."
+  - "Reference-vs-reference cross-checks use bounds from the approved record."
+  - "pnpm lint, typecheck, test, format:check, check:boundaries exit 0; lockfile unchanged."
+test_requirements:
+  - "verification/src/**/*.test.ts: BigFloat self-tests, tolerance transcription, L2c, L2a/L2b, O-1 evaluator, A2/A3, datasets."
+deliverables:
+  - verification/src (references, high-precision evaluator, tolerance formulas, dataset builder, tests)
+  - test-data/reference-cases/vt-02, vt-03, vt-04, vt-05, vt-08 (55 files)
+  - docs/verification/l2-references-report.md
+human_approval_required: true   # dataset approval; open convention F-2; record corrections F-1, F-3..F-5, F-8
+
+report:
+  files_changed:
+    - verification/tsconfig.json (Node types for tests)
+    - verification/src/hp/bigfloat.ts, bigfloat.test.ts
+    - verification/src/hp/hp-kepler.ts
+    - verification/src/hp/o1-check.ts, o1-check.test.ts
+    - verification/src/hp/a3-math-accuracy.test.ts
+    - verification/src/ref/vec.ts, elements.ts, elements.test.ts, kepler.ts, kepler.test.ts, rk.ts
+    - verification/src/tol/tolerances.ts, tolerances.test.ts
+    - verification/src/datasets/cases.ts, plan.ts, build.ts, datasets.test.ts
+    - test-data/reference-cases/{vt-02,vt-03,vt-04,vt-05,vt-08}/*.json (55 files)
+    - docs/verification/l2-references-report.md
+    - docs/backlog/tasks/ML-TASK-011.yaml
+  summary: >
+    L2a (classical elements, bracketed Newton-Kepler), L2b (RK4, compensated, step halving) and
+    L2c (explicit rotation-matrix product; in-plane polar element extraction with the ADR-008
+    convention) built and validated, plus a 320-bit BigFloat library used to measure the
+    references' own errors, an O-1 time-equation evaluator and an A2/A3 measurement. L2a bound
+    confirmed (measured ≤ 0.135 of P_A/V_A on the grid). E_RK ≤ 1.63e-12 r_a in every case
+    (target 1e-10). 55 datasets committed with evaluated tolerances before any engine run.
+    VT-19 not confirmed (primary source unreachable). A3: c_f = 2 holds on the sample (max 1.82u).
+  tests_executed:
+    - "pnpm lint -> exit 0"
+    - "pnpm typecheck -> exit 0"
+    - "pnpm test -> exit 0; Test Files 19 passed (19), Tests 418 passed (418); verification project 8 files, 44 tests"
+    - "pnpm format:check -> exit 0 (All matched files use Prettier code style!)"
+    - "pnpm check:boundaries -> exit 0"
+  reference_data_used:
+    - "Constants as written in docs/architecture/proposed-architecture.md §3 (dataset inputs; VT-19 pending)."
+    - "Tolerance formulas of docs/verification/tolerances.md revision 3; transcription checked against all printed values."
+    - "No external numeric reference values were used."
+  not_verified:
+    - "VT-19: μ, reference radius and ERA coefficients against NGA.STND.0036 (PDF could not be fetched)."
+    - "A3 beyond the measured sample; A2 against the ECMA-262 text."
+    - "L2c algorithmic independence from the engine (O-7): rests on L3 (ML-TASK-012)."
+    - "Requested Python mpmath checks replaced by in-repo BigFloat (F-4)."
+    - "No engine comparison (by design)."
+  known_limitations:
+    - "The 200-bit L2a evaluation measures rounding error only (same algorithm); algorithmic agreement rests on L2b."
+    - "VT-04 substitute angles have no approved tolerance (F-3); retrograde-equatorial convention open (F-2)."
+    - "Signs of zero are not preserved in dataset JSON."
+  documentation_changes:
+    - "New docs/verification/l2-references-report.md. Changes needed in tolerances.md and the plan are listed there (F-1, F-3..F-8), not made."
+  risks_or_blockers:
+    - "If ML-TASK-014 chooses a different retrograde-equatorial convention, VT-04 element-view comparisons are not like-for-like until F-2 is decided."
+    - "Changing reference code that alters values makes datasets.test.ts fail; new dataset versions are then required (intended)."
+  review_artifact: ""
+  recommended_next_action: >
+    Coordinator: decide F-2 and get the record corrections (F-1, F-3, F-4, F-5, F-8) approved;
+    obtain the WGS 84 PDF for VT-19; review and approve the datasets before ML-TASK-018 runs the
+    engine against them.

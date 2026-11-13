@@ -1,0 +1,116 @@
+{
+  "id": "vt-08/c4-moderate-inclined-n10",
+  "version": 1,
+  "family": "VT-08 Full-period closure (ML-FR-004 AC3)",
+  "description": "Moderately elliptical, inclined (general case). State after N = 10 period(s) vs the initial state.",
+  "gridCase": "C4",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "request": {
+      "requestId": "sha256:1d781d55794e8914d0d3a8449e00a0dbe92378081953cb8a785ee99be89df3ca",
+      "schemaVersion": "1.0",
+      "centralBody": "EARTH",
+      "constants": {
+        "mu_m3ps2": 398600441800000,
+        "referenceRadius_m": 6378137,
+        "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+      },
+      "dynamicsModel": "TWO_BODY",
+      "frame": "GCRF",
+      "epoch": {
+        "scale": "UTC",
+        "iso": "2026-01-01T00:00:00.000Z"
+      },
+      "initialState": {
+        "position_m": [6584153.049512014, -4271979.27805005, -282964.6231152527],
+        "velocity_mps": [2253.2100408224564, 6986.703557759785, -3794.5277156887623]
+      },
+      "maneuvers": [],
+      "duration_s": 130822.62211349707,
+      "outputStep_s": 130822.62211349707
+    },
+    "requestIdNote": "requestId = \"sha256:\" + hex(SHA-256(UTF-8(canonicalRequestPayload(request)))) per contracts-v1.md §7.1, computed with @mission-lab/contracts canonicalRequestPayload and Node crypto SHA-256 (test code only). The engine-side hash (ML-TASK-017) is not implemented yet; these values can serve its differential test.",
+    "gridElements": {
+      "semiMajorAxis_m": 12000000,
+      "eccentricity": 0.4,
+      "inclination_rad": 0.5,
+      "raan_rad": 2.5,
+      "argPeriapsis_rad": 4,
+      "trueAnomaly_rad": 5.5
+    },
+    "periods": 10,
+    "period": {
+      "formula": "a = 1/(2/‖r₀‖ − ‖v₀‖²/μ); T = 2 * Math.PI * Math.sqrt((a * a * a) / μ); duration_s = N * T (binary64, in this order); outputStep_s = duration_s so the samples are [0, duration_s]",
+      "a_m": 11999999.999999996,
+      "T_s": 13082.262211349707
+    }
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors and angles)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s / Δt: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-011), verification/src/datasets/build.ts",
+    "references": ["L1 (initial state)", "L2a (informative)"],
+    "codeRevision": "5e44e1ce2b8f",
+    "date": "2026-11-13",
+    "runtime": "Node.js v24.22.2",
+    "independence": "Engine source (packages/astrodynamics) not read and engine not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value (ECMA-262 Number::toString); JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0)."
+  },
+  "method": {
+    "closure": "L1: the expected state at t_s = duration_s is the initial state.",
+    "l2aInformative": {
+      "reference": "L2a (verification/src/ref/kepler.ts)",
+      "algorithm": "Classical elements from the initial state (L2c raw extraction), E₀ = atan2(√(1 − e²) sin ν₀, e + cos ν₀), M₀ = E₀ − e sin E₀ ∈ [0, 2π), n = √(μ/a³), M = M₀ + nΔt, Kepler equation E − e sin E = M by bracketed Newton, perifocal state from E, rotated by Rz(Ω)Rx(i)Rz(ω). Not universal variables.",
+      "stoppingCriterion": "Newton correction |ΔE| ≤ 4u·max(1, |M|), or f(E) = 0, or no binary64 point left inside the bracket [M − e, M + e] (shrunk with the sign of f; steps leaving it replaced by bisection); at most 100 iterations; the iterate with the smallest computed |f| is returned."
+    }
+  },
+  "outputs": {
+    "finalExpected": {
+      "position_m": [6584153.049512014, -4271979.27805005, -282964.6231152527],
+      "velocity_mps": [2253.2100408224564, 6986.703557759785, -3794.5277156887623]
+    },
+    "l2aAtDuration": {
+      "position_m": [6584153.049511971, -4271979.278050156, -282964.62311519193],
+      "velocity_mps": [2253.210040822544, 6986.7035577597335, -3794.527715688769]
+    }
+  },
+  "referenceAccuracy": {
+    "closure": "Exact (initial state); the period-computation error is in the tolerance formula.",
+    "l2aAtDuration": {
+      "bound_r_m": 0.000007424090103441925,
+      "bound_v_mps": 6.284075535393718e-9
+    }
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §7 VT-08",
+    "measure": "Euclidean norm of (state at t_s = duration_s) − initialState",
+    "formula": "‖Δr‖ ≤ M[P_E(NT) + u(7.5κ_E + 6)·v_p·NT], ‖Δv‖ ≤ M[V_E(NT) + u(7.5κ_E + 6)·g_p·NT]",
+    "evaluatedAt": {
+      "mu_m3ps2": 398600441800000,
+      "a_m": 12000000,
+      "e": 0.4,
+      "r_a_m": 16800000,
+      "v_p_mps": 8803.7288384588,
+      "g_p_mps2": 7.689051732253087,
+      "n_radps": 0.00048028278333456074,
+      "T_s": 13082.262211349715,
+      "kappa_E": 5.666666666666667,
+      "kappa_h": 1.0910894511799618,
+      "u": 1.1102230246251565e-16,
+      "M": 4,
+      "C_t": 46.5,
+      "NT_s": 130822.62211349707
+    },
+    "position_m": 0.00011275596437864324,
+    "velocity_mps": 1.5461073379552584e-7,
+    "layers": "L1"
+  }
+}
