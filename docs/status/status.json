@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Tolerance record approved by the owner and merged (PR #12). Independent references (ML-TASK-011) restarted after a usage-limit interruption. Element conversion (PR #15) and propagator (PR #16) await those references.",
+  "headline": "Independent references and 55 reference datasets delivered (ML-TASK-011, PR #17), with tolerances fixed before any engine run. Next: run the engine against them (ML-TASK-018) once PRs #15, #16 and #17 are merged.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,16 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-18",
+      "text": "Merge PRs #14 (status), #15 (element conversion), #16 (propagator) and #17 (independent references). The engine is then run against the reference datasets for the first time.",
+      "blocking": "ML-TASK-018; ML-TASK-016, 017"
+    },
+    {
+      "id": "OA-19",
+      "text": "Approve the convention for retrograde equatorial orbits: substitute angles measured in the sense of motion. The engine and the independent reference both chose it separately; no approved document fixes it yet (ADR-008 addendum).",
+      "blocking": "VT-04 comparison"
+    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -144,7 +154,7 @@
           "title": "Independent reference implementations and datasets",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "004"
         },
         {
@@ -369,6 +379,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Verification",
+      "text": "ML-TASK-011 delivered: three independent references (matrix construction, Kepler-equation propagation, RK4 with step halving), in-repo 320-bit arithmetic, the solver-check evaluator and 55 datasets with evaluated tolerances; engine neither read nor run. Coordinator re-ran all checks: 418 tests pass. VT-19 still open. PR #17."
+    },
     {
       "date": "2026-11-13",
       "who": "Coordinator",
