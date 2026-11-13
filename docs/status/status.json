@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Independent references and 55 reference datasets delivered (ML-TASK-011, PR #17), with tolerances fixed before any engine run. Next: run the engine against them (ML-TASK-018) once PRs #15, #16 and #17 are merged.",
+  "headline": "Engine core and independent references are all on `main` (542 tests pass). The first run of the engine against the reference datasets (ML-TASK-018) is next; until it passes, no verification test has been met.",
   "gates": [
     {
       "id": "G0",
@@ -31,16 +31,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-18",
-      "text": "Merge PRs #14 (status), #15 (element conversion), #16 (propagator) and #17 (independent references). The engine is then run against the reference datasets for the first time.",
-      "blocking": "ML-TASK-018; ML-TASK-016, 017"
-    },
-    {
-      "id": "OA-19",
-      "text": "Approve the convention for retrograde equatorial orbits: substitute angles measured in the sense of motion. The engine and the independent reference both chose it separately; no approved document fixes it yet (ADR-008 addendum).",
-      "blocking": "VT-04 comparison"
-    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -154,7 +144,7 @@
           "title": "Independent reference implementations and datasets",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_review",
+          "status": "done",
           "deps": "004"
         },
         {
@@ -179,7 +169,7 @@
           "title": "Element ↔ Cartesian conversion, degenerate cases",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_review",
+          "status": "done",
           "deps": "013"
         },
         {
@@ -187,7 +177,7 @@
           "title": "Universal-variable Kepler propagator",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_review",
+          "status": "done",
           "deps": "013"
         },
         {
@@ -211,7 +201,7 @@
           "title": "Numerical suite in CI and G1 verification report",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "todo",
+          "status": "in_progress",
           "deps": "011, 017",
           "approval": true
         }
@@ -379,6 +369,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Coordinator",
+      "text": "ML-TASK-018 started (first part): Verification Engineer runs the engine against the 55 reference datasets and the solver check, with tolerances already fixed."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Owner",
+      "text": "Instructed the merge of PRs #14–#17 and approved the retrograde-equatorial convention (substitute angles in the sense of motion), now in ADR-008 with the approved threshold and target values. Coordinator resolved the export conflict between #15 and #16; `main` passes 542 tests."
+    },
     {
       "date": "2026-11-13",
       "who": "Verification",

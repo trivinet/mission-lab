@@ -1,6 +1,6 @@
 # ADR-008 — Degenerate classical elements and the angular accuracy target
 
-**Status:** Accepted — owner decision, 2026-11-12 (decisions 1 and 2 of that date, taken after the
+**Status:** Accepted — owner decisions, 2026-11-12 and 2026-11-13 (values and retrograde convention added) (decisions 1 and 2 of that date, taken after the
 review of the tolerance record, PR #12) · **Refines:** architecture §3 "Classical elements" row,
 contracts-v1.md §3 (owner decision 4 of 2026-11-11) · **Affects:** ML-FR-002 AC3, ML-FR-003 AC2,
 ML-FR-009, VT-03, VT-04
@@ -67,10 +67,20 @@ angles (i, Ω, ω, ν and the substitute angles of the convention) is set by an 
 angular accuracy target. The target is independent of how the UI formats or rounds angles for
 display.
 
-**Thresholds and target value: not decided.** The numeric value of the angular accuracy target
-and the circular/equatorial thresholds are approved together with the tolerance record
-(ML-TASK-010, `docs/verification/tolerances.md`), which proposes values. Until that approval this
-ADR fixes the principle only; no value is normative.
+**Thresholds and target value (owner decision, 2026-11-13, approved with the tolerance record,
+`docs/verification/tolerances.md` §15).** Angular accuracy target: 1e-5 rad. Circular and
+equatorial thresholds: 1e-5 each (eccentricity; and the smaller of i and π − i, in rad). Detection
+uses a strict comparison (value below the threshold), plus the exactly degenerate state. Changing
+these values follows the tolerance record's change rule.
+
+**3. Retrograde equatorial orbits (owner decision, 2026-11-13).** When the orbit is equatorial and
+retrograde (inclination near π), the substitute angles (longitude of periapsis, true longitude)
+are measured from the inertial +x axis in the sense of motion, that is, positive about the
+angular-momentum direction. With this choice the reported elements, with the node angle set to
+zero, reproduce the state through the regular element→Cartesian map without a reflection. The
+engine (ML-TASK-014) and the independent reference (ML-TASK-011) each adopted this convention
+separately before it was approved; this decision makes it normative. Prograde equatorial orbits
+are unchanged (architecture §3).
 
 ## Rationale
 
