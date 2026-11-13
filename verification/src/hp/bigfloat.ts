@@ -184,8 +184,6 @@ export function ilog2(a: BigFloat): number {
 // ---------------------------------------------------------------------------------------------
 // Elementary functions
 
-const workPrec = PREC + 64;
-
 /** Taylor series of atan for |x| ≤ 1/8, at precision p. */
 function atanSeries(x: BigFloat, p: number): BigFloat {
   const x2 = mul(x, x, p);
