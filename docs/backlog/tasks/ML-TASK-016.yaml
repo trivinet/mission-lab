@@ -1,0 +1,127 @@
+task_id: ML-TASK-016
+title: "RSW basis, impulsive maneuver and post-maneuver trajectory flags in packages/astrodynamics"
+status: in_review
+requirement_ids: [ML-FR-005, ML-FR-006, ML-NFR-002, ML-NFR-003]
+owner_role: astrodynamics-engineer
+reviewer_role: verification-engineer
+dependencies: [ML-TASK-013, ML-TASK-014, ML-TASK-015]
+affected_paths:
+  - packages/astrodynamics/
+  - docs/backlog/tasks/ML-TASK-016.yaml
+objective: >
+  Provide the engine functions for the M1 maneuver: the RSW basis of a state, the application of
+  an impulsive Δv given in RSW components with the contract's bit-exact boundary rules (R8, R12),
+  and analytical classification of the post-maneuver trajectory for the runtime warnings
+  ESCAPE_TRAJECTORY and REFERENCE_SPHERE_INTERSECTION (ML-FR-006 AC6), whose detection semantics
+  are open in the approved documents (tolerance record O-5) and are proposed here for owner
+  approval.
+scope:
+  - "rswBasis(r, v): R = r/|r|, W = (r×v)/|r×v|, S = W×R with fixed evaluation order; failure result (no throw, no NaN) for r = 0, r×v = 0, non-finite input, overflow."
+  - "rswToInertial(basis, x_rsw): fixed-order resolution (x_R R[i] + x_S S[i]) + x_W W[i]."
+  - "applyImpulsiveManeuver(r, v⁻, Δv_RSW): position and v⁻ copied, Δv_I, v⁺ = v⁻ + Δv_I as one addition per component, |Δv| = norm of Δv_I; output fields map one-to-one onto ManeuverEvent (contracts-v1 §5.3)."
+  - "classifyEscape(r, v, μ): energy-sign criterion with a derived evaluation-error bound."
+  - "detectReferenceSphereIntersection(r, v, μ, R, D): analytical min of |r| over [0, D] from start, end and the next periapsis passage."
+  - "Unit tests (self-consistency, L1) with derived bounds or approved tolerances."
+out_of_scope:
+  - "Segment construction, sampling, contract Diagnostic objects and their t_s (ML-TASK-017)."
+  - "Independent references, datasets and the conformance run for VT-11…VT-16 (Verification Engineer)."
+  - "Any edit to verification/, conformance/, test-data/ or docs/verification/tolerances.md."
+  - "New dependencies; contract changes; the RSW_FRAME_UNDEFINED code (contracts-v1 §12 NQ-2)."
+inputs:
+  - AGENTS.md
+  - docs/engineering/coding-standards.md
+  - docs/architecture/proposed-architecture.md §3
+  - docs/architecture/adr/ADR-003, ADR-004, ADR-005
+  - docs/architecture/contracts-v1.md revision 3 (§2, §3.1, §5.3, §5.5 R8 R12, §8.3)
+  - docs/requirements/m1-requirements.md (ML-FR-005, ML-FR-006)
+  - docs/verification/m1-verification-plan.md §3 (VT-11…VT-16)
+  - docs/verification/tolerances.md (§1, §2, §7 VT-11…VT-16, §12 O-5) — approved 2026-11-13
+  - packages/astrodynamics/src/vector3.ts, elements.ts, orbit-quantities.ts, kepler-universal.ts, stumpff.ts
+acceptance_criteria:
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0; existing tests unchanged and passing."
+  - "packages/astrodynamics/package.json declares no `dependencies`."
+  - "Every public function documents units, frame, domain, evaluation order and source (ML-NFR-002)."
+  - "Maneuver: position bit-identical; R12 holds with Object.is per component; zero Δv gives ±0 inertial Δv and v⁺ === v⁻; magnitude = norm of the inertial Δv."
+  - "Escape and intersection detection are analytical (no sampling) and their semantics are listed for owner approval."
+test_requirements:
+  - Vitest unit tests in packages/astrodynamics/src/*.test.ts.
+deliverables:
+  - packages/astrodynamics/src/rsw.ts, maneuver.ts, trajectory-flags.ts, index.ts exports.
+  - packages/astrodynamics/src/rsw.test.ts, maneuver.test.ts, trajectory-flags.test.ts.
+human_approval_required: true
+
+report:
+  files_changed:
+    - "packages/astrodynamics/src/rsw.ts (new): rswBasis, rswToInertial, RswBasis, RswBasisFailure, RswBasisResult"
+    - "packages/astrodynamics/src/maneuver.ts (new): applyImpulsiveManeuver, ImpulsiveManeuverApplication, ImpulsiveManeuverFailure, ImpulsiveManeuverResult"
+    - "packages/astrodynamics/src/trajectory-flags.ts (new): classifyEscape, detectReferenceSphereIntersection, ESCAPE_ENERGY_BOUND_FACTOR = 6, result/failure types"
+    - "packages/astrodynamics/src/index.ts (modified): export lines appended only"
+    - "packages/astrodynamics/src/rsw.test.ts, maneuver.test.ts, trajectory-flags.test.ts (new): 63 tests"
+    - "docs/backlog/tasks/ML-TASK-016.yaml (new): this contract and report"
+  summary: >
+    RSW basis per architecture §3 evaluated as R = normalizeVec3(r), h = crossVec3(r, v),
+    W = normalizeVec3(h), S = crossVec3(W, R) (no re-normalisation). Δv_I[i] = (ΔvR R[i] + ΔvS
+    S[i]) + ΔvW W[i]; v⁺[i] = v⁻[i] + Δv_I[i] (one addition, so R12 holds bit-exactly by
+    construction); |Δv| = normVec3(Δv_I); position and v⁻ are component copies (Object.is
+    identical). Zero Δv: every Δv_I component is ±0 (−0 exactly when all three products of its
+    row are −0); v⁺ === v⁻ always; bit-identity fails only for a component where v⁻ is −0 and Δv_I
+    is +0 (v⁺ becomes +0); R12/R8 are unaffected because v⁺ is by definition that sum and the next
+    segment copies v⁺. Escape: sign of the specific energy (equivalent to e ≥ 1 for h ≠ 0), with
+    the derived evaluation-error bound η = 6u(v²/2 + μ/|r|): CLOSED if ξ̂ < −η, OPEN if ξ̂ > η,
+    NEAR_PARABOLIC otherwise; flagged unless CLOSED. Intersection: exact characterisation of
+    min |r| over [0, D] (start, end, next periapsis passage) with r_p = p/(1 + e) from the
+    eccentricity vector and t_p from the universal-variable time equation at the closed-form
+    periapsis anomaly χ_p (atan2 / atanh / linear by sign of α); end radius from
+    propagateKeplerUniversal(μ, r, v, D). No sampling and no root solve.
+  design_choices_for_owner_approval:
+    - "D1 Escape criterion = sign of the specific energy ξ = v·v/2 − μ/|r|, not the computed |e_vec|. Equivalent to e ≥ 1 whenever h ≠ 0 (derived: |e|² = 1 + 2ξh²/μ²). For rectilinear states (h = 0) e = 1 formally for every energy; the energy rule flags them only if ξ ≥ 0. Alternative: compare |e_vec| with 1 (literal reading of contracts-v1 §8.3 and ML-FR-006 AC6), which is worse conditioned near e = 1 and flags bounded rectilinear motion."
+    - "D2 Rounding rule for escape: flag unless the exact energy of the given binary64 state is provably negative (ξ̂ < −η, η = 6u(v²/2 + μ/|r|), derived from the evaluation order under the A2 assumption, not a tuning epsilon). Near-parabolic states within the evaluation noise (including exactly parabolic) are flagged and reported as regime NEAR_PARABOLIC. Alternatives: flag iff ξ̂ ≥ 0 (no band; outcome inside the noise follows rounding), or flag only when provably open."
+    - "D3 Intersection = 'some t in [0, D] has |r(t)| ≤ R', decided analytically from |r(0)|, |r(D)| and the first periapsis passage (t_p ≤ D and r_p ≤ R). Only the first periapsis matters on closed orbits; open orbits have at most one passage (none when moving outward). D is the post-maneuver arc length (ML-TASK-017 passes the same Δt it uses for the segment's last sample, so INSIDE_AT_END agrees with that sample bit-for-bit). Alternative readings: 'periapsis radius below R' regardless of span (simplest, flags passages after the end of the run), or sample-based (rejected by tolerance record O-5)."
+    - "D4 Boundaries are inclusive: start exactly on the sphere, a tangent orbit (r_p = R) and a periapsis passage exactly at D all count as intersecting."
+    - "D5 No rounding band on r_p, t_p or |r(D)|: within their evaluation error the decision follows the computed values (unlike D2, no rigorous bound on r_p was derived; it would involve κ_h). VT-16 case selection (|r_p − R| ≥ 1e-6 R) keeps tests away from this."
+    - "D6 The first crossing time (|r| = R) is not computed; the result carries the flag, its reason (INSIDE_AT_START / PERIAPSIS_BELOW_REFERENCE_IN_SPAN / INSIDE_AT_END), r_p, t_p, |r(0)| and |r(D)|. ML-TASK-017 decides the Diagnostic t_s (contracts-v1 §8.3 sets t_s only for ESCAPE_TRAJECTORY)."
+    - "D7 Zero Δv is not special-cased: the fixed evaluation order is kept, so a −0 velocity component can become +0 (=== preserved, Object.is not). Alternative: return Δv_I = [−0, −0, −0] when all RSW components are zero (−0 is the exact additive identity), making v⁺ bit-identical to v⁻."
+    - "D8 Failure of the intersection check (propagation to D failed, or an existing periapsis time overflowed) is returned as a failure result, not as 'no intersection'. ML-TASK-017 maps it (the propagation failure would fail the segment anyway)."
+  tests_executed:
+    - "pnpm exec vitest run --project astrodynamics packages/astrodynamics/src/rsw.test.ts packages/astrodynamics/src/maneuver.test.ts packages/astrodynamics/src/trajectory-flags.test.ts -> exit 0; 3 files, 63 tests passed"
+    - "pnpm lint -> exit 0"
+    - "pnpm typecheck -> exit 0"
+    - "pnpm test -> exit 0; 34 files, 729 tests passed (666 existing + 63 new)"
+    - "pnpm format:check -> exit 0"
+    - "pnpm check:boundaries -> exit 0; 20/20 fixtures reported"
+  bounds_used:
+    - "RSW (rsw.test.ts): ε_R = 4u, ε_W = (6κ_h + 4)u, ε_S = (6κ_h + 11)u, κ_h = |r||v|/|r×v| (derived in rsw.ts from B4–B6 of tolerances.md §2, unmargined); orthonormality entry ≤ ε_j + ε_k + 4u; handedness ≤ ε_R + ε_S + ε_W + 4u; R ∥ r ≤ ε_R + 4u; W ⟂ r, v ≤ ε_W + 4u."
+    - "|Δv_I| vs |Δv_RSW|: APPROVED VT-13 cross-check tolerance 4(12κ_h + 31)u (tolerances.md §7 VT-13)."
+    - "Energy evaluation |ξ̂ − ξ| ≤ 5u(v²/2 + μ/|r|) (derived in trajectory-flags.ts), used in the S-burn and W-burn energy checks with the rounding of v⁺ and of the test's own closed form."
+    - "Linearity 5u(|a| + |b| + |a + b|) per component; W-burn plane rotation tan θ relative 5u; t_p vs half period 40u relative; r_p vs a(1 − e) 40u relative (operation counts in the tests)."
+    - "Exact (Object.is / ===): axis-aligned bases and maneuvers, R12, position/v⁻ copies, power-of-two homogeneity, zero-Δv rules, escape regime vs the exact BigInt energy sign."
+  reference_data_used:
+    - "None (no reference datasets). No web source was opened in this task. Formulas are derived in the module comments from definitions already derived or cited in elements.ts (D2–D6; Wikipedia 'Eccentricity vector', 'Perifocal coordinate system', opened 2026-11-13 in ML-TASK-014) and kepler-universal.ts (D1–D5; Weber, Orbital Mechanics & Astrodynamics, universal-anomaly page, opened 2026-11-12 in ML-TASK-015)."
+  not_verified:
+    - "VT-11…VT-16: no independent (L2) or external (L3) comparison and no conformance run. The tests here are the implementer's self-consistency checks; they do not show that VT-11…VT-16 pass."
+    - "Not confirmed (not opened): Vallado (RSW convention named in architecture §3; eccentric/hyperbolic anomaly relations), Curtis. The anomaly relations used in trajectory-flags.ts are checked only by substitution in the comment and by the tests' sign-change checks with the propagator."
+    - "The η energy bound relies on assumption A2 (Math.sqrt correctly rounded) and on no underflow/overflow in v·v/2 and μ/|r|; not verified."
+    - "Math.atan2, Math.atanh, Math.acos (test only) accuracy assumed ≤ 1 ulp (tolerances.md A3); not verified."
+    - "The 40u bounds on t_p and r_p in trajectory-flags.test.ts are operation-count estimates, not rigorous derivations."
+    - "Rectilinear post-maneuver states (r × v = 0 after the burn) are not tested in the intersection check; the propagation through the centre is expected to fail."
+    - "Hyperbolic intersection: only flag behaviour and the periapsis sign change are checked; no closed-form crossing time for open orbits."
+  known_limitations:
+    - "The flags classify the binary64 state they are given; the error of the state itself (propagation, maneuver rounding) is not part of η or of the intersection decision."
+    - "t_p overflow on an outward-moving closed orbit with an enormous period is reported as 'no periapsis' (later than any finite span); on an inward-moving open orbit it is a failure (NON_FINITE_RESULT)."
+    - "No first-crossing time (D6)."
+  documentation_changes:
+    - "None outside the code and this task file."
+  ambiguities_reported:
+    - "contracts-v1 §8.3 and ML-FR-006 AC6 define escape as 'e ≥ 1'; for rectilinear states e = 1 regardless of energy, so the literal reading flags bounded radial motion. Implemented the energy reading (D1); not resolved here."
+    - "ML-FR-006 AC6 says 'intersects the reference sphere' without stating whether the intersection must occur within the propagated span; contracts-v1 §8.3 says 'goes below the reference sphere'. Implemented 'reaches |r| ≤ R within the span' (D3, D4)."
+    - "contracts-v1 §8.3 sets t_s for ESCAPE_TRAJECTORY (= maneuver time) but says nothing about t_s for REFERENCE_SPHERE_INTERSECTION; this task returns data enough for either choice (ML-TASK-017)."
+    - "proposed-architecture §3 calls the RSW definition the 'Vallado convention'; the book was not opened, so the attribution is not confirmed. The definition itself is normative in contracts-v1 §2 and is implemented as written."
+  risks_or_blockers:
+    - "Owner approval of D1–D8 is required before ML-TASK-017 emits the diagnostics; a different choice changes trajectory-flags.ts only."
+  review_artifact: ""
+  recommended_next_action: >
+    Owner: approve or change D1–D8 (tolerance record O-5). Verification Engineer: VT-11…VT-13
+    against L1/L2c references and the approved tolerances; VT-16 case selection consistent with
+    D3–D5. Coordinator: ML-TASK-017 maps ImpulsiveManeuverApplication onto ManeuverEvent and the
+    flag results onto ESCAPE_TRAJECTORY / REFERENCE_SPHERE_INTERSECTION; open the PR from
+    feat/ml-task-016-rsw-maneuver after review (not pushed by this task).

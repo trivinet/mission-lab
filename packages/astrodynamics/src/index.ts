@@ -73,3 +73,29 @@ export type {
   StateIntegralsFailure,
   StateIntegralsResult,
 } from './orbit-quantities';
+
+export { rswBasis, rswToInertial } from './rsw';
+export type { RswBasis, RswBasisFailure, RswBasisResult } from './rsw';
+
+export { applyImpulsiveManeuver } from './maneuver';
+export type {
+  ImpulsiveManeuverApplication,
+  ImpulsiveManeuverFailure,
+  ImpulsiveManeuverResult,
+} from './maneuver';
+
+export {
+  classifyEscape,
+  detectReferenceSphereIntersection,
+  ESCAPE_ENERGY_BOUND_FACTOR,
+} from './trajectory-flags';
+export type {
+  ConicRegime,
+  EscapeClassification,
+  EscapeClassificationFailure,
+  EscapeClassificationResult,
+  ReferenceSphereIntersection,
+  ReferenceSphereIntersectionFailure,
+  ReferenceSphereIntersectionReason,
+  ReferenceSphereIntersectionResult,
+} from './trajectory-flags';
