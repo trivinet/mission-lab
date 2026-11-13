@@ -23,6 +23,30 @@ export {
 } from './vector3';
 export type { Mat3, NormalizeVec3Failure, NormalizeVec3Result, Vec3 } from './vector3';
 
+export {
+  STUMPFF_SERIES_SWITCH,
+  STUMPFF_SERIES_TERMS,
+  stumpff,
+  stumpffC,
+  stumpffS,
+} from './stumpff';
+export type { StumpffValues } from './stumpff';
+
+export {
+  KEPLER_MAX_BRACKET_EXPANSIONS,
+  KEPLER_MAX_ITERATIONS,
+  KEPLER_MAX_POLISH_STEPS,
+  propagateKeplerUniversal,
+  propagateKeplerUniversalAt,
+} from './kepler-universal';
+export type {
+  KeplerPropagationFailure,
+  KeplerPropagationOptions,
+  KeplerPropagationResult,
+  KeplerSolveDiagnostics,
+  KeplerTimeEquationData,
+  LagrangeCoefficients,
+} from './kepler-universal';
 export { normalizeAngle_rad, TWO_PI_rad } from './angles';
 export type { NormalizeAngleResult } from './angles';
 
