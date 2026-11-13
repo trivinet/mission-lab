@@ -1,0 +1,110 @@
+# Mission Lab task contract. One file per task: docs/backlog/tasks/ML-TASK-NNN.yaml
+task_id: ML-TASK-018
+title: "Numerical suite against the engine (conformance workspace), wired into CI; G1 verification report"
+status: in_progress
+requirement_ids: [ML-FR-002, ML-FR-003, ML-FR-004, ML-FR-006]
+owner_role: verification-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-010, ML-TASK-011, ML-TASK-014, ML-TASK-015, ML-TASK-017]
+affected_paths:
+  - conformance/**
+  - docs/architecture/adr/ADR-009-conformance-workspace.md
+  - eslint.config.js
+  - tools/boundary-fixtures/**
+  - pnpm-workspace.yaml
+  - pnpm-lock.yaml
+  - vitest.config.ts
+  - verification/src/index.ts
+  - docs/verification/conformance-run-*.md
+  - docs/backlog/tasks/ML-TASK-018.yaml
+objective: >
+  Run the engine against the independent references and the approved tolerances (ADR-003,
+  tolerances.md revision 3) for every VT family, from a workspace that may see both the engine
+  and the verification code (ADR-009), report the results per family with the evidence layers
+  that actually back them, wire the suite into CI and produce the G1 verification report.
+scope:
+  - "Part A: ADR-009 and the conformance/ workspace (package, Vitest project, tsconfig, lint boundary rule with fixtures); verification exports needed by conformance, without behaviour change."
+  - "Part B: first conformance run — VT-02, VT-03, VT-04, VT-05, VT-08 against the committed datasets with their stored tolerances; O-1 black-box residual check on the VT-05 grid plus a deterministic grid within the O-1 range; run report."
+  - "Later parts: VT-01, VT-06, VT-07, VT-09 (L1, on engine output); VT-10 and runner-level checks once ML-TASK-017 lands; maneuver families once their engine code and datasets exist; CI wiring; G1 verification report."
+out_of_scope:
+  - Changing engine code (packages/astrodynamics, packages/simulation) or apps/web.
+  - Changing any dataset, reference or tolerance; re-evaluating a tolerance from engine output (tolerances.md §4.1).
+  - Skipping, loosening or deleting a failing comparison.
+  - New third-party dependencies.
+  - L3 (Orekit) datasets (ML-TASK-012); VT-19 primary-source confirmation.
+inputs:
+  - AGENTS.md, docs/engineering/coding-standards.md
+  - docs/architecture/adr/ADR-002, ADR-003, ADR-005, ADR-008 (and addendum, PR #18)
+  - Owner decision 2026-11-13 (conformance workspace)
+  - docs/verification/m1-verification-plan.md §3, §7
+  - docs/verification/tolerances.md revision 3 (§4.1, §6.1, §7, §8, §12 O-1, §15)
+  - docs/verification/l2-references-report.md
+  - test-data/reference-cases/ (vt-02, vt-03, vt-04, vt-05, vt-08)
+  - Public API and doc comments of packages/astrodynamics/src/index.ts (implementation bodies not studied)
+acceptance_criteria:
+  - "Part A: conformance/ exists as @mission-lab/conformance (private, tests only); eslint allows conformance → astrodynamics, simulation, contracts, verification and rejects every import of conformance; existing rules unchanged; boundary fixtures prove verification/astrodynamics/web → conformance rejected and conformance → engine/verification/contracts clean; the new fixtures fail without the new rule."
+  - "Part A: pnpm install --frozen-lockfile, lint, typecheck, format:check, check:boundaries exit 0; lockfile changes only by the new workspace importer."
+  - "Part B: one test per dataset/case; tolerances read from the datasets; first sample exact; thresholds 1e-5 passed explicitly; O-1 checked with o1Check against ε_t + δt_α; observed/tolerance ratios reported per family."
+  - "Part B: pnpm test exits 0 only if the engine conforms; failures are left failing and characterised."
+  - "Whole task: all VT families pass in CI (plan §7); the G1 report states the evidence layers per family (plan §8)."
+test_requirements:
+  - "conformance/src/**/*.test.ts: VT-02, VT-03, VT-04, VT-05, VT-08, O-1 (part B); further families in later parts."
+deliverables:
+  - docs/architecture/adr/ADR-009-conformance-workspace.md
+  - conformance/ workspace and tests
+  - docs/verification/conformance-run-1.md
+  - G1 verification report (later part)
+human_approval_required: true   # ADR-009 recorded from an owner decision; G1 evidence; datasets still in review
+
+report:
+  # Filled for parts A and B (2026-11-13). Later parts extend it.
+  files_changed:
+    - docs/architecture/adr/ADR-009-conformance-workspace.md (new)
+    - conformance/package.json, conformance/tsconfig.json (new)
+    - conformance/src/support/datasets.ts, datasets.test.ts, compare.ts (new)
+    - conformance/src/vt02-elements-to-state.test.ts, vt03-round-trip.test.ts, vt04-degenerate.test.ts, vt05-propagation.test.ts, vt08-closure.test.ts, o1-solver-residual.test.ts (new)
+    - pnpm-workspace.yaml, pnpm-lock.yaml (conformance importer only), vitest.config.ts
+    - eslint.config.js (conformance element and policy; nonWebFiles include conformance)
+    - tools/boundary-fixtures/check.mjs (new `// expect: clean` mode for positive fixtures)
+    - tools/boundary-fixtures/{verification,astrodynamics,web,simulation,contracts}/imports-conformance.ts, conformance/imports-engine-and-references.ts, conformance/imports-web.ts, conformance/uses-window.ts (new)
+    - verification/src/index.ts (re-exports o1Check, timeOfChi, L2c elementsToState, wrapPi, scales)
+    - docs/verification/conformance-run-1.md (new)
+    - docs/backlog/tasks/ML-TASK-018.yaml (new)
+  summary: >
+    Part A: ADR-009 and the conformance workspace with its lint boundary (20/20 fixtures; the 7
+    new negative fixtures fail with the rule removed, the positive fixture fails with the element
+    declared but its policy removed). Part B: first engine run against the 55 datasets and the
+    O-1 check on 1728 cases. Every comparison passed; worst observed/tolerance ratios: VT-02 0.0044,
+    VT-03 0.011 (element rows 0.015), VT-04 exact-degenerate 0.010 and near-degenerate 0.81
+    (convention term), VT-05 vs L2a 0.0096 and vs L2b 0.015, VT-08 0.0056, O-1 0.094; sample 0
+    bit-identical in all nine VT-05 cases; classifications exact in 19/19.
+  tests_executed:
+    - "pnpm install --frozen-lockfile → exit 0"
+    - "pnpm lint → exit 0"
+    - "pnpm typecheck → exit 0"
+    - "pnpm format:check → exit 0"
+    - "pnpm check:boundaries → exit 0, 20/20 fixtures reported"
+    - "negative proof: HEAD eslint.config.js (no conformance rule) → 13/20, exit 1 (7 new fixtures fail); conformance element without its policy → 19/20, exit 1 (positive fixture fails); then restored"
+    - "pnpm test → exit 0, Test Files 31 passed (31), Tests 666 passed (666); conformance project 7 files, 124 tests passed"
+  reference_data_used:
+    - "test-data/reference-cases/vt-02, vt-03, vt-04, vt-05, vt-08 version 1 (codeRevision 5e44e1ce2b8f), unchanged"
+    - "O-1 threshold of tolerances.md §6.1 via verification/src/hp/o1-check.ts"
+  not_verified:
+    - "VT-01, VT-06, VT-07, VT-09, VT-10, VT-11…VT-19, VI-01…VI-03 (see conformance-run-1.md §6)."
+    - "Substitute angles of the degenerate convention (no approved tolerance); the datasets' retrograde flag (engine has no such flag)."
+    - "State accuracy for negative Δt and hyperbolic arcs (O-1 residual only for negative Δt)."
+    - "Runner-level sampling and first-sample rule of SimulationResult (ML-TASK-017 not available); checked at propagator level only."
+    - "L3 for any family; the O-1 evaluator is the in-repo BigFloat, not a second tool."
+    - "CI run (local only)."
+  known_limitations:
+    - "Worktree path differs from the one in the instructions: the agent was isolated in .claude/worktrees/agent-a9ff6903f6ce31ece; branch test/ml-task-018a-conformance was created there from origin/main."
+    - "Datasets and L2 report are still in review; this evidence counts toward G1 only after their approval, unchanged."
+  documentation_changes:
+    - "ADR-009 added. ADR-007 write permissions and coding-standards §6 boundary table should list conformance/ (outside this task's paths)."
+  risks_or_blockers:
+    - "Later parts depend on ML-TASK-017 (runner) and on maneuver datasets (VT-12, VT-15, VT-16) and O-11 (VT-14, e > 0)."
+  review_artifact: ""   # no PR opened (instructed not to push)
+  recommended_next_action: >
+    Systems Architect review of ADR-009 and the boundary change; owner approval of the ML-TASK-011
+    datasets; then the next part of ML-TASK-018 (VT-01, VT-06, VT-07, VT-09 on engine output) and
+    CI wiring.

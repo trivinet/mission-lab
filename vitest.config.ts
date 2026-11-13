@@ -13,6 +13,7 @@ export default defineConfig({
   test: {
     projects: [
       project('astrodynamics', 'packages/astrodynamics'),
+      project('conformance', 'conformance'),
       project('contracts', 'packages/contracts'),
       project('simulation', 'packages/simulation'),
       project('verification', 'verification'),
