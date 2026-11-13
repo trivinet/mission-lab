@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "RSW basis, impulsive maneuver and trajectory flags delivered (ML-TASK-016, PR #20): 729 tests pass, self-consistency only. Eight design choices on escape and surface intersection need the owner's approval before the simulation runner uses them.",
+  "headline": "Maneuver code merged; escape and surface-intersection semantics approved by the owner and recorded (contract revision 4). The simulation runner (ML-TASK-017) is next: it ties conversion, propagation and maneuver into one result.",
   "gates": [
     {
       "id": "G0",
@@ -31,11 +31,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-22",
-      "text": "Approve the escape and surface-intersection semantics of PR #20 (design choices D1–D8), then merge it.",
-      "blocking": "ML-TASK-017 (simulation runner)"
-    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -190,7 +185,7 @@
           "title": "RSW basis and impulsive maneuver",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_review",
+          "status": "done",
           "deps": "013"
         },
         {
@@ -198,7 +193,7 @@
           "title": "Simulation runner: validation, segments, events, diagnostics",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "todo",
+          "status": "in_progress",
           "deps": "014–016"
         },
         {
@@ -374,6 +369,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Coordinator",
+      "text": "ML-TASK-017 started (Astrodynamics, opus): simulation runner in `packages/simulation`."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Owner",
+      "text": "Approved the eight escape / surface-intersection design choices (D1–D8) and instructed the merge of PRs #20 and #21 after CI passed. Recorded as contract revision 4 (§8.3, §11.3) and an amendment to ML-FR-006 AC6. `main` passes 729 tests."
+    },
     {
       "date": "2026-11-13",
       "who": "Astrodynamics",

@@ -1,12 +1,13 @@
 # Simulation Contracts v1.0
 
-**Document ID:** ML-ARCH-003 · **Date:** 2026-11-12 · **Author:** Systems Architect (ML-TASK-004, ML-TASK-008) · **Revision:** 3 · **Status:** Accepted. Revision 2 content accepted by the owner's merge of PR #7 (2026-11-12); the revision 3 changes (§5.2 initial sample, §9 versioning note, §11.2, §12 NQ-4, §13, §14) record owner decisions of 2026-11-12 and are approved by them
+**Document ID:** ML-ARCH-003 · **Date:** 2026-11-12 · **Author:** Systems Architect (ML-TASK-004, ML-TASK-008) · **Revision:** 4 · **Status:** Accepted. Revision 2 content accepted by the owner's merge of PR #7 (2026-11-12); the revision 3 changes (§5.2 initial sample, §9 versioning note, §11.2, §12 NQ-4, §13, §14) record owner decisions of 2026-11-12 and are approved by them
 
 | Revision | Date | Change |
 |---|---|---|
 | 1 | 2026-11-11 | First version (ML-TASK-004). |
 | 2 | 2026-11-11 | Owner decisions of 2026-11-11 and role reviews (§11.1). |
 | 3 | 2026-11-12 | Owner decisions of 2026-11-12 (§11.2): first sample of every segment bit-identical to the segment's initial state (§5.2); degenerate-element detail moved to ADR-008. No schema or code change; `schemaVersion` stays `"1.0"` (§9). |
+| 4 | 2026-11-13 | Owner decisions of 2026-11-13 (§11.3): meaning of `ESCAPE_TRAJECTORY` and `REFERENCE_SPHERE_INTERSECTION` made precise (§8.3). No schema, code-registry or canonical-payload change; `schemaVersion` stays "1.0". |
 
 Normative prose for `packages/contracts` (`@mission-lab/contracts`). It refines the approved
 draft contract v0.2 of [proposed-architecture.md §4](proposed-architecture.md#4-simulation-contract-draft-v02--replaces-the-illustrative-sample).
@@ -497,8 +498,8 @@ severity a `Diagnostic` with that code may carry (R13): every validation code (�
 |---|---|---|---|
 | `PROPAGATOR_NOT_CONVERGED` | error | Universal Kepler equation solve did not converge; `t_s` set. | ML-FR-004 AC6, ADR-005 |
 | `NON_FINITE_STATE` | error | A computed state is non-finite; `t_s` set. | ML-FR-004 AC6, §4 rule 3 |
-| `ESCAPE_TRAJECTORY` | warning | Post-maneuver conic is open (e ≥ 1); propagated anyway; `t_s` = maneuver time. | ML-FR-006 AC6, A.2 |
-| `REFERENCE_SPHERE_INTERSECTION` | warning | Post-maneuver trajectory goes below the reference sphere; propagated anyway. | ML-FR-006 AC6, A.2 |
+| `ESCAPE_TRAJECTORY` | warning | Post-maneuver trajectory is not bound: its specific orbital energy is not negative beyond the rounding uncertainty of its evaluation (open, or within rounding of parabolic). Decided by the energy, not by e ≥ 1, so bounded rectilinear motion is not flagged (§11.3). Propagated anyway; `t_s` = maneuver time. | ML-FR-006 AC6, A.2 |
+| `REFERENCE_SPHERE_INTERSECTION` | warning | Within the simulated span, the post-maneuver trajectory reaches a radius ≤ `constants.referenceRadius_m` (boundaries inclusive: starting on the sphere, a tangent orbit, or periapsis exactly at the end of the span count). Detected analytically, not from samples. A sub-surface periapsis not reached within the span is not flagged (§11.3). Propagated anyway. | ML-FR-006 AC6, A.2 |
 | `INTERNAL_ERROR` | error | Unexpected engine fault caught at the boundary (a defect, never a user condition). | §4 rule 3 |
 
 The exact detection criteria (thresholds, analytic vs sampled detection) of the runtime codes are
@@ -605,6 +606,26 @@ traceability.
 Resolved by these decisions: review items O-3 (decision 1), O-6 (decision 2), O-8 (decision 4)
 and O-10 (decision 3) of PR #12, and the plan wording item C-2 (VT-13 now uses the R12 form,
 verification plan §3).
+
+### 11.3 Owner decisions, 2026-11-13
+
+Semantics of the two post-maneuver warnings, proposed by ML-TASK-016 (design choices D1–D8 of
+`docs/backlog/tasks/ML-TASK-016.yaml`, PR #20) in an area the approved documents left open
+(tolerance record O-5), and approved by the owner on 2026-11-13.
+
+| # | Decision |
+|---|---|
+| D1 | Escape is decided by the sign of the specific orbital energy, not by e ≥ 1. The two agree unless the motion is rectilinear, where e = 1 at any energy. |
+| D2 | When the computed energy is within the rounding uncertainty of zero the trajectory is classified near-parabolic and is flagged like an escape. |
+| D3 | "Intersects the reference sphere" means the radius is ≤ the reference radius at some time within the simulated span. |
+| D4 | Boundaries are inclusive (start on the sphere, tangent orbit, periapsis at the end of the span). |
+| D5 | No rounding band is applied to the intersection quantities; the computed values decide. |
+| D6 | The time of first crossing is not computed in M1. |
+| D7 | A zero Δv is not special-cased: the velocity after equals the velocity before under `===`; a −0 component may become +0. |
+| D8 | A failure of the propagation used inside the intersection check is reported as a failure, never as "no intersection". |
+
+These decisions refine §8.3 and ML-FR-006 AC6. They change no schema. The `t_s` of
+`REFERENCE_SPHERE_INTERSECTION` is not defined here (ML-TASK-017 proposes it).
 
 ## 12. Open questions for the owner
 
