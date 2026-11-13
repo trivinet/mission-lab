@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Tolerance record revision 2 delivered (PR #12): solver budget derived, tolerances loosened where revision 1 undercounted. It awaits the owner's decision on re-review and approval. Element conversion (014) and propagator (015) in progress.",
+  "headline": "Element/state conversion delivered (ML-TASK-014, PR #15): 454 tests pass, but the independent verification tests VT-02…VT-04 do not exist yet. Propagator (ML-TASK-015) in progress. Tolerance record revision 2 awaits the owner.",
   "gates": [
     {
       "id": "G0",
@@ -174,7 +174,7 @@
           "title": "Element ↔ Cartesian conversion, degenerate cases",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "013"
         },
         {
@@ -374,6 +374,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-014 delivered: element ↔ state conversion with ADR-008 conventions, atan2-only angle extraction, hyperbolic states supported, orbit quantities; 79 new tests (self-consistency only). Coordinator re-ran all checks: 454 tests pass. Its first worktree was lost in the usage-limit interruption and the task was redone from scratch. PR #15."
+    },
     {
       "date": "2026-11-13",
       "who": "Verification",
