@@ -1,0 +1,142 @@
+task_id: ML-TASK-017
+title: "Simulation runner in packages/simulation: semantic validation, request building and requestId, sampling grid, segments, maneuver event, diagnostics, model metadata"
+status: in_review
+requirement_ids: [ML-FR-002, ML-FR-004, ML-FR-005, ML-FR-006, ML-FR-012, ML-NFR-001, ML-NFR-003, ML-NFR-004]
+owner_role: astrodynamics-engineer
+reviewer_role: verification-engineer
+dependencies: [ML-TASK-013, ML-TASK-014, ML-TASK-015, ML-TASK-016]
+affected_paths:
+  - packages/simulation/
+  - docs/backlog/tasks/ML-TASK-017.yaml
+objective: >
+  Turn a Scenario into a SimulationRequest with its requestId, and a SimulationRequest into a
+  contract-conforming SimulationResult, exactly as contracts-v1 revision 4 specifies: semantic
+  validation (§3), request building and SHA-256 requestId (§4, §7), the normative sampling grid and
+  segment split (§5.2), the maneuver event (§5.3), model metadata (§5.4), invariants R1–R13 (§5.5),
+  the engine boundary and failed results (§6), and runtime diagnostics with the owner-approved
+  escape/intersection semantics (§8.3, §11.3).
+scope:
+  - "validateScenarioSemantics(scenario): PERIGEE_BELOW_REFERENCE_RADIUS at [initialOrbit, elements]; SAMPLE_COUNT_EXCEEDED at [outputStep_s] against a provisional build constant."
+  - "In-repo synchronous SHA-256 (FIPS 180-4) with constants computed from their definition; computeRequestId, buildSimulationRequest, deriveRequestId."
+  - "Sampling grid (§5.2) with an analytic sample count (no enumeration) and the segment split."
+  - "runSimulation(request): segments, events, diagnostics, model; failed results; self-check with validateSimulationResult."
+  - "Unit tests in packages/simulation/src/**/*.test.ts."
+out_of_scope:
+  - "VT-10, VT-16, VT-18, VI-01 runs (Verification Engineer, conformance/)."
+  - "Edits to packages/contracts, packages/astrodynamics, verification/, conformance/, test-data/, tolerances."
+  - "Measuring the ML-NFR-004 sample limit (Phase 2); worker protocol; persistence/migration."
+  - "New dependencies."
+inputs:
+  - AGENTS.md
+  - docs/engineering/coding-standards.md
+  - docs/architecture/contracts-v1.md revision 4 (whole document)
+  - docs/architecture/proposed-architecture.md §2–§4
+  - docs/architecture/adr/ADR-002, ADR-004, ADR-005, ADR-008, ADR-009
+  - docs/requirements/m1-requirements.md (ML-FR-001…006, 012; ML-NFR-003, 004)
+  - docs/verification/m1-verification-plan.md §3 (VT-10, VT-16, VT-18, VI-01)
+  - docs/verification/tolerances.md (§1 exact checks)
+  - packages/astrodynamics/src/index.ts and packages/contracts/src/index.ts (public APIs)
+  - "FIPS PUB 180-4 (NIST, August 2015), https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf"
+  - "NIST CSRC example SHA256.pdf, https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf"
+acceptance_criteria:
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0; the 729 pre-existing tests still pass."
+  - "No new dependency; packages/simulation imports only @mission-lab/contracts and @mission-lab/astrodynamics; no platform crypto, clock, randomness or I/O in package source."
+  - "Every result returned by runSimulation passes validateSimulationResult (asserted in every run test)."
+  - "SHA-256 matches the NIST example vectors and FIPS 180-4 constant tables opened from the primary source."
+test_requirements:
+  - Vitest unit tests in packages/simulation/src/*.test.ts.
+deliverables:
+  - packages/simulation/src/{sha256,limits,sampling-grid,semantic-validation,request,model,run,index}.ts
+  - packages/simulation/src/{sha256,sampling-grid,request,run}.test.ts, test-fixtures.ts
+human_approval_required: true
+
+report:
+  files_changed:
+    - "packages/simulation/src/sha256.ts (new): sha256, sha256HexOfUtf8, utf8Encode, toLowerHex, SHA256_ROUND_CONSTANTS, SHA256_INITIAL_HASH"
+    - "packages/simulation/src/limits.ts (new): PROVISIONAL_MAX_SAMPLE_COUNT = 1_000_000 (placeholder)"
+    - "packages/simulation/src/sampling-grid.ts (new): gridCandidateCount, sampleCount, buildSamplingGrid, GridSegment"
+    - "packages/simulation/src/semantic-validation.ts (new): validateScenarioSemantics"
+    - "packages/simulation/src/request.ts (new): computeRequestId, buildSimulationRequest, deriveRequestId"
+    - "packages/simulation/src/model.ts (new): buildResultModel, TIME_CONVENTION, MODEL_LIMITATIONS"
+    - "packages/simulation/src/run.ts (new): runSimulation"
+    - "packages/simulation/src/index.ts (modified): exports"
+    - "packages/simulation/src/test-fixtures.ts (new, test helpers only)"
+    - "packages/simulation/src/sha256.test.ts, sampling-grid.test.ts, request.test.ts, run.test.ts (new): 100 tests"
+    - "docs/backlog/tasks/ML-TASK-017.yaml (new): this contract and report"
+  summary: >
+    Semantic validation (contracts-v1 §3): r_p = a·(1 − e) evaluated as written must be > the
+    engine reference radius (EARTH_CONSTANTS), else PERIGEE_BELOW_REFERENCE_RADIUS at
+    ["initialOrbit","elements"]; the §5.2 sample count (computed analytically from the defining
+    products fl(j × h), never by enumerating, so 1e300/1e-300 is rejected instantly) above
+    PROVISIONAL_MAX_SAMPLE_COUNT gives SAMPLE_COUNT_EXCEEDED at ["outputStep_s"].
+    Request building (§4): validateScenario → validateScenarioSemantics → elementsToState(elements,
+    EARTH_CONSTANTS.mu_m3ps2) → constants copied from EARTH_CONSTANTS → epoch, maneuvers, duration,
+    step copied unchanged → requestId = "sha256:" + hex SHA-256 of UTF-8(canonicalRequestPayload)
+    → self-check with validateSimulationRequest. deriveRequestId(scenario) is the §7.4 staleness
+    key. SHA-256 is implemented in the package from FIPS 180-4; K and H(0) are computed from their
+    definitions with exact BigInt integer roots and checked against the tables of the standard.
+    Grid (§5.2): candidates j × h (one multiplication) while < D, plus D, plus maneuver times with
+    === de-duplication (the sample takes the maneuver's value, so −0 survives), sorted; segment n =
+    { t : b_n ≤ t ≤ b_{n+1} }. Run: request validated (structural problems → issues, no result);
+    engine backstop on the sample count; segment 0 from request.initialState; first sample of every
+    segment copied from its initial state; every other sample propagateKeplerUniversal(μ, r_n, v_n,
+    t − b_n) independently; at a maneuver the last sample of segment n goes through
+    applyImpulsiveManeuver, the event copies its fields, segment n+1 starts from (position,
+    velocityAfter); then classifyEscape and detectReferenceSphereIntersection (span = Δt of the
+    post-maneuver segment's last sample) emit the warnings with t_s = maneuver time; any numerical
+    failure (including a failed intersection check, D8) yields a failed result (no segments, no
+    events, warnings found earlier kept, then the error). Each typed array owns its own buffer.
+    Every result is passed through validateSimulationResult before it is returned; a violation
+    (engine defect) is replaced by a failed INTERNAL_ERROR result. Maneuvers are processed as a
+    time-ordered list (M1 validator limits it to one).
+  sha256_sources:
+    - "Opened 2026-11-13: FIPS PUB 180-4, https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf — §2.2.2, §3.1–§3.2, §4.1.2 Eqs. 4.2–4.7, §4.2.2 (K table), §5.1.1, §5.2.1, §5.3.3 (H(0)), §6.2.1–§6.2.2, Appendix A.2 (pointer to the NIST examples)."
+    - "Opened 2026-11-13: NIST CSRC 'SHA256.pdf' example (One Block Message 'abc', Two Block Message 'abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq'), https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA256.pdf — final digests transcribed into sha256.test.ts."
+    - "Constants: computed in code (K_t = floor(cbrt(p_t·2^96)) mod 2^32; H(0)_i = floor(sqrt(p_i·2^64)) mod 2^32, BigInt Newton integer roots, primes by trial division) and compared in the test with the hexadecimal tables of §4.2.2 and §5.3.3 transcribed from the opened PDF. No constant was typed from memory."
+    - "Differential test against Node's crypto (and UTF-8 against Node's Buffer) in sha256.test.ts and request.test.ts only, reached through process.getBuiltinModule at test time; package source uses no platform API."
+  points_for_owner_decision:
+    - "P1 Sample-count limit: PROVISIONAL_MAX_SAMPLE_COUNT = 1 000 000 total samples (sum over segments) is a PLACEHOLDER, not a measurement (ML-NFR-004 requires Phase 2 measurement). Rationale: 7 binary64 per sample = 56 MB of typed arrays at the limit; 30 days at 10 s is 259 201 samples. Needs owner approval or replacement after measurement. The value also appears in model.limitations."
+    - "P2 t_s of REFERENCE_SPHERE_INTERSECTION (left open by contracts-v1 §11.3): proposed and implemented = the maneuver time (start of the flagged post-maneuver arc), same as ESCAPE_TRAJECTORY. Alternatives: the time of the condition (start → m, periapsis → m + t_p, end → D), which is a rounded non-sample time and close to the first-crossing time D6 excludes; or no t_s."
+    - "P3 NQ-1 (−0 normalisation): NOT implemented. The contract text records it as an open owner question with a recommendation ('Decide in ML-TASK-017'), which I did not read as authorisation. −0 inputs are copied unchanged, so a −0 Δv component or maneuver time gives a different requestId than +0 (tested). If the owner approves the recommendation, the change is local to buildSimulationRequest."
+    - "P4 Contract gap — overflowing initial state: a structurally and semantically valid scenario with an extreme a (e.g. 1.7e308, e = 0.9) makes elementsToState fail (NON_FINITE_RESULT). No code covers this; implemented as one ValidationIssue NON_FINITE_NUMBER at ['initialOrbit','elements']. Alternatives: a new semantic code, or an upper bound on a."
+    - "P5 Mapping of failures without a dedicated code: classifyEscape / detectReferenceSphereIntersection NON_FINITE_RESULT (overflow of a derived quantity) → NON_FINITE_STATE (error, t_s = maneuver time); intersection PROPAGATION_FAILED → the propagator's own code (D8); propagator INVALID_INPUT, maneuver ZERO_POSITION / ZERO_ANGULAR_MOMENTUM (rectilinear pre-maneuver state, not reachable from a scenario, contracts-v1 §8.3 note) and unexpected exceptions → INTERNAL_ERROR."
+    - "P6 Warnings are evaluated only after maneuvers (contracts-v1 §8.3 'post-maneuver'). A request built WITHOUT the semantic check (not from a scenario) whose initial orbit intersects the sphere or escapes gets no warning on segment 0. Unreachable from a scenario."
+    - "P7 runSimulation self-validates every result (O(total samples)); the worker host would otherwise validate it again before transfer (contracts-v1 §6 'Realm'). Keep, or move to the worker only."
+    - "P8 runSimulation does not recompute the request's requestId; a request with a well-formed but wrong id is run and the result carries that id. Contract does not require the check."
+    - "P9 model.engineVersion = PACKAGE_VERSION of packages/astrodynamics, currently '0.0.0' and never bumped. contracts-v1 §7.1 scopes 'equal requestId ⇒ equal result' to one engineVersion, so a persistent cache keyed on (requestId, engineVersion) would not see engine changes until a versioning policy exists."
+    - "P10 model.limitations wording (model.ts MODEL_LIMITATIONS): restates architecture §3 / ADR-004 / contracts-v1 §5.4 items, adds 'Not qualified for operational spacecraft navigation' (ML-SYS-001 §5.7 last line, ML-FR-012 AC3). Owner/Docs review of the text."
+  contract_observations:
+    - "contracts-v1 §7.3 still reads 'deferred to ML-TASK-017' and assigns the differential test to verification/; this task added one in the package test file as instructed. The 'no platform crypto API below apps/web' rule is met by the package source; the test files use Node crypto as an oracle."
+    - "contracts-v1 §6 says invalid input never produces a result but does not fix the runner's return type; runSimulation returns ValidationResult<SimulationResult> (issues for an invalid request, otherwise a result)."
+    - "No contradiction found in revision 4 for the implemented paths."
+  engine_observation_out_of_scope:
+    - "propagateKeplerUniversal documents that 'a state at or through r = 0 gives NON_FINITE_STATE or NOT_CONVERGED', but for r0 = [7e6, 0, 0] m, v0 = [-1000, 0, 0] m/s (radial infall through the centre at ~900 s) it returns ok with finite states for Δt = 900 … 3000 s (an apparent bounce). Not changed (packages/astrodynamics is outside this task); reported for ML-TASK-015's owner / the Verification Engineer. Consequence here: such a request yields status ok without a diagnostic."
+  tests_executed:
+    - "export PATH=\"/c/Program Files/nodejs:$PATH\"; pnpm lint → exit 0"
+    - "pnpm typecheck → exit 0"
+    - "pnpm test → exit 0; Test Files 38 passed (38); Tests 829 passed (829) (729 pre-existing + 100 new; simulation project 101 incl. the placeholder test)"
+    - "pnpm format:check → exit 0 ('All matched files use Prettier code style!')"
+    - "pnpm check:boundaries → exit 0 ('20/20 fixtures reported')"
+  reference_data_used:
+    - "FIPS 180-4 §4.2.2 and §5.3.3 constant tables and the NIST SHA256.pdf example digests (sources above). No orbital reference data: run tests check structure, bit-exact rules and consistency with the engine functions, not physical accuracy."
+  not_verified:
+    - "VT-10, VT-16, VT-18, VI-01 have NOT been run; they belong to the Verification Engineer in conformance/. The determinism, grid, R1–R13 and warning tests here are implementer self-checks."
+    - "PROPAGATOR_NOT_CONVERGED is mapped but not exercised: no request was found that makes propagateKeplerUniversal report NOT_CONVERGED (NON_FINITE_STATE was exercised with a 1.7e308 s hyperbolic span)."
+    - "INTERNAL_ERROR from an unexpected exception and from the self-validation fallback are not exercised (no fault injection)."
+    - "Physical correctness of samples and events (VT-05…VT-16) — only consistency with the astrodynamics functions is tested."
+    - "Performance at the provisional limit (1e6 samples) not measured."
+    - "UTF-8 encoder checked against Node Buffer for the listed strings only."
+  known_limitations:
+    - "Sample limit is a placeholder (P1)."
+    - "−0 inputs change the requestId (P3)."
+    - "Warnings only after maneuvers (P6)."
+  documentation_changes:
+    - "None outside this task file (contract unchanged)."
+  risks_or_blockers:
+    - "None blocking. Owner decisions P1–P10 pending."
+  review_artifact: "Not opened (task instruction: no push, no PR). Branch feat/ml-task-017-simulation-runner."
+  recommended_next_action: >
+    Owner: decide P1–P4 (sample limit, intersection t_s, NQ-1, overflow code). Verification
+    Engineer: implement VT-10, VT-16, VT-18, VI-01 in conformance/ against runSimulation,
+    buildSimulationRequest and validateScenarioSemantics; review the engine observation on radial
+    infall.
