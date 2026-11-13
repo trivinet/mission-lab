@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "First conformance run: the engine passes all 124 comparisons against the independent references (element conversion, degenerate cases, propagation, period closure, solver residual). Orekit evidence, invariants and maneuvers are still to come.",
+  "headline": "RSW basis, impulsive maneuver and trajectory flags delivered (ML-TASK-016, PR #20): 729 tests pass, self-consistency only. Eight design choices on escape and surface intersection need the owner's approval before the simulation runner uses them.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-22",
+      "text": "Approve the escape and surface-intersection semantics of PR #20 (design choices D1–D8), then merge it.",
+      "blocking": "ML-TASK-017 (simulation runner)"
+    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -185,7 +190,7 @@
           "title": "RSW basis and impulsive maneuver",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "todo",
+          "status": "in_review",
           "deps": "013"
         },
         {
@@ -369,6 +374,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-016 delivered: RSW basis, impulsive maneuver with bit-exact velocity update, analytical escape and reference-sphere intersection flags; 63 new tests (self-consistency only). Coordinator re-ran all checks: 729 tests pass. PR #20."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Coordinator",
+      "text": "PRs #18 and #19 merged on the owner's instruction after CI passed; `main` passes 666 tests and 20/20 boundary fixtures. ML-TASK-016 started (Astrodynamics, opus), one Opus task at a time from now on because of the usage limit."
+    },
     {
       "date": "2026-11-13",
       "who": "Verification",
