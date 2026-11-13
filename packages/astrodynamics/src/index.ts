@@ -83,3 +83,19 @@ export type {
   ImpulsiveManeuverFailure,
   ImpulsiveManeuverResult,
 } from './maneuver';
+
+export {
+  classifyEscape,
+  detectReferenceSphereIntersection,
+  ESCAPE_ENERGY_BOUND_FACTOR,
+} from './trajectory-flags';
+export type {
+  ConicRegime,
+  EscapeClassification,
+  EscapeClassificationFailure,
+  EscapeClassificationResult,
+  ReferenceSphereIntersection,
+  ReferenceSphereIntersectionFailure,
+  ReferenceSphereIntersectionReason,
+  ReferenceSphereIntersectionResult,
+} from './trajectory-flags';
