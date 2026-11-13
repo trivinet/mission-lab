@@ -1,0 +1,152 @@
+task_id: ML-TASK-015
+title: "Universal-variable Kepler propagator in packages/astrodynamics"
+status: in_review
+requirement_ids: [ML-FR-004, ML-NFR-002, ML-NFR-003]
+owner_role: astrodynamics-engineer
+reviewer_role: verification-engineer
+dependencies: [ML-TASK-013]
+affected_paths:
+  - packages/astrodynamics/
+  - docs/backlog/tasks/ML-TASK-015.yaml
+objective: >
+  Provide the engine's analytical two-body propagator (ADR-005, option B): Stumpff functions and
+  a universal-variable Kepler solve with Lagrange f, g, ḟ, ġ that advances a Cartesian state by
+  any Δt for elliptic, parabolic and hyperbolic energy, with a stated stopping criterion,
+  explicit failure results and diagnostics that let an external test check convergence.
+scope:
+  - "Stumpff functions C(ψ), S(ψ) (and c0, c1) for all real ψ: series near 0, closed forms elsewhere, switch-over and series length derived in the code."
+  - "propagateKeplerUniversal(μ, r0, v0, Δt): direct evaluation from the initial state, no warm start, Δt = 0 returns a bit-identical copy (contracts-v1 §5.2 rev. 3)."
+  - "Safeguarded Newton solve (bracketing + bisection fallback) with a hard cap and a stopping criterion at the rounding-noise floor of the time equation."
+  - "Failure results INVALID_INPUT / NOT_CONVERGED / NON_FINITE_STATE (never thrown, never NaN in a success)."
+  - "Thin helper propagateKeplerUniversalAt evaluating a list of times independently."
+  - "Unit tests (self-consistency, L1) with explicitly derived provisional bounds."
+out_of_scope:
+  - "Sampling grid, segments, maneuvers, contract diagnostics objects (ML-TASK-017)."
+  - "Element conversion (ML-TASK-014, files elements.ts, angles.ts, orbit-quantities.ts)."
+  - "Independent references and reference datasets for VT-05…VT-09 (Verification Engineer)."
+  - "Approved tolerances (ML-TASK-010); any edit to verification/, test-data/ or tolerances.md."
+  - "New dependencies."
+inputs:
+  - AGENTS.md
+  - docs/engineering/coding-standards.md
+  - docs/architecture/adr/ADR-002, ADR-004, ADR-005
+  - docs/architecture/proposed-architecture.md §3
+  - docs/architecture/contracts-v1.md revision 3 (§5.2, §8.3)
+  - docs/requirements/m1-requirements.md (ML-FR-004)
+  - docs/verification/m1-verification-plan.md (§3 VT-05…VT-09, §4, §5)
+  - packages/astrodynamics/src/vector3.ts, constants.ts
+acceptance_criteria:
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0."
+  - "packages/astrodynamics/package.json declares no `dependencies`."
+  - "Every public function documents units, frame, valid domain, evaluation order and source (ML-NFR-002)."
+  - "Each sample is computed directly from the initial state (no hidden state); Δt = 0 returns a bit-identical copy."
+  - "Stopping criterion stated in the code; diagnostics expose iterations, final time residual (s) and the cap flag."
+  - "Non-convergence and non-finite results are failure results."
+  - "Unit tests: Stumpff value at 0, continuity across the switch, identities; propagation: Δt = 0 copy, f ġ − ḟ g = 1, energy and h conservation, forward-backward, additivity, period closure, circular closed form, hyperbolic and near-parabolic smoke, diagnostics, failures; every inexact comparison with a derived bound."
+test_requirements:
+  - Vitest unit tests in packages/astrodynamics/src/*.test.ts.
+deliverables:
+  - packages/astrodynamics/src/stumpff.ts, kepler-universal.ts, index.ts exports.
+  - packages/astrodynamics/src/stumpff.test.ts, kepler-universal.test.ts.
+human_approval_required: false
+
+report:
+  files_changed:
+    - "packages/astrodynamics/src/stumpff.ts (new): stumpff (c0..c3), stumpffC, stumpffS, STUMPFF_SERIES_SWITCH = 4, STUMPFF_SERIES_TERMS = 11; internal stumpffCSeries, stumpffSSeries, stumpffClosed (exported from the module for tests, not from the index)"
+    - "packages/astrodynamics/src/kepler-universal.ts (new): propagateKeplerUniversal, propagateKeplerUniversalAt, result/diagnostic types, KEPLER_MAX_ITERATIONS = 100, KEPLER_MAX_BRACKET_EXPANSIONS = 2100, KEPLER_MAX_POLISH_STEPS = 3"
+    - "packages/astrodynamics/src/index.ts (modified): export lines appended only"
+    - "packages/astrodynamics/src/stumpff.test.ts (new): 10 tests"
+    - "packages/astrodynamics/src/kepler-universal.test.ts (new): 35 tests"
+    - "docs/backlog/tasks/ML-TASK-015.yaml (new): this contract and report"
+  summary: >
+    Universal-variable propagator per ADR-005. Formulas are derived in the module comment from
+    the two-body equation (α = 2/r − v²/μ; dχ/dt = √μ/r; r'' + αr = 1; universal Kepler
+    equation; r_vec''' + α r_vec' = 0 giving f, g, ḟ, ġ; f ġ − ḟ g = 1 from conservation of h)
+    and cross-checked against two sources that were opened (Weber, Orbital Mechanics &
+    Astrodynamics, universal-anomaly page, Eqs. 251–255, 262, 266, 267; Wikipedia, Stumpff
+    function and Universal variable formulation). g is formed as (σ0 χ² C + r0 χ c1)/√μ and ḟ
+    as −√μ χ c1/(r r0), algebraically equal to the textbook Δt − χ³S/√μ and χ(ψS − 1) at the
+    exact root, but consistent with the returned χ̂: the returned state is the point of the
+    orbit at t(χ̂), so the solver residual is a pure along-track time shift and g does not
+    carry a rounding that grows with |Δt|. Solve: documented initial guess (Curtis √μ α Δt for
+    α > 0, √μ Δt/r0 clamped to |α|χ² ≤ 1 otherwise), bracket by doubling from 0, Newton with
+    bisection fallback inside the bracket, cap 100. Each call depends only on its arguments;
+    Δt = ±0 returns a component-wise copy.
+  stopping_criterion_and_evidence:
+    criterion: >
+      F(χ) = σ0 χ² C + (1 − α r0) χ³ S + r0 χ − √μ Δt. At every evaluation the code forms
+      η(χ) = 8u (|T1| + |T2| + |T3| + |√μ Δt|) + 2u |χ| |F'(χ)| (u = 2^-53), an estimate of the
+      evaluation noise of the computed F plus the change of F across one binary64 spacing of χ.
+      CONVERGED when |F̂(χ)| ≤ η(χ), or F̂ = 0, or the bracket has collapsed to ≤ 4u|χ|. After
+      convergence up to 3 further Newton steps are taken and kept only while they strictly
+      reduce |F̂| (polishing); the best point is returned. Otherwise, at the cap (100) or when a
+      step cannot move χ: failure NOT_CONVERGED (iterationCapReached set when the cap ended it).
+      No fixed absolute threshold is used. Diagnostics: iterations, bracketExpansions,
+      iterationCapReached, universalAnomaly_sqrtm (χ̂), timeResidual_s = F̂(χ̂)/√μ (computed),
+      timeResidualNoise_s = η/√μ, and timeEquation {alpha_per_m, sigma0_sqrtm, r0_m,
+      oneMinusAlphaR0, sqrtMu_m1p5ps} so the exact time equation can be re-evaluated externally.
+    measurement_method: >
+      True residual |t(χ̂) − Δt| = |F(χ̂)|/√μ evaluated EXACTLY in the returned data (α̂, σ̂0, r̂0,
+      (1 − αr0)^) with an exact √μ, using BigInt fixed-point arithmetic (10000 fractional bits,
+      Stumpff series summed to convergence). Script kept outside the repository
+      (scratchpad zz-measure.test.ts, run once with vitest, not committed). μ = EARTH_GM_m3ps2.
+      States built from elements with Ω = 0.7, ω = 1.3 rad. Budget column: the derived budget
+      ε_t = u[(25 + 65e)|Δt| + (12 + 114e + 130e²)/n] of the tolerance record under review
+      (ML-TASK-010 branch, §6.1; not approved), quoted only for comparison.
+    results_in_units_of_u_abs_dt: >
+      Max over spans {0.1, 0.5, 1, 3.7, 10, −2.3, −10, 100} periods of true residual / (u |Δt|),
+      and max ratio true/ε_t:
+      circular LEO inclined (a 7000 km) 2.16, ratio 0.075;
+      circular equatorial 1.37, 0.054;
+      elliptical equatorial e 0.1 1.62, 0.050;
+      moderately elliptical inclined e 0.3 1.76, 0.024;
+      Molniya-like e 0.74 from perigee 1.52, 0.020;
+      Molniya-like from apogee 1.85, 0.023;
+      geostationary radius 1.53, 0.061;
+      retrograde near-polar e 0.01 1.85, 0.072.
+      Open/near-parabolic (spans 0.1…1000 × 1e4 s): hyperbola e 1.5 2.63 (ratio 0.029);
+      hyperbola e 3 6.31 (ratio 0.070); e = 1 − 1e-6 2.82; e = 1 − 1e-10 1.71; e = 1 + 1e-6 3.01;
+      e = 1 + 1e-10 2.31. Iterations used: 0–6 for closed orbits, 4–18 for open/near-parabolic;
+      bracket expansions up to 33 for e = 1 − 1e-10 (bounded by log2(1/(1 − e)) + 1, derived in
+      the code). Cap never reached. The computed residual reported in diagnostics is often
+      exactly 0 while the true residual is ~u|Δt|: it is a computed quantity, not a bound.
+    not_measured: >
+      1000-period spans for closed orbits (the BigInt checker capped its series at 2000 terms,
+      insufficient for ψ ≈ 4e7); the solver itself converged there.
+  tests_executed:
+    - "pnpm exec vitest run --project astrodynamics -> exit 0; 5 files, 83 tests passed (38 existing + 10 stumpff + 35 kepler-universal)"
+    - "pnpm lint -> exit 0"
+    - "pnpm typecheck -> exit 0 (root + all 5 workspaces)"
+    - "pnpm test -> exit 0; 14 files, 420 tests passed"
+    - "pnpm format:check -> exit 0"
+    - "pnpm check:boundaries -> exit 0; 12/12 fixtures reported"
+    - "Margin check (temporary copy of kepler-universal.test.ts, not committed): all 35 tests still pass with KB = 16 and the phase terms × 0.5; with KB = 8 and phase × 0.25 one test fails (period closure, retrograde near-polar case); with KB = 4, phase × 0.125 and the circular bound ÷8, three fail. The KB/phase bounds therefore have between 2× and 4× headroom on the tightest case and are not vacuous."
+  reference_data_used:
+    - "None (no reference datasets). Sources opened 2026-11-12: B. Weber, Orbital Mechanics & Astrodynamics, 'Orbit Independent Solution: The Universal Anomaly', https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/universal-variables.html (Eqs. 251–255, 262, 266, 267); Wikipedia 'Stumpff function' https://en.wikipedia.org/wiki/Stumpff_function; Wikipedia 'Universal variable formulation' https://en.wikipedia.org/wiki/Universal_variable_formulation."
+  not_verified:
+    - "VT-05…VT-09: no independent (L2) or external (L3) comparison was run. The tests here are the implementer's self-consistency checks (L1)."
+    - "Provisional bounds in stumpff.test.ts and kepler-universal.test.ts (KB = 32 off-orbit factor; phase coefficient CT = 6(4/(1 − e) − 1) + 16; Stumpff switch 11u) are implementer derivations, to be replaced by the approved tolerance record."
+    - "The noise estimate η is a first-order operation-count estimate, not a rigorous bound; its adequacy is shown only by the measured residuals above."
+    - "Not confirmed (not opened): Vallado KEPLER algorithm, Curtis ch. 3, Bate–Mueller–White ch. 4, Danby, Stumpff (1956), Stiefel–Scheifele. Weber's page attributes Eq. 267 to Curtis; that attribution was not checked against the book."
+    - "Accuracy of Math.sin/cos/sinh/cosh assumed ≤ 1 ulp (ECMAScript leaves them implementation-approximated) and Math.sqrt correctly rounded; not verified."
+    - "Near-parabolic and hyperbolic cases: only smoke tests (convergence, monotone r, energy and h conservation, diagnostics) plus reverse-constructed hyperbolic Kepler cases for e = 1.5 and 3. No forward-backward or closed-form position check for |e − 1| ≤ 1e-6. Exactly parabolic data (α = 0) checked for convergence and h conservation only."
+    - "Rectilinear trajectories (r0 × v0 = 0) are not tested."
+  known_limitations:
+    - "Hyperbolic states whose position or velocity exceeds the binary64 range return NON_FINITE_STATE (or NOT_CONVERGED if cosh/sinh overflow before the root is bracketed). Stumpff values overflow to +Infinity for ψ < about −5.0e5."
+    - "Near-parabolic ellipses with a tiny positive α need up to log2(1/(1 − e)) + 1 bracket doublings from the Curtis guess (measured 33 at e = 1 − 1e-10)."
+    - "Phase (along-track) error grows linearly with |Δt| through the rounding of α = 2/r − v²/μ (data error, inherent to any method using this data) and the argument √(αχ²); the solver residual adds ≤ ~6u|Δt| (measured)."
+    - "propagateKeplerUniversal does not emit contract diagnostics; mapping of NOT_CONVERGED → PROPAGATOR_NOT_CONVERGED and NON_FINITE_STATE → NON_FINITE_STATE (contracts-v1 §8.3) belongs to ML-TASK-017."
+  documentation_changes:
+    - "None outside the code and this task file."
+  ambiguities_reported:
+    - "ADR-005 says every output sample is computed from the segment's initial state at Δt = t − t0, while contracts-v1 §5.2 (revision 3) requires the first sample of a segment to be a bit-identical copy. Treated the contract as the refinement: propagateKeplerUniversal returns a copy at Δt = ±0 (so either reading gives the same bits). Not resolved here."
+    - "ADR-005 Consequences names 'Newton with a bracketing fallback' but fixes no convergence criterion; the tolerance record under review (O-1) proposes ε_t ≤ 8u(|Δt| + 1/n) while its §6.1 derives a different budget ε_t = u[(25 + 65e)|Δt| + …]. This task states its criterion and reports measured residuals in u|Δt| against the §6.1 form; the record's owners should reconcile O-1 with §6.1."
+    - "Coding standards §9: suffixes _m3ps2, _sqrtm (m^½), _per_m (1/m), _per_s, _m1p5ps (m^{3/2}/s) are not in the approved list; used and documented here."
+  risks_or_blockers:
+    - "If the approved tolerance record requires the textbook g = Δt − χ³S/√μ form specifically (its §6.1 term 4 analyses that form), the consistent form used here changes which error terms apply (term 4 vanishes except its bounded part, as the record itself notes)."
+  review_artifact: ""
+  recommended_next_action: >
+    Verification Engineer: compare against the L2 classical-elements propagator and the Orekit
+    dataset (VT-05…VT-09), check the reported residual table against the §6.1 budget with an
+    independent evaluator, and replace the provisional bounds. Coordinator: open the PR from
+    feat/ml-task-015-propagator after review (not pushed by this task).
