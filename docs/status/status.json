@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Engine core and independent references are all on `main` (542 tests pass). Before the engine can be run against the reference datasets, the owner must decide where those comparison tests live: no approved package may import both the engine and the verification code.",
+  "headline": "Owner approved a dedicated `conformance/` workspace (ADR-009). The Verification Engineer is creating it and running the engine against the 55 reference datasets for the first time.",
   "gates": [
     {
       "id": "G0",
@@ -31,11 +31,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-20",
-      "text": "Decide where the engine-versus-reference tests live. Recommended: a new workspace `conformance/` allowed to import the engine, the contracts and the verification code, with nothing importing it (recorded as ADR-009).",
-      "blocking": "ML-TASK-018 (first engine-vs-reference run)"
-    },
     {
       "id": "OA-21",
       "text": "Merge PR #18 (ADR-008 values and retrograde convention; status).",
@@ -211,7 +206,7 @@
           "title": "Numerical suite in CI and G1 verification report",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "blocked",
+          "status": "in_progress",
           "deps": "011, 017",
           "approval": true
         }
@@ -379,6 +374,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Owner",
+      "text": "Approved a new `conformance/` workspace for engine-versus-reference tests (may import engine, contracts and verification code; nothing imports it). ML-TASK-018 part A/B started (Verification, opus): workspace, ADR-009, boundary fixtures, then the first conformance run with tolerances already fixed."
+    },
     {
       "date": "2026-11-13",
       "who": "Coordinator",
