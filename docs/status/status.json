@@ -1,7 +1,7 @@
 {
-  "updated": "2026-11-12",
+  "updated": "2026-11-13",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Contract revision 3, ADR-008 and requirement amendments delivered (PR #13). Tolerance record revision still in progress. PRs #10, #11 and #13 await the owner's merge.",
+  "headline": "Independent references and 55 reference datasets delivered (ML-TASK-011, PR #17), with tolerances fixed before any engine run. Next: run the engine against them (ML-TASK-018) once PRs #15, #16 and #17 are merged.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,16 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-18",
+      "text": "Merge PRs #14 (status), #15 (element conversion), #16 (propagator) and #17 (independent references). The engine is then run against the reference datasets for the first time.",
+      "blocking": "ML-TASK-018; ML-TASK-016, 017"
+    },
+    {
+      "id": "OA-19",
+      "text": "Approve the convention for retrograde equatorial orbits: substitute angles measured in the sense of motion. The engine and the independent reference both chose it separately; no approved document fixes it yet (ADR-008 addendum).",
+      "blocking": "VT-04 comparison"
+    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -126,7 +136,7 @@
           "title": "Contract revision 3, ADR-008 (degenerate elements) and requirement amendments",
           "role": "Systems Architect",
           "model": "opus",
-          "status": "in_review",
+          "status": "done",
           "deps": "004, 010 review",
           "approval": true
         },
@@ -135,7 +145,7 @@
           "title": "Tolerance derivation and record",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_progress",
+          "status": "done",
           "deps": "004",
           "approval": true
         },
@@ -144,7 +154,7 @@
           "title": "Independent reference implementations and datasets",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "todo",
+          "status": "in_review",
           "deps": "004"
         },
         {
@@ -161,7 +171,7 @@
           "title": "Constants, units, vector math",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_review",
+          "status": "done",
           "deps": "004"
         },
         {
@@ -169,7 +179,7 @@
           "title": "Element ↔ Cartesian conversion, degenerate cases",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "todo",
+          "status": "in_review",
           "deps": "013"
         },
         {
@@ -177,7 +187,7 @@
           "title": "Universal-variable Kepler propagator",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "todo",
+          "status": "in_review",
           "deps": "013"
         },
         {
@@ -369,6 +379,66 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-13",
+      "who": "Verification",
+      "text": "ML-TASK-011 delivered: three independent references (matrix construction, Kepler-equation propagation, RK4 with step halving), in-repo 320-bit arithmetic, the solver-check evaluator and 55 datasets with evaluated tolerances; engine neither read nor run. Coordinator re-ran all checks: 418 tests pass. VT-19 still open. PR #17."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Coordinator",
+      "text": "ML-TASK-011 (independent references, Verification, opus) was stopped by the account usage limit shortly after starting; nothing had been saved. Resumed in a fresh worktree with instructions to commit after every piece."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Owner",
+      "text": "Approved the tolerance record (revision 3): angular accuracy target 1e-5 rad, degenerate thresholds 1e-5, corrected solver-check threshold. Approval recorded in §15; PR #12 merged after CI passed. ML-TASK-010 done."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Verification",
+      "text": "ML-TASK-010 revision 3: second-review corrections applied, no tolerance value changed; the solver-check threshold now includes a derived allowance for the α data error. Ready for owner approval."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Architect",
+      "text": "Bounded second review of PR #12: every recomputed value matches; B1–B3 resolved; the record stays a valid conservative standard for the propagator's consistent g form. One substantive correction (the O-1 solver check would also measure a separately budgeted error and could fail a correct engine at high eccentricity) and three wording fixes. Verification Engineer resumed for revision 3."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Owner",
+      "text": "Chose a bounded second review of the tolerance record before approval. Architect (opus) started: solver budget derivation, recomputation of changed values, and whether the record still holds for the propagator's consistent g form."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-015 delivered: Stumpff functions and universal-variable propagator, no warm start, noise-floor stopping criterion with diagnostics; 45 new tests (self-consistency only). Agent-measured time residual at most 7.5 % of the proposed solver budget. Coordinator re-ran all checks: 420 tests pass. PR #16."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-014 delivered: element ↔ state conversion with ADR-008 conventions, atan2-only angle extraction, hyperbolic states supported, orbit quantities; 79 new tests (self-consistency only). Coordinator re-ran all checks: 454 tests pass. Its first worktree was lost in the usage-limit interruption and the task was redone from scratch. PR #15."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Verification",
+      "text": "ML-TASK-010 revision 2: solver residual budget derived (24.8u to 74.6u at ten periods); an undercounted off-orbit error found and added; propagation tolerances loosened (VT-05 at LEO 1.47e-5 → 2.60e-5 m); break-even table shows margins of ×4.5 to ×10 over the budget. Not yet re-reviewed."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Coordinator",
+      "text": "The three running agents (ML-TASK-010 revision, ML-TASK-014, ML-TASK-015) were stopped by the account's usage limit on 2026-11-12 and resumed from their saved work."
+    },
+    {
+      "date": "2026-11-12",
+      "who": "Coordinator",
+      "text": "Started ML-TASK-014 (element/state conversion, atan2-based extraction required) and ML-TASK-015 (universal-variable propagator, no warm start, stated stopping criterion) in parallel worktrees."
+    },
+    {
+      "date": "2026-11-12",
+      "who": "Owner",
+      "text": "Instructed the merge of PRs #10, #11 and #13 after CI passed: constants and vector math, contract revision 3, ADR-008. `main`: 375 tests pass. ML-TASK-008 and ML-TASK-013 done (VT-19 still open against the WGS 84 standard itself)."
+    },
     {
       "date": "2026-11-12",
       "who": "Architect",
