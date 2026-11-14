@@ -62,7 +62,8 @@
  * Root solve for χ (safeguarded Newton; ADR-005: "Newton with a bracketing fallback").
  *
  * F(χ) = σ₀ χ² C + (1 − α r₀) χ³ S + r₀ χ − √μ Δt is strictly increasing (F' = r > 0 unless the
- * trajectory is rectilinear and passes through the centre), with F(0) = −√μ Δt. So the root has
+ * trajectory is rectilinear and passes through the centre, a case rejected before the solve:
+ * see "Rectilinear trajectories" below), with F(0) = −√μ Δt. So the root has
  * the sign of Δt and is unique.
  *
  * 1. Initial guess. α > 0: χ₀ = √μ α Δt (Weber Eq. 267, Curtis); this equals √a·ΔM and, since
@@ -114,6 +115,86 @@
  * Fixed evaluation order: every expression is written with explicit parentheses where the order
  * is not left-to-right; ECMAScript has no fused multiply-add, so results are bit-reproducible.
  * No state is kept between calls; each call depends only on its arguments (no warm start).
+ *
+ * =============================================================================================
+ * Rectilinear trajectories and collision with the centre (ML-TASK-019; owner decision
+ * 2026-11-14 on issue #24: "the propagator returns an explicit failure when a rectilinear
+ * trajectory reaches the centre (r = 0) within the requested time").
+ *
+ * Why it is needed. Nothing in (D1)–(D5) uses h = r_vec × v_vec, and for h = 0 the formulas stay
+ * finite through r = 0: χ ↦ r(χ) = r₀ c0 + σ₀ χ c1 + χ² c2 touches 0 and rises again, i.e. they
+ * return the regularised continuation (the body passes through the centre and comes back along
+ * the same line). That is not two-body motion: at r = 0 the state is singular.
+ *
+ * (R1) Rectilinearity rule: the trajectory is rectilinear iff the EXACT cross product of the
+ *      given binary64 vectors is zero, i.e. r₀ and v₀ are exactly linearly dependent (this
+ *      includes v₀ = 0). Tested on the three 2×2 minors r_i v_j = r_j v_i:
+ *      - fast path: if fl(r_i v_j) ≠ fl(r_j v_i) for some minor, the exact products differ
+ *        (rounding to nearest is a monotone function of the exact value, so equal exact values
+ *        round equal, also on overflow and underflow), hence h ≠ 0 exactly;
+ *      - otherwise (rounded products equal) the products are compared exactly with integer
+ *        arithmetic: every finite binary64 x is N·2^-1074 with an integer N (BigInt), so
+ *        r_i v_j = r_j v_i ⇔ N(r_i) N(v_j) = N(r_j) N(v_i).
+ *      No tolerance band is used, on purpose. A state with a tiny but non-zero exact h is a genuine
+ *      conic (e → 1, r_p = h²/(μ(1 + e)) > 0) whose periapsis passage the universal formulas
+ *      describe correctly (F' = r > 0); classifying it as rectilinear would replace a valid
+ *      solution by a failure. A computed cross product that is zero only because the products
+ *      rounded equal (|h| below the rounding of r v) is such a conic and is NOT reclassified.
+ *      Conversely, if h = 0 exactly the computed cross product is also exactly zero (fast-path
+ *      argument), so no rectilinear state can escape the rule through rounding.
+ *      The test reads only the inputs; it does not change any arithmetic of the propagation.
+ *
+ * (R2) Radial motion and its time law (derived here from the energy integral; no source opened).
+ *      For h = 0 the motion stays on the line through the centre along r0_vec; let r(t) > 0 be
+ *      the distance and ṙ its rate. Energy (D1): ṙ²/2 − μ/r = ξ = −μα/2. With σ := r ṙ/√μ
+ *      (= r_vec·v_vec/√μ, as in (D2)) the energy integral reads
+ *        σ² = 2r − α r²                                                        (E)
+ *      and σ → 0 as r → 0. Measure the universal anomaly χ from a passage through the centre
+ *      (r = 0, σ = 0, dχ/dt = √μ/r). (D2)–(D4) with r₀ = 0, σ₀ = 0 give
+ *        r(χ) = χ² c2(αχ²),   σ(χ) = χ c1(αχ²),   √μ (t − t_centre) = χ³ c3(αχ²).      (T)
+ *      Check by differentiation (D3): dr/dχ = χ c1 = σ, dσ/dχ = c0 = 1 − αr; dt/dχ = χ²c2/√μ = r/√μ;
+ *      and (E) holds: for α > 0, k = √α: σ² = sin²(kχ)/k², 2r − αr² = (1 − cos² kχ)/k².
+ *      Hence the time from a passage through the centre to radius r₀ on the outgoing branch
+ *      (σ ≥ 0) — by time reversal also the time from radius r₀ on the incoming branch to the next
+ *      passage — is t* = χ*³ c3(αχ*²)/√μ, with χ* > 0 the first anomaly at which r(χ*) = r₀:
+ *        α > 0 (k = √α): the outgoing branch is kχ ∈ (0, π] (σ = sin(kχ)/k ≥ 0) and
+ *                tan(kχ/2) = (1 − cos kχ)/sin kχ = k r/σ, so χ* = (2/k)·atan2(k r₀, |σ₀|);
+ *                check: 1 − cos kχ* = 2 tan²/(1 + tan²) = 2k²r₀²/(σ₀² + k²r₀²) = k² r₀ by (E).
+ *        α < 0 (k = √−α): r = χ² c2 = (cosh kχ − 1)/k² = 2 sinh²(kχ/2)/k², so
+ *                χ* = (2/k)·asinh(k √(r₀/2)).
+ *        α = 0: r = χ²/2, so χ* = √(2 r₀).
+ *      For α > 0 the motion is periodic: the next passage through the centre is at kχ = 2π, after
+ *        T = (2π/k)³ c3(4π²)/√μ = 2π/(k³ √μ) = 2π √(a³/μ)   (a = 1/α; c3(4π²) = 1/(4π²)),
+ *      and the farthest point r = 2a (σ = 0) is at kχ = π, i.e. at T/2.
+ *      Fall from rest (σ₀ = 0, α = 2/r₀, a = r₀/2): kχ* = 2·atan2(k r₀, 0) = π, so
+ *        t_fall = T/2 = π √(a³/μ) = (π/2) √(r₀³/(2μ)).                                 (F)
+ *      Cross-check of (F) with the elementary integral: t = ∫₀^{r₀} dr / √(2μ(1/r − 1/r₀)); with
+ *      r = r₀ sin²θ, dr = 2 r₀ sinθ cosθ dθ and √(1/r − 1/r₀) = cosθ/(√r₀ sinθ), the integrand
+ *      becomes √(r₀³/(2μ))·2 sin²θ dθ, and ∫₀^{π/2} 2 sin²θ dθ = π/2.
+ *
+ * (R3) Time to the centre in the direction of Δt (t_c > 0, or none):
+ *        forward  (Δt > 0): σ₀ < 0 (incoming)  → t_c = t*;
+ *                           σ₀ ≥ 0, α > 0     → t_c = T − t* (out to r = 2a, then back);
+ *                           σ₀ ≥ 0, α ≤ 0     → none (escape, or parabolic, along the line).
+ *        backward (Δt < 0): the mirror (reverse v₀, i.e. σ₀ → −σ₀): σ₀ > 0 → t*;
+ *                           σ₀ ≤ 0, α > 0 → T − t*; σ₀ ≤ 0, α ≤ 0 → none.
+ *      σ₀ = 0 (at rest; only possible for α > 0) gives T − t* = T/2 in both directions. The sign of
+ *      the computed σ̂₀ is exact for a rectilinear state (all terms r_i v_i have the same sign).
+ *      The code uses the same α̂, σ̂₀, r̂₀ and √μ as the solve (data list of the function), so the
+ *      collision is that of the conic the solver would otherwise follow.
+ *
+ * (R4) Decision: the call fails with 'RECTILINEAR_COLLISION' iff the trajectory is rectilinear
+ *      (R1) and t_c exists and t_c ≤ |Δt| (R3). Δt exactly equal to t_c counts as reaching the
+ *      centre (conservative). The comparison uses the computed t̂_c: within its evaluation error
+ *      (a few tens of u relative from atan2/asinh, Stumpff c3 ≤ 7u and the data α̂, σ̂₀; not
+ *      rigorously bounded, since ECMAScript does not specify the accuracy of atan2/asinh) the
+ *      outcome follows the computed value. The failure carries the signed elapsed time to the
+ *      centre, collisionDeltaT_s = t̂_c (Δt > 0) or −t̂_c (Δt < 0).
+ *      If t_c exists but its computed value is not finite (overflow; only for data far outside
+ *      any M1 range, e.g. |α| near the binary64 underflow threshold or r₀ ≳ 1e200 m), the call
+ *      fails with 'NON_FINITE_STATE' instead of guessing.
+ *      Rectilinear motion that does not reach the centre within |Δt| is propagated by the normal
+ *      path, unchanged: it is a regular solution of (D1) on that interval.
  */
 
 import { dotVec3, normVec3 } from './vector3';
@@ -139,8 +220,12 @@ export type KeplerPropagationFailure =
   | 'INVALID_INPUT'
   /** The χ solve did not reach its stopping criterion (maps to PROPAGATOR_NOT_CONVERGED). */
   | 'NOT_CONVERGED'
-  /** The solve converged but the state or a coefficient is not finite (maps to NON_FINITE_STATE). */
-  | 'NON_FINITE_STATE';
+  /** The solve converged but the state or a coefficient is not finite (maps to NON_FINITE_STATE);
+   *  also a rectilinear state whose time to the centre cannot be evaluated (module comment R4). */
+  | 'NON_FINITE_STATE'
+  /** The state is exactly rectilinear (r0_vec × v0_vec = 0) and reaches the centre r = 0 within
+   *  |Δt| (module comment R1–R4). The result carries collisionDeltaT_s. */
+  | 'RECTILINEAR_COLLISION';
 
 /** Data of the time equation, as computed from the initial state (all finite on success). */
 export interface KeplerTimeEquationData {
@@ -200,7 +285,18 @@ export type KeplerPropagationResult =
     }
   | {
       readonly ok: false;
-      readonly reason: KeplerPropagationFailure;
+      readonly reason: Exclude<KeplerPropagationFailure, 'RECTILINEAR_COLLISION'>;
+      readonly diagnostics: KeplerSolveDiagnostics;
+    }
+  | {
+      readonly ok: false;
+      readonly reason: 'RECTILINEAR_COLLISION';
+      /**
+       * Signed elapsed time from t₀ to the passage through the centre that ends the requested
+       * interval, s: in (0, Δt] for Δt > 0, in [Δt, 0) for Δt < 0. Finite.
+       */
+      readonly collisionDeltaT_s: number;
+      /** No solve is performed: zero iterations, null χ̂ and residuals, timeEquation filled. */
       readonly diagnostics: KeplerSolveDiagnostics;
     };
 
@@ -417,6 +513,104 @@ function solveUniversalAnomaly(
   };
 }
 
+/** x = N·2^-1074 for every finite binary64 x; returns the integer N (exact). */
+function binary64AsScaledInteger(x: number): bigint {
+  const view = new DataView(new ArrayBuffer(8));
+  view.setFloat64(0, x);
+  const bits = view.getBigUint64(0);
+  const biasedExponent = Number((bits >> 52n) & 0x7ffn);
+  const fraction = bits & 0xfffffffffffffn;
+  // Subnormal: fraction·2^-1074. Normal: (2^52 + fraction)·2^(E − 1075) = (…)·2^(E − 1)·2^-1074.
+  const magnitude =
+    biasedExponent === 0 ? fraction : (fraction | (1n << 52n)) << BigInt(biasedExponent - 1);
+  return bits >> 63n === 1n ? -magnitude : magnitude;
+}
+
+/** a·b = c·d in exact arithmetic, for finite binary64 a, b, c, d (module comment R1). */
+function productsEqualExactly(a: number, b: number, c: number, d: number): boolean {
+  if (a * b !== c * d) {
+    // Rounding is monotone: equal exact products would round to equal values.
+    return false;
+  }
+  return (
+    binary64AsScaledInteger(a) * binary64AsScaledInteger(b) ===
+    binary64AsScaledInteger(c) * binary64AsScaledInteger(d)
+  );
+}
+
+/**
+ * True iff the exact cross product of the given finite binary64 vectors is the zero vector, i.e.
+ * the two-body trajectory of (r, v) is rectilinear (module comment R1). No tolerance.
+ *
+ * @param position_m r, m, any inertial frame (finite components).
+ * @param velocity_mps v, m/s, same frame (finite components).
+ * @returns true for v = 0 or v exactly parallel/antiparallel to r (and for r = 0).
+ */
+export function isExactlyRectilinear(position_m: Vec3, velocity_mps: Vec3): boolean {
+  const [rx, ry, rz] = position_m;
+  const [vx, vy, vz] = velocity_mps;
+  return (
+    productsEqualExactly(ry, vz, rz, vy) &&
+    productsEqualExactly(rz, vx, rx, vz) &&
+    productsEqualExactly(rx, vy, ry, vx)
+  );
+}
+
+/** Times to the centre of a rectilinear state (module comment R2, R3). */
+export interface RectilinearCollisionTimes {
+  /**
+   * t_c > 0 from t₀ forward to the next passage through r = 0, s; null when the motion never
+   * reaches the centre going forward (outgoing with α̂ ≤ 0). May be +Infinity or NaN on overflow
+   * (module comment R4).
+   */
+  readonly forward_s: number | null;
+  /** Same for the most recent past passage (it happened at t₀ − backward_s), s. */
+  readonly backward_s: number | null;
+}
+
+/**
+ * Analytic times to the centre r = 0 of an EXACTLY rectilinear two-body state (module comment
+ * R2, R3; derived there from the energy integral). The caller must have established
+ * rectilinearity (isExactlyRectilinear); for any other state the numbers are meaningless.
+ *
+ * @param alpha_per_m α̂ = 2/r̂₀ − v̂₀²/μ, 1/m (as computed by the propagator).
+ * @param sigma0_sqrtm σ̂₀ = (r0_vec·v0_vec)/√μ, m^½.
+ * @param r0_m r̂₀ = |r0_vec| > 0, m.
+ * @param sqrtMu_m1p5ps √μ, m^{3/2}/s.
+ *
+ * Evaluation (fixed): k = sqrt(|α|); s = |σ₀|;
+ *   α > 0 ∧ k > 0: chi = (2*atan2(k*r0, s))/k;  α < 0 ∧ k > 0: chi = (2*asinh(k*sqrt(r0/2)))/k;
+ *   otherwise: chi = sqrt(2*r0);
+ *   t* = ((chi*chi)*chi * c3(α*(chi*chi)))/sqrtMu;  T = (2π)/((α*k)*sqrtMu) for α > 0 ∧ k > 0.
+ */
+export function rectilinearCollisionTimes(
+  alpha_per_m: number,
+  sigma0_sqrtm: number,
+  r0_m: number,
+  sqrtMu_m1p5ps: number,
+): RectilinearCollisionTimes {
+  const k = Math.sqrt(Math.abs(alpha_per_m));
+  const bounded = alpha_per_m > 0 && k > 0;
+  const s = Math.abs(sigma0_sqrtm);
+  let chi: number;
+  if (bounded) {
+    chi = (2 * Math.atan2(k * r0_m, s)) / k;
+  } else if (alpha_per_m < 0 && k > 0) {
+    chi = (2 * Math.asinh(k * Math.sqrt(r0_m / 2))) / k;
+  } else {
+    chi = Math.sqrt(2 * r0_m);
+  }
+  const chi2 = chi * chi;
+  const tStar = (chi2 * chi * stumpff(alpha_per_m * chi2).c3) / sqrtMu_m1p5ps;
+  const afterApoapsis = bounded ? (2 * Math.PI) / (alpha_per_m * k * sqrtMu_m1p5ps) - tStar : null;
+  // Incoming (σ₀ < 0) going forward, or outgoing (σ₀ > 0) going backward: t*. The other
+  // direction (and σ₀ = 0): through the farthest point and back, T − t*, bounded motion only.
+  return {
+    forward_s: sigma0_sqrtm < 0 ? tStar : afterApoapsis,
+    backward_s: sigma0_sqrtm > 0 ? tStar : afterApoapsis,
+  };
+}
+
 function emptyDiagnostics(timeEquation: KeplerTimeEquationData | null): KeplerSolveDiagnostics {
   return {
     iterations: 0,
@@ -438,8 +632,9 @@ function emptyDiagnostics(timeEquation: KeplerTimeEquationData | null): KeplerSo
  * @param deltaT_s Elapsed time Δt = t − t₀, s, any finite sign.
  * @param options Optional iteration cap (default KEPLER_MAX_ITERATIONS).
  * @returns The state at t₀ + Δt with the Lagrange coefficients and solve diagnostics, or a
- *   failure ('INVALID_INPUT' | 'NOT_CONVERGED' | 'NON_FINITE_STATE'). Never throws, never returns
- *   a non-finite number in a success.
+ *   failure ('INVALID_INPUT' | 'NOT_CONVERGED' | 'NON_FINITE_STATE' | 'RECTILINEAR_COLLISION',
+ *   the last with the signed elapsed time to the centre, collisionDeltaT_s). Never throws, never
+ *   returns a non-finite number.
  *
  * Behaviour:
  * - Δt = ±0: returns a copy of the input state, component by component (bit-identical, sign of
@@ -447,9 +642,16 @@ function emptyDiagnostics(timeEquation: KeplerTimeEquationData | null): KeplerSo
  *   (contracts-v1 §5.2, revision 3).
  * - Otherwise: computed from (μ, r0_vec, v0_vec, Δt) only, with no state between calls, so the
  *   result for a given Δt does not depend on which other times are requested.
- * - Valid for elliptic, parabolic and hyperbolic energy. Rectilinear (r0_vec × v0_vec = 0)
- *   trajectories are computed by the same formulas; a state at or through r = 0 gives
- *   'NON_FINITE_STATE' or 'NOT_CONVERGED'.
+ * - Valid for elliptic, parabolic and hyperbolic energy, and for nearly rectilinear conics (tiny
+ *   non-zero h), which are propagated normally, periapsis passage included.
+ * - Exactly rectilinear states (r0_vec × v0_vec = 0 in exact arithmetic on the given binary64
+ *   data; module comment R1): if the motion reaches the centre r = 0 at an elapsed time t_c with
+ *   t_c ≤ |Δt| in the direction of Δt (forward for Δt > 0, the past passage for Δt < 0; equality
+ *   included), the call fails with 'RECTILINEAR_COLLISION' and collisionDeltaT_s = ±t_c (module
+ *   comment R2–R4; collision times in closed form from the energy integral). Otherwise the
+ *   rectilinear state is propagated by the same formulas as any other (outgoing escape, bounded
+ *   motion before it falls back, incoming motion that has not yet arrived).
+ *   Before ML-TASK-019 such calls returned the regularised continuation through r = 0 (issue #24).
  *
  * Evaluation order of the state (fixed):
  *   f = 1 - (chi2*C)/r0;  g = (sigma0*(chi2*C) + r0*(chi*c1)) / sqrtMu;
@@ -518,6 +720,27 @@ export function propagateKeplerUniversal(
     return { ok: false, reason: 'NON_FINITE_STATE', diagnostics: emptyDiagnostics(null) };
   }
   const ctx: TimeEquationContext = { alpha, sigma0, r0, oneMinusAlphaR0, sqrtMuDt };
+
+  // Rectilinear trajectory reaching the centre within |Δt| (module comment R1–R4). Reads only
+  // the inputs and the data above; the normal path below is unchanged.
+  if (isExactlyRectilinear(position_m, velocity_mps)) {
+    const times = rectilinearCollisionTimes(alpha, sigma0, r0, sqrtMu);
+    const forward = deltaT_s > 0;
+    const t_c = forward ? times.forward_s : times.backward_s;
+    if (t_c !== null) {
+      if (!Number.isFinite(t_c)) {
+        return { ok: false, reason: 'NON_FINITE_STATE', diagnostics: emptyDiagnostics(data) };
+      }
+      if (t_c <= Math.abs(deltaT_s)) {
+        return {
+          ok: false,
+          reason: 'RECTILINEAR_COLLISION',
+          collisionDeltaT_s: forward ? t_c : -t_c,
+          diagnostics: emptyDiagnostics(data),
+        };
+      }
+    }
+  }
 
   const outcome = solveUniversalAnomaly(ctx, sqrtMu, deltaT_s, maxIterations);
   const best = outcome.best;
