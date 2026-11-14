@@ -512,7 +512,7 @@ describe('rectilinear trajectory reaching the centre (ML-TASK-019, issue #24)', 
       const s = sampleOf(after, k);
       expect(s.r[0]).toBeGreaterThan(0);
       expect(s.v[0]).toBeLessThan(0);
-      expect([s.r[1], s.r[2]].map(Math.abs)).toEqual([0, 0]);
+      expect(s.r.slice(1).map((x) => Math.abs(x))).toEqual([0, 0]);
     }
   });
 
