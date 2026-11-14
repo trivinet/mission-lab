@@ -1,6 +1,8 @@
 import {
   PACKAGE_VERSION as ASTRODYNAMICS_VERSION,
+  EARTH_CONSTANTS,
   applyImpulsiveManeuver,
+  elementsToState,
   propagateKeplerUniversal,
 } from '@mission-lab/astrodynamics';
 import type { Vec3 } from '@mission-lab/astrodynamics';
@@ -284,7 +286,11 @@ describe('one maneuver', () => {
   });
 
   it('maneuver at −0: sample time −0 in both segments, event t_s −0', () => {
-    const { result } = maneuverRun(-0, [0, 1, 0]);
+    // ML-TASK-019: the scenario builder now maps −0 to +0 (contracts-v1 §11.4 P3), so a request
+    // with a maneuver at −0 is given directly (a valid request may still carry −0, §6).
+    const result = run(
+      cartesianRequest([7000000, 0, 0], [0, 7546, 0], { maneuvers: [maneuver(-0, [0, 1, 0])] }),
+    );
     expect(Object.is(result.segments[0]?.t_s[0], -0)).toBe(true);
     expect(Object.is(result.segments[1]?.t_s[0], -0)).toBe(true);
     expect(Object.is(result.events[0]?.t_s, -0)).toBe(true);
@@ -424,5 +430,109 @@ describe('failed results and rejected input (contracts-v1 §5.5 R9, §6)', () =>
     const result = run(request);
     expect(result.status).toBe('failed');
     expect(result.diagnostics.map((d) => [d.code, d.t_s])).toEqual([['INTERNAL_ERROR', 10]]);
+  });
+});
+
+describe('rectilinear trajectory reaching the centre (ML-TASK-019, issue #24)', () => {
+  const MU = EARTH_CONSTANTS.mu_m3ps2;
+
+  /**
+   * Circular equatorial orbit (a = 7e6 m, all angles 0) and a maneuver at t = 0 whose RSW Δv
+   * cancels the along-track velocity exactly: the post-maneuver state is at rest, i.e. a radial
+   * fall from r = 7e6 m.
+   */
+  function fallScenario(duration_s: number) {
+    const elements = {
+      semiMajorAxis_m: 7000000,
+      eccentricity: 0,
+      inclination_rad: 0,
+      raan_rad: 0,
+      argPeriapsis_rad: 0,
+      trueAnomaly_rad: 0,
+    };
+    const state = elementsToState(elements, MU);
+    if (!state.ok) {
+      throw new Error('fixture');
+    }
+    const speed = state.state.velocity_mps[1];
+    const request = requestOf(
+      leoScenario({
+        initialOrbit: { kind: 'KEPLERIAN', elements },
+        duration_s,
+        outputStep_s: 60,
+        maneuvers: [maneuver(0, [0, -speed, 0])],
+      }),
+    );
+    const fall = propagateKeplerUniversal(MU, request.initialState.position_m, [0, 0, 0], 1e9);
+    if (fall.ok || fall.reason !== 'RECTILINEAR_COLLISION') {
+      throw new Error('fixture: expected a collision');
+    }
+    return { request, collisionTime_s: fall.collisionDeltaT_s };
+  }
+
+  it('fixture: the maneuver leaves the vehicle exactly at rest on the x axis', () => {
+    const { request } = fallScenario(600);
+    expect(request.initialState.position_m).toEqual([7000000, 0, 0]);
+    const result = run(request);
+    expect(result.events[0]?.velocityAfter_mps.map(Math.abs)).toEqual([0, 0, 0]);
+  });
+
+  it('span longer than the fall time: failed, exactly [NON_FINITE_STATE at the collision time]', () => {
+    const { request, collisionTime_s } = fallScenario(1200);
+    // (π/2)·√(r³/(2μ)) ≈ 1030.4 s for r = 7e6 m (kepler-universal.ts module comment R2, (F)).
+    expect(collisionTime_s).toBeGreaterThan(1000);
+    expect(collisionTime_s).toBeLessThan(1200);
+    const result = run(request);
+    expect(result.status).toBe('failed');
+    expect(result.segments).toEqual([]);
+    expect(result.events).toEqual([]);
+    expect(result.diagnostics.map((d) => [d.code, d.severity, d.t_s])).toEqual([
+      ['NON_FINITE_STATE', 'error', collisionTime_s],
+    ]);
+    const message = result.diagnostics[0]?.message ?? '';
+    expect(message).toContain('reaches the centre of the central body');
+    expect(message).toContain(collisionTime_s.toPrecision(9));
+  });
+
+  it('span shorter than the fall time: ok, with REFERENCE_SPHERE_INTERSECTION (inside at end)', () => {
+    const { request, collisionTime_s } = fallScenario(1000);
+    expect(collisionTime_s).toBeGreaterThan(1000);
+    const result = run(request);
+    expect(result.status).toBe('ok');
+    expect(result.diagnostics.map((d) => [d.code, d.severity, d.t_s])).toEqual([
+      ['REFERENCE_SPHERE_INTERSECTION', 'warning', 0],
+    ]);
+    expect(result.diagnostics[0]?.message).toContain('INSIDE_AT_END');
+    const after = result.segments[1];
+    if (after === undefined) {
+      throw new Error('missing');
+    }
+    // Every post-maneuver sample is on the +x half-line, falling (never through the centre).
+    for (let k = 1; k < after.t_s.length; k++) {
+      const s = sampleOf(after, k);
+      expect(s.r[0]).toBeGreaterThan(0);
+      expect(s.v[0]).toBeLessThan(0);
+      expect(s.r.slice(1).map((x) => Math.abs(x))).toEqual([0, 0]);
+    }
+  });
+
+  it('short span (100 s): ok with no warning', () => {
+    const result = run(fallScenario(100).request);
+    expect(result.status).toBe('ok');
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('segment 0 (request given in Cartesian form): fails at the collision time', () => {
+    const request = cartesianRequest([7000000, 0, 0], [-1000, 0, 0], { duration_s: 1500 });
+    const fall = propagateKeplerUniversal(MU, [7000000, 0, 0], [-1000, 0, 0], 1500);
+    if (fall.ok || fall.reason !== 'RECTILINEAR_COLLISION') {
+      throw new Error('expected a collision');
+    }
+    const result = run(request);
+    expect(result.status).toBe('failed');
+    expect(result.diagnostics.map((d) => [d.code, d.severity, d.t_s])).toEqual([
+      ['NON_FINITE_STATE', 'error', fall.collisionDeltaT_s],
+    ]);
+    expect(result.diagnostics[0]?.message).toContain('Segment 0');
   });
 });
