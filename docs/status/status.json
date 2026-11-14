@@ -1,7 +1,7 @@
 {
-  "updated": "2026-11-13",
+  "updated": "2026-11-14",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Simulation runner delivered (ML-TASK-017, PR #23): the engine now produces a full contract-conforming result; 829 tests pass, self-checks only. One engine defect found and filed (issue #24). Owner decisions P1–P10 pending.",
+  "headline": "Fix for issue #24 and the −0 normalisation delivered (ML-TASK-019, PR #26): 867 tests pass, conformance suite untouched and still green. Next: conformance tests of the remaining families, then the Orekit dataset.",
   "gates": [
     {
       "id": "G0",
@@ -32,9 +32,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-23",
-      "text": "Merge PR #22 (contract revision 4), then decide the runner's points P1–P10 in PR #23 and merge it. Decide how issue #24 is handled (propagator returns states through the centre on a rectilinear fall instead of failing).",
-      "blocking": "Conformance run of VT-10, VT-16, VT-18, VI-01; G1"
+      "id": "OA-25",
+      "text": "Merge PR #25 (owner decisions on the runner; status) and PR #26 (fix for issue #24 and −0 normalisation).",
+      "blocking": "Nothing"
     },
     {
       "id": "OA-15",
@@ -198,7 +198,7 @@
           "title": "Simulation runner: validation, segments, events, diagnostics",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_review",
+          "status": "done",
           "deps": "014–016"
         },
         {
@@ -209,6 +209,14 @@
           "status": "in_progress",
           "deps": "011, 017",
           "approval": true
+        },
+        {
+          "id": "ML-TASK-019",
+          "title": "Explicit failure on rectilinear collision (issue #24); −0 normalisation in the request builder",
+          "role": "Astrodynamics Engineer",
+          "model": "opus",
+          "status": "in_review",
+          "deps": "017"
         }
       ]
     },
@@ -374,6 +382,21 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-14",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-019 delivered: the propagator fails explicitly on a rectilinear fall to the centre (exact zero angular momentum, analytical collision time) and the runner reports it as a failed run; −0 normalised in the request builder. Coordinator re-ran all checks (867 pass, 124 conformance tests unmodified), audited the three changed tests and recomputed the fall time. PR #26."
+    },
+    {
+      "date": "2026-11-14",
+      "who": "Owner",
+      "text": "Decided issue #24: the propagator returns an explicit failure when a rectilinear trajectory reaches the centre within the requested time. ML-TASK-019 started (Astrodynamics, opus): that fix plus the approved −0 normalisation; the normal path must stay bit-identical."
+    },
+    {
+      "date": "2026-11-13",
+      "who": "Owner",
+      "text": "Approved the runner's points P1–P10 as recommended (provisional sample limit, intersection warning at the maneuver time, −0 normalised in the request builder as a follow-up) and instructed the merge of PRs #22 and #23 after CI passed. Recorded in contracts-v1.md §11.4. ML-TASK-017 done; `main` passes 829 tests."
+    },
     {
       "date": "2026-11-13",
       "who": "Astrodynamics",
