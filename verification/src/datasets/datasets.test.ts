@@ -24,6 +24,7 @@ import {
 import { describe, expect, it } from 'vitest';
 import { scales, l2aVsL2b, E_RK_TARGET_REL } from '../tol/tolerances';
 import { buildAllDatasets, type DatasetFile } from './build';
+import { buildPartCDatasets } from './build-c';
 
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const DATA_DIR = join(ROOT, 'test-data', 'reference-cases');
@@ -34,9 +35,11 @@ function requestIdOf(body: Omit<SimulationRequest, 'requestId'>): string {
 
 const PROVENANCE_KEYS = ['codeRevision', 'date', 'runtime'];
 
-const writeMode = process.env.ML_WRITE_DATASETS === '1';
+// ML_WRITE_DATASETS=1 writes the ML-TASK-011 files, ML_WRITE_DATASETS=C the ML-TASK-018 part C
+// files only (so that the provenance of earlier, committed datasets is never rewritten).
+const writeMode = process.env.ML_WRITE_DATASETS;
 
-const built: DatasetFile[] = buildAllDatasets(
+const builtA: DatasetFile[] = buildAllDatasets(
   {
     codeRevision: process.env.ML_CODE_REVISION ?? 'unset',
     date: '2026-11-13',
@@ -45,9 +48,20 @@ const built: DatasetFile[] = buildAllDatasets(
   requestIdOf,
 );
 
-if (writeMode) {
+const builtC: DatasetFile[] = buildPartCDatasets(
+  {
+    codeRevision: process.env.ML_CODE_REVISION ?? 'unset',
+    date: '2026-11-14',
+    runtime: `Node.js ${process.version}`,
+  },
+  requestIdOf,
+);
+
+const built: DatasetFile[] = [...builtA, ...builtC];
+
+if (writeMode === '1' || writeMode === 'C') {
   if (process.env.ML_CODE_REVISION === undefined) throw new Error('set ML_CODE_REVISION');
-  for (const f of built) {
+  for (const f of writeMode === '1' ? builtA : builtC) {
     const path = join(ROOT, f.path);
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, `${JSON.stringify(f.data, null, 2)}\n`, 'utf8');
@@ -219,7 +233,8 @@ describe('reference datasets (test-data/reference-cases)', () => {
         expect(physicalConstantsSchema.safeParse(inputs.constants).success, f.rel).toBe(true);
       }
       for (const key of ['elements', 'gridElements']) {
-        if (inputs[key] !== undefined) {
+        // null: no elements (part C request-level initial state, e.g. the parabolic VT-16 case).
+        if (inputs[key] !== undefined && inputs[key] !== null) {
           expect(keplerianElementsSchema.safeParse(inputs[key]).success, `${f.rel} ${key}`).toBe(
             true,
           );
