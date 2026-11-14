@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-14",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "The engine is complete end to end on `main` (829 tests): conversion, propagation, maneuver and runner. Still needed for G1: conformance tests of the remaining families, the Orekit dataset, the fix for issue #24 and the −0 normalisation.",
+  "headline": "The engine is complete end to end on `main` (829 tests). In progress: the fix for issue #24 (explicit failure on a rectilinear fall to the centre) and the −0 normalisation (ML-TASK-019). Then: remaining conformance families and the Orekit dataset.",
   "gates": [
     {
       "id": "G0",
@@ -32,9 +32,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-24",
-      "text": "Decide how the propagator handles a rectilinear fall through the centre (issue #24): recommended, return an explicit failure when a rectilinear trajectory reaches r = 0 within the requested time.",
-      "blocking": "Fix of issue #24; G1"
+      "id": "OA-25",
+      "text": "Merge PR #25 (owner decisions on the simulation runner; status).",
+      "blocking": "Nothing"
     },
     {
       "id": "OA-15",
@@ -209,6 +209,14 @@
           "status": "in_progress",
           "deps": "011, 017",
           "approval": true
+        },
+        {
+          "id": "ML-TASK-019",
+          "title": "Explicit failure on rectilinear collision (issue #24); −0 normalisation in the request builder",
+          "role": "Astrodynamics Engineer",
+          "model": "opus",
+          "status": "in_progress",
+          "deps": "017"
         }
       ]
     },
@@ -374,6 +382,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-14",
+      "who": "Owner",
+      "text": "Decided issue #24: the propagator returns an explicit failure when a rectilinear trajectory reaches the centre within the requested time. ML-TASK-019 started (Astrodynamics, opus): that fix plus the approved −0 normalisation; the normal path must stay bit-identical."
+    },
     {
       "date": "2026-11-13",
       "who": "Owner",
