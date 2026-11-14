@@ -7,9 +7,15 @@ import {
 import type { Scenario, SimulationRequest } from '@mission-lab/contracts';
 import { describe, expect, it } from 'vitest';
 import { PROVISIONAL_MAX_SAMPLE_COUNT } from './limits';
-import { buildSimulationRequest, computeRequestId, deriveRequestId } from './request';
+import {
+  buildSimulationRequest,
+  computeRequestId,
+  deriveRequestId,
+  normalizeNegativeZero,
+} from './request';
+import { runSimulation } from './run';
 import { validateScenarioSemantics } from './semantic-validation';
-import { bitEqual, leoScenario, maneuver, requestOf } from './test-fixtures';
+import { bitEqual, leoScenario, maneuver, requestOf, sampleOf } from './test-fixtures';
 
 function withElements(
   elements: Partial<Scenario['initialOrbit']['elements']>,
@@ -144,10 +150,148 @@ describe('buildSimulationRequest (contracts-v1 §4)', () => {
     ]);
   });
 
-  it('keeps −0 inputs unchanged (contracts-v1 §12 NQ-1 not decided)', () => {
+  // Superseded by ML-TASK-019 (contracts-v1 §11.4 P3, owner decision 2026-11-13): this test
+  // asserted "keeps −0 inputs unchanged (contracts-v1 §12 NQ-1 not decided)".
+  it('maps −0 inputs to +0 (contracts-v1 §11.4 P3)', () => {
     const request = requestOf(leoScenario({ maneuvers: [maneuver(-0, [-0, 1, 0])] }));
-    expect(Object.is(request.maneuvers[0]?.t_s, -0)).toBe(true);
-    expect(Object.is(request.maneuvers[0]?.deltaV_mps[0], -0)).toBe(true);
+    expect(Object.is(request.maneuvers[0]?.t_s, 0)).toBe(true);
+    expect(Object.is(request.maneuvers[0]?.deltaV_mps[0], 0)).toBe(true);
+  });
+});
+
+describe('−0 normalisation (contracts-v1 §11.4 P3; ML-TASK-019)', () => {
+  /** Every number of a JSON-like value, depth first. */
+  function numbersOf(value: unknown): number[] {
+    if (typeof value === 'number') {
+      return [value];
+    }
+    if (Array.isArray(value)) {
+      return value.flatMap(numbersOf);
+    }
+    if (value !== null && typeof value === 'object') {
+      return Object.values(value).flatMap(numbersOf);
+    }
+    return [];
+  }
+
+  function expectNoNegativeZero(request: SimulationRequest): void {
+    expect(numbersOf(request).filter((x) => Object.is(x, -0))).toEqual([]);
+  }
+
+  /** Two scenarios that differ only in the sign of zeros give byte-identical requests. */
+  function expectEquivalent(plus: Scenario, minus: Scenario): void {
+    const a = requestOf(plus);
+    const b = requestOf(minus);
+    expectNoNegativeZero(a);
+    expectNoNegativeZero(b);
+    const { requestId: idA, ...restA } = a;
+    const { requestId: idB, ...restB } = b;
+    expect(canonicalRequestPayload(restB)).toBe(canonicalRequestPayload(restA));
+    expect(idB).toBe(idA);
+  }
+
+  const zeroElements = {
+    semiMajorAxis_m: 7000000,
+    eccentricity: 0,
+    inclination_rad: 0,
+    raan_rad: 0,
+    argPeriapsis_rad: 0,
+    trueAnomaly_rad: 0,
+  };
+
+  it('orbital elements: each zero-valued element with either sign', () => {
+    const keys = [
+      'eccentricity',
+      'inclination_rad',
+      'raan_rad',
+      'argPeriapsis_rad',
+      'trueAnomaly_rad',
+    ] as const;
+    for (const key of keys) {
+      expectEquivalent(withElements(zeroElements), withElements({ ...zeroElements, [key]: -0 }));
+    }
+    const allMinus = withElements({
+      ...zeroElements,
+      eccentricity: -0,
+      inclination_rad: -0,
+      raan_rad: -0,
+      argPeriapsis_rad: -0,
+      trueAnomaly_rad: -0,
+    });
+    expectEquivalent(withElements(zeroElements), allMinus);
+  });
+
+  it('maneuver time and each Δv component', () => {
+    const plus = leoScenario({ maneuvers: [maneuver(0, [0, 0, 0])] });
+    expectEquivalent(plus, leoScenario({ maneuvers: [maneuver(-0, [0, 0, 0])] }));
+    expectEquivalent(plus, leoScenario({ maneuvers: [maneuver(0, [-0, 0, 0])] }));
+    expectEquivalent(plus, leoScenario({ maneuvers: [maneuver(0, [0, -0, 0])] }));
+    expectEquivalent(plus, leoScenario({ maneuvers: [maneuver(0, [0, 0, -0])] }));
+    expectEquivalent(plus, leoScenario({ maneuvers: [maneuver(-0, [-0, -0, -0])] }));
+  });
+
+  it('duration_s and outputStep_s: −0 is rejected like +0 (> 0 rules), so nothing to normalise', () => {
+    for (const overrides of [{ duration_s: -0 }, { outputStep_s: -0 }]) {
+      const outcome = buildSimulationRequest(leoScenario(overrides));
+      expect(outcome.ok).toBe(false);
+    }
+  });
+
+  it('a −0 produced by the element→state conversion from +0 inputs is normalised', () => {
+    // With all angles +0 and e = +0, elementsToState returns velocity_mps[0] = −0 (checked here,
+    // so the test notices if the conversion changes).
+    const state = elementsToState(zeroElements, EARTH_CONSTANTS.mu_m3ps2);
+    if (!state.ok) {
+      throw new Error('fixture');
+    }
+    expect(Object.is(state.state.velocity_mps[0], -0)).toBe(true);
+    const request = requestOf(withElements(zeroElements));
+    expect(Object.is(request.initialState.velocity_mps[0], 0)).toBe(true);
+    expectNoNegativeZero(request);
+    // Apart from the sign of zero, the state is the conversion's (bit-identical otherwise).
+    const plusZero = (x: number): number => (x === 0 ? 0 : x);
+    expect(
+      bitEqual(request.initialState.velocity_mps, state.state.velocity_mps.map(plusZero)),
+    ).toBe(true);
+    expect(bitEqual(request.initialState.position_m, state.state.position_m.map(plusZero))).toBe(
+      true,
+    );
+  });
+
+  it('the first sample of segment 0 is bit-identical to request.initialState (+0 included)', () => {
+    const request = requestOf(withElements(zeroElements, { duration_s: 600 }));
+    const outcome = runSimulation(request);
+    if (!outcome.ok) {
+      throw new Error('rejected');
+    }
+    const segment = outcome.value.segments[0];
+    if (segment === undefined) {
+      throw new Error('no segment');
+    }
+    const first = sampleOf(segment, 0);
+    expect(bitEqual(first.r, request.initialState.position_m)).toBe(true);
+    expect(bitEqual(first.v, request.initialState.velocity_mps)).toBe(true);
+    expect(Object.is(first.v[0], 0)).toBe(true);
+  });
+
+  it('normalizeNegativeZero: every depth and number class (constants included), nothing else', () => {
+    const input = {
+      a: -0,
+      b: [-0, 1, -2, [-0]],
+      c: { mu_m3ps2: -0, referenceRadius_m: 5, source: '-0' },
+      d: null,
+      e: true,
+    };
+    const output = normalizeNegativeZero(input);
+    expect(numbersOf(output).some((x) => Object.is(x, -0))).toBe(false);
+    expect(output).toStrictEqual({
+      a: 0,
+      b: [0, 1, -2, [0]],
+      c: { mu_m3ps2: 0, referenceRadius_m: 5, source: '-0' },
+      d: null,
+      e: true,
+    });
+    expect(Object.is(input.a, -0)).toBe(true); // input not mutated
   });
 });
 
@@ -243,9 +387,25 @@ describe('requestId (contracts-v1 §7)', () => {
     expect(new Set([requestId, ...ids]).size).toBe(variants.length + 1);
   });
 
-  it('distinguishes −0 from +0 (owner decision 8)', () => {
+  // Superseded by ML-TASK-019 (contracts-v1 §11.4 P3): this test asserted "distinguishes −0 from
+  // +0 (owner decision 8)" for scenarios. computeRequestId itself still distinguishes them
+  // (contract §7.2); the builder no longer passes −0 to it.
+  it('equivalent scenarios differing in the sign of a zero get the same requestId', () => {
     const plus = requestOf(leoScenario({ maneuvers: [maneuver(0, [0, 1, 0])] }));
     const minus = requestOf(leoScenario({ maneuvers: [maneuver(0, [-0, 1, 0])] }));
-    expect(minus.requestId).not.toBe(plus.requestId);
+    expect(minus.requestId).toBe(plus.requestId);
+  });
+
+  it('computeRequestId still distinguishes −0 from +0 (contracts-v1 §7.2, decision 8)', () => {
+    const { requestId, ...rest } = requestOf(leoScenario({ maneuvers: [maneuver(0, [0, 1, 0])] }));
+    const m0 = rest.maneuvers[0];
+    if (m0 === undefined) {
+      throw new Error('fixture');
+    }
+    const minus = {
+      ...rest,
+      maneuvers: [{ ...m0, deltaV_mps: [-0, 1, 0] as [number, number, number] }],
+    };
+    expect(computeRequestId(minus)).not.toBe(requestId);
   });
 });

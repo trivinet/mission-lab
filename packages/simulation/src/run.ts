@@ -60,7 +60,26 @@ function propagationDiagnostic(
       return diagnostic('NON_FINITE_STATE', `${context}: computed state is not finite.`, t_s);
     case 'INVALID_INPUT':
       return diagnostic('INTERNAL_ERROR', `${context}: propagator rejected its input.`, t_s);
+    case 'RECTILINEAR_COLLISION':
+      // Callers use collisionDiagnostic, which knows the collision time; kept for exhaustiveness.
+      return collisionDiagnostic(t_s, context);
   }
+}
+
+/**
+ * A rectilinear trajectory that reaches the centre of the central body (propagator failure
+ * 'RECTILINEAR_COLLISION', ML-TASK-019). The contract registers no dedicated code; owner decision
+ * 2026-11-14 with §11.4 P4/P5: mapped to NON_FINITE_STATE (the state at r = 0 is singular), with
+ * t_s = the computed time of the passage through the centre (s from epoch).
+ */
+function collisionDiagnostic(collision_t_s: number, context: string): Diagnostic {
+  return diagnostic(
+    'NON_FINITE_STATE',
+    `${context}: the trajectory is rectilinear (position x velocity = 0) and reaches the centre ` +
+      `of the central body (r = 0) at t_s ≈ ${collision_t_s.toPrecision(9)} s, where the state ` +
+      `is singular; the run cannot continue past it.`,
+    collision_t_s,
+  );
 }
 
 /** Copies a Vec3 into a new tuple (no aliasing of frozen request tuples). */
@@ -119,6 +138,14 @@ function propagateRequest(request: SimulationRequest, diagnostics: Diagnostic[])
         // Every other sample independently from the segment's initial state (ADR-005).
         const deltaT_s = t - segmentGrid.start_s;
         const result = propagateKeplerUniversal(mu_m3ps2, r0, v0, deltaT_s);
+        if (!result.ok && result.reason === 'RECTILINEAR_COLLISION') {
+          throw new RunFailure(
+            collisionDiagnostic(
+              segmentGrid.start_s + result.collisionDeltaT_s,
+              `Segment ${String(n)}, sample at t_s = ${String(t)}`,
+            ),
+          );
+        }
         if (!result.ok) {
           throw new RunFailure(
             propagationDiagnostic(
@@ -200,6 +227,18 @@ function propagateRequest(request: SimulationRequest, diagnostics: Diagnostic[])
     );
     if (!intersection.ok) {
       // D8: a failure of the check is a failure of the run, never "no intersection".
+      if (
+        intersection.reason === 'PROPAGATION_FAILED' &&
+        intersection.propagationFailure === 'RECTILINEAR_COLLISION' &&
+        intersection.collisionDeltaT_s !== undefined
+      ) {
+        throw new RunFailure(
+          collisionDiagnostic(
+            maneuver.t_s + intersection.collisionDeltaT_s,
+            `Post-maneuver trajectory (maneuver ${maneuver.id})`,
+          ),
+        );
+      }
       if (
         intersection.reason === 'PROPAGATION_FAILED' &&
         intersection.propagationFailure !== null
@@ -298,6 +337,12 @@ function runValidRequest(request: SimulationRequest): SimulationResult {
  *   with no segments, no events and at least one error diagnostic for a condition found while
  *   running (PROPAGATOR_NOT_CONVERGED, NON_FINITE_STATE, the SAMPLE_COUNT_EXCEEDED backstop,
  *   INTERNAL_ERROR). Warnings found before a failure are kept, in the order found.
+ *   A rectilinear trajectory (position x velocity = 0 exactly) that reaches the centre of the
+ *   central body within its segment is a failed run with NON_FINITE_STATE at the computed time of
+ *   that passage (ML-TASK-019; propagator reason RECTILINEAR_COLLISION). After a maneuver it is
+ *   found by the reference-sphere intersection check (its span covers every sample of the
+ *   segment), so no REFERENCE_SPHERE_INTERSECTION warning for that maneuver precedes it; an
+ *   ESCAPE_TRAJECTORY warning for it (incoming motion that is not bound) is kept before it.
  *   Never throws for JSON-like input.
  *
  * Behaviour (contracts-v1 §5.2): sample times from the normative grid (sampling-grid.ts);

@@ -30,21 +30,59 @@ export function computeRequestId(request: Omit<SimulationRequest, 'requestId'>):
 }
 
 /**
+ * Replaces every −0 by +0 in a JSON-like value (numbers inside plain objects and arrays, at any
+ * depth); every other value is returned unchanged (deep copy of objects and arrays). Contracts-v1
+ * §11.4 P3 (owner decision 2026-11-13, resolves NQ-1): the scenario→request builder normalises −0
+ * to +0 in every numeric field, so equivalent scenarios have the same requestId.
+ *
+ * `x === 0` is true for both zeros, so the result is +0 exactly for ±0 and x itself otherwise
+ * (NaN and ±Infinity pass through unchanged; they cannot occur in validated data).
+ */
+export function normalizeNegativeZero<T>(value: T): T {
+  return normalizeValue(value) as T;
+}
+
+function normalizeValue(value: unknown): unknown {
+  if (typeof value === 'number') {
+    return value === 0 ? 0 : value;
+  }
+  if (Array.isArray(value)) {
+    return value.map(normalizeValue);
+  }
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, normalizeValue(entry)]),
+    );
+  }
+  return value;
+}
+
+/**
  * Builds the SimulationRequest of a scenario (contracts-v1 §4), after structural (§6) and
  * semantic (§3) validation.
  *
  * Steps:
  * 1. `validateScenario(input)`; issues are returned unchanged.
  * 2. `validateScenarioSemantics(scenario)`; issues are returned unchanged.
- * 3. initialState = elementsToState(elements, EARTH_CONSTANTS.mu_m3ps2) (packages/astrodynamics;
+ * 3. −0 → +0 on the validated scenario, every numeric field (normalizeNegativeZero; §11.4 P3).
+ *    Done BEFORE the conversion so that elementsToState never sees −0: two scenarios that differ
+ *    only in the sign of a zero then take the same arithmetic path, not merely paths whose
+ *    results differ only in signs of zero.
+ * 4. initialState = elementsToState(elements, EARTH_CONSTANTS.mu_m3ps2) (packages/astrodynamics;
  *    regular map, contracts-v1 §3 owner decision 4). The angles refer to the scenario frame
  *    (GCRF); the state is in GCRF, m and m/s.
- * 4. constants = { mu_m3ps2, referenceRadius_m, source } copied from EARTH_CONSTANTS.
- * 5. epoch, maneuvers (deep copies, same order), duration_s, outputStep_s copied unchanged. No
- *    value is transformed: in particular −0 is NOT mapped to +0 (contracts-v1 §12 NQ-1 is an open
- *    owner question; see the ML-TASK-017 report).
- * 6. requestId = computeRequestId(...).
- * 7. Self-check: the request is passed through `validateSimulationRequest`.
+ * 5. constants = { mu_m3ps2, referenceRadius_m, source } copied from EARTH_CONSTANTS.
+ * 6. epoch, maneuvers (deep copies, same order), duration_s, outputStep_s copied.
+ * 7. −0 → +0 again on every numeric field of the assembled request (normalizeNegativeZero). This
+ *    is what guarantees that the request never contains −0: the conversion can produce −0 from
+ *    +0 inputs (e.g. a product with a negative factor and an exact zero sine), and step 3 cannot
+ *    prevent that. Normalising only here would also give equal requests; step 3 is kept so the
+ *    conversion itself is the same for equivalent scenarios.
+ *    Validation is unaffected: −0 and +0 pass and fail the same `≥ 0` / `> 0` rules.
+ *    Consequence (contracts-v1 §5.2 rev. 3): segment 0 starts with a bit-identical copy of
+ *    request.initialState, which is therefore free of −0 as well.
+ * 8. requestId = computeRequestId(...).
+ * 9. Self-check: the request is passed through `validateSimulationRequest`.
  *
  * Failure not foreseen by the contract: if elementsToState fails (only possible through overflow
  * for an extreme but structurally valid a), the result is one issue `NON_FINITE_NUMBER` at
@@ -59,11 +97,11 @@ export function buildSimulationRequest(input: unknown): ValidationResult<Simulat
   if (!structural.ok) {
     return structural;
   }
-  const scenario: Scenario = structural.value;
-  const semantic = validateScenarioSemantics(scenario);
+  const semantic = validateScenarioSemantics(structural.value);
   if (semantic.length > 0) {
     return { ok: false, issues: semantic };
   }
+  const scenario: Scenario = normalizeNegativeZero(structural.value);
   const state = elementsToState(scenario.initialOrbit.elements, EARTH_CONSTANTS.mu_m3ps2);
   if (!state.ok) {
     const issue: ValidationIssue = {
@@ -74,7 +112,7 @@ export function buildSimulationRequest(input: unknown): ValidationResult<Simulat
     return { ok: false, issues: [issue] };
   }
   const { position_m, velocity_mps } = state.state;
-  const withoutId: Omit<SimulationRequest, 'requestId'> = {
+  const withoutId: Omit<SimulationRequest, 'requestId'> = normalizeNegativeZero({
     schemaVersion: scenario.schemaVersion,
     centralBody: scenario.centralBody,
     constants: {
@@ -97,7 +135,7 @@ export function buildSimulationRequest(input: unknown): ValidationResult<Simulat
     })),
     duration_s: scenario.duration_s,
     outputStep_s: scenario.outputStep_s,
-  };
+  });
   const request: SimulationRequest = { requestId: computeRequestId(withoutId), ...withoutId };
   return validateSimulationRequest(request);
 }

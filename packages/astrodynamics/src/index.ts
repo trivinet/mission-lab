@@ -36,8 +36,10 @@ export {
   KEPLER_MAX_BRACKET_EXPANSIONS,
   KEPLER_MAX_ITERATIONS,
   KEPLER_MAX_POLISH_STEPS,
+  isExactlyRectilinear,
   propagateKeplerUniversal,
   propagateKeplerUniversalAt,
+  rectilinearCollisionTimes,
 } from './kepler-universal';
 export type {
   KeplerPropagationFailure,
@@ -46,6 +48,7 @@ export type {
   KeplerSolveDiagnostics,
   KeplerTimeEquationData,
   LagrangeCoefficients,
+  RectilinearCollisionTimes,
 } from './kepler-universal';
 export { normalizeAngle_rad, TWO_PI_rad } from './angles';
 export type { NormalizeAngleResult } from './angles';

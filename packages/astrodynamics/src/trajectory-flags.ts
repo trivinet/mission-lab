@@ -235,7 +235,8 @@ export type ReferenceSphereIntersectionFailure =
    * Non-finite input, μ ≤ 0, R ≤ 0, D < 0 (−0 is accepted as 0), or r = 0.
    */
   | 'INVALID_INPUT'
-  /** The propagation to D failed; `propagationFailure` gives the propagator's reason. */
+  /** The propagation to D failed; `propagationFailure` gives the propagator's reason (for
+   *  'RECTILINEAR_COLLISION' also `collisionDeltaT_s`). */
   | 'PROPAGATION_FAILED'
   /**
    * r_p or the time of an existing future periapsis passage is not finite (overflow; for an open
@@ -252,6 +253,12 @@ export type ReferenceSphereIntersectionResult =
       readonly ok: false;
       readonly reason: ReferenceSphereIntersectionFailure;
       readonly propagationFailure: KeplerPropagationFailure | null;
+      /**
+       * Present only when propagationFailure is 'RECTILINEAR_COLLISION': the propagator's
+       * collisionDeltaT_s, the elapsed time from the start of the span to the passage through the
+       * centre (0 < value ≤ D), s.
+       */
+      readonly collisionDeltaT_s?: number;
     };
 
 function fail(
@@ -344,8 +351,10 @@ function timeToNextPeriapsis(r: Vec3, v: Vec3, rn: number, mu: number): Periapsi
  *   computed values [D5] (the VT-16 case-selection margins keep test cases ≥ 1e-6 R away);
  * - the first crossing time (|r| = R) is NOT computed [D6]; only the flag, r_p and t_p.
  * Closed orbits: only the first periapsis matters (all have the same r_p). Open orbits: at most one
- * periapsis passage, none if moving outward. Rectilinear states: r_p = 0 (the propagation through
- * the centre will usually fail and be reported as PROPAGATION_FAILED).
+ * periapsis passage, none if moving outward. Rectilinear states: r_p = 0; if the motion reaches
+ * the centre within [0, D] the propagation to D fails with 'RECTILINEAR_COLLISION' (ML-TASK-019)
+ * and this function returns PROPAGATION_FAILED with that reason and collisionDeltaT_s; otherwise
+ * the flag is evaluated as for any other state.
  *
  * Evaluation: n = normVec3(r); r_p and t_p as documented on the helpers above (T2, T3);
  * end = propagateKeplerUniversal(μ, r, v, D) (a copy for D = ±0); |r(D)| = normVec3(end.position).
@@ -386,6 +395,14 @@ export function detectReferenceSphereIntersection(
 
   const end = propagateKeplerUniversal(mu_m3ps2, position_m, velocity_mps, span_s);
   if (!end.ok) {
+    if (end.reason === 'RECTILINEAR_COLLISION') {
+      return {
+        ok: false,
+        reason: 'PROPAGATION_FAILED',
+        propagationFailure: end.reason,
+        collisionDeltaT_s: end.collisionDeltaT_s,
+      };
+    }
     return fail('PROPAGATION_FAILED', end.reason);
   }
   const radiusAtEnd_m = normVec3(end.position_m);

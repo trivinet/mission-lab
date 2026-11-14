@@ -1,0 +1,145 @@
+task_id: ML-TASK-019
+title: "Engine corrections: explicit failure for a rectilinear trajectory reaching the centre (issue #24) and −0 → +0 normalisation in the request builder (contracts-v1 §11.4 P3)"
+status: in_review
+requirement_ids: [ML-FR-004, ML-FR-006, ML-FR-012, ML-NFR-003]
+owner_role: astrodynamics-engineer
+reviewer_role: verification-engineer
+dependencies: [ML-TASK-014, ML-TASK-016, ML-TASK-017]
+affected_paths:
+  - packages/astrodynamics/
+  - packages/simulation/
+  - docs/backlog/tasks/ML-TASK-019.yaml
+objective: >
+  Implement two owner decisions. (1) 2026-11-14, issue #24: "the propagator returns an explicit
+  failure when a rectilinear trajectory reaches the centre (r = 0) within the requested time",
+  mapped in the runner onto a registered code (NON_FINITE_STATE, §11.4 P4/P5) with a plain
+  message. (2) 2026-11-13, contracts-v1 §11.4 P3 (resolves NQ-1): the scenario→request builder
+  normalises −0 to +0 in every numeric field, so equivalent scenarios have the same requestId.
+scope:
+  - "packages/astrodynamics: exact rectilinearity test, analytic time to the centre (three energy cases, both time directions), new propagator failure RECTILINEAR_COLLISION with collisionDeltaT_s; trajectory-flags passes it through; documentation."
+  - "packages/simulation: runner maps RECTILINEAR_COLLISION to NON_FINITE_STATE at the collision time; request builder −0 → +0."
+  - "Unit tests in both packages, including bit-pattern regression fixtures of the normal path captured before the change."
+out_of_scope:
+  - "Changes to packages/contracts, verification/, conformance/, test-data/, tolerances or any document other than this file."
+  - "Registering a new diagnostic code (would be a contract minor version, §11.4 P4/P5)."
+  - "Independent reference comparison (Verification Engineer)."
+  - "New dependencies."
+inputs:
+  - AGENTS.md
+  - docs/engineering/coding-standards.md
+  - "GitHub issue #24 (Coordinator report)"
+  - docs/architecture/contracts-v1.md §4, §7, §8.3, §11.3, §12 NQ-1; §11.4 as on branch origin/docs/runner-owner-decisions
+  - docs/verification/tolerances.md (read only)
+  - docs/backlog/tasks/ML-TASK-017.yaml
+  - packages/astrodynamics/src/kepler-universal.ts, trajectory-flags.ts; packages/simulation/src/run.ts, request.ts and their tests
+acceptance_criteria:
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0."
+  - "All 829 pre-existing tests pass, except superseded assertions, each listed in the report; the 124 conformance tests unmodified and passing."
+  - "Non-rectilinear propagation bit-identical to the pre-change code (fixtures captured on c1bba42)."
+  - "The issue #24 reproduction fails with RECTILINEAR_COLLISION; rectilinear motion that does not reach the centre is propagated."
+  - "Two scenarios differing only in the sign of a zero give byte-identical requests and the same requestId; no request built from a scenario contains −0."
+test_requirements:
+  - "Vitest unit tests in packages/astrodynamics/src and packages/simulation/src."
+deliverables:
+  - packages/astrodynamics/src/kepler-universal.ts, trajectory-flags.ts, index.ts
+  - packages/astrodynamics/src/kepler-universal-rectilinear.test.ts
+  - packages/simulation/src/run.ts, request.ts, run.test.ts, request.test.ts
+  - docs/backlog/tasks/ML-TASK-019.yaml
+human_approval_required: false
+
+report:
+  files_changed:
+    - "packages/astrodynamics/src/kepler-universal.ts: module comment section 'Rectilinear trajectories' (R1–R4), new failure reason RECTILINEAR_COLLISION (separate union member with collisionDeltaT_s), isExactlyRectilinear, rectilinearCollisionTimes, the pre-solve check, updated doc comment of propagateKeplerUniversal."
+    - "packages/astrodynamics/src/trajectory-flags.ts: PROPAGATION_FAILED carries collisionDeltaT_s when the reason is RECTILINEAR_COLLISION; doc updated."
+    - "packages/astrodynamics/src/index.ts: exports isExactlyRectilinear, rectilinearCollisionTimes, RectilinearCollisionTimes."
+    - "packages/astrodynamics/src/kepler-universal-rectilinear.test.ts (new): 26 tests."
+    - "packages/simulation/src/run.ts: collisionDiagnostic (NON_FINITE_STATE, t_s = collision time) on the segment path and the intersection-check path; doc."
+    - "packages/simulation/src/request.ts: normalizeNegativeZero, applied to the validated scenario and to the assembled request; doc."
+    - "packages/simulation/src/run.test.ts: 5 new tests; 1 existing test changed (see summary)."
+    - "packages/simulation/src/request.test.ts: 7 new tests; 2 superseded tests replaced (see summary)."
+    - "docs/backlog/tasks/ML-TASK-019.yaml (new)."
+  summary: >
+    RECTILINEARITY RULE (R1). A state is rectilinear iff the EXACT cross product of the given
+    binary64 r and v is zero (no tolerance). Each 2×2 minor r_i v_j = r_j v_i is tested: if the
+    rounded products differ the exact ones differ (round-to-nearest is monotone), so h ≠ 0; if
+    each side has a zero factor both are 0; otherwise the products are compared exactly with
+    BigInt (x = N·2^-1074). Why: a tiny non-zero h is a genuine conic with r_p > 0 that the
+    universal formulas propagate correctly, so it must not be reclassified; in particular a
+    computed r × v that is zero only because the products rounded equal is NOT rectilinear (test
+    with r = 2^23(1+2^-52, 1, 0), v = −2^10(1+2^-51, 1+2^-52, 0)). Conversely exact h = 0 always
+    gives a computed zero, so no rectilinear state escapes the rule.
+    COLLISION TIME (R2, R3; derived from the energy integral, no source opened). With σ = r ṙ/√μ,
+    energy gives σ² = 2r − αr² and σ → 0 at r = 0. Measuring the universal anomaly from a passage
+    through the centre, (D2)–(D4) give r = χ²c2(αχ²), σ = χ c1(αχ²), √μ(t − t_centre) = χ³c3(αχ²).
+    Time from the centre to r₀ on the outgoing branch (= from r₀ incoming to the centre):
+    t* = χ*³c3(αχ*²)/√μ with χ* = (2/k)atan2(k r₀, |σ₀|) (α > 0, k = √α), (2/k)asinh(k√(r₀/2))
+    (α < 0, k = √−α), √(2r₀) (α = 0). Period for α > 0: T = 2π/(k³√μ). Forward: σ₀ < 0 → t*;
+    σ₀ ≥ 0 and α > 0 → T − t*; σ₀ ≥ 0 and α ≤ 0 → none. Backward (Δt < 0) is the mirror
+    (σ₀ → −σ₀). Fall from rest: t = T/2 = (π/2)√(r₀³/(2μ)), cross-checked in the comment with the
+    elementary integral (r = r₀ sin²θ). Decision: fail iff rectilinear and t_c exists and
+    t_c ≤ |Δt| (equality counts, conservative); collisionDeltaT_s = ±t_c. A non-finite computed
+    t_c (overflow, only far outside M1 ranges) gives NON_FINITE_STATE. The check uses the same
+    α̂, σ̂₀, r̂₀, √μ as the solver and only reads data; the solver arithmetic is untouched.
+    NORMAL PATH: bit patterns of 10 propagations (ellipse fwd/back, e≈0.99 through periapsis,
+    hyperbola, near-rectilinear h = 7 m²/s through periapsis, 5 rectilinear cases that do not
+    reach the centre within Δt) were printed on c1bba42 by a temporary probe (not committed) and
+    are asserted bit-for-bit as fixtures; the full suite including the 124 conformance tests
+    passes unchanged.
+    RUNNER. Collision → NON_FINITE_STATE, t_s = segment start + collisionDeltaT_s, message "…the
+    trajectory is rectilinear (position x velocity = 0) and reaches the centre of the central body
+    (r = 0) at t_s ≈ <9 significant digits> s, where the state is singular; the run cannot continue
+    past it." After a maneuver the intersection check (span = last sample Δt ≥ every sample Δt)
+    meets the collision first (D8 path), so no REFERENCE_SPHERE_INTERSECTION is emitted for that
+    maneuver; an ESCAPE_TRAJECTORY warning for it (unbound incoming motion) would be kept first.
+    Scenario "circular equatorial a = 7e6 m, all angles 0, maneuver at t = 0 with RSW Δv
+    (0, −v_y, 0)" (velocity after = 0 exactly; fall time 1030.3459096915992 s): duration 1200 s →
+    status failed, diagnostics exactly [{NON_FINITE_STATE, error, t_s = 1030.3459096915992}];
+    duration 1000 s → status ok, diagnostics exactly [{REFERENCE_SPHERE_INTERSECTION, warning,
+    t_s = 0, reason INSIDE_AT_END}]; duration 100 s → ok, no diagnostics.
+    −0 NORMALISATION. normalizeNegativeZero (deep, every number) is applied twice in
+    buildSimulationRequest: on the validated scenario before elementsToState (so equivalent
+    scenarios take the same arithmetic path), and on the assembled request (so engine-produced −0
+    — e.g. all-zero elements give velocity_mps[0] = −0 — never reaches the request). Validation
+    outcomes are unaffected (±0 behave the same under ≥ 0 / > 0). computeRequestId itself still
+    distinguishes ±0 (contract §7.2). Segment 0's first sample stays bit-identical to
+    request.initialState (tested with the all-zero-elements scenario).
+    TESTS CHANGED (superseded behaviour): request.test.ts 'keeps −0 inputs unchanged (contracts-v1
+    §12 NQ-1 not decided)' → 'maps −0 inputs to +0'; request.test.ts 'distinguishes −0 from +0
+    (owner decision 8)' → 'equivalent scenarios differing in the sign of a zero get the same
+    requestId' (plus a new test that computeRequestId still distinguishes them); run.test.ts
+    'maneuver at −0: sample time −0 in both segments, event t_s −0' — assertions unchanged, but
+    its request is now given in Cartesian form (cartesianRequest) because the builder no longer
+    produces a −0 maneuver time.
+    CHOICES MADE: (a) the rectilinearity line is exact h = 0 (no band); (b) the collision failure
+    carries collisionDeltaT_s as a separate union member so existing failure shapes are
+    unchanged; (c) the runner diagnostic t_s is the collision time, not the maneuver time;
+    (d) normalisation is applied both before conversion and on the request; (e) a non-finite
+    collision time → NON_FINITE_STATE.
+  tests_executed:
+    - "pnpm lint → exit 0"
+    - "pnpm typecheck → exit 0"
+    - "pnpm test → exit 0; Test Files 39 passed (39); Tests 867 passed (867) (829 pre-existing, 2 of them replaced in place, + 38 new)"
+    - "pnpm format:check → exit 0"
+    - "pnpm check:boundaries → exit 0"
+  reference_data_used:
+    - "None external. Regression fixtures: bit patterns of this engine at commit c1bba42 (self-reference for 'unchanged', not correctness)."
+    - "Closed forms derived in kepler-universal.ts module comment R2 (no source opened)."
+  not_verified:
+    - "No independent (L2/L3) reference comparison of collision times or of near-collision states."
+    - "Accuracy of t_c is not rigorously bounded (ECMAScript does not specify atan2/asinh accuracy); measured fall-from-rest at r = 7e6 m: 0 u difference from (π/2)√(r³/(2μ)); unit tests use provisional bounds (64u, 1e-13, 1e-12)."
+    - "Outcome within rounding of the boundary t_c = |Δt| follows the computed t_c; a true collision a few ulps before |Δt| could be returned as a near-centre state."
+    - "Accuracy of propagated states very close to the centre (just before a collision) and of nearly rectilinear conics at periapsis."
+    - "The NON_FINITE_STATE branch for a non-finite collision time is unit-tested only through rectilinearCollisionTimes, not end to end."
+    - "Performance impact of the per-call rectilinearity test was not measured (BigInt work only when rounded products are equal and non-zero)."
+  known_limitations:
+    - "No dedicated diagnostic code: the collision is reported as NON_FINITE_STATE (P4/P5)."
+    - "A rectilinear run fails at the first collision; nothing past r = 0 is produced."
+  documentation_changes:
+    - "Doc comments in kepler-universal.ts, trajectory-flags.ts, run.ts, request.ts. No repository document changed."
+  risks_or_blockers:
+    - "Ambiguity: §11.4 P3 says 'every numeric field' without saying of the scenario or of the request; implemented on both."
+    - "Ambiguity: §8.3 NON_FINITE_STATE 'A computed state is non-finite; t_s set' does not say which time for a collision; chose the collision time (P2 fixes t_s only for the two warnings)."
+    - "Contract §2 'Numbers' row and §12 NQ-1 on main still describe −0 as changing the requestId; true for computeRequestId, no longer for scenarios. §11.4 (branch docs/runner-owner-decisions) records P3 but is not on main yet."
+    - "trajectory-flags.ts still carries 'STATUS: DESIGN PROPOSAL' although §11.3 approved the semantics; not changed here (out of scope)."
+  review_artifact: ""
+  recommended_next_action: "Verification Engineer review; owner to decide whether a dedicated diagnostic code for a collision with the centre is wanted in a contract minor version."
