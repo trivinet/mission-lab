@@ -627,11 +627,28 @@ Semantics of the two post-maneuver warnings, proposed by ML-TASK-016 (design cho
 These decisions refine §8.3 and ML-FR-006 AC6. They change no schema. The `t_s` of
 `REFERENCE_SPHERE_INTERSECTION` is not defined here (ML-TASK-017 proposes it).
 
+### 11.4 Owner decisions on the simulation runner, 2026-11-13
+
+Points P1–P10 raised by ML-TASK-017 (`docs/backlog/tasks/ML-TASK-017.yaml`, PR #23), approved by
+the owner on 2026-11-13. They change no schema.
+
+| # | Decision |
+|---|---|
+| P1 | The sample-count limit is the provisional build constant of `packages/simulation` (1 000 000 samples) until the Phase 2 measurement required by ML-NFR-004 replaces it. It is not a measured value. |
+| P2 | `REFERENCE_SPHERE_INTERSECTION` carries `t_s` = the maneuver time, like `ESCAPE_TRAJECTORY`. |
+| P3 | Resolves NQ-1: the scenario→request builder normalises −0 to +0 in every numeric field, so equivalent scenarios have the same `requestId`. Not implemented yet (follow-up task); until then −0 inputs are copied unchanged. |
+| P4, P5 | Failures without a dedicated code are mapped to the nearest registered code as implemented (overflowing initial state → `NON_FINITE_NUMBER` issue; flag-evaluation overflow → `NON_FINITE_STATE`; unreachable internal cases → `INTERNAL_ERROR`). New codes may be registered in a minor version. |
+| P6 | Escape and intersection warnings are evaluated only for post-maneuver segments; the initial orbit is covered by validation. |
+| P7 | The runner validates every result before returning it. |
+| P8 | The `requestId` of an incoming request is not recomputed by the runner. |
+| P9 | `model.engineVersion` stays at the package version; it must be bumped with the first release. |
+| P10 | The wording of `model.limitations` is accepted for now and reviewed with the Model & assumptions panel (ML-TASK-025). |
+
 ## 12. Open questions for the owner
 
 | # | Question | Implemented now | Recommendation |
 |---|---|---|---|
-| NQ-1 | −0 is accepted where a rule says `≥ 0` (angles, eccentricity, inclination, maneuver `t_s`, vector components). `JSON.stringify` writes −0 as `0`, but `JSON.parse("-0")` yields −0 (both checked on Node 24), so a hand-edited file can carry it, and it changes the `requestId` (decision 8). Should the request builder (ML-TASK-017) map −0 to +0 in inputs where the sign of zero has no physical meaning? | Accepted unchanged; the grid (§5.2) and R10 handle a maneuver at −0. | Leave the contract as is; let the request builder normalise −0 to +0 in every input field so equal-looking scenarios get equal ids. Decide in ML-TASK-017. |
+| NQ-1 (resolved 2026-11-13, §11.4 P3) | −0 is accepted where a rule says `≥ 0` (angles, eccentricity, inclination, maneuver `t_s`, vector components). `JSON.stringify` writes −0 as `0`, but `JSON.parse("-0")` yields −0 (both checked on Node 24), so a hand-edited file can carry it, and it changes the `requestId` (decision 8). Should the request builder (ML-TASK-017) map −0 to +0 in inputs where the sign of zero has no physical meaning? | Accepted unchanged; the grid (§5.2) and R10 handle a maneuver at −0. | Leave the contract as is; let the request builder normalise −0 to +0 in every input field so equal-looking scenarios get equal ids. Decide in ML-TASK-017. |
 | NQ-2 | `RSW_FRAME_UNDEFINED` (§8.3 note). | Not registered. | Register it in the minor version that lifts the one-maneuver limit. |
 | NQ-3 | Who owns the degree/radian and angle-normalisation helpers requested by the Frontend review? | Not in contracts. | A tested formatting module in `apps/web` (or a small UI-free package), assigned by the Coordinator before ML-TASK-022. |
 | NQ-4 | Should the result echo the initial state (e.g. `model.initialState`), so that the segment-0 rule of §5.2 becomes schema-checkable without the request? | Not added (revision 3). Segment 0 is checked by VI-01, which sees request and result. | Do not add it in v1.0. It would duplicate data the receiver already has (the UI holds the request it sent) and would be a new result field for a check that VI-01 and the worker host, which also hold both objects, can make. Reconsider only if results are ever persisted or exchanged without their request (same trigger as OQ-8). |
