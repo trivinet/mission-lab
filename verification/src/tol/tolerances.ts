@@ -278,3 +278,131 @@ export function elementRows(
 
 /** §9.2 target for the RK reference: E_RK ≤ 1e-10 r_max. */
 export const E_RK_TARGET_REL = 1e-10;
+
+// ---------------------------------------------------------------------------------------------
+// ML-TASK-018 part C: the remaining families of §7. Transcription only, same rules as above.
+
+/** VT-01 (§7): (a) 4(2√2 + 3)u ≈ 23.3u × ‖a‖²‖b‖ for |a·(a × b)| and |b·(a × b)|. */
+export const VT01_CROSS_ORTHOGONALITY = MARGIN * (2 * Math.SQRT2 + 3) * U;
+/** VT-01 (§7): (b) 4·2(2√2 + 3)u ≈ 46.6u × ‖a‖‖b‖‖c‖ for a·(b × c) − b·(c × a). */
+export const VT01_TRIPLE_PRODUCT = MARGIN * 2 * (2 * Math.SQRT2 + 3) * U;
+/** VT-01 (§7): (c) 4·6u = 24u relative, engine norm vs the test's own norm. */
+export const VT01_NORM = MARGIN * 6 * U;
+/** VT-01 (§7): (d) 4·7u = 28u, |‖x/‖x‖‖ − 1|. */
+export const VT01_UNIT = MARGIN * 7 * U;
+
+/**
+ * Engine part of VT-06 (§7 VT-06), unmargined, used again by VT-14 and VT-15:
+ * τ_E,eng(Δt) = (v_p V_b + g_p P_b)/|E| + (3 + 2e)(v_p g_p/|E|)(δt_res + δt_g), δt_res = ε_t.
+ */
+export function tauEEng(s: Scales, dt: number): number {
+  const bounded = (s.vp * vB(s) + s.gp * pB(s)) / s.energy;
+  const offOrbit = (3 + 2 * s.e) * ((s.vp * s.gp) / s.energy) * (epsT(s, dt) + dtG(s, dt));
+  return bounded + offOrbit;
+}
+
+/** VT-06 (§7): τ_E(Δt) = M[10uκ_E + τ_E,eng(Δt)], relative energy deviation. */
+export function vt06(s: Scales, dt: number): number {
+  return MARGIN * (10 * U * s.kappaE + tauEEng(s, dt));
+}
+
+/**
+ * VT-07 (§7): τ_h(Δt) = M[6uκ_h + (P_b v_p + r_a V_b + (v_p² + 2(1 + e) r_a g_p)(δt_res + δt_g))/h],
+ * normwise relative deviation of the angular-momentum vector.
+ */
+export function vt07(s: Scales, dt: number): number {
+  const off = (s.vp * s.vp + 2 * (1 + s.e) * s.ra * s.gp) * (epsT(s, dt) + dtG(s, dt));
+  return MARGIN * (6 * U * s.kappaH + (pB(s) * s.vp + s.ra * vB(s) + off) / s.h);
+}
+
+export interface Vt11Tol {
+  /** max |(BᵀB − I)_jk| and ‖R × S − W‖: M(2ε_S + 3u) = 4(12κ_h + 25)u. */
+  readonly orthonormality: number;
+  /** ‖R − r/‖r‖‖: M·2ε_R = 32u. */
+  readonly rParallel: number;
+  /** ‖W − (r × v)/‖r × v‖‖: M·2ε_W = 4(12κ_h + 8)u. */
+  readonly wParallel: number;
+}
+
+/** VT-11 (§7), κ_h of the pre-maneuver orbit (reference side). */
+export function vt11(kappaH: number): Vt11Tol {
+  return {
+    orthonormality: MARGIN * (12 * kappaH + 25) * U,
+    rParallel: MARGIN * 8 * U,
+    wParallel: MARGIN * (12 * kappaH + 8) * U,
+  };
+}
+
+/** VT-12 (§7): ‖ΔΔv_I‖ ≤ 8(12κ_h + 25)u ‖Δv_RSW‖ (relative factor returned). */
+export function vt12(kappaH: number): number {
+  return MARGIN * 2 * (12 * kappaH + 25) * U;
+}
+
+export interface Vt13Tol {
+  /** |deltaV_magnitude_mps − test's ‖deltaV_inertial_mps‖| ≤ 24u‖Δv‖ (relative factor). */
+  readonly magnitude: number;
+  /** |‖deltaV_inertial_mps‖ − ‖Δv_RSW‖| ≤ 4(12κ_h + 31)u‖Δv‖ (relative factor). */
+  readonly rotationNorm: number;
+}
+
+/** VT-13 (§7). */
+export function vt13(kappaH: number): Vt13Tol {
+  return { magnitude: MARGIN * 6 * U, rotationNorm: MARGIN * (12 * kappaH + 31) * U };
+}
+
+/** Clohessy–Wiltshire transport factors of §7 VT-14, valid for e = 0 only (O-11). */
+export const VT14_K_R = 14;
+export const VT14_K_V = 9;
+
+/**
+ * VT-14 (§7), e = 0 only (O-11): maneuvered (zero Δv at m) vs coast run at t > m.
+ * ‖Δr‖ ≤ M[P_E(t) + v_p(uC_t L_m + δt_res(m)) + P_E(t − m) + (3/2)τ_E,eng(m) v_p (t − m)
+ *          + K_r P_off(m) + K_v V_off(m)/n];
+ * velocity: v_p → g_p in the time-like terms, P_E → V_E, transport K_r V_off(m) + K_v n P_off(m).
+ * P_off(m) = P_b + v_p δt_off(m), V_off(m) = V_b + 2(1 + e) g_p δt_off(m), δt_off = δt_res + δt_g.
+ */
+export function vt14(s: Scales, m: number, t: number): PosVelTol {
+  if (s.e !== 0) throw new RangeError('VT-14 transport factors are derived for e = 0 only (O-11)');
+  const Lm = spanL(s, m);
+  const res = epsT(s, m);
+  const off = res + dtG(s, m);
+  const pOff = pB(s) + s.vp * off;
+  const vOff = vB(s) + 2 * (1 + s.e) * s.gp * off;
+  const tau = tauEEng(s, m);
+  const phaseR = s.vp * (U * s.Ct * Lm + res);
+  const phaseV = s.gp * (U * s.Ct * Lm + res);
+  return {
+    position_m:
+      MARGIN *
+      (pE(s, t) +
+        phaseR +
+        pE(s, t - m) +
+        1.5 * tau * s.vp * (t - m) +
+        VT14_K_R * pOff +
+        (VT14_K_V * vOff) / s.n),
+    velocity_mps:
+      MARGIN *
+      (vE(s, t) +
+        phaseV +
+        vE(s, t - m) +
+        1.5 * tau * s.gp * (t - m) +
+        VT14_K_R * vOff +
+        VT14_K_V * s.n * pOff),
+  };
+}
+
+export interface Vt15Tol {
+  /** |δa⁺|/a⁺ ≤ M[τ_E,eng(m)·a⁺/a⁻ + 11u(4a⁺/r − 1)]. */
+  readonly aRelative: number;
+  /** |δe⁺| ≤ M[(r/a⁺)(|δa⁺|/a⁺)/M + 60u] with |δa⁺|/a⁺ the margined a⁺ tolerance. */
+  readonly eAbsolute: number;
+}
+
+/**
+ * VT-15 (§7), tangential burn at an apsis. sPre: scales of the pre-maneuver orbit; m: maneuver
+ * time (Δt of the pre-maneuver propagation); aPlus: closed-form a⁺; r: burn radius.
+ */
+export function vt15(sPre: Scales, m: number, aPlus: number, r: number): Vt15Tol {
+  const aRel = MARGIN * (tauEEng(sPre, m) * (aPlus / sPre.a) + 11 * U * ((4 * aPlus) / r - 1));
+  return { aRelative: aRel, eAbsolute: MARGIN * (((r / aPlus) * aRel) / MARGIN + 60 * U) };
+}
