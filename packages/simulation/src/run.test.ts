@@ -286,7 +286,11 @@ describe('one maneuver', () => {
   });
 
   it('maneuver at −0: sample time −0 in both segments, event t_s −0', () => {
-    const { result } = maneuverRun(-0, [0, 1, 0]);
+    // ML-TASK-019: the scenario builder now maps −0 to +0 (contracts-v1 §11.4 P3), so a request
+    // with a maneuver at −0 is given directly (a valid request may still carry −0, §6).
+    const result = run(
+      cartesianRequest([7000000, 0, 0], [0, 7546, 0], { maneuvers: [maneuver(-0, [0, 1, 0])] }),
+    );
     expect(Object.is(result.segments[0]?.t_s[0], -0)).toBe(true);
     expect(Object.is(result.segments[1]?.t_s[0], -0)).toBe(true);
     expect(Object.is(result.events[0]?.t_s, -0)).toBe(true);
