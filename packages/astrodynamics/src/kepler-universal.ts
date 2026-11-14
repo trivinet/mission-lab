@@ -132,6 +132,7 @@
  *      - fast path: if fl(r_i v_j) ≠ fl(r_j v_i) for some minor, the exact products differ
  *        (rounding to nearest is a monotone function of the exact value, so equal exact values
  *        round equal, also on overflow and underflow), hence h ≠ 0 exactly;
+ *      - if each side has a zero factor, both exact products are 0 (equal; no further work);
  *      - otherwise (rounded products equal) the products are compared exactly with integer
  *        arithmetic: every finite binary64 x is N·2^-1074 with an integer N (BigInt), so
  *        r_i v_j = r_j v_i ⇔ N(r_i) N(v_j) = N(r_j) N(v_i).
@@ -531,6 +532,10 @@ function productsEqualExactly(a: number, b: number, c: number, d: number): boole
   if (a * b !== c * d) {
     // Rounding is monotone: equal exact products would round to equal values.
     return false;
+  }
+  if ((a === 0 || b === 0) && (c === 0 || d === 0)) {
+    // Both exact products are zero (the common case of a zero component; no integer arithmetic).
+    return true;
   }
   return (
     binary64AsScaledInteger(a) * binary64AsScaledInteger(b) ===
