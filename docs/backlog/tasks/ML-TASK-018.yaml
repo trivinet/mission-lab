@@ -26,6 +26,7 @@ scope:
   - "Part A: ADR-009 and the conformance/ workspace (package, Vitest project, tsconfig, lint boundary rule with fixtures); verification exports needed by conformance, without behaviour change."
   - "Part B: first conformance run — VT-02, VT-03, VT-04, VT-05, VT-08 against the committed datasets with their stored tolerances; O-1 black-box residual check on the VT-05 grid plus a deterministic grid within the O-1 range; run report."
   - "Part C (two phases, commit boundary between them): phase 1 — independent references (RSW projection form in 320-bit, exact-maneuver closed forms, VT-16 classification, §5.2 grid) and datasets for VT-01, VT-06/07, VT-09, VT-11/12/13, VT-14, VT-15, VT-16, VT-18, VI-01 with tolerances evaluated from the approved record, without reading the engine; phase 2 — conformance tests on runSimulation results for VT-01, VT-06/07, VT-09 (exact), VT-10, VT-11…VT-16, VT-18, VI-01 and the −0 rule (§11.4 P3); run report conformance-run-2.md. Part C affected paths: verification/**, conformance/**, test-data/reference-cases/**, docs/verification/conformance-run-2.md, this file."
+  - "Part D (owner directions of 2026-11-15 on P-1…P-4 of conformance-run-2.md §7, and the L3 Orekit datasets of ML-TASK-012 part B). D1: tolerance record revision 4 — VT-14 accepted at e = 0 only for G1 (O-11 open, not blocking); VT-15 tolerances for non-tangential burns and the orbit plane (direction term Δv·v·ε); VT-16 hyperbolic budget with the 10κ_E·a substitution (O-5 numeric part); O-4 checked against the approved documents; L3 Orekit rows for VT-02, VT-12, VT-15 and hyperbolic VT-16 and the rule for maneuvers at t > 0; status 'Proposed, awaiting owner approval'. D1 affected paths: docs/verification/tolerances.md, this file. D1 does not run the engine. D2 (later, only after the owner signs revision 4): conformance run on the P-1…P-4 gaps and on the L3 datasets, with the needed datasets (L2b hyperbolic trajectories, L3 restart arcs) and the selfcheck extension committed before any engine comparison."
   - "Later parts: CI wiring; G1 verification report."
 out_of_scope:
   - Changing engine code (packages/astrodynamics, packages/simulation) or apps/web.
@@ -153,3 +154,61 @@ report_part_c:
     Review of the part-C references and datasets (Systems Architect) and owner approval; owner
     decisions on the proposals P-1…P-4 of conformance-run-2.md §7; then CI wiring and the G1
     report.
+
+report_part_d1:
+  # Part D1 (2026-11-15), branch docs/ml-task-018d-tolerances-rev4, not pushed. Engine not read, not run.
+  commits:
+    - "ca60e1b record rev 4: VT-14 scope, VT-15 general burns and plane, VT-16 hyperbolic budget (§6.8), VT-09 exact"
+    - "141af0c record rev 4: L3 Orekit rows (§9.3.1), maneuvers at t > 0 (§9.3.2), open items, approval table"
+    - "this commit: part D scope and this report"
+  files_changed:
+    - docs/verification/tolerances.md (revision 4, Proposed)
+    - docs/backlog/tasks/ML-TASK-018.yaml (scope part D, this report)
+  summary: >
+    Revision 4 of the tolerance record. P-1: VT-14 accepted for G1 at e = 0 only, O-11 open and not
+    blocking. P-2: VT-15 error model gains term (iv), the direction error of the computed Δv_I
+    (|δE⁺| ≤ v⁺(12κ_h⁻ + 25)u‖Δv‖); new a⁺/e⁺ rows for normal, radial and combined burns
+    (1.55e-14…2.91e-14 relative, 2.98e-14…3.08e-14 absolute), plane-normal (6.4e-15…6.5e-13 rad) and
+    plane-rotation (2.6e-14…6.7e-13 rad) rows for all 14 cases; comparison modes A (exact pre-state,
+    m = 0 or tangential at an apsis) and B (engine event state, any m). The magnitude part of term
+    (iv) also applies to tangential burns; it is absorbed by the 1u slack of the approved coefficient
+    except for C3 apogee circularisation (+0.073 %, listed as a loosening in §15). P-3: hyperbolic
+    componentwise budget written out and evaluated (§6.8); 10κ_E·a replaced by 10κ_E·r_max (|a| does
+    not bound r on a hyperbola); C_b recounted for cosh/sinh (+2u|a| terms). Only c3-midrun-escape meets
+    the approved validity condition |E| ≥ 0.1(v²/2 + μ/r) (M·P_E,gen 4.54e-6 m at the end of the L2 arc);
+    lowering it to 0.05 is proposed to the owner. O-5 closed. P-4: O-4 resolved on ADR-005 (Decision)
+    plus the ML-TASK-015 contract (scope item 2, acceptance criterion 4), reading stated; VT-09 exact.
+    L3: rows 3M × per-side bound for VT-02, VT-12, VT-15 and hyperbolic VT-16 (A6 confirmed for
+    elliptic propagation by selfcheck.py; new assumption A6′ for the other Orekit computations);
+    maneuvers at t > 0 handled by restarting Orekit from the engine's event state (transport factors
+    do not exist for these arcs).
+  tests_executed:
+    - "Independent arithmetic: every revision-4 number computed by a Node.js v24.22.2 binary64 script and by a separately written Python 3.13.17 decimal script (50 digits); agreement to the four printed digits. Scripts kept in the session scratchpad, not in the repository."
+    - "Transcription check: the binary64 script reproduces the approved §6.6 values (P_b, V_b, P_E, V_E for C1…C6) and the ten approved VT-15 values stored in test-data/reference-cases/vt-15 to four digits."
+    - "Precondition check on data (no engine): in all 20 m = 0 L3 files of vt-12, vt-15, vt-16 the event position and velocityBefore equal the requestBody initialState (JSON equality)."
+    - "pnpm format:check → exit 0 (All matched files use Prettier code style)"
+  reference_data_used:
+    - "Inputs and reference-side outputs of test-data/l3-orekit/ (Orekit 13.1.9) and test-data/reference-cases/vt-15, vt-16 (event states, post-maneuver energies, elements); grid elements from verification/l3/cases.py"
+    - "conformance-run-2.md measured values and selfcheck.py informational values: read, used only as a non-contradiction check after evaluation, never to set a value"
+  not_verified:
+    - "Hyperbolic solver residual (O-12): ε_t,gen assumes the engine's solve ends at the noise level for E > 0; O-1 check and δt_α exist for e < 1 only."
+    - "A6′ for Orekit's hyperbolic propagation (O-13): informational only; L3 VT-16 hyperbolic rows not usable until selfcheck has a pass/fail check."
+    - "VT-14 for e > 0 (O-11, by owner direction)."
+    - "Non-tangential VT-15 burns at m > 0 in mode A (phase term not derived; mode B required)."
+    - "Literature citations of the record that were already 'to be confirmed' (Higham, Curtis, Vallado, Hairer, IEEE 754, ECMA-262) are unchanged; no new literature value was introduced."
+  known_limitations:
+    - "The O-4 resolution rests on reading ADR-005's 'computed directly from the segment's initial state at Δt' as excluding other inputs; the explicit 'no warm start' is in the propagator task contract, not in the contract or the runner's task contract."
+    - "Four of the six hyperbolic arcs (ratio 0.055–0.079) have evaluated values but stay warnings-only unless the owner lowers the validity condition to 0.05."
+    - "The L3 files carry stored tolerances that differ from the revision-4 rows (record C-8); D2 must use the record."
+  documentation_changes:
+    - docs/verification/tolerances.md (revision 4)
+  risks_or_blockers:
+    - "Revision 4 needs the owner's signatures in §15 before D2 may run the engine on the gaps or on the L3 datasets (§4.1)."
+    - "Outside this part's paths: ML-TASK-015.yaml status reads in_review although the task is done (C-7); selfcheck.py hyperbolic pass/fail check (O-13)."
+  review_artifact: ""   # no PR opened (instructed not to push)
+  recommended_next_action: >
+    Systems Architect review of revision 4 (in particular the O-4 reading, §6.8 and the C_b
+    recount); owner: sign the revision-4 rows of §15, the C3 loosening and the 0.1 → 0.05 validity
+    decision. Then part D2: extend selfcheck.py (O-13), produce the L2b hyperbolic trajectories and
+    the L3 restart arcs, commit datasets with their evaluated tolerances and the comparison code,
+    then run the engine.
