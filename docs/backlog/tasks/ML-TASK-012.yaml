@@ -1,6 +1,6 @@
 task_id: ML-TASK-012
 title: "External references (L3): textbook assessment (part A) and one Orekit reference dataset (part B)"
-status: in_progress          # part A done, awaiting review; part B done on branch test/ml-task-012b-orekit-dataset, awaiting review and a decision on the dataset location (report_part_b)
+status: in_progress          # part A done, awaiting review; part B done on branch test/ml-task-012b-orekit-dataset, awaiting review; dataset location decided by the owner on 2026-11-15 (test-data/l3-orekit/)
 requirement_ids: [ML-FR-003, ML-FR-004, ML-FR-006]
 owner_role: verification-engineer
 reviewer_role: systems-architect
@@ -9,7 +9,7 @@ affected_paths:
   - docs/verification/l3-textbook-assessment.md      # part A
   - docs/backlog/tasks/ML-TASK-012.yaml
   - verification/l3/                                  # part B: Orekit generation scripts and pinned environment description
-  - test-data/reference-cases/                        # part B: datasets only, in the format of m1-verification-plan.md §6
+  - test-data/l3-orekit/                              # part B: datasets only, in the format of m1-verification-plan.md §6 (owner decision 2026-11-15; was test-data/reference-cases/)
 objective: >
   Provide evidence layer L3 (m1-verification-plan.md §2, ADR-003): references that are independent of both the
   engine and the Verification Engineer's own L2 code. Part A assesses the textbook offered by the owner
@@ -18,7 +18,7 @@ objective: >
   configuration recorded.
 scope:
   - "Part A: identify the book (edition, ISBN, terms of use); map every VT family to the equations and worked examples the book offers, with section, equation number and page; list the constants it states and compare them in kind with ML-ARCH-002 §3 and ADR-004; list the conventions that differ from Mission Lab's; give a verdict on L3 coverage and precision."
-  - "Part B (blocked): pinned Python + Orekit environment; scripts in verification/l3/ that generate, for the orbit test grid of m1-verification-plan.md §5, element-to-state (VT-02), two-body propagation (VT-05, VT-16), RSW maneuver transformation and post-maneuver elements (VT-12, VT-15) reference cases; datasets in test-data/reference-cases/<family>/<case>.json with id, inputs (SI, frame GCRF, epoch), model (Keplerian two-body, mu as in ML-ARCH-002), producedBy (Orekit and Python versions, script commit), method, outputs, tolerance reference."
+  - "Part B (blocked): pinned Python + Orekit environment; scripts in verification/l3/ that generate, for the orbit test grid of m1-verification-plan.md §5, element-to-state (VT-02), two-body propagation (VT-05, VT-16), RSW maneuver transformation and post-maneuver elements (VT-12, VT-15) reference cases; datasets in test-data/l3-orekit/<family>/<case>.json with id, inputs (SI, frame GCRF, epoch), model (Keplerian two-body, mu as in ML-ARCH-002), producedBy (Orekit and Python versions, script commit), method, outputs, tolerance reference."
 out_of_scope:
   - Transcribing textbook numbers into datasets before the owner has confirmed that this is acceptable under the book's terms of use.
   - Deriving or changing tolerances (ML-TASK-010). Running the engine against the datasets (G1 verification).
@@ -47,7 +47,7 @@ test_requirements:
 deliverables:
   - docs/verification/l3-textbook-assessment.md (part A)
   - verification/l3/ scripts and environment description (part B)
-  - test-data/reference-cases/ datasets (part B)
+  - test-data/l3-orekit/ datasets (part B)
   - The report section of this file
 human_approval_required: true   # installing Python/Java/Orekit on the dev machine; use of textbook values in a public repository
 
@@ -112,7 +112,7 @@ report_part_b:
     orekit-data, which is not installed and was not needed. The generator was committed (df84b5e6d75a)
     before generating; datasets committed in bd28f41. selfcheck.py validates every case before use:
     489 pass/fail checks, 0 failures, plus 72 informational measurements; regeneration is
-    byte-identical. The datasets are in an interim location, test-data/l3-orekit/, not
+    byte-identical. The datasets are in test-data/l3-orekit/ (owner decision 2026-11-15), not
     test-data/reference-cases/: two existing tests enumerate that tree and would fail on new files,
     and fixing that needs changes outside this task's affected_paths (one in conformance/, which this
     task may not touch). Conflict reported under risks_or_blockers.
@@ -156,14 +156,12 @@ report_part_b:
     - verification/l3/README.md
     - test-data/l3-orekit/README.md
   risks_or_blockers:
-    - "CONFLICT (stop-and-report, AGENTS.md): the contract and the coordinator place the datasets in test-data/reference-cases/<family>/, but verification/src/datasets/datasets.test.ts requires that tree (recursively) to equal exactly what the L2 builders produce, and conformance/src/support/datasets.test.ts counts the files of vt-02 and vt-05 while the conformance families run the engine on every file of a family directory. L3 files there would fail pnpm test and make conformance run the engine on them (out of scope). Resolving it needs changes outside affected_paths (verification/src/datasets, conformance/). Interim choice: test-data/l3-orekit/, movable by one constant (l3lib.DATA_SUBDIR). Decision needed from the coordinator or owner."
-    - "test-data/l3-orekit/ is itself outside the contract's affected_paths (test-data/reference-cases/), though inside the Verification Engineer's owned test-data/."
+    - "CONFLICT (stop-and-report, AGENTS.md): the contract and the coordinator place the datasets in test-data/reference-cases/<family>/, but verification/src/datasets/datasets.test.ts requires that tree (recursively) to equal exactly what the L2 builders produce, and conformance/src/support/datasets.test.ts counts the files of vt-02 and vt-05 while the conformance families run the engine on every file of a family directory. L3 files there would fail pnpm test and make conformance run the engine on them (out of scope). Resolving it needs changes outside affected_paths (verification/src/datasets, conformance/). Interim choice: test-data/l3-orekit/, movable by one constant (l3lib.DATA_SUBDIR). RESOLVED 2026-11-15: the owner chose to keep test-data/l3-orekit/; contract paths amended."
+    - "test-data/l3-orekit/ is itself outside the contract's affected_paths (test-data/reference-cases/), though inside the Verification Engineer's owned test-data/. RESOLVED by the same amendment."
     - "Tolerance-record gap: no Orekit row for VT-02 (element->state), VT-12 and VT-15; the datasets cite the engine-vs-L2 formulas with a status note. A reviewer should confirm before the G1 conformance run."
   review_artifact: ""   # no PR opened (coordinator instruction)
   recommended_next_action: >
-    Coordinator/owner: decide the dataset location (keep test-data/l3-orekit/ and point a new conformance
-    family at it, or move the files into reference-cases/ with the enumerating tests changed by their
-    owners). Systems Architect: review the convention mappings (verification/l3/README.md) and the
+    Coordinator/owner: dataset location decided (test-data/l3-orekit/); a later conformance family reads it explicitly. Systems Architect: review the convention mappings (verification/l3/README.md) and the
     tolerance-record gaps above. Then a G1 conformance task: rerun verification/l3/selfcheck.py --repro;
     run the engine on each requestBody (adding requestId); compare VT-02 and VT-05 with the stored
     per-sample §9.3 tolerances, VT-12 at t = 0 with the VT-12 formula, VT-15 a⁺/e⁺ with the VT-15

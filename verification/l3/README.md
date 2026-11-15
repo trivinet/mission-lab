@@ -75,6 +75,6 @@ The datasets are written to `test-data/l3-orekit/<family>/l3-orekit-<case>.json`
 `test-data/reference-cases/` because two existing tests enumerate that tree and would fail on any
 new file (`verification/src/datasets/datasets.test.ts` requires the tree to equal what the L2
 builders produce; `conformance/src/support/datasets.test.ts` counts the files of `vt-02` and
-`vt-05` and the conformance families run the engine on every file of a family directory). Moving
-them is a one-line change of `l3lib.DATA_SUBDIR` plus a decision on those tests (ML-TASK-012 part B
-report).
+`vt-05` and the conformance families run the engine on every file of a family directory). The owner
+decided on 2026-11-15 to keep L3 in this separate directory; a later conformance task reads it
+explicitly.

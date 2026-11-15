@@ -16,6 +16,6 @@ byte-identical regeneration). Environment and conventions: `verification/l3/READ
 | `vt-16` | Post-maneuver escape (2 hyperbolic) and sub-surface periapsis (1) | 3 |
 
 Ids are `l3-orekit/<family>/<case>`; file names carry the `l3-orekit-` prefix so that they cannot be
-confused with the L2 datasets of `test-data/reference-cases/`. This directory is an interim
-location: see `verification/l3/README.md` "Dataset location". Requests are stored as
+confused with the L2 datasets of `test-data/reference-cases/`. The owner chose this separate
+directory on 2026-11-15: see `verification/l3/README.md` "Dataset location". Requests are stored as
 `inputs.requestBody` (no `requestId`); `−0` is written as `{"$number": "-0"}`.
