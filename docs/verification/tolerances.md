@@ -836,6 +836,13 @@ backwards). The thresholds are committed per sample in `test-data/reference-case
   = (0.9, 2.2, 3.7), (1.6, 4.6, 1.3), (2.4, 0.3, 5.2) rad for the three start families.
 
   All 144 grid starts lie inside the gate (ratios 0.0521 to 0.63); κ_E(r₀) from 1.60 to 19.18.
+  **Note (review N7):** 50 of the 144 grid arcs have part of the arc inside R_ref (r_min < R_ref;
+  15 of the first 96 — the reviewer's 9 are the periapsis passages among them — and 35 of the
+  supplement; 32 of the 50 start inside R_ref). That is harmless here: the check calls the
+  propagator `propagateKeplerUniversal` directly (a pure two-body Kepler solve), not
+  `runSimulation`, so no surface or warning logic is involved. If the propagator rejects such an
+  input (for example a rectilinear or collision guard), the phase-2 report treats it as a
+  test-design artefact, not as an O-12 finding.
 
 The engine-side input is the reference-side state, not the engine's event state: the O-1 check
 concerns the solver for a given input, so its input need not come from the engine (§4.1 item 2).
