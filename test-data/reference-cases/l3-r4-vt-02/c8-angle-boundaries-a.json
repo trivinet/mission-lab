@@ -1,0 +1,47 @@
+{
+  "id": "l3-r4-vt-02/c8-angle-boundaries-a",
+  "version": 1,
+  "family": "L3 Orekit comparison, VT-02 (tolerances.md §9.3, §9.3.1, §9.3.2)",
+  "status": "Evaluated L3 tolerances, committed before any engine comparison with the Orekit dataset (tolerances.md §4.1 item 1; §9.3.2 item 3). Not yet reviewed or approved.",
+  "inputs": {
+    "l3": {
+      "dataset": "l3-orekit/vt-02/c8-angle-boundaries-a",
+      "version": 1,
+      "path": "test-data/l3-orekit/vt-02/l3-orekit-c8-angle-boundaries-a.json",
+      "generatorRevision": "df84b5e6d75a",
+      "storedTolerances": "Not used: the tolerances stored in the Orekit file are not the approved L3 rows (tolerances.md §13 C-8); the values below govern."
+    }
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part D2), verification/src/datasets/build-d2.ts",
+    "references": [
+      "Formulas of tolerances.md revision 4 transcribed in verification/src/tol/tolerances-r4.ts; inputs from the reference side of the Orekit dataset (§4.1 item 2)"
+    ],
+    "codeRevision": "29699cfa1b3b",
+    "date": "2026-11-15",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0)."
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 4 (approved by the owner 2026-11-15) §9.3.1 VT-02 L3",
+    "formula": "‖Δr‖ ≤ 3M·η_r(e)·u·r_a, ‖Δv‖ ≤ 3M·η_v(e)·u·v_p (grid a, e)",
+    "evaluatedAt": {
+      "mu_m3ps2": 398600441800000,
+      "a_m": 7000000,
+      "e": 0.005,
+      "r_a_m": 7034999.999999999,
+      "v_p_mps": 7583.878355630022,
+      "g_p_mps2": 8.216664118459182,
+      "n_radps": 0.001078007612872506,
+      "T_s": 5828.516637686015,
+      "kappa_E": 3.0201005025125625,
+      "kappa_h": 1.00001250023438,
+      "u": 1.1102230246251565e-16,
+      "M": 4
+    },
+    "position_m": 3.188539549645195e-7,
+    "velocity_mps": 3.330723166217751e-10,
+    "assertion": "asserted"
+  }
+}

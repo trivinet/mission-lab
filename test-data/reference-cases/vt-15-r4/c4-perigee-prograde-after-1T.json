@@ -1,0 +1,124 @@
+{
+  "id": "vt-15-r4/c4-perigee-prograde-after-1T",
+  "version": 2,
+  "previousVersion": "vt-15/c4-perigee-prograde-after-1T version 1 (test-data/reference-cases/vt-15, run in conformance run 2; keeps its approved values, tolerances.md §4.1 item 5 (ii))",
+  "family": "VT-15 Post-maneuver orbit (ML-FR-006 AC5, ML-FR-010 AC3)",
+  "description": "Moderately elliptical, inclined (general case), ν₀ = 0 rad; apsis-tangential burn Δv_RSW = [0, 100, 0] m/s at t_s = 13082.262211349715 s.",
+  "gridCase": "C4",
+  "kind": "apsis-tangential",
+  "status": "New dataset version (tolerances.md §4.1 item 5), committed before any engine run on it (§4.1 item 1; ML-TASK-018 part D2 phase 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "request": {
+      "requestId": "sha256:94ed4792d45f55e1e4be9c396fb0896f91a77d97b46f1b39b1bfccf8cbaac4e2",
+      "schemaVersion": "1.0",
+      "centralBody": "EARTH",
+      "constants": {
+        "mu_m3ps2": 398600441800000,
+        "referenceRadius_m": 6378137,
+        "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+      },
+      "dynamicsModel": "TWO_BODY",
+      "frame": "GCRF",
+      "epoch": {
+        "scale": "UTC",
+        "iso": "2026-01-01T00:00:00.000Z"
+      },
+      "initialState": {
+        "position_m": [6632220.107635427, 1014461.1272177348, -2612379.1962960595],
+        "velocity_mps": [-2315.4525191344273, 8033.245987332483, -2758.8548348457366]
+      },
+      "maneuvers": [
+        {
+          "id": "m1",
+          "t_s": 13082.262211349715,
+          "frame": "RSW",
+          "deltaV_mps": [0, 100, 0]
+        }
+      ],
+      "duration_s": 13682.262211349715,
+      "outputStep_s": 60
+    },
+    "requestIdNote": "requestId = \"sha256:\" + hex(SHA-256(UTF-8(canonicalRequestPayload(request)))) per contracts-v1.md §7.1, computed with @mission-lab/contracts canonicalRequestPayload and Node crypto SHA-256 (test code only).",
+    "elements": {
+      "semiMajorAxis_m": 12000000,
+      "eccentricity": 0.4,
+      "inclination_rad": 0.5,
+      "raan_rad": 2.5,
+      "argPeriapsis_rad": 4,
+      "trueAnomaly_rad": 0
+    },
+    "maneuverTime_s": 13082.262211349715
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part D2), verification/src/datasets/build-d2.ts",
+    "references": [
+      "Closed form in RSW coordinates (ref/maneuver.ts, 320-bit)",
+      "Exact post-maneuver plane normal (ref/rsw.ts projection-form basis, 320-bit, rounded once)"
+    ],
+    "codeRevision": "29699cfa1b3b",
+    "date": "2026-11-15",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0)."
+  },
+  "method": {
+    "comparisonMode": "A at m > 0, allowed only for a tangential burn at an apsis (§7 VT-15, review B1): reference from the exact initial state (the same apsis one period later; phase error second order), tilt term added to the plane rows.",
+    "closedForm": "a⁺, e⁺, plane rotation δ = atan2(|ΔvW|, v_s + ΔvS) from the exact RSW maneuver (as version 1). Plane normal ĥ⁺_ref = (r × v⁺)/‖r × v⁺‖ with v⁺ = v⁻ + ΔvR R + ΔvS S + ΔvW W, all in 320-bit, rounded once per component.",
+    "engineSide": "Test, binary64, from the event: a⁺ = 1/(2/r − v⁺²/μ); e⁺ = ‖[(v⁺² − μ/r) r − (r·v⁺) v⁺]/μ‖; ĥ = (r × v)/‖r × v‖ from (position_m, velocityAfter_mps) and (position_m, velocityBefore_mps); ψ = atan2(‖ĥ⁻ × ĥ⁺‖, ĥ⁻·ĥ⁺) (atan2 form required, §7 VT-15)."
+  },
+  "outputs": {
+    "burnRadius_m": 7200000,
+    "semiMajorAxisAfter_m": 12675729.116106126,
+    "eccentricityAfter": 0.43198533717074433,
+    "speedAfter_mps": 8903.7288384588,
+    "angularMomentumAfter_m2ps": 64106847636.90335,
+    "planeNormalAfter": [0.2869228300266515, 0.38408870938290723, 0.8775825618903728],
+    "planeRotation_rad": 0
+  },
+  "referenceAccuracy": {
+    "closedForm": "320-bit evaluation, rounded once: ≤ 1 ulp per value, below the binary64 reference share counted in every row (§7 VT-15)."
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 4 (approved by the owner 2026-11-15) §7 VT-15 (revision 4, P-2), \"new version\" column",
+    "formula": "|δa⁺|/a⁺ ≤ M[[m > 0]τ_E,eng(m)a⁺/a⁻ + 11u(4a⁺/r − 1) + max(0, 24a⁺v⁺Δv/μ − 1)u]; |δe⁺| ≤ M[(r/a⁺)(|δa⁺|/a⁺)/M + 60u], or for e⁺ < 1e-6 the general formula M[(4rv⁺/μ)((12κ_h⁻ + 25)u‖Δv‖ + uv⁺) + 60u]; δψ_n ≤ M[κ_h⁺u(2(12κ_h⁻ + 25)‖Δv‖/v⁺ + 14) + [m > 0]2(P_b v⁺ + rV_b)/h⁺]; |δψ| ≤ M[κ_h⁺u(2(12κ_h⁻ + 25)‖Δv‖/v⁺ + 14) + 12uκ_h⁻ + 32u + [m > 0]2(P_b v⁺ + rV_b)/h⁺]",
+    "evaluatedAt": {
+      "mu_m3ps2": 398600441800000,
+      "a_m": 12000000,
+      "e": 0.4,
+      "r_a_m": 16800000,
+      "v_p_mps": 8803.7288384588,
+      "g_p_mps2": 7.689051732253087,
+      "n_radps": 0.00048028278333456074,
+      "T_s": 13082.262211349715,
+      "kappa_E": 5.666666666666667,
+      "kappa_h": 1.0910894511799618,
+      "u": 1.1102230246251565e-16,
+      "M": 4,
+      "m_s": 13082.262211349715,
+      "deltaV_mps": 100,
+      "aPlus_m": 12675729.116106126,
+      "ePlus": 0.43198533717074433,
+      "r_m": 7200000,
+      "vPlus_mps": 8903.7288384588,
+      "hPlus_m2ps": 64106847636.90335,
+      "kappa_hPlus": 1
+    },
+    "semiMajorAxis_rel": 9.113803121826932e-12,
+    "eccentricity_abs": 5.203419159927746e-12,
+    "eccentricityFormula": "tangential",
+    "planeNormal_rad": 5.68994737465002e-13,
+    "planeRotation_rad": 5.89020084807207e-13,
+    "layers": "L1 closed form (exact maneuver, 320-bit)",
+    "assertion": "asserted"
+  }
+}
