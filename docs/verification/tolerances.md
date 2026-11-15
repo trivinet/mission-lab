@@ -1,6 +1,6 @@
 # M1 Tolerance Record
 
-**Document ID:** ML-VER-002 · **Date:** 2026-11-12 (revision 4: 2026-11-15) · **Author:** Verification Engineer (ML-TASK-010; revision 4: ML-TASK-018 part D1) · **Revision:** 4 · **Status:** Proposed, awaiting owner approval (revision 4). Revision 3 was approved by the owner on 2026-11-13 and stays in force until revision 4 is signed in §15. Changes follow §4.1: any loosening needs owner sign-off before the engine is run against it
+**Document ID:** ML-VER-002 · **Date:** 2026-11-12 (revision 4: 2026-11-15) · **Author:** Verification Engineer (ML-TASK-010; revision 4: ML-TASK-018 part D1) · **Revision:** 4 · **Status:** Approved by the owner on 2026-11-15 (revision 4; see §15). Revision 3 was approved on 2026-11-13. Changes follow §4.1: any loosening needs owner sign-off before the engine is run against it
 
 Implements the tolerance policy of the [verification plan](m1-verification-plan.md) §4 (method fixed
 there) for the numerical families VT-01…VT-19 and the numeric parts of VI-01…VI-03. Nothing in this
@@ -1638,17 +1638,17 @@ against it or against the L3 Orekit datasets):
 
 | Item | Proposed decision | Owner | Date |
 |---|---|---|---|
-| P-1: VT-14 accepted for G1 at e = 0 only; O-11 open, not blocking G1 (§7 VT-14, §12) | Records the owner direction of 2026-11-15 | | |
-| P-2: VT-15 direction term (iv); non-tangential a⁺, e⁺ rows; plane-normal and plane-rotation rows; modes A/B — mode A at m > 0 only for tangential burns at an apsis (every row, plane rows included), every other burn at m > 0 in mode B (§7 VT-15, §9.3.2 item 4) | Approve the formulas and evaluated values | | |
-| P-2: correction of the tangential VT-15 formula (term (iv), magnitude part; term (i) zero at m = 0; general e⁺ formula for e⁺ < 10⁻⁶) | Approve; no approved value changes (the approved values bound the corrected formula and stay in force for the run-2 datasets) | | |
-| §4.1 item 5 (review B2, remedy (a)): revision-4 values for the L2 VT-15 and VT-16 cases already run in conformance run 2 apply only to new dataset versions committed with them in D2 before any engine run; the run-2 versions keep their approved values (VT-15 tangential) and are informative for the new rows | Approve | | |
-| P-3: hyperbolic budget §6.8, including 10κ_E·a → 10κ_E·r_max and the hyperbolic C_b recount; O-5 closed | Approve the method and the evaluated values | | |
-| P-3: VT-16 validity condition \|E\| ≥ 0.1(v²/2 + μ/r) → 0.05 (§7 VT-16) | Owner decision; recommended (adds four arcs to the toleranced set; not a loosening of any value) | | |
-| P-4: O-4 resolved on ADR-005 Decision + ML-TASK-015 contract, with the reading stated in §12; VT-09 exact | Approve, or reject the reading (then VT-09 uses §7 and a contract amendment by the Systems Architect is needed) | | |
-| L3 rows VT-02, VT-12, VT-15, VT-16 (§9.3.1) and assumption A6′ | Approve; VT-16 hyperbolic L3 rows usable only after O-13 | | |
-| L3 maneuvers at t > 0: restart from the engine's event state (§9.3.2) | Approve | | |
-| O-10 marked resolved (bookkeeping of the 2026-11-12 decision) | Acknowledge | | |
-| New open items O-12 (hyperbolic solver residual), O-13 (A6′ hyperbolic check) | Acknowledge | | |
+| P-1: VT-14 accepted for G1 at e = 0 only; O-11 open, not blocking G1 (§7 VT-14, §12) | Records the owner direction of 2026-11-15 **Approved by the owner.** | Owner | 2026-11-15 |
+| P-2: VT-15 direction term (iv); non-tangential a⁺, e⁺ rows; plane-normal and plane-rotation rows; modes A/B — mode A at m > 0 only for tangential burns at an apsis (every row, plane rows included), every other burn at m > 0 in mode B (§7 VT-15, §9.3.2 item 4) | Approve the formulas and evaluated values **Approved by the owner.** | Owner | 2026-11-15 |
+| P-2: correction of the tangential VT-15 formula (term (iv), magnitude part; term (i) zero at m = 0; general e⁺ formula for e⁺ < 10⁻⁶) | Approve; no approved value changes (the approved values bound the corrected formula and stay in force for the run-2 datasets) **Approved by the owner.** | Owner | 2026-11-15 |
+| §4.1 item 5 (review B2, remedy (a)): revision-4 values for the L2 VT-15 and VT-16 cases already run in conformance run 2 apply only to new dataset versions committed with them in D2 before any engine run; the run-2 versions keep their approved values (VT-15 tangential) and are informative for the new rows | Approve **Approved by the owner.** | Owner | 2026-11-15 |
+| P-3: hyperbolic budget §6.8, including 10κ_E·a → 10κ_E·r_max and the hyperbolic C_b recount; O-5 closed | Approve the method and the evaluated values **Approved by the owner.** | Owner | 2026-11-15 |
+| P-3: VT-16 validity condition \|E\| ≥ 0.1(v²/2 + μ/r) → 0.05 (§7 VT-16) | Owner decision; recommended (adds four arcs to the toleranced set; not a loosening of any value) **Approved by the owner.** | Owner | 2026-11-15 |
+| P-4: O-4 resolved on ADR-005 Decision + ML-TASK-015 contract, with the reading stated in §12; VT-09 exact | Approve, or reject the reading (then VT-09 uses §7 and a contract amendment by the Systems Architect is needed) **Approved by the owner.** | Owner | 2026-11-15 |
+| L3 rows VT-02, VT-12, VT-15, VT-16 (§9.3.1) and assumption A6′ | Approve; VT-16 hyperbolic L3 rows usable only after O-13 **Approved by the owner.** | Owner | 2026-11-15 |
+| L3 maneuvers at t > 0: restart from the engine's event state (§9.3.2) | Approve **Approved by the owner.** | Owner | 2026-11-15 |
+| O-10 marked resolved (bookkeeping of the 2026-11-12 decision) | Acknowledge **Approved by the owner.** | Owner | 2026-11-15 |
+| New open items O-12 (hyperbolic solver residual), O-13 (A6′ hyperbolic check) | Acknowledge **Approved by the owner.** | Owner | 2026-11-15 |
 
 **Loosenings** (§4.1 item 3; each needs owner sign-off before the engine is run against it):
 
