@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Tolerance record revision 5 (PR #35, hyperbolic states) is under a bounded Systems Architect review, as the owner asked. Phase-2 tests stay locked until the owner signs.",
+  "headline": "Bounded review of tolerance record revision 5: approve with non-blocking notes (no blocking findings; all recomputed values match). The Verification Engineer is applying the seven notes before the owner signs.",
   "gates": [
     {
       "id": "G0",
@@ -382,6 +382,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Verification",
+      "text": "Applying rev. 5 review notes N1–N7: O-1 grid extended to cover the inbound/outbound arcs, same-run condition, superseded fields, c1 event-state premise asserted, gate after approval, stale text, sub-surface grid note."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Architect",
+      "text": "Bounded review of rev. 5: approve with non-blocking notes. δt_α,hyp re-derived and checked by finite difference (≤ 4e-39); B_tof sensitivity re-derived and tested with 400 random perturbations (worst 0.95 of bound); 20 values recomputed, all match; gate verified by reading; no tuning, no loosening. Seven non-blocking notes."
+    },
     {
       "date": "2026-11-16",
       "who": "Architect",
