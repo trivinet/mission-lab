@@ -75,8 +75,10 @@ describe('part D3 dataset o1-hyp-r5', () => {
         };
       };
       const m = d.inputs.requestBody.maneuvers[0]?.t_s ?? NaN;
-      expect(c?.startState.position_m).toEqual(d.outputs.event.position_m);
-      expect(c?.startState.velocity_mps).toEqual(d.outputs.event.velocityAfter_mps);
+      // JSON carries no sign of zero (−0 written as 0; same value for the O-1 input).
+      const plus0 = (v: number[]): number[] => v.map((x) => (x === 0 ? 0 : x));
+      expect(c?.startState.position_m).toEqual(plus0(d.outputs.event.position_m));
+      expect(c?.startState.velocity_mps).toEqual(plus0(d.outputs.event.velocityAfter_mps));
       expect(c?.dt_s).toEqual(
         (d.outputs.segments[1]?.t_s ?? []).map((t) => t - m).filter((x) => x > 0),
       );

@@ -1,0 +1,85 @@
+{
+  "id": "o1-hyp-r5/l3-c3-midrun-escape",
+  "version": 1,
+  "family": "O-1 solver acceptance check, extended to hyperbolic arcs (open item O-12)",
+  "description": "Universal-variable solver residual on the VT-16 hyperbolic arc l3-c3-midrun-escape: every compared sample with Δt > 0.",
+  "status": "New dataset (tolerances.md §4.1 item 1), committed before any engine run on it (ML-TASK-018 part D3 phase 1). Gated: not compared with the engine before the owner signs revision 5. Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "constants": {
+      "mu_m3ps2": 398600441800000,
+      "referenceRadius_m": 6378137,
+      "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+    },
+    "source": "test-data/l3-orekit/vt-16/l3-orekit-c3-midrun-escape.json: Orekit's own event state (position_m, velocityAfter_mps); Δt = t − m of Orekit's segment 1 (k ≥ 1)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part D3), verification/src/datasets/build-d3.ts",
+    "references": [
+      "Thresholds: tolerances.md revision 5 §6.8 (ε_t,gen of revision 4, δt_α,hyp of revision 5) transcribed in verification/src/tol/tolerances-r4.ts and tolerances-r5.ts, evaluated in binary64 from the exact input state (§4.1 item 2)",
+      "Residual (in the conformance test): verification/src/hp/o1-check-hyp.ts, the universal time equation in 320-bit at the engine χ̂"
+    ],
+    "codeRevision": "35bbaa797879",
+    "date": "2026-11-15",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0)."
+  },
+  "cases": [
+    {
+      "label": "l3-c3-midrun-escape",
+      "source": "test-data/l3-orekit/vt-16/l3-orekit-c3-midrun-escape.json: Orekit's own event state (position_m, velocityAfter_mps); Δt = t − m of Orekit's segment 1 (k ≥ 1)",
+      "startState": {
+        "position_m": [4531856.3093219455, -10275674.905336946, 0],
+        "velocity_mps": [8860.907711683834, 5588.913212502061, 0]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.21449594555443563,
+        "aAbs_m": 10281909.044300044,
+        "e": 2.0748006111449833,
+        "n_h_radps": 0.0006055614933675664,
+        "sinhF0": -0.13004632316302958,
+        "coshF0": 1.0084205700838431,
+        "kappa_E_r0": 4.662092784155755,
+        "kappa_E_arc": 4.721620511304703,
+        "r_min_m": 11051002.124550818,
+        "r_max_m": 108285535.76195543,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [
+        1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000,
+        15000
+      ],
+      "x": [
+        0.5402589091664712, 0.9455196964683377, 1.2318508647857014, 1.4483551949306164,
+        1.621876176612915, 1.7667081819860233, 1.8911113756685898, 2.000239412716259,
+        2.097511840216846, 2.185310767735523, 2.2653614916029987, 2.3389537775964446,
+        2.4070773466672666, 2.4705085059243834, 2.5298676085941647
+      ],
+      "epsTgen_s": [
+        4.013606410079931e-12, 9.990741658669136e-12, 1.716763677101267e-11, 2.4956052045453025e-11,
+        3.310806398498463e-11, 4.1505711677800964e-11, 5.008457402270048e-11, 5.880552379878789e-11,
+        6.764282444834369e-11, 7.657848717924534e-11, 8.559932970266376e-11, 9.469532217483154e-11,
+        1.038585979497616e-10, 1.1308283118847125e-10, 1.2236282835564256e-10
+      ],
+      "dtAlphaHyp_s": [
+        9.433785340713698e-13, 4.473651205248086e-12, 9.778072531576159e-12, 1.60969034440591e-11,
+        2.3062929503862023e-11, 3.0486862834651256e-11, 3.825941205951301e-11,
+        4.631137662040329e-11, 5.4595745669760946e-11, 6.307880970060093e-11, 7.173535396178734e-11,
+        8.05458718789086e-11, 8.949485494194589e-11, 9.856969262591553e-11, 1.0775993627204214e-10
+      ],
+      "threshold_s": [
+        4.956984944151301e-12, 1.4464392863917222e-11, 2.694570930258883e-11,
+        4.1052955489512125e-11, 5.617099348884665e-11, 7.199257451245222e-11, 8.83439860822135e-11,
+        1.0511690041919119e-10, 1.2223857011810464e-10, 1.3965729687984627e-10,
+        1.5733468366445109e-10, 1.7524119405374013e-10, 1.9335345289170748e-10,
+        2.116525238143868e-10, 2.301227646276847e-10
+      ]
+    }
+  ],
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 5 (Proposed, awaiting owner approval; ML-TASK-018 part D3) §6.8 \"Extended O-1 check\", §12 O-12",
+    "formula": "Pass when |t(χ̂) − Δt| ≤ ε_t,gen(Δt) + δt_α,hyp(Δt), t(χ̂) the universal time equation evaluated in high precision at the engine χ̂ with α, σ₀, r₀ formed in high precision from the exact binary64 input (§6.1 O-1 route (1), extended to E > 0 by revision 5 §6.8). ε_t,gen of §6.8 (revision 4); δt_α,hyp = 5u κ_E(r₀) D(x)/n_h, κ_E(r₀) = 1 + 4|a|/r₀, D(X) = e|sinh F₀|[(cosh X − 1) + X sinh X/2] + (sinh X − X) + (e cosh F₀/2)[(sinh X − X) + X(cosh X − 1)] (revision 5). No margin factor (as the elliptic O-1 threshold).",
+    "assertion": "gated: asserted only after the owner signs revision 5 (§15)"
+  }
+}
