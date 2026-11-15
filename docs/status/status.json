@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-15",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Orekit L3 datasets merged (43 cases). Next for G1: decide tolerance gaps P-1…P-4, then run the engine against the L2 gaps and the L3 data; also the WGS 84 constants check and the G1 report.",
+  "headline": "Owner approved the four tolerance-gap directions. The Verification Engineer is writing tolerance record revision 4 (gaps P-1…P-4 and the Orekit rows); the owner approves it before the engine is run on the gaps and the L3 data.",
   "gates": [
     {
       "id": "G0",
@@ -31,11 +31,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-26",
-      "text": "Decide the four tolerance gaps P-1…P-4 from conformance run 2 (zero-Δv on eccentric orbits, non-tangential burns, hyperbolic arcs, sampling-independence rule).",
-      "blocking": "G1 verification report"
-    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -206,8 +201,8 @@
           "title": "Numerical suite in CI and G1 verification report",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_review",
-          "deps": "011, 017",
+          "status": "in_progress",
+          "deps": "Part D1: tolerance record rev. 4 running; D2 conformance run 3 after owner approval",
           "approval": true
         },
         {
@@ -382,6 +377,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "ML-TASK-018 part D1 started: tolerance record revision 4 (P-1 VT-14 e = 0 only for G1; P-2 non-tangential burns; P-3 hyperbolic budget; P-4 close O-4; Orekit rows for VT-02, VT-12, VT-15, VT-16). No engine run until the owner approves it."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Owner",
+      "text": "Approved the recommendations for tolerance gaps P-1…P-4."
+    },
     {
       "date": "2026-11-15",
       "who": "Coordinator",
