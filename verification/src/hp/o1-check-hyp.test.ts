@@ -69,8 +69,8 @@ function F(alpha: BigFloat, chi: BigFloat, sigma0: BigFloat, r0: BigFloat): BigF
 }
 
 describe('O-1 hyperbolic reference (revision 5): dataset coverage', () => {
-  it('covers the six VT-16 hyperbolic arcs and the 96-case grid', () => {
-    expect(cases.length).toBe(6 + 96);
+  it('covers the six VT-16 hyperbolic arcs and the 144-case grid', () => {
+    expect(cases.length).toBe(6 + 144);
     for (const c of cases) {
       expect(c.dt_s.every((d) => d > 0)).toBe(true);
       expect(c.threshold_s.length).toBe(c.dt_s.length);

@@ -35,7 +35,7 @@ const files = readdirSync(DIR)
   }));
 
 describe('part D3 dataset o1-hyp-r5', () => {
-  it('has six arc files and one grid file of 96 cases', () => {
+  it('has six arc files and one grid file of 144 cases', () => {
     expect(files.map((f) => f.name)).toEqual([
       'grid.json',
       'l2-c3-midrun-escape.json',
@@ -45,7 +45,7 @@ describe('part D3 dataset o1-hyp-r5', () => {
       'l3-c1-escape-prograde.json',
       'l3-c3-midrun-escape.json',
     ]);
-    expect(files[0]?.data.cases.length).toBe(96);
+    expect(files[0]?.data.cases.length).toBe(144);
   });
 
   it('L2 arcs start at the vt-16-r4 reference start state with its Δt > 0', () => {

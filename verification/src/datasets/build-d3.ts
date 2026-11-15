@@ -10,14 +10,20 @@
  *  - Six VT-16 hyperbolic arcs: the four L2 arcs of vt-16-r4 (reference post-maneuver state
  *    `outputs.startState`, Δt of segment 1) and the two L3 hyperbolic arcs (Orekit's own event state
  *    of test-data/l3-orekit/vt-16, Δt of Orekit's segment 1).
- *  - A deterministic grid (O1_HYP_GRID, tolerances-r5.ts): 96 states built in binary64 from
+ *  - A deterministic grid (O1_HYP_GRID + O1_HYP_GRID_NEAR_GATE, tolerances-r5.ts): 144 states built in binary64 from
  *    hyperbolic elements; the binary64 state is the input, whatever rounding the construction did.
  *
  * Independence: written without reading packages/astrodynamics or packages/simulation (ADR-003).
  */
 import { U } from '../tol/tolerances';
 import { VT16_VALIDITY_GATE, prepareHyperbolicArc, type HyperbolicArc } from '../tol/tolerances-r4';
-import { O1_HYP_GRID, kappaE0, o1HypThreshold } from '../tol/tolerances-r5';
+import {
+  O1_HYP_GRID,
+  O1_HYP_GRID_NEAR_GATE,
+  anomalyForRadius,
+  kappaE0,
+  o1HypThreshold,
+} from '../tol/tolerances-r5';
 import type { V3 } from '../ref/vec';
 import { CONSTANTS, type DatasetFile, type Provenance } from './build';
 import { v3 } from './build-c';
@@ -154,7 +160,7 @@ export interface O1HypGridCase extends O1HypCase {
   };
 }
 
-/** The 96 grid cases of O1_HYP_GRID (one Δt per case). */
+/** The 144 grid cases of O1_HYP_GRID and O1_HYP_GRID_NEAR_GATE (one Δt per case). */
 export function o1HypGridCases(): O1HypGridCase[] {
   const g = O1_HYP_GRID;
   const out: O1HypGridCase[] = [];
@@ -186,6 +192,43 @@ export function o1HypGridCases(): O1HypGridCase[] {
         }
       }
     });
+  }
+  // Near-gate supplement (review N1): e ∈ {1.1, 1.17} at r₀/|a| = 0.22 inbound and outbound, and
+  // e = 1.1 at F₀ = ±1.
+  const ng = O1_HYP_GRID_NEAR_GATE;
+  for (const aAbs of ng.aAbs_m) {
+    const nH = Math.sqrt(MU / (aAbs * aAbs * aAbs));
+    for (const st of ng.starts) {
+      const f = 'rOverA' in st ? anomalyForRadius(st.e, st.rOverA) : st.F0abs;
+      for (const F0 of [-f, f]) {
+        const s = hyperbolicElementsToState(
+          aAbs,
+          st.e,
+          st.inclination_rad,
+          st.raan_rad,
+          st.argPeriapsis_rad,
+          F0,
+        );
+        for (const span of ng.meanMotionSpan) {
+          out.push({
+            label: `near-gate a=${aAbs.toExponential(1)} e=${String(st.e)} F0=${F0.toPrecision(6)} nΔt=${String(span)}`,
+            source:
+              'O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64',
+            elements: {
+              aAbs_m: aAbs,
+              e: st.e,
+              inclination_rad: st.inclination_rad,
+              raan_rad: st.raan_rad,
+              argPeriapsis_rad: st.argPeriapsis_rad,
+              F0,
+            },
+            position_m: v3(s.position_m),
+            velocity_mps: v3(s.velocity_mps),
+            dt_s: [span / nH],
+          });
+        }
+      }
+    }
   }
   return out;
 }
@@ -254,11 +297,11 @@ export function buildPartD3Datasets(prov: Provenance): DatasetFile[] {
       id: 'o1-hyp-r5/grid',
       version: 1,
       family: 'O-1 solver acceptance check, extended to hyperbolic arcs (open item O-12)',
-      description: `Deterministic grid of ${String(grid.length)} hyperbolic start states and spans (revision 5 §6.8): |a| ∈ {7.0e6, 3.0e7} m, e ∈ {1.25, 1.5, 2.5, 5}, F₀ ∈ {−1, 0, 1}, n_h Δt ∈ {0.05, 0.5, 5, 20}; all inside the §7 VT-16 validity gate; Δt > 0 only.`,
+      description: `Deterministic grid of ${String(grid.length)} hyperbolic start states and spans (revision 5 §6.8): |a| ∈ {7.0e6, 3.0e7} m, e ∈ {1.25, 1.5, 2.5, 5}, F₀ ∈ {−1, 0, 1}, n_h Δt ∈ {0.05, 0.5, 5, 20}; plus the near-gate supplement (review N1): e ∈ {1.1, 1.17} starting at r₀/|a| = 0.22 (gate ratio ≈ 0.052) inbound and outbound, and e = 1.1 at F₀ = ±1, same |a| and spans; all inside the §7 VT-16 validity gate; Δt > 0 only.`,
       status: STATUS,
       inputs: {
         constants: CONSTANTS,
-        source: 'O1_HYP_GRID, verification/src/tol/tolerances-r5.ts',
+        source: 'O1_HYP_GRID and O1_HYP_GRID_NEAR_GATE, verification/src/tol/tolerances-r5.ts',
       },
       producedBy: producedBy(prov),
       cases: grid.map((c) => ({ ...caseRecord(c), elements: c.elements })),

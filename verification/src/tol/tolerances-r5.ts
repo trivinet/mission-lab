@@ -72,3 +72,27 @@ export const O1_HYP_GRID = {
   raan_rad: [0.7, 3.3, 5.1, 1.9],
   argPeriapsis_rad: [4.4, 0.2, 2.6, 5.8],
 } as const;
+
+/**
+ * Near-gate supplement of the grid (Systems Architect review N1 of revision 5): low eccentricity
+ * and starts close to the §7 VT-16 gate, the region of the L2 inbound/outbound arcs (e 1.17,
+ * κ_E(r₀) 18.2, gate ratio 0.0549). |a| ∈ {7.0e6, 3.0e7} m, n_h Δt ∈ {0.05, 0.5, 5, 20}, and
+ *  - e ∈ {1.1, 1.17} with the start at r₀/|a| = 0.22 (gate ratio 1/(1 + 4/0.22) ≈ 0.0521, κ_E(r₀)
+ *    ≈ 19.2), inbound and outbound: F₀ = ∓acosh(1.22/e);
+ *  - e = 1.1 with F₀ ∈ {−1, 1}.
+ * Orientation fixed per entry. Every start lies inside the gate (checked by the builder).
+ */
+export const O1_HYP_GRID_NEAR_GATE = {
+  aAbs_m: [7.0e6, 3.0e7],
+  meanMotionSpan: [0.05, 0.5, 5, 20],
+  starts: [
+    { e: 1.1, rOverA: 0.22, inclination_rad: 0.9, raan_rad: 2.2, argPeriapsis_rad: 3.7 },
+    { e: 1.17, rOverA: 0.22, inclination_rad: 1.6, raan_rad: 4.6, argPeriapsis_rad: 1.3 },
+    { e: 1.1, F0abs: 1, inclination_rad: 2.4, raan_rad: 0.3, argPeriapsis_rad: 5.2 },
+  ],
+} as const;
+
+/** F₀ ≥ 0 at which r₀/|a| = e cosh F₀ − 1 equals rOverA. */
+export function anomalyForRadius(e: number, rOverA: number): number {
+  return Math.acosh((1 + rOverA) / e);
+}
