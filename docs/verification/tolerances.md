@@ -250,6 +250,20 @@ after the record and must not be influenced by engine results. Therefore:
 4. Values not yet computed — VT-05 vs L2b (E_RK), VT-16 (all values), VI-03 per-sample values,
    L3 Orekit if A6 fails — fall under items 1–3. No section of this record grants a
    re-evaluation "without new approval".
+5. **Datasets already run (revision 4, review B2, remedy (a)).** Conformance run 2 ran the engine
+   on all fourteen L2 VT-15 datasets (`test-data/reference-cases/vt-15`, version 1) and on the L2
+   VT-16 datasets (states of the hyperbolic arcs not compared, warnings only). By item 1 a value
+   evaluated now for those dataset versions would be void. Therefore: (i) the revision-4 values of
+   §7 VT-15 (non-tangential a⁺, e⁺, the plane rows, the corrected tangential formula) and of §6.8 /
+   §7 VT-16 (hyperbolic arcs vs L2b) apply **only to new dataset versions** (new id or new
+   `version`) that part D2 commits **together with** these evaluated values before any engine run
+   on them; (ii) the run-2 dataset versions keep exactly what they carried: the ten approved
+   tangential VT-15 values stay asserted on them (they still bound the corrected formula, §7
+   VT-15), and their non-tangential and plane measurements and the VT-16 hyperbolic arcs stay
+   **informative** for the new rows, never asserted against them; (iii) the L2 hyperbolic VT-16
+   arcs are treated the same way although their states were never compared (borderline case;
+   treated as run, to be safe). The L3 Orekit datasets have never been run against the engine and
+   are not affected.
 
 ## 5. Display resolution used to judge the indicative expectation
 
@@ -1141,9 +1155,11 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
   evaluated in §6.8 (P_E,gen, V_E,gen, with 10κ_E·a → 10κ_E·r_max). O-5 is closed (§12).
   - *Hyperbolic arc vs L2b:* ‖Δr‖ ≤ M·P_E,gen(Δt) + 2E_RK,r, ‖Δv‖ ≤ M·V_E,gen(Δt) + 2E_RK,v, the
     approved form. The engine part M·P_E,gen, M·V_E,gen is evaluated in §6.8. The L2 hyperbolic
-    datasets of conformance run 2 carry no reference trajectory (`stateComparison: null`); the L2b
-    trajectory and its E_RK are produced and committed in part D2 before the engine comparison
-    (§4.1 item 1; an E_RK above the §9.2 target is a loosening for §15). Hyperbolic arcs vs L2a are
+    datasets of conformance run 2 carry no reference trajectory (`stateComparison: null`) and were
+    run for warnings; the §6.8 values apply only to **new dataset versions** with the L2b
+    trajectory and its E_RK, committed in part D2 together with the evaluated values before the
+    engine comparison (§4.1 items 1 and 5; an E_RK above the §9.2 target is a loosening for §15).
+    The run-2 versions stay informative. Hyperbolic arcs vs L2a are
     not defined (L2a is the elliptic Newton–Kepler method).
   - *Maneuver at m > 0* (`c3-midrun-escape`): the reference arc starts from the engine's event
     state (`position_m`, `velocityAfter_mps`), as for VT-05 post-maneuver segments; Δt = t − m.
@@ -1612,6 +1628,7 @@ against it or against the L3 Orekit datasets):
 | P-1: VT-14 accepted for G1 at e = 0 only; O-11 open, not blocking G1 (§7 VT-14, §12) | Records the owner direction of 2026-11-15 | | |
 | P-2: VT-15 direction term (iv); non-tangential a⁺, e⁺ rows; plane-normal and plane-rotation rows; modes A/B — mode A at m > 0 only for tangential burns at an apsis (every row, plane rows included), every other burn at m > 0 in mode B (§7 VT-15, §9.3.2 item 4) | Approve the formulas and evaluated values | | |
 | P-2: correction of the tangential VT-15 formula (term (iv), magnitude part; term (i) zero at m = 0; general e⁺ formula for e⁺ < 10⁻⁶) | Approve; no approved value changes (the approved values bound the corrected formula and stay in force for the run-2 datasets) | | |
+| §4.1 item 5 (review B2, remedy (a)): revision-4 values for the L2 VT-15 and VT-16 cases already run in conformance run 2 apply only to new dataset versions committed with them in D2 before any engine run; the run-2 versions keep their approved values (VT-15 tangential) and are informative for the new rows | Approve | | |
 | P-3: hyperbolic budget §6.8, including 10κ_E·a → 10κ_E·r_max and the hyperbolic C_b recount; O-5 closed | Approve the method and the evaluated values | | |
 | P-3: VT-16 validity condition \|E\| ≥ 0.1(v²/2 + μ/r) → 0.05 (§7 VT-16) | Owner decision; recommended (adds four arcs to the toleranced set; not a loosening of any value) | | |
 | P-4: O-4 resolved on ADR-005 Decision + ML-TASK-015 contract, with the reading stated in §12; VT-09 exact | Approve, or reject the reading (then VT-09 uses §7 and a contract amendment by the Systems Architect is needed) | | |
