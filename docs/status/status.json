@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-15",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Owner approved the four tolerance-gap directions. The Verification Engineer is writing tolerance record revision 4 (gaps P-1…P-4 and the Orekit rows); the owner approves it before the engine is run on the gaps and the L3 data.",
+  "headline": "Tolerance record revision 4 is ready for the owner (PR #31): gaps P-1…P-4 and the Orekit rows, one forced loosening of 0.073 %. After approval: conformance run 3 on the gaps and the L3 data.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-29",
+      "text": "Approve tolerance record revision 4 (PR #31), or ask for a bounded Systems Architect review first. Sign: the new rows, the forced +0.073 % loosening of VT-15 c3-apogee-circularise, and lowering the VT-16 validity condition from 0.1 to 0.05.",
+      "blocking": "ML-TASK-018 D2 (conformance run 3)"
+    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -201,8 +206,8 @@
           "title": "Numerical suite in CI and G1 verification report",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_progress",
-          "deps": "Part D1: tolerance record rev. 4 running; D2 conformance run 3 after owner approval",
+          "status": "in_review",
+          "deps": "D1 rev. 4 in PR #31 awaiting owner; D2 after approval",
           "approval": true
         },
         {
@@ -377,6 +382,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-15",
+      "who": "Coordinator",
+      "text": "Checked rev. 4: only the two allowed files changed; the P-4 clauses exist in ADR-005, contracts §5.2 and ML-TASK-015; L3 VT-02 C1 is 1.5000× the L2 value; the C3 loosening recomputes to +0.073 %. New formulas not re-derived. PR #31 opened."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "ML-TASK-018 D1 delivered: tolerance record rev. 4 (Proposed). VT-09 exact, VT-14 e = 0 for G1, VT-15 general burns and plane angle, VT-16 hyperbolic budget with 10κ_E·r_max, L3 rows for VT-02/12/15/16. All numbers evaluated twice (binary64 and 50-digit decimal)."
+    },
     {
       "date": "2026-11-15",
       "who": "Verification",
