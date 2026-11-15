@@ -1,0 +1,62 @@
+{
+  "id": "l3-restart/c3-midrun-escape",
+  "description": "Orekit arc restarted from the engine's event state (tolerances.md §9.3.2 item 2) for l3-orekit/vt-16/l3-orekit-c3-midrun-escape.json; used only by the conformance comparison of the states after the burn. Depends on the engine only through the event state recorded in inputs, which the test checks bit-for-bit against the engine before using this arc.",
+  "producedBy": {
+    "tool": "Orekit orekit-13.1.9.jar, hipparchus-core-4.0.3.jar through orekit_jpype 13.1.9.0, JPype1 1.7.1",
+    "script": "verification/l3-d2/restart.py",
+    "codeRevision": "a55eb1f023f0",
+    "date": "2026-11-15",
+    "runtime": "Python 3.13.17; JDK 21.0.13 (Eclipse Adoptium, OpenJDK 64-Bit Server VM 21.0.13+9-LTS); Windows 11 AMD64",
+    "orekitApi": "KeplerianPropagator(CartesianOrbit(PV(r0, v0), GCRF, epoch.shiftedBy(m), mu), FrameAlignedProvider(GCRF), mu).propagate(epoch.shiftedBy(t_s)); verification/l3/generate.py propagate (unchanged)",
+    "frameAndTime": "As test-data/l3-orekit (GCRF, TAI-labelled epoch, epoch.shiftedBy(t_s))."
+  },
+  "inputs": {
+    "l3Dataset": "l3-orekit/vt-16/l3-orekit-c3-midrun-escape.json",
+    "engineRevision": "a55eb1f023f0",
+    "maneuverTime_s": 5000,
+    "position_m": [4531856.309321949, -10275674.90533695, 0],
+    "velocityAfter_mps": [8860.907711683834, 5588.913212502057, 0]
+  },
+  "outputs": {
+    "t_s": [
+      5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000,
+      19000, 20000
+    ],
+    "position_m": [
+      [4531856.309321949, -10275674.90533695, 0],
+      [12382163.98699663, -3526221.2383776233, 0],
+      [18101068.082168777, 4070539.2666524197, 0],
+      [22630464.949922815, 11476844.37281327, 0],
+      [26581027.061494946, 18608563.456839632, 0],
+      [30211397.818495754, 25522078.915448718, 0],
+      [33642824.84770087, 32269853.317414943, 0],
+      [36939828.06746539, 38889750.8346349, 0],
+      [40140319.55634771, 45408585.26674534, 0],
+      [43268310.164308675, 51845706.222558826, 0],
+      [46339907.565293774, 58215435.17298266, 0],
+      [49366417.607465856, 64528635.5409384, 0],
+      [52356069.46758736, 70793731.51322545, 0],
+      [55315033.88057735, 77017383.61802487, 0],
+      [58248054.176361784, 83204947.9644406, 0],
+      [61158853.62962547, 89360796.09070067, 0]
+    ],
+    "velocity_mps": [
+      [8860.907711683834, 5588.913212502057, 0],
+      [6665.228281769811, 7500.860850131777, 0],
+      [4975.708402484318, 7548.381920186697, 0],
+      [4178.01967169983, 7261.469905195134, 0],
+      [3762.9145100229302, 7012.610597286955, 0],
+      [3516.892762149729, 6823.198796261657, 0],
+      [3356.2755442660714, 6678.585378582872, 0],
+      [3243.8585432490395, 6565.618244421478, 0],
+      [3161.033955212486, 6475.235906810986, 0],
+      [3097.5833490865393, 6401.367510785998, 0],
+      [3047.468436985562, 6339.884459995423, 0],
+      [3006.9069020149836, 6287.9093368626145, 0],
+      [2973.415117802338, 6243.385217165995, 0],
+      [2945.2976717323427, 6204.80645478526, 0],
+      [2921.359042541827, 6171.047098802483, 0],
+      [2900.732710675408, 6141.248905066783, 0]
+    ]
+  }
+}
