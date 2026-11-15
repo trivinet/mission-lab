@@ -370,3 +370,32 @@ report_part_d3_phase1:
     and of the gate; owner signature of the revision-5 rows of §15. Phase 2: follow
     conformance/l3-restart-r5/README.md (c1 event state, Orekit restart, selfcheck --restart, then
     ML_CONFORMANCE_REV5=1 pnpm vitest run --project conformance) and write the run report.
+  review_fixes:
+    # Systems Architect bounded review of PR #35: "approve with non-blocking notes" N1–N7. Fixes on
+    # test/ml-task-018d3-hyperbolic, not pushed. Engine not read, not run.
+    commits:
+      - "8ac71f4 N1 grid supplement in code (O1_HYP_GRID_NEAR_GATE)"
+      - "f65f2b8 N1 o1-hyp-r5 regenerated (codeRevision 8ac71f4), never run against the engine"
+      - "2a1df51 N1 record: grid definition, counts and ranges"
+      - "f9babbf N2 O-1 check and asserted rows in one gated file; asserted tests require O-1 passed in the same run; both restart directories named"
+      - "7960a32 N3 superseded stored fields listed, incl. comparedWith of l3-r4-vt-16/c1"
+      - "a5b0b7b N4 c1 premise asserted inside the gated L3 block"
+      - "b7f5df6 N5 record lock accepts any approved revision ≥ 5; post-approval step defined"
+      - "1f2b0b0 N6 stale text (w, VT-16 L3 gate remark, §4.1 item 5)"
+      - "75502ee N7 R_ref note; check calls propagateKeplerUniversal directly"
+      - "this commit: this subsection"
+    resolution:
+      - "N1: 48 near-gate cases added (|a| 7e6, 3e7; e 1.1 and 1.17 at r₀/|a| = 0.22, gate ratio 0.0521, κ_E(r₀) 19.18, inbound and outbound; e 1.1 at F₀ = ±1; n_h Δt 0.05…20). Grid 96 → 144 cases, dataset 498 → 546 samples. Grid thresholds 1.14e-13…2.25e-8 s → 1.14e-13…2.71e-8 s (supplement 5.24e-13…2.71e-8 s); threshold/ε_t,gen up to 6.45 (was 5.16). The first 96 cases and the six arcs are unchanged. Checked twice: all 546 thresholds vs 60-digit decimal agree to 5.8e-15 relative; the 320-bit reference validation (spacing at the correctly rounded root, detection at 1e-9) passes on all 546."
+      - "N2: enforced in code (one file, conformance/src/vt16-r5-hyperbolic.test.ts, O-1 suite first; each asserted test fails unless all 150 O-1 cases ran and passed). Selfcheck (b) is a Python step, stated in §4.1 item 6 and the README as a condition for the run to count. Both restart directories named."
+      - "N3: §4.1 item 6 lists the superseded fields: assertion, assertionReason (vt-16-r4, l3-r4-vt-16 segment1) and comparedWith of l3-r4-vt-16/c1."
+      - "N4: asserted, gated: engine c1 event position_m and velocityBefore_mps bit-identical to initialState; ‖Δv_I,engine − Δv_I,Orekit‖ ≤ the approved L3 VT-12 row 3M(12κ_h + 25)u‖Δv‖ = 1.972e-10 m/s (κ_h = 1, ‖Δv‖ = 4000 m/s; binary64 and decimal). Deviation from the note: see disagreements."
+      - "N5: recordApprovesRev5 accepts revision ≥ 5 with status 'Approved by the owner on DATE', or revision ≥ 6 whose header says 'Revision 5 was approved by the owner on DATE'; refuses revision 5 Proposed and revision < 5 (unit tests). Switch kept until phase 2; after the phase-2 report is accepted the switch is removed and the tests run in pnpm test and CI (record §4.1 item 6, README, gate doc comment)."
+      - "N6: §9.3.1 w stated as w = 1 on both L3 arcs (with the numbers); VT-16 L3 row no longer says 'toleranced only if …'; §4.1 item 5 says the L3 datasets were run in run 3 with values committed before."
+      - "N7: 50 of 144 grid arcs have r_min < R_ref (15 of the first 96, 35 of the supplement; 32 start inside R_ref); the check calls propagateKeplerUniversal directly; a rejection would be a test-design artefact."
+    loosenings: "None. No approved value changed; the only new values are the 48 added grid thresholds."
+    tests_executed:
+      - "Decimal re-check of o1-hyp-r5 (546 samples): threshold 5.8e-15, ε_t,gen 3.5e-15 relative max difference"
+      - "Gate: normal run skips 156 gated tests (150 O-1 + 4 L2 + 2 L3); with ML_CONFORMANCE_REV5=1 the gated file fails at collection, no test body run"
+      - "pnpm install --frozen-lockfile, lint, typecheck, format:check, check:boundaries -> exit 0; pnpm test -> exit 0, 67 files, 1415 passed | 156 skipped"
+    disagreements:
+      - "N4 bound: the note asked for ≤ 2 × the VT-12 per-side bound, i.e. 2(12κ_h + 25)u‖Δv‖ = 3.29e-11 m/s, unmargined. I used the approved L3 VT-12 row 3M(12κ_h + 25)u‖Δv‖ = 1.972e-10 m/s instead: it is already approved for exactly this quantity (engine Δv_I vs Orekit Δv_I, §9.3.1), and an unmargined bound would be a new tolerance outside the margin policy of §3. Not a loosening (no approved value existed for 2× per side). The choice was not driven by the run-3 value (1.8e-12 m/s), which both bounds pass. If the reviewer prefers the tighter form, it is a one-line change in the gated test before phase 2."
