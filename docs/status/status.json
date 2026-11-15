@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Tolerance record revision 5 (O-12/O-13, hyperbolic states) is ready in PR #35, no loosening; the phase-2 tests are written but locked until the owner signs. Then: run them, the WGS 84 constants check, CI wiring and the G1 report.",
+  "headline": "Tolerance record revision 5 (PR #35, hyperbolic states) is under a bounded Systems Architect review, as the owner asked. Phase-2 tests stay locked until the owner signs.",
   "gates": [
     {
       "id": "G0",
@@ -33,7 +33,7 @@
   "ownerActions": [
     {
       "id": "OA-31",
-      "text": "Tolerance record revision 5 (PR #35): ask for a bounded Systems Architect review (recommended; the time-of-flight bound is the least certain) or approve it directly.",
+      "text": "After the bounded Systems Architect review: approve tolerance record revision 5 (PR #35).",
       "blocking": "ML-TASK-018 D3 phase 2 (hyperbolic states asserted)"
     },
     {
@@ -382,6 +382,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Architect",
+      "text": "Bounded review of tolerance record rev. 5 (PR #35) started at the owner's request: hyperbolic δt_α, extended O-1 check, the time-of-flight bound B_tof, §4.1 item 6, the c1 restart and the gate."
+    },
     {
       "date": "2026-11-16",
       "who": "Coordinator",
