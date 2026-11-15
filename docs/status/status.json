@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-15",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Tolerance record revision 4 (PR #31) is under a bounded Systems Architect review, as the owner asked. After it: owner approval, then conformance run 3 on the gaps and the L3 data.",
+  "headline": "Bounded review of tolerance record rev. 4: arithmetic confirmed (31 values), three blocking items; the Verification Engineer is applying the fixes. The forced loosening is withdrawn (not needed).",
   "gates": [
     {
       "id": "G0",
@@ -382,6 +382,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "Applying review fixes to rev. 4: B1 mode A at m > 0 only for apsis-tangential burns; B2 new dataset versions for re-evaluated run-2 cases (§4.1 item 1); B3 hyperbolic χ²C coefficient 7 → 8; keep the approved C3 values (no loosening); N1, N2, N4."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Architect",
+      "text": "Bounded review of rev. 4: changes required. 31 values recomputed independently, all agree; r_max substitution tested independently (model bounds the true sensitivity with wide slack). Blocking: B1 mode-A rule for non-tangential burns at m > 0; B2 values re-evaluated on datasets already run (§4.1 item 1); B3 missing subtraction rounding in the hyperbolic χ²C row. The C3 loosening is not forced. P-4 authority sufficient; 0.05 threshold safe."
+    },
     {
       "date": "2026-11-15",
       "who": "Architect",
