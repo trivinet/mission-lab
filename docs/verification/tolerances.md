@@ -340,7 +340,13 @@ after the record and must not be influenced by engine results. Therefore:
    2 from the engine's event state, as the run-3 restarts were. Until (a), the asserted tests are
    gated: they are skipped in every normal run, and when the switch is set they refuse to run while
    this record's status line does not record the owner's approval of revision 5
-   (`conformance/src/support/rev5-gate.ts`).
+   (`conformance/src/support/rev5-gate.ts`). The record lock accepts the header at revision ≥ 5
+   with status "Approved by the owner on YYYY-MM-DD", or a later revision (e.g. revision 6
+   Proposed) whose header states "Revision 5 was approved by the owner on YYYY-MM-DD"; **later
+   revisions of this record keep that sentence in the header** so the lock stays open (review N5).
+   **After approval (review N5):** phase 2 runs with the switch set; once the owner accepts the
+   phase-2 run report, the switch is removed from the test file, so the tests run in every normal
+   `pnpm test` and in CI; the record lock stays and is then always satisfied.
 
 ## 5. Display resolution used to judge the indicative expectation
 

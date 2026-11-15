@@ -28,3 +28,9 @@ condition (c) — together with the asserted state rows. Condition (c) is enforc
 suite and the asserted suites are in one file (`conformance/src/vt16-r5-hyperbolic.test.ts`), and
 every asserted test fails unless every O-1 case ran and passed in the same run. Condition (b) is a
 Python step and is not enforced in code; the phase-2 report must show its output.
+
+**After the phase-2 run is accepted by the owner:** remove the switch (`ML_CONFORMANCE_REV5`, the
+`describe.skipIf(!enabled)` lock of `conformance/src/vt16-r5-hyperbolic.test.ts`) so that the tests
+run in every normal `pnpm test` and in CI. The record lock stays; it accepts any header that records
+revision 5 as approved, including a later revision while it is proposed ("Revision 5 was approved by
+the owner on YYYY-MM-DD"; tolerances.md §4.1 item 6).

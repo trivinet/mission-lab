@@ -46,6 +46,30 @@ describe('revision-5 gate', () => {
     ).toBe(false);
   });
 
+  it('accepts a later revision only once revision 5 is approved (review N5)', () => {
+    const head = (rev: number, status: string, extra = ''): string =>
+      `# M1 Tolerance Record\n\n**Document ID:** ML-VER-002 · **Revision:** ${String(rev)} · **Status:** ${status}${extra}\n`;
+    expect(recordApprovesRev5(head(6, 'Approved by the owner on 2026-12-01 (revision 6)'))).toBe(
+      true,
+    );
+    expect(
+      recordApprovesRev5(
+        head(
+          6,
+          'Proposed, awaiting owner approval (revision 6).',
+          ' Revision 5 was approved by the owner on 2026-11-20.',
+        ),
+      ),
+    ).toBe(true);
+    expect(recordApprovesRev5(head(6, 'Proposed, awaiting owner approval (revision 6).'))).toBe(
+      false,
+    );
+    expect(recordApprovesRev5(head(4, 'Approved by the owner on 2026-11-15 (revision 4)'))).toBe(
+      false,
+    );
+    expect(recordApprovesRev5('# no status line\n')).toBe(false);
+  });
+
   it('with the switch set, refuses to run while the committed record is not approved', () => {
     if (recordApprovesRev5(record)) return; // after the owner's signature this lock is open
     process.env[REV5_SWITCH] = '1';
