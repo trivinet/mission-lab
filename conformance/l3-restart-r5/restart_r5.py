@@ -3,7 +3,7 @@ after the burn): tolerances.md revision 5 §9.3.2 item 6 (ML-TASK-018 part D3, p
 
 This driver runs verification/l3-d2/restart.py UNCHANGED, pointed at this directory: it reads
 conformance/l3-restart-r5/engine-event-states.json (written by the gated test
-conformance/src/vt16-r5-hyperbolic-asserted.test.ts with ML_WRITE_R5_EVENT_STATES=1) and writes
+conformance/src/vt16-r5-hyperbolic.test.ts with ML_WRITE_R5_EVENT_STATES=1) and writes
 conformance/l3-restart-r5/c1-escape-prograde.json. It does not run the engine.
 
 Usage (repository root, the pinned Orekit environment of verification/l3/README.md):

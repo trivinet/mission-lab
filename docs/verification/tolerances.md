@@ -318,11 +318,17 @@ after the record and must not be influenced by engine results. Therefore:
    (a) the owner has signed the revision-5 rows of §15;
    (b) for the L3 rows: the A6′ hyperbolic criterion (§9.3.1, O-13) passes in
    `selfcheck.py --repro` on the unchanged L3 datasets, and, for the arcs restarted from the
-   engine's event state, `selfcheck.py --restart conformance/l3-restart` passes on them;
+   engine's event state, `selfcheck.py --restart` passes on **both** restart directories,
+   `conformance/l3-restart` (c3, run 3) and `conformance/l3-restart-r5` (c1, §9.3.2 item 6);
    (c) the extended O-1 check (§6.8, O-12) passes on every sample of every case of `o1-hyp-r5` in
    the same run. If (c) fails, the hyperbolic state rows stay informative and the failure is a
    finding (the assumption under ε_t,gen does not hold for the engine), not a reason to change a
    value.
+   **A phase-2 run counts as evidence only if all three — (b), (c) and the asserted state rows —
+   pass** (review N2). (c) is enforced in code: the O-1 check and the asserted state rows are in one
+   test file (`conformance/src/vt16-r5-hyperbolic.test.ts`), run in order, and every asserted test
+   fails unless every O-1 case ran and passed in that run. (b) is a Python step; the phase-2 report
+   shows its output.
    The field `assertion: "informative"` stored in those dataset files is superseded by this rule
    (the same way as the stored L3 tolerances, §13 C-8); the files are not changed. Values that
    revision 5 does evaluate — the O-1 hyperbolic thresholds — apply only to the new dataset
