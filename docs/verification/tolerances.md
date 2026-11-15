@@ -16,7 +16,7 @@ arc, δt_α,hyp, is derived from the §6.1 expression of ∂F/∂α with cosh/si
 closed form was checked against a high-precision finite difference. The O-1 black-box residual
 check is extended to hyperbolic arcs with the threshold ε_t,gen + δt_α,hyp, the time equation
 evaluated in high precision as in §6.1, on every sample with Δt > 0 of the six VT-16 hyperbolic arcs
-and on a 96-case grid (§6.8). Its per-sample thresholds are a new dataset (`o1-hyp-r5`), committed
+and on a 144-case grid (§6.8). Its per-sample thresholds are a new dataset (`o1-hyp-r5`), committed
 before any engine run on it. O-12 is closed for its definition; the evidence is the phase-2 run
 (§12). (2) **O-13:** the A6′ criterion for Orekit's hyperbolic propagation is stated as pass/fail
 bounds on the energy, angular-momentum and time-of-flight measurements of `selfcheck.py` — 2× the
@@ -115,7 +115,7 @@ VI-03 split into an exact plumbing check and a toleranced correctness check with
   the O-1 thresholds, the Python of `verification/l3/selfcheck.py` for the A6′ criterion) and by a
   separately written Python 3.13.17 script in `decimal` arithmetic (60 significant digits, `exp`/`ln`
   for the hyperbolic functions, Newton solve of the hyperbolic Kepler equation; kept outside the
-  repository). Agreement: every O-1 threshold of the dataset (498 samples) to 4 × 10⁻¹⁵ relative,
+  repository). Agreement: every O-1 threshold of the dataset (546 samples) to 6 × 10⁻¹⁵ relative,
   every A6′ bound of the two L3 arcs to 7 × 10⁻¹⁶ relative. The decimal script also reproduces the
   approved §6.8 values (M·P_E,gen, M·V_E,gen at the end of the six arcs) to four digits, which checks
   the transcription.
@@ -811,8 +811,14 @@ backwards). The thresholds are committed per sample in `test-data/reference-case
   start anomaly F₀ ∈ {−1, 0, 1} (inbound, at periapsis, outbound), one span per case with
   n_h Δt ∈ {0.05, 0.5, 5, 20}; i, Ω, ω fixed per e index ((0.4, 0.7, 4.4), (1.1, 3.3, 0.2),
   (2.0, 5.1, 2.6), (2.9, 1.9, 5.8) rad); the start state is formed in binary64 from these elements
-  and that binary64 state is the input. Every grid start lies inside the gate (ratios 0.059 to
-  0.63); κ_E(r₀) from 1.60 to 17.0.
+  and that binary64 state is the input;
+- a near-gate supplement of 48 cases (review N1: the 96-case grid did not reach the region of the
+  L2 inbound/outbound arcs, e 1.17, κ_E(r₀) 18.2, gate ratio 0.0549): the same \|a\| and spans, and
+  (i) e ∈ {1.1, 1.17} starting at r₀/\|a\| = 0.22, i.e. gate ratio 1/(1 + 4/0.22) ≈ 0.0521 and
+  κ_E(r₀) ≈ 19.18, inbound and outbound (F₀ = ∓acosh(1.22/e)), (ii) e = 1.1 with F₀ = ±1; (i, Ω, ω)
+  = (0.9, 2.2, 3.7), (1.6, 4.6, 1.3), (2.4, 0.3, 5.2) rad for the three start families.
+
+  All 144 grid starts lie inside the gate (ratios 0.0521 to 0.63); κ_E(r₀) from 1.60 to 19.18.
 
 The engine-side input is the reference-side state, not the engine's event state: the O-1 check
 concerns the solver for a given input, so its input need not come from the engine (§4.1 item 2).
@@ -823,8 +829,8 @@ rows informative (§4.1 item 6 (c)).
 **Reference validation (before any engine run; `o1-check-hyp.test.ts`).** At the correctly rounded
 root χ* = √\|a\|(F − F₀), taken from the independent 200-bit hyperbolic-anomaly propagation
 (`ref/hyperbolic.ts`), the 320-bit residual is within the representation spacing
-(r/√μ)·u·\|χ*\| on all 498 samples, hence within the threshold; and χ*(1 + 10⁻⁹) fails the threshold
-on all 498 samples (detection power).
+(r/√μ)·u·\|χ*\| on all 546 samples (402 arc samples, 144 grid cases), hence within the threshold;
+and χ*(1 + 10⁻⁹) fails the threshold on all 546 samples (detection power).
 
 **Evaluated** (u = 2⁻⁵³; last sample of each arc, which carries the largest threshold of the arc;
 printed to four digits, the dataset values govern):
@@ -838,9 +844,11 @@ printed to four digits, the dataset values govern):
 | L3 `c1-escape-prograde` (Orekit event state) | 12.725 | 20 000 | 2.296 | 1.336e-10 | 3.472e-10 | **4.808e-10** |
 | L3 `c3-midrun-escape` (Orekit event state) | 4.662 | 15 000 | 2.530 | 1.224e-10 | 1.078e-10 | **2.301e-10** |
 
-Over all cases the threshold is 1.00003 to 5.16 times ε_t,gen at the last sample (the α term
+Over all cases the threshold is 1.00003 to 6.45 times ε_t,gen at the last sample (the α term
 dominates at large κ_E(r₀), as δt_α does at high e in §6.1). Grid thresholds range from
-1.14 × 10⁻¹³ s (n_h Δt = 0.05) to 2.25 × 10⁻⁸ s (n_h Δt = 20). ε_t,gen at the last sample reproduces
+1.14 × 10⁻¹³ s (n_h Δt = 0.05) to 2.71 × 10⁻⁸ s (n_h Δt = 20); the near-gate supplement alone
+5.24 × 10⁻¹³ s to 2.71 × 10⁻⁸ s (before review N1 the grid maximum was 2.25 × 10⁻⁸ s and the
+largest ratio to ε_t,gen 5.16; no value of the first 96 cases changed). ε_t,gen at the last sample reproduces
 the §6.8 table (2.50e-11, 1.22e-10, 3.58e-11, 1.34e-10, 9.06e-11, 3.51e-11 s).
 
 ## 7. Per-family records
@@ -1809,7 +1817,7 @@ The review's table (PR #12) was the input; where this record's position differs 
 | O-9 | Assumptions A2 (correctly rounded `Math.sqrt` under ECMA-262), A3 (transcendental accuracy ≤ 1 ulp on the CI Node version) and A6 (Orekit accuracy) unconfirmed. | Verification Engineer (ML-TASK-011/012) | Measure/confirm; any c_f > 2 or A6 failure is re-evaluated under §4.1 and listed in §15. Revision 4: **A6 confirmed for elliptic propagation** by `selfcheck.py` (§9.3); A6′ (§9.3.1) supported by pass/fail checks except for hyperbolic arcs, which need the D2 check (O-13). A2, A3 unchanged here. Revision 5: hyperbolic A6′ now pass/fail (§9.3.1, O-13). | Formulas use c_f = 2 and A6 |
 | O-10 | Is the first sample of every segment bit-identical to the segment's initial state? For segments n ≥ 1 R8 already makes it so (event state); for segment 0 the contract is silent. | **Owner** (contract revision 3, drafted by the Systems Architect) | **Resolved** (bookkeeping in revision 4): adopted as contracts-v1 §5.2 revision 3 (owner decision 2026-11-12, §11.2 decision 3; recorded as decided in §15 on 2026-11-13). VT-05 at Δt = 0 is `Object.is` (§1). | — |
 | O-11 | VT-14 transport factors K_r(e), K_v(e) for e > 0 not derived (e = 0: Clohessy–Wiltshire, K_r = 14, K_v = 9, citation to be confirmed). New in revision 2. | Verification Engineer (ML-TASK-011) | Derive K(e) from the elliptic state-transition matrix (literature source to be cited) and commit it with the first e > 0 VT-14 dataset, before the engine is run on it (§4.1); until then VT-14 runs at e = 0 only. **Revision 4 (owner direction P-1, 2026-11-15): stays open and does not block G1; VT-14 is accepted for G1 at e = 0 only (§7 VT-14).** | VT-14 at e = 0 only; G1 report says so |
-| O-12 | Solver residual on hyperbolic arcs: ε_t,gen (§6.8) assumes the engine's solve ends at the noise level for E > 0; the O-1 acceptance check covered e < 1 only, and δt_α is derived for ellipses only. New in revision 4. | Verification Engineer (part D2 or later) | Derive the hyperbolic δt_α from the same ∂F/∂α expression (§6.1) with cosh/sinh magnitudes and extend the O-1 black-box check to the VT-16 hyperbolic arcs before the hyperbolic state comparison. **Closed in revision 5 (ML-TASK-018 part D3), subject to the owner's signature (§15):** δt_α,hyp = 5uκ_E(r₀)D(x)/n_h derived (§6.8); extended O-1 check defined with threshold ε_t,gen + δt_α,hyp, no margin, on the six VT-16 hyperbolic arcs and a 96-case grid (§6.8); thresholds committed in `o1-hyp-r5` before any engine run; the reference validated (§6.8). The evidence is the phase-2 run of that check; if any sample fails, O-12 reopens as a finding and the hyperbolic state rows stay informative (§4.1 item 6 (c)). | Until the phase-2 run: hyperbolic VT-16 state rows informative |
+| O-12 | Solver residual on hyperbolic arcs: ε_t,gen (§6.8) assumes the engine's solve ends at the noise level for E > 0; the O-1 acceptance check covered e < 1 only, and δt_α is derived for ellipses only. New in revision 4. | Verification Engineer (part D2 or later) | Derive the hyperbolic δt_α from the same ∂F/∂α expression (§6.1) with cosh/sinh magnitudes and extend the O-1 black-box check to the VT-16 hyperbolic arcs before the hyperbolic state comparison. **Closed in revision 5 (ML-TASK-018 part D3), subject to the owner's signature (§15):** δt_α,hyp = 5uκ_E(r₀)D(x)/n_h derived (§6.8); extended O-1 check defined with threshold ε_t,gen + δt_α,hyp, no margin, on the six VT-16 hyperbolic arcs and a 144-case grid (§6.8, with the near-gate supplement of review N1); thresholds committed in `o1-hyp-r5` before any engine run; the reference validated (§6.8). The evidence is the phase-2 run of that check; if any sample fails, O-12 reopens as a finding and the hyperbolic state rows stay informative (§4.1 item 6 (c)). | Until the phase-2 run: hyperbolic VT-16 state rows informative |
 | O-13 | A6′ for Orekit's hyperbolic propagation is only informational (§9.3.1). New in revision 4. | Verification Engineer (part D2; change to `verification/l3/selfcheck.py`) | Make the hyperbolic energy, angular-momentum and time-of-flight measurements pass/fail against 2× the §6.8 engine bounds; commit before the engine comparison. **Closed in revision 5, subject to the owner's signature (§15):** criterion stated in §9.3.1 ("A6′ hyperbolic criterion") and implemented in `selfcheck.py` (ML-TASK-018 part D3); result in §9.3.1 ("Selfcheck result, revision 5"). No engine comparison was involved. | — (L3 VT-16 hyperbolic rows usable under §4.1 item 6 after signature) |
 
 Changes to other documents proposed by the review are listed here, not made (outside this task's
@@ -1929,7 +1937,7 @@ signature before the engine is run against it; the conformance tests that use th
 | Item | Proposed decision | Owner | Date |
 |---|---|---|---|
 | O-12: δt_α,hyp = 5uκ_E(r₀)D(x)/n_h (§6.8 revision 5), derived from the §6.1 ∂F/∂α with cosh/sinh magnitudes | Approve the derivation | | |
-| O-12: extended O-1 check — threshold ε_t,gen + δt_α,hyp (no margin), time equation in high precision as §6.1, cases = six VT-16 hyperbolic arcs (every Δt > 0) + 96-case grid, dataset `o1-hyp-r5`; pass = every sample; O-12 closed on a pass | Approve the check and its dataset | | |
+| O-12: extended O-1 check — threshold ε_t,gen + δt_α,hyp (no margin), time equation in high precision as §6.1, cases = six VT-16 hyperbolic arcs (every Δt > 0) + 144-case grid (incl. the near-gate supplement), dataset `o1-hyp-r5`; pass = every sample; O-12 closed on a pass | Approve the check and its dataset | | |
 | O-13: A6′ hyperbolic criterion (§9.3.1) — energy M[10uκ_E + 2τ_E,gen], angular momentum M[6uκ_h + 2τ_h,gen], time of flight M·2·B_tof; implemented in `selfcheck.py`; also applied to restarted arcs (`--restart`); O-13 closed on the recorded result | Approve the criterion and the result | | |
 | §4.1 item 6: run-3 informative hyperbolic rows (`vt-16-r4`, `l3-r4-vt-16` segment 1) become asserted with their committed, unchanged values when (a) revision 5 is signed, (b) A6′ hyperbolic passes, (c) the extended O-1 check passes in the same run; no new dataset version (values committed before run 3) | Approve | | |
 | §9.3.2 item 6: L3 `c1-escape-prograde` segment 1 (m = 0, hyperbolic) compared with an Orekit arc restarted from the engine's event state; committed values unchanged | Approve | | |
