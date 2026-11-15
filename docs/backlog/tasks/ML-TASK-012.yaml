@@ -1,0 +1,176 @@
+task_id: ML-TASK-012
+title: "External references (L3): textbook assessment (part A) and one Orekit reference dataset (part B)"
+status: in_progress          # part A done, awaiting review; part B done on branch test/ml-task-012b-orekit-dataset, awaiting review; dataset location decided by the owner on 2026-11-15 (test-data/l3-orekit/)
+requirement_ids: [ML-FR-003, ML-FR-004, ML-FR-006]
+owner_role: verification-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-004]   # contracts (reference data format, frame and units); D-5 owner decision
+affected_paths:
+  - docs/verification/l3-textbook-assessment.md      # part A
+  - docs/backlog/tasks/ML-TASK-012.yaml
+  - verification/l3/                                  # part B: Orekit generation scripts and pinned environment description
+  - test-data/l3-orekit/                              # part B: datasets only, in the format of m1-verification-plan.md §6 (owner decision 2026-11-15; was test-data/reference-cases/)
+objective: >
+  Provide evidence layer L3 (m1-verification-plan.md §2, ADR-003): references that are independent of both the
+  engine and the Verification Engineer's own L2 code. Part A assesses the textbook offered by the owner
+  (Wakker, Fundamentals of Astrodynamics, TU Delft 2015) as a source of cited worked examples. Part B produces
+  at least one reference dataset with Python + Orekit (owner decision D-5), with tool version and
+  configuration recorded.
+scope:
+  - "Part A: identify the book (edition, ISBN, terms of use); map every VT family to the equations and worked examples the book offers, with section, equation number and page; list the constants it states and compare them in kind with ML-ARCH-002 §3 and ADR-004; list the conventions that differ from Mission Lab's; give a verdict on L3 coverage and precision."
+  - "Part B (blocked): pinned Python + Orekit environment; scripts in verification/l3/ that generate, for the orbit test grid of m1-verification-plan.md §5, element-to-state (VT-02), two-body propagation (VT-05, VT-16), RSW maneuver transformation and post-maneuver elements (VT-12, VT-15) reference cases; datasets in test-data/l3-orekit/<family>/<case>.json with id, inputs (SI, frame GCRF, epoch), model (Keplerian two-body, mu as in ML-ARCH-002), producedBy (Orekit and Python versions, script commit), method, outputs, tolerance reference."
+out_of_scope:
+  - Transcribing textbook numbers into datasets before the owner has confirmed that this is acceptable under the book's terms of use.
+  - Deriving or changing tolerances (ML-TASK-010). Running the engine against the datasets (G1 verification).
+  - Confirming constants against primary sources (VT-19 belongs to ML-TASK-011); part A only records what the book states.
+  - Any change to packages/astrodynamics, packages/simulation or apps/web.
+inputs:
+  - AGENTS.md
+  - docs/verification/m1-verification-plan.md (§2 layers, §3 VT-01…VT-19, §5 grid, §6 data format)
+  - docs/architecture/adr/ADR-003-independent-verification.md
+  - docs/architecture/adr/ADR-004-frame-and-time-conventions.md
+  - docs/architecture/adr/ADR-005-kepler-propagation-algorithm.md
+  - docs/architecture/proposed-architecture.md §3 (constants and conventions)
+  - docs/requirements/m1-requirements.md
+  - docs/releases/G0-review.md (decision D-5)
+  - "Wakker, K.F., Fundamentals of Astrodynamics, TU Delft Institutional Repository, 2015, ISBN 978-94-6186-419-2 (owner's copy, SHA-256 5d6f3f8d6170a05c4fcad566cfee98a713830e78294a26e251e073ed7b106362)"
+  - packages/contracts (part B, for field names and units)
+acceptance_criteria:
+  - "Part A: l3-textbook-assessment.md exists with bibliographic identification and terms of use cited by page, a VT-01…VT-19 coverage table, the constants with page and attributed source, the convention differences with the conversion each needs, and a verdict stating which families the book can back, at what precision, and which remain uncovered."
+  - "Part A: no passage, table or figure of the book is reproduced; no book number is written into test-data/."
+  - "Part B: every dataset follows m1-verification-plan.md §6 and records Orekit version, Python version, configuration and the generating script's commit."
+  - "Part B: the datasets cover at least VT-02, VT-05 and VT-15 on the §5 grid, including one post-maneuver escape case (VT-16)."
+  - "Part B: the Orekit run is reproducible from the committed script and the pinned environment description."
+  - "The L3 gaps that remain are stated explicitly for the G1 verification report."
+test_requirements:
+  - "Part B: a self-check that each Orekit case conserves energy and angular momentum to its expected round-off (validates the reference before it is used), and that elements→state→elements round-trips in Orekit."
+deliverables:
+  - docs/verification/l3-textbook-assessment.md (part A)
+  - verification/l3/ scripts and environment description (part B)
+  - test-data/l3-orekit/ datasets (part B)
+  - The report section of this file
+human_approval_required: true   # installing Python/Java/Orekit on the dev machine; use of textbook values in a public repository
+
+report:
+  # Part A only (unchanged). Part B: see report_part_b below.
+  files_changed:
+    - docs/verification/l3-textbook-assessment.md (new)
+    - docs/backlog/tasks/ML-TASK-012.yaml (new)
+  summary: >
+    Part A done. Wakker's book is a good cited source for closed-form relations (Kepler's equation, rotation
+    matrices for elements to state, elliptic f and g, vis-viva, Hohmann, plane changes, linearised Gauss
+    equations). None of these is the engine's universal-variable method; the book explicitly does not
+    present universal variables. It is a weak L3 source. The pages read contain five usable worked
+    examples (WK-01…WK-05, with 3–5 significant digits): two for VT-05 and three for VT-15, one of which
+    comes from linearised equations. There is no element-to-state example, no maneuver-frame example and
+    no ERA. The book gives mu and an equatorial radius in Appendix B. The radius is 0.4 m away from the WGS 84
+    value assumed in ML-ARCH-002 and the ellipsoid is not named. The book's maneuver axes are labelled
+    S (radial), N (along-track), W, so its letter S is not Mission Lab's S. The book allows copying parts
+    for personal non-commercial use with credit; whether stored values in a public repository are covered
+    is for the owner to decide. Recommendation: Wakker as a supplementary L3 source for VT-05 and VT-15
+    at the gross-error level; Orekit remains the main L3 source.
+  tests_executed: []   # no tests; document review only
+  reference_data_used:
+    - "Wakker, Fundamentals of Astrodynamics (2015), ISBN 978-94-6186-419-2, local file SHA-256 5d6f3f8d6170a05c4fcad566cfee98a713830e78294a26e251e073ed7b106362; text layer extracted with pdftotext 4.00 (Xpdf). Pages read are listed in l3-textbook-assessment.md §1."
+  not_verified:
+    - "Equation bodies, figures and table layouts: the PDF could not be rendered (pdftoppm not installed); only the text layer was read, which omits all formulas. Each equation must be checked on a rendered page by a second reader before use."
+    - "The label-to-value pairing in Appendix B (pp. 671–674) and in Table 22.1 (p. 610), reconstructed from scrambled extraction."
+    - "The internal consistency of the worked examples (not recomputed, to avoid producing reference numbers before ML-TASK-010)."
+    - "Which revision of the book the owner's file is (book says January 2015; text mentions events up to June 2015; file name suffix 250115)."
+    - "Chapters 2–4, 7, 9, 10, 14–21 and 23 were only keyword-searched, not read."
+  known_limitations:
+    - "Textbook examples are given to 3–5 significant digits and some depend on an unstated Earth radius; they cannot back any family at float64-tolerance precision."
+    - "The book is a secondary compilation for constants; VT-19 still needs the NGA WGS 84 definition and IERS Conventions 2010."
+  documentation_changes:
+    - docs/verification/l3-textbook-assessment.md
+  risks_or_blockers:
+    - "Part B blocked: Python and Java are not installed on the dev machine; installing Python + Orekit (and a JDK) needs the owner's go-ahead (D-5 chose the tool; the installation itself is an owner action per ADR-003)."
+    - "Owner decision needed on storing textbook-derived values in the public repository (terms of use, assessment §2)."
+    - "Naming hazard: the book's S axis is radial and Mission Lab's S is along-track. Any ch. 22 case must be relabelled explicitly."
+    - "Reference-radius mismatch: the book's 6378.1366 km vs ML-ARCH-002's WGS 84 6 378 137 m (document-to-document comparison). Altitude-defined book cases inherit an unstated radius."
+  review_artifact: ""   # no PR opened (coordinator instruction)
+  recommended_next_action: >
+    Systems Architect review of the assessment. Owner: (1) authorise installing Python + JDK + Orekit for
+    part B; (2) decide whether textbook example values may be stored in the repository; (3) if a rendering
+    tool is acceptable, let a second reader check the cited equations and the Appendix B / Table 22.1 values.
+
+report_part_b:
+  files_changed:
+    - docs/backlog/tasks/ML-TASK-012.yaml (restored from 5b0886a; status comment; this section)
+    - verification/l3/README.md, requirements.txt, .gitignore (new; pinned environment, conventions)
+    - verification/l3/l3lib.py, cases.py, generate.py, selfcheck.py (new)
+    - test-data/l3-orekit/README.md (new)
+    - "test-data/l3-orekit/{vt-02,vt-05,vt-12,vt-15,vt-16}/l3-orekit-*.json (43 new datasets)"
+  summary: >
+    Part B done. 43 L3 datasets generated with Orekit 13.1.9 (orekit_jpype 13.1.9.0, JPype1 1.7.1,
+    Python 3.13.17, Temurin JDK 21.0.13) on the plan §5 grid with the same element values, sampling and
+    maneuvers as the L2 datasets: VT-02 (9 grid cases), VT-05 (9, 160 steps, about 10 periods), VT-12
+    (8: pure radial, along-track and cross-track on C4 at ν = 1 rad, combined on C1, C3, C5, C7, C8b),
+    VT-15 (14, mirroring the L2 VT-15 set, at t = 0 and after one period), VT-16 (2 hyperbolic escapes,
+    1 bound sub-surface periapsis reached within the span). mu is passed explicitly to every Orekit
+    orbit and propagator; frame GCRF only; epoch represented as TAI because Orekit's UTC needs
+    orekit-data, which is not installed and was not needed. The generator was committed (df84b5e6d75a)
+    before generating; datasets committed in bd28f41. selfcheck.py validates every case before use:
+    489 pass/fail checks, 0 failures, plus 72 informational measurements; regeneration is
+    byte-identical. The datasets are in test-data/l3-orekit/ (owner decision 2026-11-15), not
+    test-data/reference-cases/: two existing tests enumerate that tree and would fail on new files,
+    and fixing that needs changes outside this task's affected_paths (one in conformance/, which this
+    task may not touch). Conflict reported under risks_or_blockers.
+  tests_executed:
+    - "python -B verification/l3/selfcheck.py --repro -> exit 0; 489 pass/fail checks, 0 failures, 72 informational"
+    - "  VT-02 recompute = file, bit-exact: 9/9 pass"
+    - "  Orekit elements->state->elements->state round trip vs VT-03 M·B_rt·u·r_a, M·B_vt·u·v_p: max ratio 0.002 (r), 0.004 (v)"
+    - "  Orekit VT-02 vs L2c dataset (cross-check) vs VT-02 M·2η·u·scale: max ratio 0.008 (r), 0.013 (v)"
+    - "  Energy on every sample, VT-06 with engine part x2 (A6): max ratio 0.001; angular momentum, VT-07 x2 (A6): max ratio 0.001 (all VT-05 coasts and all elliptic segments)"
+    - "  Closure after N = 1 and 10 periods, VT-08 with P_E, V_E x2 (A6): max ratio 0.004 (r), 0.003 (v)"
+    - "  RSW: Orekit QSW Q vs r/‖r‖ (32u) max ratio 0.114; W vs (r×v)/‖r×v‖ (4(12κ_h+8)u) 0.064; S vs W×R, orthonormality, handedness (4(12κ_h+25)u) ≤ 0.054"
+    - "  Δv inertial, Orekit vs ΔvR·R + ΔvS·S + ΔvW·W in binary64 (VT-12, 8(12κ_h+25)u): max ratio 0.016; ‖Δv_I‖ vs ‖Δv_RSW‖ (VT-13): 0.015; v⁺ = fl(v⁻ + Δv_I) bit-exact: 25/25"
+    - "  a⁺ Orekit vs vis-viva (VT-15 terms (ii)+(iii)): 0.025; e⁺ vs e-vector (M·60u): 0.008; i⁺ vs atan2 (VI-03(b) row i): 0.014"
+    - "  Hyperbolic segments (info, no evaluated bound): energy deviation ≤ 2.3e-15 relative, ‖Δh‖/h ≤ 9.2e-16, Kepler time-of-flight residual (40-digit decimal) ≤ 1.1e-11 s"
+    - "  VT-05 L3 vs L2a (info; initial states differ, L2c vs Orekit element->state): max ‖Δr‖ 1.1e-5 m (C5) against a §9.3 tolerance of 1.6e-3 m at the end of the span; C1 3.1e-8 m"
+    - "  --repro: generator unchanged since df84b5e6d75a; same 43 files; byte-identical regeneration"
+    - "pnpm install --frozen-lockfile -> ok"
+    - "pnpm lint -> ok"
+    - "pnpm typecheck -> ok"
+    - "pnpm test -> 53 files, 1153 tests passed"
+    - "pnpm format:check -> All matched files use Prettier code style"
+    - "pnpm check:boundaries -> 20/20 fixtures reported"
+  reference_data_used:
+    - "Orekit 13.1.9 (orekit-13.1.9.jar, Hipparchus 4.0.3) via orekit_jpype 13.1.9.0 / JPype1 1.7.1 on Python 3.13.17 and Eclipse Temurin JDK 21.0.13; no orekit-data"
+    - "mu = 3.986004418e14 m^3/s^2 and R_ref = 6378137 m as written in docs/architecture/proposed-architecture.md §3 (ML-ARCH-002, WGS 84; primary-source status per VT-19)"
+    - "Grid element values, sampling and maneuver inputs copied from the L2 datasets' inputs (test-data/reference-cases/vt-02, vt-05, vt-15) so that L2 and L3 cases correspond; L2 outputs were read only by the self-check cross-comparison, after generation"
+  not_verified:
+    - "Orekit's algorithms were not read (no source or javadoc available offline); the QSW axis mapping is verified numerically against the contract definitions, not from documentation."
+    - "Assumption A6 (Orekit obeys §6.3 with coefficients at most 2x) is checked only as §9.3 asks (closure and energy of Orekit's own output). Those bounds are loose: the measured values use 0.1 % to 0.4 % of them, so they confirm A6 but do not measure Orekit's accuracy. Tighter evidence is the L3 vs L2 cross-check (VT-02 at 1.3 % of its tolerance; VT-05 within 0.7 % of the §9.3 tolerance at the end of the span)."
+    - "Hyperbolic arcs (VT-16 escape cases): no derived bound exists (tolerances.md §7 VT-16 generalised budget not evaluated, open item O-5); energy, angular momentum and time-of-flight residual are measured only."
+    - "Element-space differences of the Orekit round trip are reported without a bound (the record has none for elements->state->elements); the pass/fail check is in state space with the VT-03 bound."
+    - "Orekit element angles of near-circular or near-equatorial states follow Orekit's convention, not ADR-008; not compared."
+    - "requestId is not computed (Python generator); requests are stored as inputs.requestBody."
+    - "Reproducibility on another machine, OS or JDK was not tested."
+  known_limitations:
+    - "The VT-02 tolerance written in each dataset reuses the §7 VT-02 formula; the record states no VT-02 tolerance for Orekit (§9.3 covers propagation only)."
+    - "Maneuvers at m > 0: the event and segment 1 start from Orekit's pre-maneuver state, which differs from the engine's by propagation error; a conformance run must restart the reference from the engine's event state (generate.propagate) or add the VT-14 transport term. VT-12 Δv comparisons have identical inputs only for t = 0."
+    - "Hyperbolic segments carry no evaluated tolerance (segment1 tolerance null)."
+    - "Orekit propagation is analytical Keplerian (KeplerianPropagator on a CartesianOrbit); whether its internal algorithm differs from ADR-005's universal-variable method was not established (independence is organisational)."
+  documentation_changes:
+    - verification/l3/README.md
+    - test-data/l3-orekit/README.md
+  risks_or_blockers:
+    - "CONFLICT (stop-and-report, AGENTS.md): the contract and the coordinator place the datasets in test-data/reference-cases/<family>/, but verification/src/datasets/datasets.test.ts requires that tree (recursively) to equal exactly what the L2 builders produce, and conformance/src/support/datasets.test.ts counts the files of vt-02 and vt-05 while the conformance families run the engine on every file of a family directory. L3 files there would fail pnpm test and make conformance run the engine on them (out of scope). Resolving it needs changes outside affected_paths (verification/src/datasets, conformance/). Interim choice: test-data/l3-orekit/, movable by one constant (l3lib.DATA_SUBDIR). RESOLVED 2026-11-15: the owner chose to keep test-data/l3-orekit/; contract paths amended."
+    - "test-data/l3-orekit/ is itself outside the contract's affected_paths (test-data/reference-cases/), though inside the Verification Engineer's owned test-data/. RESOLVED by the same amendment."
+    - "Tolerance-record gap: no Orekit row for VT-02 (element->state), VT-12 and VT-15; the datasets cite the engine-vs-L2 formulas with a status note. A reviewer should confirm before the G1 conformance run."
+  review_artifact: ""   # no PR opened (coordinator instruction)
+  recommended_next_action: >
+    Coordinator/owner: dataset location decided (test-data/l3-orekit/); a later conformance family reads it explicitly. Systems Architect: review the convention mappings (verification/l3/README.md) and the
+    tolerance-record gaps above. Then a G1 conformance task: rerun verification/l3/selfcheck.py --repro;
+    run the engine on each requestBody (adding requestId); compare VT-02 and VT-05 with the stored
+    per-sample §9.3 tolerances, VT-12 at t = 0 with the VT-12 formula, VT-15 a⁺/e⁺ with the VT-15
+    formula, VT-16 expected warnings exactly; restart segment-1 references from the engine's event state
+    for m > 0; commit the comparison code before any engine result on these datasets is inspected (§4.1).
+  l3_gaps_for_g1:
+    - "VT-16 hyperbolic arcs: no evaluated tolerance (O-5); the Orekit escape states back only the warning expectations and an informational state comparison."
+    - "No L3 dataset for VT-03, VT-04, VT-06…VT-11, VT-13, VT-14 (L1 families; not required by the contract)."
+    - "VT-19 constants: L3 uses the same constants as the engine by construction and gives no evidence on their values."
+    - "VT-15 elements other than a, e, i (Ω, ω, ν after the burn) are stored as Orekit returns them and are not comparable for near-degenerate orbits."
+    - "Textbook L3 (part A) stays at print resolution and awaits the owner's decision on the use of book values."
+    - "Single external tool: L3 rests on Orekit only (no GMAT cross-check)."

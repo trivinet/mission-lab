@@ -1,0 +1,207 @@
+{
+  "id": "l3-orekit/vt-15/c4-apogee-prograde",
+  "version": 1,
+  "family": "VT-15 Post-maneuver orbit (ML-FR-006 AC5, ML-FR-010 AC3); also VT-12, VT-13",
+  "description": "Moderately elliptical, inclined (general case), ν₀ = 3.141592653589793 rad; apsis-tangential burn Δv_RSW = [0.0, 100.0, 0.0] m/s at t_s = 0",
+  "gridCase": "C4",
+  "kind": "apsis-tangential",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "requestBody": {
+      "schemaVersion": "1.0",
+      "centralBody": "EARTH",
+      "constants": {
+        "mu_m3ps2": 398600441800000,
+        "referenceRadius_m": 6378137,
+        "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-ARCH-002); passed explicitly to every Orekit orbit and propagator, Orekit's own constants not used"
+      },
+      "dynamicsModel": "TWO_BODY",
+      "frame": "GCRF",
+      "epoch": {
+        "scale": "UTC",
+        "iso": "2026-01-01T00:00:00.000Z"
+      },
+      "initialState": {
+        "position_m": [-15475180.251149332, -2367075.963508043, 6095551.458024139],
+        "velocity_mps": [992.3367939147537, -3442.819708856779, 1182.36635779103]
+      },
+      "maneuvers": [
+        {
+          "id": "m1",
+          "t_s": 0,
+          "frame": "RSW",
+          "deltaV_mps": [0, 100, 0]
+        }
+      ],
+      "duration_s": 600,
+      "outputStep_s": 60
+    },
+    "requestNote": "inputs.requestBody is a SimulationRequest without requestId (contracts-v1.md §4); the consumer adds requestId = \"sha256:\" + hex(SHA-256(canonicalRequestPayload(body))) (§7) with @mission-lab/contracts. Its initialState is the Orekit element→state of inputs.elements with −0 normalised to +0, and is exactly the state given to Orekit (assumption A4).",
+    "elements": {
+      "semiMajorAxis_m": 12000000,
+      "eccentricity": 0.4,
+      "inclination_rad": 0.5,
+      "raan_rad": 2.5,
+      "argPeriapsis_rad": 4,
+      "trueAnomaly_rad": 3.141592653589793
+    },
+    "maneuverTime_s": 0
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors and angles)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-ARCH-002); passed explicitly to every Orekit orbit and propagator, Orekit's own constants not used",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "Orekit (orekit-13.1.9.jar, hipparchus-core-4.0.3.jar) through orekit_jpype 13.1.9.0, JPype1 1.7.1",
+    "script": "verification/l3/generate.py",
+    "codeRevision": "df84b5e6d75a",
+    "date": "2026-11-15",
+    "runtime": "Python 3.13.17; JDK 21.0.13 (Eclipse Adoptium, OpenJDK 64-Bit Server VM 21.0.13+9-LTS); Windows 11 AMD64",
+    "environment": "verification/l3/README.md, verification/l3/requirements.txt",
+    "orekitApi": "KeplerianPropagator(CartesianOrbit) per segment; LOFType.QSW.rotationFromInertial(PV).applyInverseTo(Δv_RSW) for the inertial Δv; new KeplerianOrbit(PV, GCRF, date, μ) for the elements",
+    "frameAndTime": "Orekit frame FramesFactory.getGCRF() (root of Orekit's frame tree; no transformation applied). Epoch 2026-01-01T00:00:00.000Z represented in Orekit as 2026-01-01T00:00:00 TAI (UTC needs the leap-second table of orekit-data, not installed; two-body motion depends only on elapsed time, so the label of the origin changes no number); sample date = epoch.shiftedBy(t_s) with the binary64 t_s (tolerances.md §9.3).",
+    "layer": "L3 (external tool, organisational independence; m1-verification-plan.md §2)",
+    "independence": "Generated from Orekit and the contracts only. packages/astrodynamics, packages/simulation, conformance/ and the L2 reference code were not read or run.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value, in the ECMA-262 Number::toString form; JSON.parse restores the exact binary64. −0 is written as {\"$number\": \"-0\"} (test-data/reference-cases/README.md encoding); request inputs are normalised to +0 (contracts-v1.md §11.4 P3)."
+  },
+  "method": {
+    "reference": "L3 Orekit",
+    "rswMapping": "Contract RSW (R = r/‖r‖, W = (r × v)/‖r × v‖, S = W × R, pre-maneuver state; contracts-v1.md §2, §3.1) = Orekit LOFType.QSW with Q ↔ R, S ↔ S, W ↔ W, Δv_RSW = [ΔvR, ΔvS, ΔvW] given to Orekit as the local vector (x, y, z) unchanged. The mapping is checked numerically by selfcheck.py (axes vs the contract definitions in binary64, VT-11 bounds). Only the rotation is used (no frame-rate term).",
+    "impulse": "Position unchanged; velocityAfter[k] = velocityBefore[k] + deltaV_inertial[k], one binary64 addition per component (contracts-v1.md R12); deltaV_magnitude = √(Σ Δv_I,k²) in binary64.",
+    "segments": "Segment 0 from the request initial state, segment 1 from the event state (position_m, velocityAfter_mps); first sample of each segment copied from its initial state (contracts-v1.md §5.2 revision 3); sample times per §5.2.",
+    "elements": "Orekit KeplerianOrbit from the event state, angles exactly as Orekit returns them (Orekit's ranges, no normalisation, no ADR-008 convention: for near-circular or near-equatorial states the angles Orekit returns for ω, Ω, ν are not comparable with the engine's convention; compare a, e, i, and the state)."
+  },
+  "outputs": {
+    "event": {
+      "t_s": 0,
+      "position_m": [-15475180.251149332, -2367075.963508043, 6095551.458024139],
+      "velocityBefore_mps": [992.3367939147537, -3442.819708856779, 1182.36635779103],
+      "deltaV_inertial_mps": [26.300815956750593, -91.24822146088275, 31.337344498773856],
+      "velocityAfter_mps": [1018.6376098715043, -3534.0679303176616, 1213.7037022898037],
+      "deltaV_magnitude_mps": 100.00000000000001
+    },
+    "rswAxes": {
+      "R": [-0.9211416816160316, -0.14089737878024064, 0.3628304439300082],
+      "S": [0.2630081595675059, -0.9124822146088274, 0.31337344498773856],
+      "W": [0.28692283002665153, 0.38408870938290707, 0.8775825618903728]
+    },
+    "elementsBefore": {
+      "semiMajorAxis_m": 12000000,
+      "eccentricity": 0.4,
+      "inclination_rad": 0.4999999999999999,
+      "raan_rad": 2.5,
+      "argPeriapsis_rad": -2.2831853071795867,
+      "trueAnomaly_rad": 3.141592653589793
+    },
+    "elementsAfter": {
+      "semiMajorAxis_m": 12282732.534102943,
+      "eccentricity": 0.36777382014587445,
+      "inclination_rad": 0.4999999999999999,
+      "raan_rad": 2.5,
+      "argPeriapsis_rad": -2.2831853071795867,
+      "trueAnomaly_rad": 3.141592653589793
+    },
+    "postManeuver": {
+      "specificEnergy_Jpkg": -16226049.077161288,
+      "energyScale_Jpkg": 31226384.470457755,
+      "semiMajorAxis_m": 12282732.534102943,
+      "eccentricity": 0.36777382014587445,
+      "periapsisRadius_m": 7765465.0682058865,
+      "radialVelocity_mps": 0,
+      "timeToPeriapsis_s": 6773.661301143034,
+      "timeToReferenceSphere_s": null,
+      "minSampledRadius_m": 16706484.470473086
+    },
+    "segments": [
+      {
+        "t_s": [0],
+        "position_m": [[-15475180.251149332, -2367075.963508043, 6095551.458024139]],
+        "velocity_mps": [[992.3367939147537, -3442.819708856779, 1182.36635779103]]
+      },
+      {
+        "t_s": [0, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600],
+        "position_m": [
+          [-15475180.251149332, -2367075.963508043, 6095551.458024139],
+          [-15411723.441925779, -2578751.168385775, 6167447.6552629],
+          [-15343601.788125748, -2789645.8290781793, 6237477.0781519655],
+          [-15270833.583060792, -2999695.68500788, 6305617.582913246],
+          [-15193437.001119083, -3208836.3636136428, 6371846.937875416],
+          [-15111430.11263862, -3417003.3355508945, 6436142.808729423],
+          [-15024830.89960401, -3624131.8698043297, 6498482.744014781],
+          [-14933657.272200098, -3830156.988645902, 6558844.160818333],
+          [-14837927.086260147, -4035013.4223712776, 6617204.330668533],
+          [-14737658.161650244, -4238635.563748067, 6673540.365609676],
+          [-14632868.301636413, -4440957.422108649, 6727829.204441859]
+        ],
+        "velocity_mps": [
+          [1018.6376098715043, -3534.0679303176616, 1213.7037022898037],
+          [1096.5381837377656, -3521.593929799262, 1182.7749019090224],
+          [1174.1327987521572, -3508.0496041129536, 1151.4776880629424],
+          [1251.4235564650849, -3493.433459981822, 1119.8107200986794],
+          [1328.4123172341178, -3477.7432578302864, 1087.7724095904675],
+          [1405.1006867540636, -3460.9760108779333, 1055.3609243470091],
+          [1481.4900020645973, -3443.127983118189, 1022.574192101569],
+          [1557.5813169672117, -3424.1946861838205, 989.4099039079892],
+          [1633.375386780936, -3404.1708750991943, 955.8655172656646],
+          [1708.872652363764, -3383.050542917179, 921.9382589964345],
+          [1784.0732233235683, -3360.826914236656, 887.6251278965531]
+        ]
+      }
+    ]
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3: §7 VT-11/VT-12 (frame), VT-13, VT-15 (a⁺, e⁺), §9.3 (states)",
+    "frame": "VT-12: ‖ΔΔv_I‖ ≤ 8(12κ_h + 25)u·‖Δv_RSW‖ (κ_h of the pre-maneuver orbit). Valid against these Δv_I only when the engine's event state equals this one bit-for-bit (maneuver at t_s = 0); for m > 0 the event states differ by propagation error and the comparison must restart from the engine's event state.",
+    "segment0": {
+      "formula": "3M·P_E(t), 3M·V_E(t) (§9.3)",
+      "evaluatedAt": {
+        "a_m": 12000000.000000002,
+        "e": 0.3999999999999999,
+        "r_a_m": 16800000,
+        "v_p_mps": 8803.728838458797,
+        "g_p_mps2": 7.689051732253083,
+        "n_radps": 0.00048028278333456064,
+        "T_s": 13082.262211349716,
+        "kappa_E": 5.666666666666666,
+        "kappa_h": 1.0910894511799618,
+        "u": 1.1102230246251565e-16,
+        "M": 4
+      },
+      "position_m": [0.00000913727953994367],
+      "velocity_mps": [1.1136100886246675e-8]
+    },
+    "segment1": {
+      "evaluatedAt": {
+        "a_m": 12282732.534102945,
+        "e": 0.36777382014587445,
+        "r_a_m": 16800000,
+        "v_p_mps": 8379.002038565119,
+        "g_p_mps2": 6.610020933383662,
+        "n_radps": 0.00046379535585277333,
+        "T_s": 13547.322602286069,
+        "kappa_E": 5.326849674151307,
+        "kappa_h": 1.075366786340751,
+        "u": 1.1102230246251565e-16,
+        "M": 4
+      },
+      "position_m": [
+        0.000008522572608701686, 0.000008629243789740653, 0.00000873591497077962,
+        0.000008842586151818585, 0.00000894925733285755, 0.000009055928513896516,
+        0.000009162599694935483, 0.000009269270875974448, 0.000009375942057013413,
+        0.000009482613238052378, 0.000009589284419091344
+      ],
+      "velocity_mps": [
+        9.282001252736646e-9, 9.427047383543894e-9, 9.572093514351143e-9, 9.717139645158392e-9,
+        9.862185775965643e-9, 1.0007231906772893e-8, 1.015227803758014e-8, 1.029732416838739e-8,
+        1.044237029919464e-8, 1.0587416430001888e-8, 1.0732462560809137e-8
+      ]
+    },
+    "segment1Note": "Segment 1 starts from the Orekit event state. An engine comparison must either restart the reference from the engine's event state (rerun generate.propagate) or add the VT-14 transport term; for a hyperbolic segment no tolerance is evaluated (tolerances.md §7 VT-16: generalised budget per dataset, not derived here; open item O-5)."
+  }
+}

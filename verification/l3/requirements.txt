@@ -1,0 +1,9 @@
+# Pinned Python environment of the L3 Orekit datasets (ML-TASK-012 part B).
+# Exactly the packages of the venv that produced the committed datasets (`pip freeze`, 2026-11-15).
+# orekit_jpype bundles the Orekit and Hipparchus jars (orekit-13.1.9.jar, hipparchus-*-4.0.3.jar).
+# numpy and packaging are dependencies pulled in by orekit_jpype / JPype1; they are not used directly.
+# No hashes: the wheels were installed by the owner; their hashes were not recorded.
+orekit_jpype==13.1.9.0
+JPype1==1.7.1
+numpy==2.5.4
+packaging==26.3
