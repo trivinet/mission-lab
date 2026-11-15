@@ -33,7 +33,7 @@
   "ownerActions": [
     {
       "id": "OA-26",
-      "text": "Merge PR #27 (status) and PR #28 (conformance run 2). Decide the four tolerance gaps P-1…P-4 reported there (zero-Δv on eccentric orbits, non-tangential burns, hyperbolic arcs, sampling-independence rule).",
+      "text": "Merge PR #27 (conformance run 2) and PR #28 (status). Decide the four tolerance gaps P-1…P-4 reported there (zero-Δv on eccentric orbits, non-tangential burns, hyperbolic arcs, sampling-independence rule).",
       "blocking": "G1 verification report"
     },
     {
@@ -385,7 +385,7 @@
     {
       "date": "2026-11-15",
       "who": "Verification",
-      "text": "ML-TASK-018 part C delivered: independent RSW, maneuver and grid references; 67 datasets; 254 new conformance tests, 0 failures (worst ratio 0.071). Coordinator re-ran everything (1153 tests), checked the phase order and showed a 1e-9 perturbation of one reference makes its test fail. Four gaps without approved tolerance reported."
+      "text": "ML-TASK-018 part C delivered: independent RSW, maneuver and grid references; 67 datasets; 254 new conformance tests, 0 failures (worst ratio 0.071). Coordinator re-ran everything (1153 tests), checked the phase order and showed a 1e-9 perturbation of one reference makes its test fail. Four gaps without approved tolerance reported. PR #27."
     },
     {
       "date": "2026-11-15",
