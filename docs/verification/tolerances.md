@@ -1047,11 +1047,15 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
   and the engine's pre-maneuver state equals it bit-for-bit (§1, precondition row), so term (i) is
   zero. At m > 0 the engine's pre-maneuver state carries propagation error; for a burn away from an
   apsis or not along S its phase part changes a⁺, e⁺ and the plane at **first** order (the burn
-  point moves), which is not derived here. Mode A at m > 0 is therefore allowed only for tangential
-  burns at an apsis (approved formula with τ_E,eng(m)) and for the plane rows below (with the tilt
-  term). (B) The reference applies the burn exactly to the engine's **event** state
-  (`position_m`, `velocityBefore_mps`); term (i) is zero for every m. Every non-tangential burn at
-  m > 0 uses mode B. (All non-tangential grid cases are at m = 0.)
+  point moves), which is not derived here. **Mode A at m > 0 is allowed only for tangential burns
+  at an apsis, for every VT-15 row** (a⁺, e⁺ with τ_E,eng(m), and the plane rows with the tilt
+  term). For any other burn the plane rows would miss two first-order terms, ΔvW·δs/(rv⁺) from the
+  along-track phase error δs and the tilt of the engine's W axis times ‖Δv‖/v⁺ (review B1 of
+  revision 4); for a tangential burn at an apsis ΔvW = 0 and Δv lies along S, which tilts with the
+  plane, so neither term arises. (B) The reference applies the burn exactly to the engine's
+  **event** state (`position_m`, `velocityBefore_mps`); term (i) and the tilt term are zero for
+  every m. **Every burn at m > 0 that is not tangential at an apsis uses mode B** (as §9.3.2
+  item 4). (All non-tangential grid cases are at m = 0.)
 - **Non-tangential burns (normal, radial, combined).** Measures as above (a⁺ relative, e⁺
   absolute); mode A at m = 0 or mode B:
   - \|δa⁺\|/a⁺ ≤ M[11u(4a⁺/r − 1) + 2a⁺v⁺(12κ_h⁻ + 25)u‖Δv‖/μ].
@@ -1066,8 +1070,8 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
     bounds \|sin\| of the angle). Engine state: δh⁺ = r × δv⁺, direction error ≤ 2r‖δv⁺‖/h⁺ (B6);
     with κ_h⁺ = rv⁺/h⁺ (the post-maneuver flight-path factor at the burn point, from the
     reference state) that is κ_h⁺u[2(12κ_h⁻ + 25)‖Δv‖/v⁺ + 2]. Evaluation of ĥ⁺ by the test and by
-    a binary64 reference: 6uκ_h⁺ each (B5, B6). At m > 0 (mode A) add the tilt of the engine's
-    pre-maneuver plane: only the bounded rounding P_b, V_b of §6.2 leaves the plane (§10, inclination
+    a binary64 reference: 6uκ_h⁺ each (B5, B6). At m > 0 (mode A, tangential burns at an apsis
+    only) add the tilt of the engine's pre-maneuver plane: only the bounded rounding P_b, V_b of §6.2 leaves the plane (§10, inclination
     noise), giving 2(P_b v⁺ + rV_b)/h⁺.
     **δψ_n ≤ M[κ_h⁺u(2(12κ_h⁻ + 25)‖Δv‖/v⁺ + 14) + [m > 0]·2(P_b v⁺ + rV_b)/h⁺].**
   - *Plane-rotation angle* ψ = atan2(‖ĥ⁻ × ĥ⁺‖, ĥ⁻·ĥ⁺) (the atan2 form is required; acos of the dot
@@ -1606,7 +1610,7 @@ against it or against the L3 Orekit datasets):
 | Item | Proposed decision | Owner | Date |
 |---|---|---|---|
 | P-1: VT-14 accepted for G1 at e = 0 only; O-11 open, not blocking G1 (§7 VT-14, §12) | Records the owner direction of 2026-11-15 | | |
-| P-2: VT-15 direction term (iv); non-tangential a⁺, e⁺ rows; plane-normal and plane-rotation rows; modes A/B (§7 VT-15) | Approve the formulas and evaluated values | | |
+| P-2: VT-15 direction term (iv); non-tangential a⁺, e⁺ rows; plane-normal and plane-rotation rows; modes A/B — mode A at m > 0 only for tangential burns at an apsis (every row, plane rows included), every other burn at m > 0 in mode B (§7 VT-15, §9.3.2 item 4) | Approve the formulas and evaluated values | | |
 | P-2: correction of the tangential VT-15 formula (term (iv), magnitude part; term (i) zero at m = 0; general e⁺ formula for e⁺ < 10⁻⁶) | Approve; no approved value changes (the approved values bound the corrected formula and stay in force for the run-2 datasets) | | |
 | P-3: hyperbolic budget §6.8, including 10κ_E·a → 10κ_E·r_max and the hyperbolic C_b recount; O-5 closed | Approve the method and the evaluated values | | |
 | P-3: VT-16 validity condition \|E\| ≥ 0.1(v²/2 + μ/r) → 0.05 (§7 VT-16) | Owner decision; recommended (adds four arcs to the toleranced set; not a loosening of any value) | | |
