@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-15",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Issue #24 fixed and −0 normalisation on `main` (867 tests). The Verification Engineer is building references and conformance tests for the remaining families: invariants, determinism, maneuvers, invalid input and the integration checks.",
+  "headline": "Second conformance run: the engine passes all 254 new comparisons (invariants, determinism, maneuvers, invalid input, integration). For G1 still: Orekit evidence, the WGS 84 constants check, four tolerance gaps and the G1 report.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-26",
+      "text": "Merge PR #27 (status) and PR #28 (conformance run 2). Decide the four tolerance gaps P-1…P-4 reported there (zero-Δv on eccentric orbits, non-tangential burns, hyperbolic arcs, sampling-independence rule).",
+      "blocking": "G1 verification report"
+    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -201,7 +206,7 @@
           "title": "Numerical suite in CI and G1 verification report",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_progress",
+          "status": "in_review",
           "deps": "011, 017",
           "approval": true
         },
@@ -377,6 +382,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "ML-TASK-018 part C delivered: independent RSW, maneuver and grid references; 67 datasets; 254 new conformance tests, 0 failures (worst ratio 0.071). Coordinator re-ran everything (1153 tests), checked the phase order and showed a 1e-9 perturbation of one reference makes its test fail. Four gaps without approved tolerance reported."
+    },
     {
       "date": "2026-11-15",
       "who": "Coordinator",
