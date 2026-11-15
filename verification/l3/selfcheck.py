@@ -114,7 +114,7 @@ class Report:
     def print(self):
         for case, name, meas, bound, ratio, status, src in self.rows:
             b = "-" if bound is None else f"{bound:.3e}"
-            r = "-" if ratio is None else f"{ratio:.3f}"
+            r = "-" if ratio is None else f"{ratio:.3g}"
             print(f"{status:4} {case:52} {name:34} {meas:.3e} {b:>10} {r:>7}  {src}")
         n = sum(1 for r in self.rows if r[5] != "info")
         print(f"\n{n} pass/fail checks, {self.failures} failures; "

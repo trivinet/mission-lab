@@ -1645,8 +1645,26 @@ the datasets):
   from the restart state; at the last sample (Δt = 5999.5 s) 3.73 × 10⁻⁵ m / 1.71 × 10⁻⁷ m/s.
 - VT-05 L3 is the approved §9.3 row, unchanged.
 
-**Selfcheck result, revision 5 (O-13).** Not yet run when the criterion was committed; the result
-of `selfcheck.py --repro` with the criterion is recorded here in the following commit.
+**Selfcheck result, revision 5 (O-13).** The criterion and its implementation were committed
+(6967f93, 35a548f) before the run. `python -B verification/l3/selfcheck.py --repro --restart
+conformance/l3-restart` (Orekit venv: Python 3.13.17, Orekit 13.1.9, orekit_jpype 13.1.9.0,
+Hipparchus 4.0.3, JDK Temurin 21.0.13): **exit 0, 500 pass/fail checks, 0 failures,
+66 informational measurements; generator unchanged since df84b5e6d75a, same 43 files,
+byte-identical regeneration** (without `--restart`: 495 checks, 0 failures). The six former
+informational hyperbolic measurements are now pass/fail. Worst sample per measured quantity
+(observed / bound = ratio):
+
+| Arc | energy | ‖Δh‖/h | time of flight (s) |
+|---|---|---|---|
+| Orekit segment 1, `c1-escape-prograde` | 2.301e-15 / 2.087e-11 = 1.1e-4 | 3.532e-16 / 7.946e-12 = 4.4e-5 | 1.030e-11 / 1.960e-7 = 5.3e-5 |
+| Orekit segment 1, `c3-midrun-escape` | 7.688e-16 / 2.794e-12 = 2.8e-4 | 3.933e-16 / 5.041e-12 = 7.8e-5 | 8.499e-12 / 6.110e-8 = 1.4e-4 |
+| Restarted arc `l3-restart/c3-midrun-escape` (§9.3.2) | 2.691e-15 / 2.794e-12 = 9.6e-4 | 2.622e-16 / 2.736e-12 = 9.6e-5 | 2.280e-12 / 1.721e-8 = 1.3e-4 |
+
+(The restarted elliptic arc `c4-midrun-retro-subsurface` passes the approved A6 energy and
+angular-momentum checks at ratios 7.0e-5 and 5.2e-5.) **A6′ is therefore confirmed for Orekit's
+hyperbolic propagation on these arcs** in the sense of this criterion. As for the elliptic A6
+check, the bounds are worst-case and loose (the measurements use at most 0.1 % of them); they
+confirm A6′, they do not measure Orekit's accuracy.
 
 #### 9.3.2 Maneuvers at t > 0 in the L3 comparison (revision 4)
 
