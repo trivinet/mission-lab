@@ -18,7 +18,7 @@
       "Thresholds: tolerances.md revision 5 §6.8 (ε_t,gen of revision 4, δt_α,hyp of revision 5) transcribed in verification/src/tol/tolerances-r4.ts and tolerances-r5.ts, evaluated in binary64 from the exact input state (§4.1 item 2)",
       "Residual (in the conformance test): verification/src/hp/o1-check-hyp.ts, the universal time equation in 320-bit at the engine χ̂"
     ],
-    "codeRevision": "35bbaa797879",
+    "codeRevision": "8ac71f4",
     "date": "2026-11-15",
     "runtime": "Node.js v24.22.2",
     "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",

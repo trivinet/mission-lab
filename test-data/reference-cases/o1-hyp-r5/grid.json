@@ -2,7 +2,7 @@
   "id": "o1-hyp-r5/grid",
   "version": 1,
   "family": "O-1 solver acceptance check, extended to hyperbolic arcs (open item O-12)",
-  "description": "Deterministic grid of 96 hyperbolic start states and spans (revision 5 §6.8): |a| ∈ {7.0e6, 3.0e7} m, e ∈ {1.25, 1.5, 2.5, 5}, F₀ ∈ {−1, 0, 1}, n_h Δt ∈ {0.05, 0.5, 5, 20}; all inside the §7 VT-16 validity gate; Δt > 0 only.",
+  "description": "Deterministic grid of 144 hyperbolic start states and spans (revision 5 §6.8): |a| ∈ {7.0e6, 3.0e7} m, e ∈ {1.25, 1.5, 2.5, 5}, F₀ ∈ {−1, 0, 1}, n_h Δt ∈ {0.05, 0.5, 5, 20}; plus the near-gate supplement (review N1): e ∈ {1.1, 1.17} starting at r₀/|a| = 0.22 (gate ratio ≈ 0.052) inbound and outbound, and e = 1.1 at F₀ = ±1, same |a| and spans; all inside the §7 VT-16 validity gate; Δt > 0 only.",
   "status": "New dataset (tolerances.md §4.1 item 1), committed before any engine run on it (ML-TASK-018 part D3 phase 1). Gated: not compared with the engine before the owner signs revision 5. Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
   "inputs": {
     "constants": {
@@ -10,7 +10,7 @@
       "referenceRadius_m": 6378137,
       "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
     },
-    "source": "O1_HYP_GRID, verification/src/tol/tolerances-r5.ts"
+    "source": "O1_HYP_GRID and O1_HYP_GRID_NEAR_GATE, verification/src/tol/tolerances-r5.ts"
   },
   "producedBy": {
     "tool": "@mission-lab/verification (ML-TASK-018 part D3), verification/src/datasets/build-d3.ts",
@@ -18,7 +18,7 @@
       "Thresholds: tolerances.md revision 5 §6.8 (ε_t,gen of revision 4, δt_α,hyp of revision 5) transcribed in verification/src/tol/tolerances-r4.ts and tolerances-r5.ts, evaluated in binary64 from the exact input state (§4.1 item 2)",
       "Residual (in the conformance test): verification/src/hp/o1-check-hyp.ts, the universal time equation in 320-bit at the engine χ̂"
     ],
-    "codeRevision": "35bbaa797879",
+    "codeRevision": "8ac71f4",
     "date": "2026-11-15",
     "runtime": "Node.js v24.22.2",
     "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
@@ -3382,6 +3382,1686 @@
         "inclination_rad": 2.9,
         "raan_rad": 1.9,
         "argPeriapsis_rad": 5.8,
+        "F0": 1
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=-0.462954 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-224762.73280810594, -1105204.4801502596, 1048620.4132079561],
+        "velocity_mps": [14587.435254940656, 4783.938478000759, -18409.956464025992]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.0521327014218007,
+        "aAbs_m": 7000000.000000031,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.0010780076128724988,
+        "sinhF0": -0.4796693075735593,
+        "coshF0": 1.1090909090909085,
+        "kappa_E_r0": 19.18181818181827,
+        "kappa_E_arc": 37.02046708981916,
+        "r_min_m": 777335.8388213144,
+        "r_max_m": 1539999.9999999993,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [46.38186168905415],
+      "x": [0.32134290149575195],
+      "epsTgen_s": [6.553424434410848e-13],
+      "dtAlphaHyp_s": [7.343827955690605e-13],
+      "threshold_s": [1.3897252390101453e-12],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": -0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=-0.462954 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-224762.73280810594, -1105204.4801502596, 1048620.4132079561],
+        "velocity_mps": [14587.435254940656, 4783.938478000759, -18409.956464025992]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.0521327014218007,
+        "aAbs_m": 7000000.000000031,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.0010780076128724988,
+        "sinhF0": -0.4796693075735593,
+        "coshF0": 1.1090909090909085,
+        "kappa_E_r0": 19.18181818181827,
+        "kappa_E_arc": 41.00000000000014,
+        "r_min_m": 700000.0000000006,
+        "r_max_m": 6646188.643747718,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [463.8186168905415],
+      "x": [1.6371010023272867],
+      "epsTgen_s": [1.153993859154007e-11],
+      "dtAlphaHyp_s": [4.897737990871702e-11],
+      "threshold_s": [6.051731850025709e-11],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": -0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=-0.462954 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-224762.73280810594, -1105204.4801502596, 1048620.4132079561],
+        "velocity_mps": [14587.435254940656, 4783.938478000759, -18409.956464025992]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.0521327014218007,
+        "aAbs_m": 7000000.000000031,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.0010780076128724988,
+        "sinhF0": -0.4796693075735593,
+        "coshF0": 1.1090909090909085,
+        "kappa_E_r0": 19.18181818181827,
+        "kappa_E_arc": 41.00000000000014,
+        "r_min_m": 700000.0000000006,
+        "r_max_m": 46487430.44081735,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4638.186168905415],
+      "x": [3.089105719693454],
+      "epsTgen_s": [8.896842018254393e-11],
+      "dtAlphaHyp_s": [4.5157862743869774e-10],
+      "threshold_s": [5.405470476212417e-10],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": -0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=-0.462954 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-224762.73280810594, -1105204.4801502596, 1048620.4132079561],
+        "velocity_mps": [14587.435254940656, 4783.938478000759, -18409.956464025992]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.0521327014218007,
+        "aAbs_m": 7000000.000000031,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.0010780076128724988,
+        "sinhF0": -0.4796693075735593,
+        "coshF0": 1.1090909090909085,
+        "kappa_E_r0": 19.18181818181827,
+        "kappa_E_arc": 41.00000000000014,
+        "r_min_m": 700000.0000000006,
+        "r_max_m": 159072521.4047266,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [18552.74467562166],
+      "x": [4.226767526002088],
+      "epsTgen_s": [3.44095295356932e-10],
+      "dtAlphaHyp_s": [1.874679136080038e-9],
+      "threshold_s": [2.21877443143697e-9],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": -0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=0.462954 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [127349.80876776036, 1167805.116546296, -995797.7886976375],
+        "velocity_mps": [-10598.051119238708, 20968.93128567322, -4753.005880117579]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180081,
+        "aAbs_m": 7000000.000000017,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.001078007612872502,
+        "sinhF0": 0.47966930757355963,
+        "coshF0": 1.1090909090909087,
+        "kappa_E_r0": 19.181818181818233,
+        "kappa_E_arc": 19.181818181818233,
+        "r_min_m": 1539999.9999999993,
+        "r_max_m": 2357271.3882109458,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [46.38186168905415],
+      "x": [0.18190884346356623],
+      "epsTgen_s": [4.3284578764868027e-13],
+      "dtAlphaHyp_s": [2.0734089792775983e-13],
+      "threshold_s": [6.401866855764401e-13],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": 0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=0.462954 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [127349.80876776036, 1167805.116546296, -995797.7886976375],
+        "velocity_mps": [-10598.051119238708, 20968.93128567322, -4753.005880117579]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180081,
+        "aAbs_m": 7000000.000000017,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.001078007612872502,
+        "sinhF0": 0.47966930757355963,
+        "coshF0": 1.1090909090909087,
+        "kappa_E_r0": 19.181818181818233,
+        "kappa_E_arc": 19.181818181818233,
+        "r_min_m": 1539999.9999999993,
+        "r_max_m": 8136395.35972725,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [463.8186168905415],
+      "x": [0.8340092072413197],
+      "epsTgen_s": [2.7266657591237655e-12],
+      "dtAlphaHyp_s": [7.393522554777025e-12],
+      "threshold_s": [1.0120188313900791e-11],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": 0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=0.462954 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [127349.80876776036, 1167805.116546296, -995797.7886976375],
+        "velocity_mps": [-10598.051119238708, 20968.93128567322, -4753.005880117579]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180081,
+        "aAbs_m": 7000000.000000017,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.001078007612872502,
+        "sinhF0": 0.47966930757355963,
+        "coshF0": 1.1090909090909087,
+        "kappa_E_r0": 19.181818181818233,
+        "kappa_E_arc": 19.181818181818233,
+        "r_min_m": 1539999.9999999993,
+        "r_max_m": 47517218.03557178,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4638.186168905415],
+      "x": [2.182464560843507],
+      "epsTgen_s": [2.9192897670377163e-11],
+      "dtAlphaHyp_s": [1.2389773527612982e-10],
+      "threshold_s": [1.53090632946507e-10],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": 0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=0.462954 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [127349.80876776036, 1167805.116546296, -995797.7886976375],
+        "velocity_mps": [-10598.051119238708, 20968.93128567322, -4753.005880117579]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180081,
+        "aAbs_m": 7000000.000000017,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.001078007612872502,
+        "sinhF0": 0.47966930757355963,
+        "coshF0": 1.1090909090909087,
+        "kappa_E_r0": 19.181818181818233,
+        "kappa_E_arc": 19.181818181818233,
+        "r_min_m": 1539999.9999999993,
+        "r_max_m": 160016793.3197231,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [18552.74467562166],
+      "x": [3.3065354446185227],
+      "epsTgen_s": [1.2674820181350273e-10],
+      "dtAlphaHyp_s": [5.99829771365242e-10],
+      "threshold_s": [7.265779731787447e-10],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": 0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.17 F0=-0.291321 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-177632.0677544364, -1437850.673051994, 522142.02139763685],
+        "velocity_mps": [1591.5587687303, 18156.779123589768, 15569.33345485821]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421801035,
+        "aAbs_m": 6999999.999999987,
+        "e": 1.1700000000000004,
+        "n_h_radps": 0.001078007612872509,
+        "sinhF0": -0.2954595900417714,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181815,
+        "kappa_E_arc": 24.476196950875288,
+        "r_min_m": 1192697.4398191865,
+        "r_max_m": 1539999.9999999998,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [46.38186168905415],
+      "x": [0.26565666824940654],
+      "epsTgen_s": [4.563268750513176e-13],
+      "dtAlphaHyp_s": [3.497908130494826e-13],
+      "threshold_s": [8.061176881008002e-13],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": -0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.17 F0=-0.291321 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-177632.0677544364, -1437850.673051994, 522142.02139763685],
+        "velocity_mps": [1591.5587687303, 18156.779123589768, 15569.33345485821]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421801035,
+        "aAbs_m": 6999999.999999987,
+        "e": 1.1700000000000004,
+        "n_h_radps": 0.001078007612872509,
+        "sinhF0": -0.2954595900417714,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181815,
+        "kappa_E_arc": 24.52941176470583,
+        "r_min_m": 1190000.0000000005,
+        "r_max_m": 6468315.604790502,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [463.8186168905415],
+      "x": [1.3731200411064122],
+      "epsTgen_s": [6.56703997937316e-12],
+      "dtAlphaHyp_s": [2.4731378013096152e-11],
+      "threshold_s": [3.129841799246931e-11],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": -0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.17 F0=-0.291321 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-177632.0677544364, -1437850.673051994, 522142.02139763685],
+        "velocity_mps": [1591.5587687303, 18156.779123589768, 15569.33345485821]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421801035,
+        "aAbs_m": 6999999.999999987,
+        "e": 1.1700000000000004,
+        "n_h_radps": 0.001078007612872509,
+        "sinhF0": -0.2954595900417714,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181815,
+        "kappa_E_arc": 24.52941176470583,
+        "r_min_m": 1190000.0000000005,
+        "r_max_m": 46156561.58502039,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4638.186168905415],
+      "x": [2.8488080774200033],
+      "epsTgen_s": [6.027654841334255e-11],
+      "dtAlphaHyp_s": [2.9107511531427636e-10],
+      "threshold_s": [3.513516637276189e-10],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": -0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.17 F0=-0.291321 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-177632.0677544364, -1437850.673051994, 522142.02139763685],
+        "velocity_mps": [1591.5587687303, 18156.779123589768, 15569.33345485821]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421801035,
+        "aAbs_m": 6999999.999999987,
+        "e": 1.1700000000000004,
+        "n_h_radps": 0.001078007612872509,
+        "sinhF0": -0.2954595900417714,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181815,
+        "kappa_E_arc": 24.52941176470583,
+        "r_min_m": 1190000.0000000005,
+        "r_max_m": 158721449.08157343,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [18552.74467562166],
+      "x": [3.991251909653829],
+      "epsTgen_s": [2.424270116763631e-10],
+      "dtAlphaHyp_s": [1.2670435545069915e-9],
+      "threshold_s": [1.5094705661833545e-9],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": -0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.17 F0=0.291321 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [74366.68179399235, 969874.5092083883, 1193906.6265947009],
+        "velocity_mps": [2766.302603581878, 23480.46148065132, -3952.3828568068056]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421801035,
+        "aAbs_m": 6999999.999999987,
+        "e": 1.1700000000000004,
+        "n_h_radps": 0.001078007612872509,
+        "sinhF0": 0.2954595900417714,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181815,
+        "kappa_E_arc": 19.18181818181815,
+        "r_min_m": 1539999.9999999998,
+        "r_max_m": 2164384.773148526,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [46.38186168905415],
+      "x": [0.1917635068114557],
+      "epsTgen_s": [3.5788018588185347e-13],
+      "dtAlphaHyp_s": [1.6617634099293908e-13],
+      "threshold_s": [5.240565268747925e-13],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": 0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.17 F0=0.291321 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [74366.68179399235, 969874.5092083883, 1193906.6265947009],
+        "velocity_mps": [2766.302603581878, 23480.46148065132, -3952.3828568068056]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421801035,
+        "aAbs_m": 6999999.999999987,
+        "e": 1.1700000000000004,
+        "n_h_radps": 0.001078007612872509,
+        "sinhF0": 0.2954595900417714,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181815,
+        "kappa_E_arc": 19.18181818181815,
+        "r_min_m": 1539999.9999999998,
+        "r_max_m": 7699650.770476227,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [463.8186168905415],
+      "x": [0.8981271966577296],
+      "epsTgen_s": [2.7126774437617223e-12],
+      "dtAlphaHyp_s": [7.37447667484209e-12],
+      "threshold_s": [1.0087154118603813e-11],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": 0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.17 F0=0.291321 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [74366.68179399235, 969874.5092083883, 1193906.6265947009],
+        "velocity_mps": [2766.302603581878, 23480.46148065132, -3952.3828568068056]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421801035,
+        "aAbs_m": 6999999.999999987,
+        "e": 1.1700000000000004,
+        "n_h_radps": 0.001078007612872509,
+        "sinhF0": 0.2954595900417714,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181815,
+        "kappa_E_arc": 19.18181818181815,
+        "r_min_m": 1539999.9999999998,
+        "r_max_m": 47021766.487797774,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4638.186168905415],
+      "x": [2.2825026854141135],
+      "epsTgen_s": [2.994057191607907e-11],
+      "dtAlphaHyp_s": [1.2756003574243756e-10],
+      "threshold_s": [1.5750060765851664e-10],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": 0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.17 F0=0.291321 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [74366.68179399235, 969874.5092083883, 1193906.6265947009],
+        "velocity_mps": [2766.302603581878, 23480.46148065132, -3952.3828568068056]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421801035,
+        "aAbs_m": 6999999.999999987,
+        "e": 1.1700000000000004,
+        "n_h_radps": 0.001078007612872509,
+        "sinhF0": 0.2954595900417714,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181815,
+        "kappa_E_arc": 19.18181818181815,
+        "r_min_m": 1539999.9999999998,
+        "r_max_m": 159515094.9563545,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [18552.74467562166],
+      "x": [3.4133924980209684],
+      "epsTgen_s": [1.2985877400702711e-10],
+      "dtAlphaHyp_s": [6.158606557423347e-10],
+      "threshold_s": [7.457194297493618e-10],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": 0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=-1.00000 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-4357721.348823483, -2099701.005245648, 657813.9278469493],
+        "velocity_mps": [10482.537537653989, 9146.920999026794, -5166.857134523998]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.14846305960365452,
+        "aAbs_m": 7000000.0000000205,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.0010780076128725012,
+        "sinhF0": -1.175201193643799,
+        "coshF0": 1.543080634815242,
+        "kappa_E_r0": 6.7356822813005275,
+        "kappa_E_arc": 7.635992126362991,
+        "r_min_m": 4219414.289050118,
+        "r_max_m": 4881720.888077376,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [46.38186168905415],
+      "x": [0.07701002984203786],
+      "epsTgen_s": [6.963498072563537e-13],
+      "dtAlphaHyp_s": [2.7771782648941018e-14],
+      "threshold_s": [7.241215899052948e-13],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": -1
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=-1.00000 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-4357721.348823483, -2099701.005245648, 657813.9278469493],
+        "velocity_mps": [10482.537537653989, 9146.920999026794, -5166.857134523998]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.14846305960365452,
+        "aAbs_m": 7000000.0000000205,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.0010780076128725012,
+        "sinhF0": -1.175201193643799,
+        "coshF0": 1.543080634815242,
+        "kappa_E_r0": 6.7356822813005275,
+        "kappa_E_arc": 41.00000000000005,
+        "r_min_m": 700000.0000000012,
+        "r_max_m": 4881720.888077376,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [463.8186168905415],
+      "x": [1.86052453651309],
+      "epsTgen_s": [2.992791127535502e-11],
+      "dtAlphaHyp_s": [4.4079742994540206e-11],
+      "threshold_s": [7.400765426989522e-11],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": -1
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=-1.00000 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-4357721.348823483, -2099701.005245648, 657813.9278469493],
+        "velocity_mps": [10482.537537653989, 9146.920999026794, -5166.857134523998]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.14846305960365452,
+        "aAbs_m": 7000000.0000000205,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.0010780076128725012,
+        "sinhF0": -1.175201193643799,
+        "coshF0": 1.543080634815242,
+        "kappa_E_r0": 6.7356822813005275,
+        "kappa_E_arc": 41.00000000000005,
+        "r_min_m": 700000.0000000012,
+        "r_max_m": 44665822.06316264,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4638.186168905415],
+      "x": [3.591123667483012],
+      "epsTgen_s": [2.783751991729131e-10],
+      "dtAlphaHyp_s": [4.973064849092645e-10],
+      "threshold_s": [7.756816840821776e-10],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": -1
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=-1.00000 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-4357721.348823483, -2099701.005245648, 657813.9278469493],
+        "velocity_mps": [10482.537537653989, 9146.920999026794, -5166.857134523998]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.14846305960365452,
+        "aAbs_m": 7000000.0000000205,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.0010780076128725012,
+        "sinhF0": -1.175201193643799,
+        "coshF0": 1.543080634815242,
+        "kappa_E_r0": 6.7356822813005275,
+        "kappa_E_arc": 41.00000000000005,
+        "r_min_m": 700000.0000000012,
+        "r_max_m": 157407444.53747064,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [18552.74467562166],
+      "x": [4.753725788668851],
+      "epsTgen_s": [1.0462689484794582e-9],
+      "dtAlphaHyp_s": [2.013039549624298e-9],
+      "threshold_s": [3.0593084981037565e-9],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": -1
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=1.00000 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [2775468.933251206, -2619725.277414937, 3043847.975921534],
+        "velocity_mps": [3995.414353979005, -10202.393529160765, 10009.695302830196]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036547,
+        "aAbs_m": 7000000.000000013,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.001078007612872503,
+        "sinhF0": 1.1752011936437998,
+        "coshF0": 1.5430806348152426,
+        "kappa_E_r0": 6.73568228130052,
+        "kappa_E_arc": 6.73568228130052,
+        "r_min_m": 4881720.888077377,
+        "r_max_m": 5518736.134242616,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [46.38186168905415],
+      "x": [0.06736447392322154],
+      "epsTgen_s": [6.776380182184818e-13],
+      "dtAlphaHyp_s": [2.1135724540257776e-14],
+      "threshold_s": [6.987737427587396e-13],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": 1
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=1.00000 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [2775468.933251206, -2619725.277414937, 3043847.975921534],
+        "velocity_mps": [3995.414353979005, -10202.393529160765, 10009.695302830196]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036547,
+        "aAbs_m": 7000000.000000013,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.001078007612872503,
+        "sinhF0": 1.1752011936437998,
+        "coshF0": 1.5430806348152426,
+        "kappa_E_r0": 6.73568228130052,
+        "kappa_E_arc": 6.73568228130052,
+        "r_min_m": 4881720.888077377,
+        "r_max_m": 10599480.78752078,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [463.8186168905415],
+      "x": [0.4680882042381733],
+      "epsTgen_s": [2.3592263493888078e-12],
+      "dtAlphaHyp_s": [1.2741414705765736e-12],
+      "threshold_s": [3.6333678199653816e-12],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": 1
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=1.00000 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [2775468.933251206, -2619725.277414937, 3043847.975921534],
+        "velocity_mps": [3995.414353979005, -10202.393529160765, 10009.695302830196]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036547,
+        "aAbs_m": 7000000.000000013,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.001078007612872503,
+        "sinhF0": 1.1752011936437998,
+        "coshF0": 1.5430806348152426,
+        "kappa_E_r0": 6.73568228130052,
+        "kappa_E_arc": 6.73568228130052,
+        "r_min_m": 4881720.888077377,
+        "r_max_m": 49326552.553872205,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4638.186168905415],
+      "x": [1.6783879005179878],
+      "epsTgen_s": [2.577623848681635e-11],
+      "dtAlphaHyp_s": [3.223946622049592e-11],
+      "threshold_s": [5.8015704707312266e-11],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": 1
+      }
+    },
+    {
+      "label": "near-gate a=7.0e+6 e=1.1 F0=1.00000 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [2775468.933251206, -2619725.277414937, 3043847.975921534],
+        "velocity_mps": [3995.414353979005, -10202.393529160765, 10009.695302830196]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036547,
+        "aAbs_m": 7000000.000000013,
+        "e": 1.0999999999999999,
+        "n_h_radps": 0.001078007612872503,
+        "sinhF0": 1.1752011936437998,
+        "coshF0": 1.5430806348152426,
+        "kappa_E_r0": 6.73568228130052,
+        "kappa_E_arc": 6.73568228130052,
+        "r_min_m": 4881720.888077377,
+        "r_max_m": 161680781.96235365,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [18552.74467562166],
+      "x": [2.7794135657482784],
+      "epsTgen_s": [1.1746817777696003e-10],
+      "dtAlphaHyp_s": [1.733702525702442e-10],
+      "threshold_s": [2.9083843034720424e-10],
+      "elements": {
+        "aAbs_m": 7000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": 1
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=-0.462954 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-963268.8548918825, -4736590.629215398, 4494087.485176955],
+        "velocity_mps": [7046.4006679997, 2310.8618271767023, -8892.853833371539]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180053,
+        "aAbs_m": 30000000.000000242,
+        "e": 1.0999999999999992,
+        "n_h_radps": 0.00012150300130418824,
+        "sinhF0": -0.4796693075735585,
+        "coshF0": 1.1090909090909082,
+        "kappa_E_r0": 19.181818181818336,
+        "kappa_E_arc": 37.02046708981937,
+        "r_min_m": 3331439.309234197,
+        "r_max_m": 6599999.999999997,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [411.5124685259597],
+      "x": [0.3213429014957525],
+      "epsTgen_s": [5.814376068779482e-12],
+      "dtAlphaHyp_s": [6.515643530517062e-12],
+      "threshold_s": [1.2330019599296544e-11],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": -0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=-0.462954 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-963268.8548918825, -4736590.629215398, 4494087.485176955],
+        "velocity_mps": [7046.4006679997, 2310.8618271767023, -8892.853833371539]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180053,
+        "aAbs_m": 30000000.000000242,
+        "e": 1.0999999999999992,
+        "n_h_radps": 0.00012150300130418824,
+        "sinhF0": -0.4796693075735585,
+        "coshF0": 1.1090909090909082,
+        "kappa_E_r0": 19.181818181818336,
+        "kappa_E_arc": 41.00000000000032,
+        "r_min_m": 3000000.0000000005,
+        "r_max_m": 28483665.61606163,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4115.124685259597],
+      "x": [1.637101002327284],
+      "epsTgen_s": [1.0238546801503948e-10],
+      "dtAlphaHyp_s": [4.3454061079498143e-10],
+      "threshold_s": [5.369260788100209e-10],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": -0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=-0.462954 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-963268.8548918825, -4736590.629215398, 4494087.485176955],
+        "velocity_mps": [7046.4006679997, 2310.8618271767023, -8892.853833371539]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180053,
+        "aAbs_m": 30000000.000000242,
+        "e": 1.0999999999999992,
+        "n_h_radps": 0.00012150300130418824,
+        "sinhF0": -0.4796693075735585,
+        "coshF0": 1.1090909090909082,
+        "kappa_E_r0": 19.181818181818336,
+        "kappa_E_arc": 41.00000000000032,
+        "r_min_m": 3000000.0000000005,
+        "r_max_m": 199231844.74635983,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [41151.24685259597],
+      "x": [3.0891057196934497],
+      "epsTgen_s": [7.893519767623634e-10],
+      "dtAlphaHyp_s": [4.006528175964062e-9],
+      "threshold_s": [4.795880152726426e-9],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": -0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=-0.462954 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-963268.8548918825, -4736590.629215398, 4494087.485176955],
+        "velocity_mps": [7046.4006679997, 2310.8618271767023, -8892.853833371539]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180053,
+        "aAbs_m": 30000000.000000242,
+        "e": 1.0999999999999992,
+        "n_h_radps": 0.00012150300130418824,
+        "sinhF0": -0.4796693075735585,
+        "coshF0": 1.1090909090909082,
+        "kappa_E_r0": 19.181818181818336,
+        "kappa_E_arc": 41.00000000000032,
+        "r_min_m": 3000000.0000000005,
+        "r_max_m": 681739377.4488276,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [164604.98741038388],
+      "x": [4.226767526002083],
+      "epsTgen_s": [3.0529068744542624e-9],
+      "dtAlphaHyp_s": [1.6632662228055206e-8],
+      "threshold_s": [1.968556910250947e-8],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": -0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=0.462954 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [545784.894718973, 5004879.070912697, -4267704.808704161],
+        "velocity_mps": [-5119.345051475424, 10128.956107521635, -2295.9199628545844]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180053,
+        "aAbs_m": 30000000.000000242,
+        "e": 1.0999999999999992,
+        "n_h_radps": 0.00012150300130418824,
+        "sinhF0": 0.4796693075735585,
+        "coshF0": 1.1090909090909082,
+        "kappa_E_r0": 19.181818181818336,
+        "kappa_E_arc": 19.181818181818336,
+        "r_min_m": 6599999.999999997,
+        "r_max_m": 10102591.6637612,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [411.5124685259597],
+      "x": [0.18190884346356595],
+      "epsTgen_s": [3.840325335807041e-12],
+      "dtAlphaHyp_s": [1.8395847347537184e-12],
+      "threshold_s": [5.67991007056076e-12],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": 0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=0.462954 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [545784.894718973, 5004879.070912697, -4267704.808704161],
+        "velocity_mps": [-5119.345051475424, 10128.956107521635, -2295.9199628545844]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180053,
+        "aAbs_m": 30000000.000000242,
+        "e": 1.0999999999999992,
+        "n_h_radps": 0.00012150300130418824,
+        "sinhF0": 0.4796693075735585,
+        "coshF0": 1.1090909090909082,
+        "kappa_E_r0": 19.181818181818336,
+        "kappa_E_arc": 19.181818181818336,
+        "r_min_m": 6599999.999999997,
+        "r_max_m": 34870265.8274025,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4115.124685259597],
+      "x": [0.8340092072413177],
+      "epsTgen_s": [2.4191718842692135e-11],
+      "dtAlphaHyp_s": [6.559733927921845e-11],
+      "threshold_s": [8.97890581219106e-11],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": 0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=0.462954 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [545784.894718973, 5004879.070912697, -4267704.808704161],
+        "velocity_mps": [-5119.345051475424, 10128.956107521635, -2295.9199628545844]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180053,
+        "aAbs_m": 30000000.000000242,
+        "e": 1.0999999999999992,
+        "n_h_radps": 0.00012150300130418824,
+        "sinhF0": 0.4796693075735585,
+        "coshF0": 1.1090909090909082,
+        "kappa_E_r0": 19.181818181818336,
+        "kappa_E_arc": 19.181818181818336,
+        "r_min_m": 6599999.999999997,
+        "r_max_m": 203645220.15245014,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [41151.24685259597],
+      "x": [2.1824645608435023],
+      "epsTgen_s": [2.590073133394233e-10],
+      "dtAlphaHyp_s": [1.0992543427873782e-9],
+      "threshold_s": [1.3582616561268014e-9],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": 0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=0.462954 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [545784.894718973, 5004879.070912697, -4267704.808704161],
+        "velocity_mps": [-5119.345051475424, 10128.956107521635, -2295.9199628545844]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180053,
+        "aAbs_m": 30000000.000000242,
+        "e": 1.0999999999999992,
+        "n_h_radps": 0.00012150300130418824,
+        "sinhF0": 0.4796693075735585,
+        "coshF0": 1.1090909090909082,
+        "kappa_E_r0": 19.181818181818336,
+        "kappa_E_arc": 19.181818181818336,
+        "r_min_m": 6599999.999999997,
+        "r_max_m": 685786257.0845263,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [164604.98741038388],
+      "x": [3.306535444618517],
+      "epsTgen_s": [1.1245444557437874e-9],
+      "dtAlphaHyp_s": [5.321852571694553e-9],
+      "threshold_s": [6.4463970274383405e-9],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 0.9,
+        "raan_rad": 2.2,
+        "argPeriapsis_rad": 3.7,
+        "F0": 0.46295397413151546
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.17 F0=-0.291321 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-761280.290376156, -6162217.170222832, 2237751.5202755863],
+        "velocity_mps": [768.7959243790718, 8770.557559242885, 7520.702559380048]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180081,
+        "aAbs_m": 30000000.000000075,
+        "e": 1.1699999999999995,
+        "n_h_radps": 0.00012150300130418925,
+        "sinhF0": -0.295459590041771,
+        "coshF0": 1.0427350427350426,
+        "kappa_E_r0": 19.18181818181823,
+        "kappa_E_arc": 24.47619695087541,
+        "r_min_m": 5111560.456367938,
+        "r_max_m": 6599999.999999999,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [411.5124685259597],
+      "x": [0.2656566682494061],
+      "epsTgen_s": [4.048655917824477e-12],
+      "dtAlphaHyp_s": [3.1034390536261278e-12],
+      "threshold_s": [7.1520949714506045e-12],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": -0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.17 F0=-0.291321 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-761280.290376156, -6162217.170222832, 2237751.5202755863],
+        "velocity_mps": [768.7959243790718, 8770.557559242885, 7520.702559380048]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180081,
+        "aAbs_m": 30000000.000000075,
+        "e": 1.1699999999999995,
+        "n_h_radps": 0.00012150300130418925,
+        "sinhF0": -0.295459590041771,
+        "coshF0": 1.0427350427350426,
+        "kappa_E_r0": 19.18181818181823,
+        "kappa_E_arc": 24.529411764705955,
+        "r_min_m": 5099999.999999997,
+        "r_max_m": 27721352.591959275,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4115.124685259597],
+      "x": [1.3731200411064097],
+      "epsTgen_s": [5.826456149901098e-11],
+      "dtAlphaHyp_s": [2.194234997389003e-10],
+      "threshold_s": [2.776880612379113e-10],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": -0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.17 F0=-0.291321 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-761280.290376156, -6162217.170222832, 2237751.5202755863],
+        "velocity_mps": [768.7959243790718, 8770.557559242885, 7520.702559380048]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180081,
+        "aAbs_m": 30000000.000000075,
+        "e": 1.1699999999999995,
+        "n_h_radps": 0.00012150300130418925,
+        "sinhF0": -0.295459590041771,
+        "coshF0": 1.0427350427350426,
+        "kappa_E_r0": 19.18181818181823,
+        "kappa_E_arc": 24.529411764705955,
+        "r_min_m": 5099999.999999997,
+        "r_max_m": 197813835.36437294,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [41151.24685259597],
+      "x": [2.848808077419999],
+      "epsTgen_s": [5.347899012353102e-10],
+      "dtAlphaHyp_s": [2.5824974433426905e-9],
+      "threshold_s": [3.1172873445780007e-9],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": -0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.17 F0=-0.291321 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-761280.290376156, -6162217.170222832, 2237751.5202755863],
+        "velocity_mps": [768.7959243790718, 8770.557559242885, 7520.702559380048]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.05213270142180081,
+        "aAbs_m": 30000000.000000075,
+        "e": 1.1699999999999995,
+        "n_h_radps": 0.00012150300130418925,
+        "sinhF0": -0.295459590041771,
+        "coshF0": 1.0427350427350426,
+        "kappa_E_r0": 19.18181818181823,
+        "kappa_E_arc": 24.529411764705955,
+        "r_min_m": 5099999.999999997,
+        "r_max_m": 680234781.7781711,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [164604.98741038388],
+      "x": [3.991251909653824],
+      "epsTgen_s": [2.1508782610132917e-9],
+      "dtAlphaHyp_s": [1.1241554389097077e-8],
+      "threshold_s": [1.3392432650110369e-8],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": -0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.17 F0=0.291321 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [318714.35054568143, 4156605.0394645208, 5116742.685405861],
+        "velocity_mps": [1336.2511074156569, 11342.140449683577, -1909.1823007722633]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421800876,
+        "aAbs_m": 30000000.00000004,
+        "e": 1.1699999999999997,
+        "n_h_radps": 0.00012150300130418945,
+        "sinhF0": 0.295459590041771,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181821,
+        "kappa_E_arc": 19.18181818181821,
+        "r_min_m": 6599999.999999999,
+        "r_max_m": 9275934.742065115,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [411.5124685259597],
+      "x": [0.19176350681145554],
+      "epsTgen_s": [3.1752101654756686e-12],
+      "dtAlphaHyp_s": [1.4743616103869e-12],
+      "threshold_s": [4.649571775862569e-12],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": 0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.17 F0=0.291321 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [318714.35054568143, 4156605.0394645208, 5116742.685405861],
+        "velocity_mps": [1336.2511074156569, 11342.140449683577, -1909.1823007722633]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421800876,
+        "aAbs_m": 30000000.00000004,
+        "e": 1.1699999999999997,
+        "n_h_radps": 0.00012150300130418945,
+        "sinhF0": 0.295459590041771,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181821,
+        "kappa_E_arc": 19.18181818181821,
+        "r_min_m": 6599999.999999999,
+        "r_max_m": 32998503.302040946,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4115.124685259597],
+      "x": [0.8981271966577284],
+      "epsTgen_s": [2.4067610711290577e-11],
+      "dtAlphaHyp_s": [6.542835906191235e-11],
+      "threshold_s": [8.949596977320294e-11],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": 0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.17 F0=0.291321 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [318714.35054568143, 4156605.0394645208, 5116742.685405861],
+        "velocity_mps": [1336.2511074156569, 11342.140449683577, -1909.1823007722633]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421800876,
+        "aAbs_m": 30000000.00000004,
+        "e": 1.1699999999999997,
+        "n_h_radps": 0.00012150300130418945,
+        "sinhF0": 0.295459590041771,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181821,
+        "kappa_E_arc": 19.18181818181821,
+        "r_min_m": 6599999.999999999,
+        "r_max_m": 201521856.3762761,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [41151.24685259597],
+      "x": [2.2825026854141113],
+      "epsTgen_s": [2.6564088222384557e-10],
+      "dtAlphaHyp_s": [1.131747266755751e-9],
+      "threshold_s": [1.3973881489795967e-9],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": 0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.17 F0=0.291321 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [318714.35054568143, 4156605.0394645208, 5116742.685405861],
+        "velocity_mps": [1336.2511074156569, 11342.140449683577, -1909.1823007722633]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.052132701421800876,
+        "aAbs_m": 30000000.00000004,
+        "e": 1.1699999999999997,
+        "n_h_radps": 0.00012150300130418945,
+        "sinhF0": 0.295459590041771,
+        "coshF0": 1.0427350427350428,
+        "kappa_E_r0": 19.18181818181821,
+        "kappa_E_arc": 19.18181818181821,
+        "r_min_m": 6599999.999999999,
+        "r_max_m": 683636121.2415184,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [164604.98741038388],
+      "x": [3.413392498020965],
+      "epsTgen_s": [1.1521422966943479e-9],
+      "dtAlphaHyp_s": [5.4640829299086566e-9],
+      "threshold_s": [6.616225226603005e-9],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.17,
+        "inclination_rad": 1.6,
+        "raan_rad": 4.6,
+        "argPeriapsis_rad": 1.3,
+        "F0": 0.2913214165804867
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=-1.00000 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-18675948.637814928, -8998718.59390992, 2819202.547915498],
+        "velocity_mps": [5063.546690473897, 4418.382608817624, -2495.829111004134]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036545,
+        "aAbs_m": 30000000.000000108,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.00012150300130418906,
+        "sinhF0": -1.1752011936437994,
+        "coshF0": 1.5430806348152417,
+        "kappa_E_r0": 6.735682281300531,
+        "kappa_E_arc": 7.635992126362988,
+        "r_min_m": 18083204.095929097,
+        "r_max_m": 20921660.948903043,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [411.5124685259597],
+      "x": [0.07701002984203786],
+      "epsTgen_s": [6.178204533115244e-12],
+      "dtAlphaHyp_s": [2.463987950688317e-13],
+      "threshold_s": [6.424603328184076e-12],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": -1
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=-1.00000 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-18675948.637814928, -8998718.59390992, 2819202.547915498],
+        "velocity_mps": [5063.546690473897, 4418.382608817624, -2495.829111004134]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036545,
+        "aAbs_m": 30000000.000000108,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.00012150300130418906,
+        "sinhF0": -1.1752011936437994,
+        "coshF0": 1.5430806348152417,
+        "kappa_E_r0": 6.735682281300531,
+        "kappa_E_arc": 41.00000000000014,
+        "r_min_m": 3000000,
+        "r_max_m": 20921660.948903043,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4115.124685259597],
+      "x": [1.8605245365130902],
+      "epsTgen_s": [2.6552855358226577e-10],
+      "dtAlphaHyp_s": [3.9108744649535993e-10],
+      "threshold_s": [6.566160000776256e-10],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": -1
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=-1.00000 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-18675948.637814928, -8998718.59390992, 2819202.547915498],
+        "velocity_mps": [5063.546690473897, 4418.382608817624, -2495.829111004134]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036545,
+        "aAbs_m": 30000000.000000108,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.00012150300130418906,
+        "sinhF0": -1.1752011936437994,
+        "coshF0": 1.5430806348152417,
+        "kappa_E_r0": 6.735682281300531,
+        "kappa_E_arc": 41.00000000000014,
+        "r_min_m": 3000000,
+        "r_max_m": 191424951.69926843,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [41151.24685259597],
+      "x": [3.591123667483012],
+      "epsTgen_s": [2.4698203395980873e-9],
+      "dtAlphaHyp_s": [4.4122381415163255e-9],
+      "threshold_s": [6.882058481114413e-9],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": -1
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=-1.00000 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [-18675948.637814928, -8998718.59390992, 2819202.547915498],
+        "velocity_mps": [5063.546690473897, 4418.382608817624, -2495.829111004134]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036545,
+        "aAbs_m": 30000000.000000108,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.00012150300130418906,
+        "sinhF0": -1.1752011936437994,
+        "coshF0": 1.5430806348152417,
+        "kappa_E_r0": 6.735682281300531,
+        "kappa_E_arc": 41.00000000000014,
+        "r_min_m": 3000000,
+        "r_max_m": 674603333.7320172,
+        "periapsisPassed": true,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [164604.98741038388],
+      "x": [4.75372578866885],
+      "epsTgen_s": [9.282782149135894e-9],
+      "dtAlphaHyp_s": [1.7860233378725643e-8],
+      "threshold_s": [2.7143015527861538e-8],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": -1
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=1.00000 nΔt=0.05",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [11894866.85679088, -11227394.046064015, 13045062.753949432],
+        "velocity_mps": [1929.9684886880952, -4928.2242781317955, 4835.142191595838]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036545,
+        "aAbs_m": 30000000.000000108,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.00012150300130418906,
+        "sinhF0": 1.175201193643799,
+        "coshF0": 1.5430806348152417,
+        "kappa_E_r0": 6.735682281300531,
+        "kappa_E_arc": 6.735682281300531,
+        "r_min_m": 20921660.948903043,
+        "r_max_m": 23651726.28961123,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [411.5124685259597],
+      "x": [0.06736447392322187],
+      "epsTgen_s": [6.012188460946068e-12],
+      "dtAlphaHyp_s": [1.8752188598973872e-13],
+      "threshold_s": [6.199710346935807e-12],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": 1
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=1.00000 nΔt=0.5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [11894866.85679088, -11227394.046064015, 13045062.753949432],
+        "velocity_mps": [1929.9684886880952, -4928.2242781317955, 4835.142191595838]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036545,
+        "aAbs_m": 30000000.000000108,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.00012150300130418906,
+        "sinhF0": 1.175201193643799,
+        "coshF0": 1.5430806348152417,
+        "kappa_E_r0": 6.735682281300531,
+        "kappa_E_arc": 6.735682281300531,
+        "r_min_m": 20921660.948903043,
+        "r_max_m": 45426346.23223192,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [4115.124685259597],
+      "x": [0.468088204238173],
+      "epsTgen_s": [2.093169664807982e-11],
+      "dtAlphaHyp_s": [1.1304529027389182e-11],
+      "threshold_s": [3.2236225675469e-11],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": 1
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=1.00000 nΔt=5",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [11894866.85679088, -11227394.046064015, 13045062.753949432],
+        "velocity_mps": [1929.9684886880952, -4928.2242781317955, 4835.142191595838]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036545,
+        "aAbs_m": 30000000.000000108,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.00012150300130418906,
+        "sinhF0": 1.175201193643799,
+        "coshF0": 1.5430806348152417,
+        "kappa_E_r0": 6.735682281300531,
+        "kappa_E_arc": 6.735682281300531,
+        "r_min_m": 20921660.948903043,
+        "r_max_m": 211399510.94516644,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [41151.24685259597],
+      "x": [1.6783879005179867],
+      "epsTgen_s": [2.2869378551760227e-10],
+      "dtAlphaHyp_s": [2.8603729659015616e-10],
+      "threshold_s": [5.147310821077585e-10],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
+        "F0": 1
+      }
+    },
+    {
+      "label": "near-gate a=3.0e+7 e=1.1 F0=1.00000 nΔt=20",
+      "source": "O1_HYP_GRID_NEAR_GATE (tolerances-r5.ts; review N1); state from hyperbolicElementsToState in binary64",
+      "startState": {
+        "position_m": [11894866.85679088, -11227394.046064015, 13045062.753949432],
+        "velocity_mps": [1929.9684886880952, -4928.2242781317955, 4835.142191595838]
+      },
+      "arc": {
+        "energyOverScaleAtStart": 0.1484630596036545,
+        "aAbs_m": 30000000.000000108,
+        "e": 1.0999999999999996,
+        "n_h_radps": 0.00012150300130418906,
+        "sinhF0": 1.175201193643799,
+        "coshF0": 1.5430806348152417,
+        "kappa_E_r0": 6.735682281300531,
+        "kappa_E_arc": 6.735682281300531,
+        "r_min_m": 20921660.948903043,
+        "r_max_m": 692917636.9815154,
+        "periapsisPassed": false,
+        "u": 1.1102230246251565e-16
+      },
+      "dt_s": [164604.98741038388],
+      "x": [2.779413565748277],
+      "epsTgen_s": [1.0422095631760931e-9],
+      "dtAlphaHyp_s": [1.5381879468841407e-9],
+      "threshold_s": [2.580397510060234e-9],
+      "elements": {
+        "aAbs_m": 30000000,
+        "e": 1.1,
+        "inclination_rad": 2.4,
+        "raan_rad": 0.3,
+        "argPeriapsis_rad": 5.2,
         "F0": 1
       }
     }
