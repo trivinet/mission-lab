@@ -171,11 +171,11 @@ report_part_d1:
     (1.55e-14…2.91e-14 relative, 2.98e-14…3.08e-14 absolute), plane-normal (6.4e-15…6.5e-13 rad) and
     plane-rotation (2.6e-14…6.7e-13 rad) rows for all 14 cases; comparison modes A (exact pre-state,
     m = 0 or tangential at an apsis) and B (engine event state, any m). The magnitude part of term
-    (iv) also applies to tangential burns; it is absorbed by the 1u slack of the approved coefficient
-    except for C3 apogee circularisation (+0.073 %, listed as a loosening in §15). P-3: hyperbolic
+    (iv) also applies to tangential burns; the approved values still bound the corrected formula
+    (after review: no loosening, see review_fixes). P-3: hyperbolic
     componentwise budget written out and evaluated (§6.8); 10κ_E·a replaced by 10κ_E·r_max (|a| does
     not bound r on a hyperbola); C_b recounted for cosh/sinh (+2u|a| terms). Only c3-midrun-escape meets
-    the approved validity condition |E| ≥ 0.1(v²/2 + μ/r) (M·P_E,gen 4.54e-6 m at the end of the L2 arc);
+    the approved validity condition |E| ≥ 0.1(v²/2 + μ/r) (M·P_E,gen 4.551e-6 m at the end of the L2 arc, after review B3);
     lowering it to 0.05 is proposed to the owner. O-5 closed. P-4: O-4 resolved on ADR-005 (Decision)
     plus the ML-TASK-015 contract (scope item 2, acceptance criterion 4), reading stated; VT-09 exact.
     L3: rows 3M × per-side bound for VT-02, VT-12, VT-15 and hyperbolic VT-16 (A6 confirmed for
@@ -205,10 +205,32 @@ report_part_d1:
   risks_or_blockers:
     - "Revision 4 needs the owner's signatures in §15 before D2 may run the engine on the gaps or on the L3 datasets (§4.1)."
     - "Outside this part's paths: ML-TASK-015.yaml status reads in_review although the task is done (C-7); selfcheck.py hyperbolic pass/fail check (O-13)."
-  review_artifact: ""   # no PR opened (instructed not to push)
+  review_artifact: "PR #31 (pushed by the Coordinator)"
   recommended_next_action: >
-    Systems Architect review of revision 4 (in particular the O-4 reading, §6.8 and the C_b
-    recount); owner: sign the revision-4 rows of §15, the C3 loosening and the 0.1 → 0.05 validity
-    decision. Then part D2: extend selfcheck.py (O-13), produce the L2b hyperbolic trajectories and
-    the L3 restart arcs, commit datasets with their evaluated tolerances and the comparison code,
-    then run the engine.
+    Systems Architect re-check of the review fixes; owner: sign the revision-4 rows of §15 and the
+    0.1 → 0.05 validity decision. Then part D2: extend selfcheck.py (O-13), produce new versions of
+    the L2 VT-15 and VT-16 datasets with the revision-4 values (§4.1 item 5), the L2b hyperbolic
+    trajectories and the L3 restart arcs, commit datasets with their evaluated tolerances and the
+    comparison code, then run the engine.
+  review_fixes:
+    # Systems Architect bounded review of PR #31, verdict "changes required"; fixes 2026-11-15, not pushed.
+    commits:
+      - "a85dd25 Q3/N1: C3 loosening withdrawn; term (i) zero at m = 0; general e⁺ formula for e⁺ < 1e-6"
+      - "b8e0096 B1: mode A at m > 0 only for tangential burns at an apsis (all VT-15 rows)"
+      - "9d49a10 B2: §4.1 item 5 — revision-4 values only for new dataset versions; run-2 datasets informative"
+      - "bf24cfc B3/N4: χ²C row 7 → 8; hyperbolic values re-evaluated; arc-wide per-sample convention"
+      - "c3d0068 N2/N3: start-of-arc validity test stated as a scope gate; VT-14 G1 wording"
+      - "this commit: report"
+    resolution:
+      - "B1: mode A at m > 0 restricted to tangential burns at an apsis for every row incl. the plane rows; every other burn at m > 0 uses mode B (consistent with §9.3.2 item 4); §15 row updated."
+      - "B2: remedy (a) as new §4.1 item 5, repeated in §7 VT-15 (table columns 'run-2 dataset' and 'new version'), §7 VT-16 and §15. L2 hyperbolic VT-16 arcs treated the same way."
+      - "Q3: agreed. At m = 0 term (i) is zero; corrected formula for c3-apogee-circularise = 143.7u = 1.595e-14 (verified in binary64 and decimal), bounded by the approved 1.7686e-12; e⁺ (general formula, N1) 3.93e-14 ≤ 1.7952e-12. Approved values stay for the run-2 dataset; loosening rows removed from §15 and the change paragraph."
+      - "B3: coefficient 7 → 8; both scripts re-run; inbound M·P_E,gen 2.2225e-5 → 2.2341e-5 m, outbound 1.2653e-5 → 1.2691e-5 m, as the reviewer found; escape-clear and L3 C1 unchanged (sinh F₀ = 0)."
+      - "N1: chose 'general e⁺ formula for e⁺ < 1e-6' rather than adding the term everywhere: the radial part changes ‖e⁺‖ at first order only when e⁺ is of the size of the perturbation (≤ 1e-14); for e⁺ ≥ 1e-6 it is ≤ 5e-23 (second order). Adding it everywhere would raise approved values for a term that does not act there. The general formula contains the reviewer's term. Affects c3-apogee-circularise only (L2 new version 3.93e-14; L3 6.78e-14 → 7.80e-14)."
+      - "N2: stated that the start-of-arc test is a scope gate the bound does not need (factors taken over the whole arc; inbound reaches 0.0411 at periapsis)."
+      - "N4: per-sample values use arc-wide r_max, r_min, v_max, g_max, κ_E; D2 uses the same convention."
+      - "N3: VT-14 text says the G1 report must state exactly 'VT-14: e = 0 only'."
+    tests_executed:
+      - "Node binary64 and Python decimal scripts re-run after the B3 and Q3/N1 changes; agreement to four digits."
+      - "pnpm format:check → exit 0"
+    disagreements: []
