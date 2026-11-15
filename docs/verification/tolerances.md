@@ -14,9 +14,10 @@ of [conformance run 2](conformance-run-2.md) §7, and the L3 Orekit datasets of 
 VT-14, §12, §15). Nothing is derived for e > 0. (2) **P-2:** VT-15 gets a general error model with a
 first-order direction term from the computed RSW basis, tolerances for normal, radial and combined
 burns, and two new rows for the orbit plane (plane-normal error and plane-rotation angle) (§7
-VT-15). The same term, restricted to its magnitude part, is added to the approved tangential
-formula; it changes one approved value (C3 apogee circularisation, +0.07 %), listed as a loosening
-in §15. (3) **P-3:** the VT-16 componentwise budget is evaluated for hyperbolic arcs (§6.8), with
+VT-15). The same term, restricted to its magnitude part, is added to the tangential formula, and
+term (i) is written as zero at m = 0; the approved values still bound the corrected formula, so
+they stay in force for the run-2 datasets and **no approved value is loosened**. Revision-4 values
+apply only to new dataset versions (§4.1 item 5). (3) **P-3:** the VT-16 componentwise budget is evaluated for hyperbolic arcs (§6.8), with
 the 10κ_E·a term replaced by 10κ_E·r_max (justified in §6.8); O-5 is closed for its numeric part.
 Only one hyperbolic case of the grid meets the approved validity condition \|E\| ≥ 0.1(v²/2 + μ/r);
 lowering it to 0.05 is proposed for owner decision (§7 VT-16, §15). (4) **P-4:** O-4 is resolved
@@ -1014,12 +1015,33 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
   rounds up the exact sum u(4a⁺/r − 2) + 10u(4a⁺/r − 1) = 11u(4a⁺/r − 1) − u, so it has a slack of
   1u that absorbs the tangential term whenever 24a⁺v⁺Δv/μ ≤ 1. Revision 3 omitted term (iv); the
   §6.1 phase argument (second order at an apsis) is unaffected.
-- **Corrected tangential formula** (apsis, along ±S): \|δa⁺\|/a⁺ ≤ M[τ_E,eng(m)·a⁺/a⁻ +
-  11u(4a⁺/r − 1) + max(0, 24a⁺v⁺Δv/μ − 1)u]; e⁺ as before with this \|δa⁺\|/a⁺. Of the ten
-  tangential grid cases only C3 apogee circularisation (Δv = 904.46 m/s, 24a⁺v⁺Δv/μ = 3.92) has a
-  non-zero extra term: a⁺ 1.7686 × 10⁻¹² → **1.7698 × 10⁻¹²** (+0.073 %), e⁺ 1.7952 × 10⁻¹² →
-  **1.7965 × 10⁻¹²** (+0.072 %). This is a loosening forced by the derivation and is listed in
-  §15. The other nine approved values are unchanged to all digits.
+- **Corrected tangential formula** (apsis, along ±S): \|δa⁺\|/a⁺ ≤ M[[m > 0]·τ_E,eng(m)·a⁺/a⁻ +
+  11u(4a⁺/r − 1) + max(0, 24a⁺v⁺Δv/μ − 1)u]; e⁺ as before with this \|δa⁺\|/a⁺, except for
+  e⁺ < 10⁻⁶ (below). Term (i) is written with [m > 0] because at m = 0 it is exactly zero: the
+  engine's pre-maneuver state is the request's `initialState` bit-for-bit (§1, precondition row).
+  Of the ten tangential grid cases only C3 apogee circularisation (m = 0, Δv = 904.46 m/s,
+  24a⁺v⁺Δv/μ = 3.92) has a non-zero extra term; there the corrected formula gives
+  \|δa⁺\|/a⁺ ≤ 4[11u·3 + 2.92u] = 143.7u = **1.60 × 10⁻¹⁴**. **No approved value is loosened**
+  (review Q3 of revision 4): for every tangential case the corrected formula is ≤ the approved
+  value — equal at m > 0 (extra term zero), smaller at m = 0 (term (i) zero; C3: 1.60 × 10⁻¹⁴ ≤
+  1.7686 × 10⁻¹², and for e⁺ the general formula of N1 below gives 3.93 × 10⁻¹⁴ ≤ 1.7952 × 10⁻¹²).
+  The approved values therefore stay in force, unchanged, for the run-2 datasets; the corrected
+  formula applies to the m > 0 cases (where it equals the approved value) and to the new dataset
+  versions of part D2 (below), where at m = 0 it is a tightening.
+- **e⁺ near zero (circularisation; review N1).** The tangential e⁺ formula uses e⁺ = \|1 − r/a⁺\|,
+  i.e. only the energy error. A velocity error δv_r normal to v⁺ (from the direction error of Ŝ and
+  the R12 addition) changes the e-vector by ‖δe_⊥‖ ≤ (rv⁺/μ)\|δv_r\| perpendicular to ê⁺, which
+  changes ‖e⁺‖ only by ≤ ‖δe_⊥‖²/(2e⁺) — second order — unless e⁺ is itself of the size of ‖δe_⊥‖
+  (≤ 10⁻¹⁴ on the grid), where it is first order. **Chosen resolution: for e⁺ < 10⁻⁶ the general
+  e⁺ formula below is used instead of the tangential one** (it bounds the e-vector change from any
+  velocity error, 4rv⁺‖δv⁺‖/μ, which contains the reviewer's radial term (rv⁺²/μ)[(6κ_h⁻ + 12)
+  u‖Δv‖/v⁺ + u]). For e⁺ ≥ 10⁻⁶ the neglected second-order part is ≤ (10⁻¹⁴)²/(2·10⁻⁶) = 5 × 10⁻²³,
+  below 10⁻⁸ of every e⁺ tolerance, and is neglected as the apsis phase error is (§7 VT-15). Why
+  not add the term to every case: it is first order only near e⁺ = 0, and adding it everywhere
+  would raise approved values for a term that does not act there. Grid case affected:
+  `c3-apogee-circularise` (e⁺ = 3.7 × 10⁻¹⁶): general formula 3.93 × 10⁻¹⁴, bounded by the
+  approved 1.7952 × 10⁻¹² that stays in force for the run-2 dataset. A circularisation at m > 0
+  must use mode B (the general formula has no pre-maneuver term).
 - **Two comparison modes for the pre-maneuver state.** (A) The reference applies the burn exactly
   to the **exact** pre-maneuver state at m. At m = 0 that state is the request's `initialState`,
   and the engine's pre-maneuver state equals it bit-for-bit (§1, precondition row), so term (i) is
@@ -1055,29 +1077,31 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
     **\|δψ\| ≤ M[κ_h⁺u(2(12κ_h⁻ + 25)‖Δv‖/v⁺ + 14) + 12uκ_h⁻ + 32u + [m > 0]·2(P_b v⁺ + rV_b)/h⁺]**.
     A common tilt of ĥ⁻ and ĥ⁺ cancels in ψ; keeping the tilt term is conservative.
 - **Evaluated (L2, M = 4; inputs: the grid elements, ν₀, m and Δv_RSW of the datasets; κ_h⁻ =
-  1/√(1 − e²) of the grid case; κ_h⁺ from the reference post-maneuver state).** "Approved" is the
-  revision-3 value; "rev. 4" the value of this revision.
+  1/√(1 − e²) of the grid case; κ_h⁺ from the reference post-maneuver state).** "Run-2 dataset"
+  is the approved revision-3 value, which stays in force for the dataset version run in
+  conformance run 2 (§4.1 item 1); "new version" is the revision-4 value, which applies only to the
+  new dataset versions committed in part D2 before any engine run (§4.1 item 5). The plane rows
+  exist only for new versions.
 
-| Case | Burn | m | a⁺ (m) | κ_h⁺ | \|δa⁺\|/a⁺ approved → rev. 4 | \|δe⁺\| approved → rev. 4 | δψ_n (rad) | \|δψ\| (rad) |
+| Case | Burn | m | a⁺ (m) | κ_h⁺ | \|δa⁺\|/a⁺ run-2 dataset \| new version | \|δe⁺\| run-2 dataset \| new version | δψ_n (rad), new version | \|δψ\| (rad), new version |
 |---|---|---|---|---|---|---|---|---|
-| c1-circular-prograde | +100 S | 0 | 7.1919e6 | 1.0000 | 3.318e-13 (unchanged) | 3.496e-13 (unchanged) | 6.65e-15 | 2.62e-14 |
-| c1-circular-prograde-after-1T | +100 S | T | 7.1919e6 | 1.0000 | 1.063e-12 (unchanged) | 1.061e-12 (unchanged) | 2.76e-13 | 2.95e-13 |
-| c1-normal | +200 W | 0 | 7.0049e6 | 1.0000 | — → **1.55e-14** | — → **3.02e-14** | 7.09e-15 | 2.66e-14 |
-| c3-apogee-circularise | +904.46 S | 0 | 1.3000e7 | 1.0000 | 1.7686e-12 → **1.7698e-12** | 1.7952e-12 → **1.7965e-12** | 1.17e-14 | 3.15e-14 |
-| c4-perigee-prograde | +100 S | 0 | 1.2676e7 | 1.0000 | 2.603e-12 (unchanged) | 1.505e-12 (unchanged) | 6.60e-15 | 2.66e-14 |
-| c4-perigee-prograde-after-1T | +100 S | T | 1.2676e7 | 1.0000 | 9.114e-12 (unchanged) | 5.203e-12 (unchanged) | 5.69e-13 | 5.89e-13 |
-| c4-perigee-retrograde | −100 S | 0 | 1.1399e7 | 1.0000 | 2.340e-12 (unchanged) | 1.505e-12 (unchanged) | 6.61e-15 | 2.66e-14 |
-| c4-apogee-prograde | +100 S | 0 | 1.2283e7 | 1.0000 | 2.503e-12 (unchanged) | 3.450e-12 (unchanged) | 7.09e-15 | 2.71e-14 |
-| c4-apogee-prograde-after-1T | +100 S | T | 1.2283e7 | 1.0000 | 8.812e-12 (unchanged) | 1.208e-11 (unchanged) | 6.45e-13 | 6.65e-13 |
-| c4-perigee-normal | −150 W | 0 | 1.2008e7 | 1.0000 | — → **2.91e-14** | — → **3.08e-14** | 6.79e-15 | 2.68e-14 |
-| c4-radial (ν₀ = 1) | +80 R | 0 | 1.2126e7 | 1.0404 | — → **2.44e-14** | — → **2.99e-14** | 6.82e-15 | 2.69e-14 |
-| c4-combined (ν₀ = 1) | (30, −60, 45) | 0 | 1.1723e7 | 1.0392 | — → **2.34e-14** | — → **2.98e-14** | 6.82e-15 | 2.69e-14 |
-| c5-perigee-prograde | +50 S | 0 | 2.7844e7 | 1.0000 | 4.237e-11 (unchanged) | 1.031e-11 (unchanged) | 6.40e-15 | 2.85e-14 |
-| c5-apogee-raise-perigee | +200 S | 0 | 2.7143e7 | 1.0000 | 4.124e-11 (unchanged) | 6.876e-11 (unchanged) | 1.07e-14 | 3.28e-14 |
+| c1-circular-prograde | +100 S | 0 | 7.1919e6 | 1.0000 | 3.318e-13 \| 1.52e-14 | 3.496e-13 \| 4.14e-14 | 6.65e-15 | 2.62e-14 |
+| c1-circular-prograde-after-1T | +100 S | T | 7.1919e6 | 1.0000 | 1.063e-12 \| 1.063e-12 | 1.061e-12 \| 1.061e-12 | 2.76e-13 | 2.95e-13 |
+| c1-normal | +200 W | 0 | 7.0049e6 | 1.0000 | — \| **1.55e-14** | — \| **3.02e-14** | 7.09e-15 | 2.66e-14 |
+| c3-apogee-circularise | +904.46 S | 0 | 1.3000e7 | 1.0000 | 1.7686e-12 \| 1.60e-14 | 1.7952e-12 \| 3.93e-14 (general formula, e⁺ < 10⁻⁶) | 1.17e-14 | 3.15e-14 |
+| c4-perigee-prograde | +100 S | 0 | 1.2676e7 | 1.0000 | 2.603e-12 \| 2.95e-14 | 1.505e-12 \| 4.34e-14 | 6.60e-15 | 2.66e-14 |
+| c4-perigee-prograde-after-1T | +100 S | T | 1.2676e7 | 1.0000 | 9.114e-12 \| 9.114e-12 | 5.203e-12 \| 5.203e-12 | 5.69e-13 | 5.89e-13 |
+| c4-perigee-retrograde | −100 S | 0 | 1.1399e7 | 1.0000 | 2.340e-12 \| 2.61e-14 | 1.505e-12 \| 4.31e-14 | 6.61e-15 | 2.66e-14 |
+| c4-apogee-prograde | +100 S | 0 | 1.2283e7 | 1.0000 | 2.503e-12 \| 9.40e-15 | 3.450e-12 \| 3.95e-14 | 7.09e-15 | 2.71e-14 |
+| c4-apogee-prograde-after-1T | +100 S | T | 1.2283e7 | 1.0000 | 8.812e-12 \| 8.812e-12 | 1.208e-11 \| 1.208e-11 | 6.45e-13 | 6.65e-13 |
+| c4-perigee-normal | −150 W | 0 | 1.2008e7 | 1.0000 | — \| **2.91e-14** | — \| **3.08e-14** | 6.79e-15 | 2.68e-14 |
+| c4-radial (ν₀ = 1) | +80 R | 0 | 1.2126e7 | 1.0404 | — \| **2.44e-14** | — \| **2.99e-14** | 6.82e-15 | 2.69e-14 |
+| c4-combined (ν₀ = 1) | (30, −60, 45) | 0 | 1.1723e7 | 1.0392 | — \| **2.34e-14** | — \| **2.98e-14** | 6.82e-15 | 2.69e-14 |
+| c5-perigee-prograde | +50 S | 0 | 2.7844e7 | 1.0000 | 4.237e-11 \| 7.56e-14 | 1.031e-11 \| 4.50e-14 | 6.40e-15 | 2.85e-14 |
+| c5-apogee-raise-perigee | +200 S | 0 | 2.7143e7 | 1.0000 | 4.124e-11 \| 6.84e-15 | 6.876e-11 \| 3.80e-14 | 1.07e-14 | 3.28e-14 |
 
-  (T is fl(2π/n) of the grid a, as in the datasets. The tangential m = 0 values keep the
-  approved term τ_E,eng(0), although the pre-maneuver state is exact there; dropping it would
-  tighten them and is not done in this revision.) **Consistency check, not used to set any
+  (T is fl(2π/n) of the grid a, as in the datasets. Every new-version value is ≤ the run-2 value
+  of the same case: no loosening.) **Consistency check, not used to set any
   value:** conformance run 2 §5 item 2 reports, for the four non-tangential cases, observed
   \|δa⁺\|/a⁺ ≤ 4.0e-16, \|δe⁺\| ≤ 2.1e-16 and plane rotation (sine) ≤ 6.7e-17, i.e. at most 2.6 %,
   0.7 % and 1.0 % of the smallest rev. 4 values above; nothing in the measurements contradicts the
@@ -1317,7 +1341,8 @@ the datasets):
   own post-maneuver state). Per-side bounds, from §7 VT-15 revision 4:
   X_a = [m > 0]·τ_E,eng(m)a⁺/a⁻ + 6u(4a⁺/r − 1) + (tangential: max(0, 24a⁺v⁺Δv/μ − 1)u; otherwise
   2a⁺v⁺(12κ_h⁻ + 25)u‖Δv‖/μ) — one evaluation of E⁺ (5u) and the R12 addition (u) per side;
-  X_e = (r/a⁺)X_a + 30u (tangential at an apsis) or (4rv⁺/μ)((12κ_h⁻ + 25)u‖Δv‖ + uv⁺) + 30u;
+  X_e = (r/a⁺)X_a + 30u (tangential at an apsis with e⁺ ≥ 10⁻⁶) or (4rv⁺/μ)((12κ_h⁻ + 25)u‖Δv‖ +
+  uv⁺) + 30u (every other burn, and e⁺ < 10⁻⁶; §7 VT-15, review N1);
   X_n = κ_h⁺u(2(12κ_h⁻ + 25)‖Δv‖/v⁺ + 8) + [m > 0]·2(P_b v⁺ + rV_b)/h⁺ (state error plus one ĥ⁺
   evaluation); X_ψ = X_n + 6uκ_h⁻ + 16u. Tolerances 3M·X. At m = 0 both pre-maneuver states are the
   request's `initialState` (precondition row of §1; true in all eleven m = 0 L3 VT-15 files), so
@@ -1331,7 +1356,7 @@ the datasets):
 | c1-circular-prograde | 2.49e-14 | 6.42e-14 | 1.20e-14 | 4.13e-14 |
 | c1-circular-prograde-after-1T | 3.17e-12 | 3.12e-12 | 8.19e-13 | 8.48e-13 |
 | c1-normal | 2.66e-14 | 5.05e-14 | 1.33e-14 | 4.26e-14 |
-| c3-apogee-circularise | 2.79e-14 | 6.78e-14 | 2.70e-14 | 5.67e-14 |
+| c3-apogee-circularise | 2.79e-14 | 7.80e-14 (general formula, e⁺ < 10⁻⁶) | 2.70e-14 | 5.67e-14 |
 | c4-perigee-prograde | 4.83e-14 | 6.74e-14 | 1.18e-14 | 4.18e-14 |
 | c4-perigee-prograde-after-1T | 2.73e-11 | 1.56e-11 | 1.70e-12 | 1.73e-12 |
 | c4-perigee-retrograde | 4.26e-14 | 6.69e-14 | 1.18e-14 | 4.19e-14 |
@@ -1582,7 +1607,7 @@ against it or against the L3 Orekit datasets):
 |---|---|---|---|
 | P-1: VT-14 accepted for G1 at e = 0 only; O-11 open, not blocking G1 (§7 VT-14, §12) | Records the owner direction of 2026-11-15 | | |
 | P-2: VT-15 direction term (iv); non-tangential a⁺, e⁺ rows; plane-normal and plane-rotation rows; modes A/B (§7 VT-15) | Approve the formulas and evaluated values | | |
-| P-2: correction of the tangential VT-15 formula (term (iv), magnitude part) | Approve; changes one value (loosening table below) | | |
+| P-2: correction of the tangential VT-15 formula (term (iv), magnitude part; term (i) zero at m = 0; general e⁺ formula for e⁺ < 10⁻⁶) | Approve; no approved value changes (the approved values bound the corrected formula and stay in force for the run-2 datasets) | | |
 | P-3: hyperbolic budget §6.8, including 10κ_E·a → 10κ_E·r_max and the hyperbolic C_b recount; O-5 closed | Approve the method and the evaluated values | | |
 | P-3: VT-16 validity condition \|E\| ≥ 0.1(v²/2 + μ/r) → 0.05 (§7 VT-16) | Owner decision; recommended (adds four arcs to the toleranced set; not a loosening of any value) | | |
 | P-4: O-4 resolved on ADR-005 Decision + ML-TASK-015 contract, with the reading stated in §12; VT-09 exact | Approve, or reject the reading (then VT-09 uses §7 and a contract amendment by the Systems Architect is needed) | | |
@@ -1595,5 +1620,8 @@ against it or against the L3 Orekit datasets):
 
 | Tolerance | Old value | New value | Reason | Owner | Date |
 |---|---|---|---|---|---|
-| VT-15 \|δa⁺\|/a⁺, `c3-apogee-circularise` (L2, closed form) | 1.7686 × 10⁻¹² | 1.7698 × 10⁻¹² (+0.073 %) | Revision 4 term (iv): the magnitude error of the computed S, \|v⁺·δΔv_I\| ≤ 12u v⁺Δv, omitted in revision 3; exceeds the 1u rounding slack of the approved coefficient only for this case (24a⁺v⁺Δv/μ = 3.92). Forced by the derivation, not by any result | | |
-| VT-15 \|δe⁺\|, `c3-apogee-circularise` (L2, closed form) | 1.7952 × 10⁻¹² | 1.7965 × 10⁻¹² (+0.072 %) | Follows from the a⁺ row through the approved e⁺ formula | | |
+| | | | | | |
+
+Revision 4 proposes no loosening. (A loosening of the C3 circularisation values proposed in the
+first draft of revision 4 was withdrawn after review Q3: at m = 0 term (i) is zero and the
+corrected formula gives 1.60 × 10⁻¹⁴, well inside the approved 1.7686 × 10⁻¹².)
