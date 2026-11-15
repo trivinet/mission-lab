@@ -1,6 +1,6 @@
 task_id: ML-TASK-012
 title: "External references (L3): textbook assessment (part A) and one Orekit reference dataset (part B)"
-status: in_progress          # part A done, awaiting review; part B under way (Python, JDK, Orekit installed with owner approval)
+status: in_progress          # part A done, awaiting review; part B done on branch test/ml-task-012b-orekit-dataset, awaiting review and a decision on the dataset location (report_part_b)
 requirement_ids: [ML-FR-003, ML-FR-004, ML-FR-006]
 owner_role: verification-engineer
 reviewer_role: systems-architect
@@ -52,7 +52,7 @@ deliverables:
 human_approval_required: true   # installing Python/Java/Orekit on the dev machine; use of textbook values in a public repository
 
 report:
-  # Part A only. Part B has not started.
+  # Part A only (unchanged). Part B: see report_part_b below.
   files_changed:
     - docs/verification/l3-textbook-assessment.md (new)
     - docs/backlog/tasks/ML-TASK-012.yaml (new)
@@ -93,3 +93,86 @@ report:
     Systems Architect review of the assessment. Owner: (1) authorise installing Python + JDK + Orekit for
     part B; (2) decide whether textbook example values may be stored in the repository; (3) if a rendering
     tool is acceptable, let a second reader check the cited equations and the Appendix B / Table 22.1 values.
+
+report_part_b:
+  files_changed:
+    - docs/backlog/tasks/ML-TASK-012.yaml (restored from 5b0886a; status comment; this section)
+    - verification/l3/README.md, requirements.txt, .gitignore (new; pinned environment, conventions)
+    - verification/l3/l3lib.py, cases.py, generate.py, selfcheck.py (new)
+    - test-data/l3-orekit/README.md (new)
+    - "test-data/l3-orekit/{vt-02,vt-05,vt-12,vt-15,vt-16}/l3-orekit-*.json (43 new datasets)"
+  summary: >
+    Part B done. 43 L3 datasets generated with Orekit 13.1.9 (orekit_jpype 13.1.9.0, JPype1 1.7.1,
+    Python 3.13.17, Temurin JDK 21.0.13) on the plan §5 grid with the same element values, sampling and
+    maneuvers as the L2 datasets: VT-02 (9 grid cases), VT-05 (9, 160 steps, about 10 periods), VT-12
+    (8: pure radial, along-track and cross-track on C4 at ν = 1 rad, combined on C1, C3, C5, C7, C8b),
+    VT-15 (14, mirroring the L2 VT-15 set, at t = 0 and after one period), VT-16 (2 hyperbolic escapes,
+    1 bound sub-surface periapsis reached within the span). mu is passed explicitly to every Orekit
+    orbit and propagator; frame GCRF only; epoch represented as TAI because Orekit's UTC needs
+    orekit-data, which is not installed and was not needed. The generator was committed (df84b5e6d75a)
+    before generating; datasets committed in bd28f41. selfcheck.py validates every case before use:
+    489 pass/fail checks, 0 failures, plus 72 informational measurements; regeneration is
+    byte-identical. The datasets are in an interim location, test-data/l3-orekit/, not
+    test-data/reference-cases/: two existing tests enumerate that tree and would fail on new files,
+    and fixing that needs changes outside this task's affected_paths (one in conformance/, which this
+    task may not touch). Conflict reported under risks_or_blockers.
+  tests_executed:
+    - "python -B verification/l3/selfcheck.py --repro -> exit 0; 489 pass/fail checks, 0 failures, 72 informational"
+    - "  VT-02 recompute = file, bit-exact: 9/9 pass"
+    - "  Orekit elements->state->elements->state round trip vs VT-03 M·B_rt·u·r_a, M·B_vt·u·v_p: max ratio 0.002 (r), 0.004 (v)"
+    - "  Orekit VT-02 vs L2c dataset (cross-check) vs VT-02 M·2η·u·scale: max ratio 0.008 (r), 0.013 (v)"
+    - "  Energy on every sample, VT-06 with engine part x2 (A6): max ratio 0.001; angular momentum, VT-07 x2 (A6): max ratio 0.001 (all VT-05 coasts and all elliptic segments)"
+    - "  Closure after N = 1 and 10 periods, VT-08 with P_E, V_E x2 (A6): max ratio 0.004 (r), 0.003 (v)"
+    - "  RSW: Orekit QSW Q vs r/‖r‖ (32u) max ratio 0.114; W vs (r×v)/‖r×v‖ (4(12κ_h+8)u) 0.064; S vs W×R, orthonormality, handedness (4(12κ_h+25)u) ≤ 0.054"
+    - "  Δv inertial, Orekit vs ΔvR·R + ΔvS·S + ΔvW·W in binary64 (VT-12, 8(12κ_h+25)u): max ratio 0.016; ‖Δv_I‖ vs ‖Δv_RSW‖ (VT-13): 0.015; v⁺ = fl(v⁻ + Δv_I) bit-exact: 25/25"
+    - "  a⁺ Orekit vs vis-viva (VT-15 terms (ii)+(iii)): 0.025; e⁺ vs e-vector (M·60u): 0.008; i⁺ vs atan2 (VI-03(b) row i): 0.014"
+    - "  Hyperbolic segments (info, no evaluated bound): energy deviation ≤ 2.3e-15 relative, ‖Δh‖/h ≤ 9.2e-16, Kepler time-of-flight residual (40-digit decimal) ≤ 1.1e-11 s"
+    - "  VT-05 L3 vs L2a (info; initial states differ, L2c vs Orekit element->state): max ‖Δr‖ 1.1e-5 m (C5) against a §9.3 tolerance of 1.6e-3 m at the end of the span; C1 3.1e-8 m"
+    - "  --repro: generator unchanged since df84b5e6d75a; same 43 files; byte-identical regeneration"
+    - "pnpm install --frozen-lockfile -> ok"
+    - "pnpm lint -> ok"
+    - "pnpm typecheck -> ok"
+    - "pnpm test -> 53 files, 1153 tests passed"
+    - "pnpm format:check -> All matched files use Prettier code style"
+    - "pnpm check:boundaries -> 20/20 fixtures reported"
+  reference_data_used:
+    - "Orekit 13.1.9 (orekit-13.1.9.jar, Hipparchus 4.0.3) via orekit_jpype 13.1.9.0 / JPype1 1.7.1 on Python 3.13.17 and Eclipse Temurin JDK 21.0.13; no orekit-data"
+    - "mu = 3.986004418e14 m^3/s^2 and R_ref = 6378137 m as written in docs/architecture/proposed-architecture.md §3 (ML-ARCH-002, WGS 84; primary-source status per VT-19)"
+    - "Grid element values, sampling and maneuver inputs copied from the L2 datasets' inputs (test-data/reference-cases/vt-02, vt-05, vt-15) so that L2 and L3 cases correspond; L2 outputs were read only by the self-check cross-comparison, after generation"
+  not_verified:
+    - "Orekit's algorithms were not read (no source or javadoc available offline); the QSW axis mapping is verified numerically against the contract definitions, not from documentation."
+    - "Assumption A6 (Orekit obeys §6.3 with coefficients at most 2x) is checked only as §9.3 asks (closure and energy of Orekit's own output). Those bounds are loose: the measured values use 0.1 % to 0.4 % of them, so they confirm A6 but do not measure Orekit's accuracy. Tighter evidence is the L3 vs L2 cross-check (VT-02 at 1.3 % of its tolerance; VT-05 within 0.7 % of the §9.3 tolerance at the end of the span)."
+    - "Hyperbolic arcs (VT-16 escape cases): no derived bound exists (tolerances.md §7 VT-16 generalised budget not evaluated, open item O-5); energy, angular momentum and time-of-flight residual are measured only."
+    - "Element-space differences of the Orekit round trip are reported without a bound (the record has none for elements->state->elements); the pass/fail check is in state space with the VT-03 bound."
+    - "Orekit element angles of near-circular or near-equatorial states follow Orekit's convention, not ADR-008; not compared."
+    - "requestId is not computed (Python generator); requests are stored as inputs.requestBody."
+    - "Reproducibility on another machine, OS or JDK was not tested."
+  known_limitations:
+    - "The VT-02 tolerance written in each dataset reuses the §7 VT-02 formula; the record states no VT-02 tolerance for Orekit (§9.3 covers propagation only)."
+    - "Maneuvers at m > 0: the event and segment 1 start from Orekit's pre-maneuver state, which differs from the engine's by propagation error; a conformance run must restart the reference from the engine's event state (generate.propagate) or add the VT-14 transport term. VT-12 Δv comparisons have identical inputs only for t = 0."
+    - "Hyperbolic segments carry no evaluated tolerance (segment1 tolerance null)."
+    - "Orekit propagation is analytical Keplerian (KeplerianPropagator on a CartesianOrbit); whether its internal algorithm differs from ADR-005's universal-variable method was not established (independence is organisational)."
+  documentation_changes:
+    - verification/l3/README.md
+    - test-data/l3-orekit/README.md
+  risks_or_blockers:
+    - "CONFLICT (stop-and-report, AGENTS.md): the contract and the coordinator place the datasets in test-data/reference-cases/<family>/, but verification/src/datasets/datasets.test.ts requires that tree (recursively) to equal exactly what the L2 builders produce, and conformance/src/support/datasets.test.ts counts the files of vt-02 and vt-05 while the conformance families run the engine on every file of a family directory. L3 files there would fail pnpm test and make conformance run the engine on them (out of scope). Resolving it needs changes outside affected_paths (verification/src/datasets, conformance/). Interim choice: test-data/l3-orekit/, movable by one constant (l3lib.DATA_SUBDIR). Decision needed from the coordinator or owner."
+    - "test-data/l3-orekit/ is itself outside the contract's affected_paths (test-data/reference-cases/), though inside the Verification Engineer's owned test-data/."
+    - "Tolerance-record gap: no Orekit row for VT-02 (element->state), VT-12 and VT-15; the datasets cite the engine-vs-L2 formulas with a status note. A reviewer should confirm before the G1 conformance run."
+  review_artifact: ""   # no PR opened (coordinator instruction)
+  recommended_next_action: >
+    Coordinator/owner: decide the dataset location (keep test-data/l3-orekit/ and point a new conformance
+    family at it, or move the files into reference-cases/ with the enumerating tests changed by their
+    owners). Systems Architect: review the convention mappings (verification/l3/README.md) and the
+    tolerance-record gaps above. Then a G1 conformance task: rerun verification/l3/selfcheck.py --repro;
+    run the engine on each requestBody (adding requestId); compare VT-02 and VT-05 with the stored
+    per-sample §9.3 tolerances, VT-12 at t = 0 with the VT-12 formula, VT-15 a⁺/e⁺ with the VT-15
+    formula, VT-16 expected warnings exactly; restart segment-1 references from the engine's event state
+    for m > 0; commit the comparison code before any engine result on these datasets is inspected (§4.1).
+  l3_gaps_for_g1:
+    - "VT-16 hyperbolic arcs: no evaluated tolerance (O-5); the Orekit escape states back only the warning expectations and an informational state comparison."
+    - "No L3 dataset for VT-03, VT-04, VT-06…VT-11, VT-13, VT-14 (L1 families; not required by the contract)."
+    - "VT-19 constants: L3 uses the same constants as the engine by construction and gives no evidence on their values."
+    - "VT-15 elements other than a, e, i (Ω, ω, ν after the burn) are stored as Orekit returns them and are not comparable for near-degenerate orbits."
+    - "Textbook L3 (part A) stays at print resolution and awaits the owner's decision on the use of book values."
+    - "Single external tool: L3 rests on Orekit only (no GMAT cross-check)."
