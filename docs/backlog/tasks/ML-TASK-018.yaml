@@ -25,7 +25,8 @@ objective: >
 scope:
   - "Part A: ADR-009 and the conformance/ workspace (package, Vitest project, tsconfig, lint boundary rule with fixtures); verification exports needed by conformance, without behaviour change."
   - "Part B: first conformance run — VT-02, VT-03, VT-04, VT-05, VT-08 against the committed datasets with their stored tolerances; O-1 black-box residual check on the VT-05 grid plus a deterministic grid within the O-1 range; run report."
-  - "Later parts: VT-01, VT-06, VT-07, VT-09 (L1, on engine output); VT-10 and runner-level checks once ML-TASK-017 lands; maneuver families once their engine code and datasets exist; CI wiring; G1 verification report."
+  - "Part C (two phases, commit boundary between them): phase 1 — independent references (RSW projection form in 320-bit, exact-maneuver closed forms, VT-16 classification, §5.2 grid) and datasets for VT-01, VT-06/07, VT-09, VT-11/12/13, VT-14, VT-15, VT-16, VT-18, VI-01 with tolerances evaluated from the approved record, without reading the engine; phase 2 — conformance tests on runSimulation results for VT-01, VT-06/07, VT-09 (exact), VT-10, VT-11…VT-16, VT-18, VI-01 and the −0 rule (§11.4 P3); run report conformance-run-2.md. Part C affected paths: verification/**, conformance/**, test-data/reference-cases/**, docs/verification/conformance-run-2.md, this file."
+  - "Later parts: CI wiring; G1 verification report."
 out_of_scope:
   - Changing engine code (packages/astrodynamics, packages/simulation) or apps/web.
   - Changing any dataset, reference or tolerance; re-evaluating a tolerance from engine output (tolerances.md §4.1).
@@ -108,3 +109,47 @@ report:
     Systems Architect review of ADR-009 and the boundary change; owner approval of the ML-TASK-011
     datasets; then the next part of ML-TASK-018 (VT-01, VT-06, VT-07, VT-09 on engine output) and
     CI wiring.
+
+report_part_c:
+  # Part C (2026-11-14/15), branch test/ml-task-018c-remaining-families, not pushed.
+  commits:
+    - "733fccf references + part-C tolerance transcription (phase 1)"
+    - "dadff5d dataset builder and dataset self-checks (phase 1)"
+    - "0e904ea phase-1 end: 67 datasets (codeRevision dadff5d6e225), committed before any engine read or run"
+    - "5d9b54d conformance tests, committed before the first engine run"
+    - "this commit: conformance-run-2.md and this report"
+  files_changed:
+    - verification/src/hp/hp-vec.ts, ref/rsw.ts, ref/maneuver.ts, ref/grid.ts (+ tests) (new)
+    - verification/src/tol/tolerances.ts (VT-01, VT-06/07, VT-11…VT-15 transcription), tolerances-part-c.test.ts (new)
+    - verification/src/datasets/build-c.ts, encoding.ts, datasets-c.test.ts (new); datasets.test.ts (includes part C; ML_WRITE_DATASETS=C)
+    - verification/src/index.ts (re-exports only)
+    - test-data/reference-cases/{vt-01,vt-06-07,vt-09,vt-12,vt-14,vt-15,vt-16,vt-18,vi-01}/ (new), README.md
+    - conformance/src/support/run.ts, vi01-structure, vt01-vector, vt06-07-invariants, vt09-sampling-independence, vt11-13-maneuver, vt14-zero-maneuver, vt15-post-maneuver, vt16-escape-intersection, vt18-invalid-input tests (new)
+    - docs/verification/conformance-run-2.md (new)
+  summary: >
+    254 new conformance tests, all passed against origin/main ed672c6; no failure, no dataset or
+    reference defect. Worst ratios: VT-01 0.071, VT-06 0.0022, VT-07 0.0017, VT-11 0.027,
+    VT-12 0.0060, VT-13 0.014, VT-14 (e = 0) 0.00059, VT-15 0.0016, VT-16 states 0.030 (L2b) /
+    0.0050 (L2a); VT-09, VT-10, VT-16 warnings, VT-18, VI-01, P3 exact and all passed. The
+    rectilinear collision fails with one NON_FINITE_STATE at exactly the free-fall time.
+  tests_executed:
+    - "pnpm install --frozen-lockfile → exit 0"
+    - "pnpm lint → exit 0; pnpm typecheck → exit 0; pnpm format:check → exit 0; pnpm check:boundaries → exit 0 (20/20)"
+    - "pnpm test → exit 0, Test Files 53 passed (53), Tests 1153 passed (1153); conformance project 378 tests (254 new)"
+  reference_data_used:
+    - "test-data/reference-cases part C datasets version 1 (codeRevision dadff5d6e225), unchanged after 0e904ea"
+  not_verified:
+    - "VT-14 for e > 0 (O-11; restricted to e = 0, K(e) not derived)"
+    - "VT-15 non-tangential burns and plane-rotation angle (no approved tolerance; observed only)"
+    - "VT-16 hyperbolic arc states (componentwise budget not evaluated)"
+    - "VT-09 exactness rests on O-4 (runner doc states no chaining; O-4 formally open)"
+    - "VT-17, VT-19, VI-02, VI-03, VE, L3; CI run"
+  known_limitations:
+    - "VT-11 R ∥ r, W ∥ r × v and VT-13 magnitude are formed by engine and test with the same expression (ratio 0); no independent numerical evidence from those three checks"
+    - "Datasets and report are committed, not approved"
+  risks_or_blockers: []
+  review_artifact: ""   # no PR opened (instructed not to push)
+  recommended_next_action: >
+    Review of the part-C references and datasets (Systems Architect) and owner approval; owner
+    decisions on the proposals P-1…P-4 of conformance-run-2.md §7; then CI wiring and the G1
+    report.
