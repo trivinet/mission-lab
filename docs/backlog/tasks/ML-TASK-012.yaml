@@ -1,0 +1,95 @@
+task_id: ML-TASK-012
+title: "External references (L3): textbook assessment (part A) and one Orekit reference dataset (part B)"
+status: in_progress          # part A done, awaiting review; part B under way (Python, JDK, Orekit installed with owner approval)
+requirement_ids: [ML-FR-003, ML-FR-004, ML-FR-006]
+owner_role: verification-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-004]   # contracts (reference data format, frame and units); D-5 owner decision
+affected_paths:
+  - docs/verification/l3-textbook-assessment.md      # part A
+  - docs/backlog/tasks/ML-TASK-012.yaml
+  - verification/l3/                                  # part B: Orekit generation scripts and pinned environment description
+  - test-data/reference-cases/                        # part B: datasets only, in the format of m1-verification-plan.md §6
+objective: >
+  Provide evidence layer L3 (m1-verification-plan.md §2, ADR-003): references that are independent of both the
+  engine and the Verification Engineer's own L2 code. Part A assesses the textbook offered by the owner
+  (Wakker, Fundamentals of Astrodynamics, TU Delft 2015) as a source of cited worked examples. Part B produces
+  at least one reference dataset with Python + Orekit (owner decision D-5), with tool version and
+  configuration recorded.
+scope:
+  - "Part A: identify the book (edition, ISBN, terms of use); map every VT family to the equations and worked examples the book offers, with section, equation number and page; list the constants it states and compare them in kind with ML-ARCH-002 §3 and ADR-004; list the conventions that differ from Mission Lab's; give a verdict on L3 coverage and precision."
+  - "Part B (blocked): pinned Python + Orekit environment; scripts in verification/l3/ that generate, for the orbit test grid of m1-verification-plan.md §5, element-to-state (VT-02), two-body propagation (VT-05, VT-16), RSW maneuver transformation and post-maneuver elements (VT-12, VT-15) reference cases; datasets in test-data/reference-cases/<family>/<case>.json with id, inputs (SI, frame GCRF, epoch), model (Keplerian two-body, mu as in ML-ARCH-002), producedBy (Orekit and Python versions, script commit), method, outputs, tolerance reference."
+out_of_scope:
+  - Transcribing textbook numbers into datasets before the owner has confirmed that this is acceptable under the book's terms of use.
+  - Deriving or changing tolerances (ML-TASK-010). Running the engine against the datasets (G1 verification).
+  - Confirming constants against primary sources (VT-19 belongs to ML-TASK-011); part A only records what the book states.
+  - Any change to packages/astrodynamics, packages/simulation or apps/web.
+inputs:
+  - AGENTS.md
+  - docs/verification/m1-verification-plan.md (§2 layers, §3 VT-01…VT-19, §5 grid, §6 data format)
+  - docs/architecture/adr/ADR-003-independent-verification.md
+  - docs/architecture/adr/ADR-004-frame-and-time-conventions.md
+  - docs/architecture/adr/ADR-005-kepler-propagation-algorithm.md
+  - docs/architecture/proposed-architecture.md §3 (constants and conventions)
+  - docs/requirements/m1-requirements.md
+  - docs/releases/G0-review.md (decision D-5)
+  - "Wakker, K.F., Fundamentals of Astrodynamics, TU Delft Institutional Repository, 2015, ISBN 978-94-6186-419-2 (owner's copy, SHA-256 5d6f3f8d6170a05c4fcad566cfee98a713830e78294a26e251e073ed7b106362)"
+  - packages/contracts (part B, for field names and units)
+acceptance_criteria:
+  - "Part A: l3-textbook-assessment.md exists with bibliographic identification and terms of use cited by page, a VT-01…VT-19 coverage table, the constants with page and attributed source, the convention differences with the conversion each needs, and a verdict stating which families the book can back, at what precision, and which remain uncovered."
+  - "Part A: no passage, table or figure of the book is reproduced; no book number is written into test-data/."
+  - "Part B: every dataset follows m1-verification-plan.md §6 and records Orekit version, Python version, configuration and the generating script's commit."
+  - "Part B: the datasets cover at least VT-02, VT-05 and VT-15 on the §5 grid, including one post-maneuver escape case (VT-16)."
+  - "Part B: the Orekit run is reproducible from the committed script and the pinned environment description."
+  - "The L3 gaps that remain are stated explicitly for the G1 verification report."
+test_requirements:
+  - "Part B: a self-check that each Orekit case conserves energy and angular momentum to its expected round-off (validates the reference before it is used), and that elements→state→elements round-trips in Orekit."
+deliverables:
+  - docs/verification/l3-textbook-assessment.md (part A)
+  - verification/l3/ scripts and environment description (part B)
+  - test-data/reference-cases/ datasets (part B)
+  - The report section of this file
+human_approval_required: true   # installing Python/Java/Orekit on the dev machine; use of textbook values in a public repository
+
+report:
+  # Part A only. Part B has not started.
+  files_changed:
+    - docs/verification/l3-textbook-assessment.md (new)
+    - docs/backlog/tasks/ML-TASK-012.yaml (new)
+  summary: >
+    Part A done. Wakker's book is a good cited source for closed-form relations (Kepler's equation, rotation
+    matrices for elements to state, elliptic f and g, vis-viva, Hohmann, plane changes, linearised Gauss
+    equations). None of these is the engine's universal-variable method; the book explicitly does not
+    present universal variables. It is a weak L3 source. The pages read contain five usable worked
+    examples (WK-01…WK-05, with 3–5 significant digits): two for VT-05 and three for VT-15, one of which
+    comes from linearised equations. There is no element-to-state example, no maneuver-frame example and
+    no ERA. The book gives mu and an equatorial radius in Appendix B. The radius is 0.4 m away from the WGS 84
+    value assumed in ML-ARCH-002 and the ellipsoid is not named. The book's maneuver axes are labelled
+    S (radial), N (along-track), W, so its letter S is not Mission Lab's S. The book allows copying parts
+    for personal non-commercial use with credit; whether stored values in a public repository are covered
+    is for the owner to decide. Recommendation: Wakker as a supplementary L3 source for VT-05 and VT-15
+    at the gross-error level; Orekit remains the main L3 source.
+  tests_executed: []   # no tests; document review only
+  reference_data_used:
+    - "Wakker, Fundamentals of Astrodynamics (2015), ISBN 978-94-6186-419-2, local file SHA-256 5d6f3f8d6170a05c4fcad566cfee98a713830e78294a26e251e073ed7b106362; text layer extracted with pdftotext 4.00 (Xpdf). Pages read are listed in l3-textbook-assessment.md §1."
+  not_verified:
+    - "Equation bodies, figures and table layouts: the PDF could not be rendered (pdftoppm not installed); only the text layer was read, which omits all formulas. Each equation must be checked on a rendered page by a second reader before use."
+    - "The label-to-value pairing in Appendix B (pp. 671–674) and in Table 22.1 (p. 610), reconstructed from scrambled extraction."
+    - "The internal consistency of the worked examples (not recomputed, to avoid producing reference numbers before ML-TASK-010)."
+    - "Which revision of the book the owner's file is (book says January 2015; text mentions events up to June 2015; file name suffix 250115)."
+    - "Chapters 2–4, 7, 9, 10, 14–21 and 23 were only keyword-searched, not read."
+  known_limitations:
+    - "Textbook examples are given to 3–5 significant digits and some depend on an unstated Earth radius; they cannot back any family at float64-tolerance precision."
+    - "The book is a secondary compilation for constants; VT-19 still needs the NGA WGS 84 definition and IERS Conventions 2010."
+  documentation_changes:
+    - docs/verification/l3-textbook-assessment.md
+  risks_or_blockers:
+    - "Part B blocked: Python and Java are not installed on the dev machine; installing Python + Orekit (and a JDK) needs the owner's go-ahead (D-5 chose the tool; the installation itself is an owner action per ADR-003)."
+    - "Owner decision needed on storing textbook-derived values in the public repository (terms of use, assessment §2)."
+    - "Naming hazard: the book's S axis is radial and Mission Lab's S is along-track. Any ch. 22 case must be relabelled explicitly."
+    - "Reference-radius mismatch: the book's 6378.1366 km vs ML-ARCH-002's WGS 84 6 378 137 m (document-to-document comparison). Altitude-defined book cases inherit an unstated radius."
+  review_artifact: ""   # no PR opened (coordinator instruction)
+  recommended_next_action: >
+    Systems Architect review of the assessment. Owner: (1) authorise installing Python + JDK + Orekit for
+    part B; (2) decide whether textbook example values may be stored in the repository; (3) if a rendering
+    tool is acceptable, let a second reader check the cited equations and the Appendix B / Table 22.1 values.
