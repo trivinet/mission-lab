@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-15",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Orekit reference dataset (43 cases, L3) is in PR #29. For G1 still: run the engine against it, the WGS 84 constants check, four tolerance gaps and the G1 report.",
+  "headline": "Orekit L3 datasets merged (43 cases). Next for G1: decide tolerance gaps P-1…P-4, then run the engine against the L2 gaps and the L3 data; also the WGS 84 constants check and the G1 report.",
   "gates": [
     {
       "id": "G0",
@@ -31,11 +31,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-28",
-      "text": "Merge PR #29 (Orekit L3 datasets) and PR #30 (status).",
-      "blocking": "G1 conformance run on the L3 data"
-    },
     {
       "id": "OA-26",
       "text": "Decide the four tolerance gaps P-1…P-4 from conformance run 2 (zero-Δv on eccentric orbits, non-tangential burns, hyperbolic arcs, sampling-independence rule).",
@@ -163,7 +158,7 @@
           "role": "Verification Engineer",
           "model": "opus",
           "status": "in_review",
-          "deps": "Part B in PR #29; part A awaits OA-15",
+          "deps": "Part B merged (PR #29); part A awaits OA-15",
           "approval": true
         },
         {
@@ -387,6 +382,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-15",
+      "who": "Coordinator",
+      "text": "Merged PR #29 (Orekit L3 datasets, merge commit) and PR #30 (status) on the owner's go-ahead; CI green on both."
+    },
     {
       "date": "2026-11-15",
       "who": "Coordinator",
