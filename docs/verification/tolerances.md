@@ -585,7 +585,7 @@ by the actual magnitude; units u \|a\|^(3/2); q₀ = r₀v₀/√(μ\|a\|)):
 | Part | Error bound (× u) | Steps (as §6.1) |
 |---|---|---|
 | σ₀ (data) | (3q₀ + 2e\|sinh F₀\|)(cosh x − 1) | r₀·v₀ γ_3 r₀v₀, ÷√μ 2u, times χ²C = \|a\|(cosh x − 1) |
-| χ²C (in T1) | e\|sinh F₀\| [2.5x sinh x + 2 cosh x + 7(cosh x − 1)] | argument 2.5ux through d cosh/dx = sinh x; cosh c_f u **relative to cosh x**; subtraction, ÷ψ, ×χ², ×σ₀ 7u relative |
+| χ²C (in T1) | e\|sinh F₀\| [2.5x sinh x + 2 cosh x + 8(cosh x − 1)] | argument 2.5ux through d cosh/dx = sinh x; cosh c_f u **relative to cosh x**; subtraction u counted separately (as in §6.1 and the χ³S row; review B3); ÷ψ, ×χ², ×σ₀ 7u relative |
 | 1 − α r₀ (data) | (4r₀/\|a\| + e cosh F₀)(sinh x − x) | r̂₀ 3u and product u on r₀/\|a\|, addition u; times \|χ³S\| |
 | χ³S (in T2) | e cosh F₀ [2.5x(cosh x − 1) + 2 sinh x + 11.5(sinh x − x)] | argument through d(sinh x − x)/dx; sinh c_f u relative to sinh x; subtraction u; 10.5u for ψ^(3/2), χ³, ÷, ×c₂ |
 | r₀χ (T3) | 4(r₀/\|a\|) x | r̂₀ 3u, product u |
@@ -656,17 +656,23 @@ values at the last sample, which is the largest):
 
 | Arc (dataset) | E/(v²/2 + μ/r) | \|a\| (m) | e | r_min, r_max (m) | κ_E | x(end) | P_b,gen (m) [\|a\| form] | ε_t,gen (s) | M·P_E,gen (m) | M·V_E,gen (m/s) |
 |---|---|---|---|---|---|---|---|---|---|---|
-| L2 `vt-16/c3-midrun-escape` (Δt ≤ 4000 s) | 0.2145 | 1.0282e7 | 2.0748 | 1.105e7, 3.245e7 | 4.722 | 1.448 | 3.90e-7 [2.74e-7] | 2.48e-11 | **4.54 × 10⁻⁶** | **3.40 × 10⁻⁹** |
-| L3 `l3-orekit-c3-midrun-escape` (Δt ≤ 15 000 s) | 0.2145 | 1.0282e7 | 2.0748 | 1.105e7, 1.083e8 | 4.722 | 2.530 | 1.24e-6 [7.24e-7] | 1.22e-10 | 1.90e-5 | 1.43e-8 |
-| L2 `vt-16/escape-clear` (Δt ≤ 6000 s) | 0.0786 | 2.0519e7 | 1.3411 | 7.000e6, 4.239e7 | 12.725 | 1.468 | 8.88e-7 [5.79e-7] | 3.58e-11 | 1.04e-5 | 1.10e-8 |
-| L3 `l3-orekit-c1-escape-prograde` (Δt ≤ 20 000 s) | 0.0786 | 2.0519e7 | 1.3411 | 7.000e6, 1.175e8 | 12.725 | 2.296 | 2.43e-6 [1.06e-6] | 1.34e-10 | 3.43e-5 | 3.83e-8 |
-| L2 `vt-16/hyperbolic-inbound` (Δt ≤ 6000 s; periapsis passed) | 0.0549 | 3.0103e7 | 1.1714 | 5.159e6, 3.821e7 | 24.340 | 1.602 | 1.35e-6 [1.13e-6] | 8.95e-11 | 2.22e-5 | 4.27e-8 |
-| L2 `vt-16/hyperbolic-outbound` (Δt ≤ 6000 s) | 0.0549 | 3.0103e7 | 1.1714 | 7.000e6, 4.380e7 | 18.202 | 1.049 | 1.24e-6 [9.64e-7] | 3.46e-11 | 1.27e-5 | 1.13e-8 |
+| L2 `vt-16/c3-midrun-escape` (Δt ≤ 4000 s) | 0.2145 | 1.0282e7 | 2.0748 | 1.105e7, 3.245e7 | 4.722 | 1.448 | 3.90e-7 [2.74e-7] | 2.50e-11 | **4.551 × 10⁻⁶** | **3.412 × 10⁻⁹** |
+| L3 `l3-orekit-c3-midrun-escape` (Δt ≤ 15 000 s) | 0.2145 | 1.0282e7 | 2.0748 | 1.105e7, 1.083e8 | 4.722 | 2.530 | 1.24e-6 [7.24e-7] | 1.22e-10 | 1.904e-5 | 1.435e-8 |
+| L2 `vt-16/escape-clear` (Δt ≤ 6000 s) | 0.0786 | 2.0519e7 | 1.3411 | 7.000e6, 4.239e7 | 12.725 | 1.468 | 8.88e-7 [5.79e-7] | 3.58e-11 | 1.039e-5 | 1.105e-8 |
+| L3 `l3-orekit-c1-escape-prograde` (Δt ≤ 20 000 s) | 0.0786 | 2.0519e7 | 1.3411 | 7.000e6, 1.175e8 | 12.725 | 2.296 | 2.43e-6 [1.06e-6] | 1.34e-10 | 3.428e-5 | 3.833e-8 |
+| L2 `vt-16/hyperbolic-inbound` (Δt ≤ 6000 s; periapsis passed) | 0.0549 | 3.0103e7 | 1.1714 | 5.159e6, 3.821e7 | 24.340 | 1.602 | 1.35e-6 [1.13e-6] | 9.06e-11 | 2.234e-5 | 4.302e-8 |
+| L2 `vt-16/hyperbolic-outbound` (Δt ≤ 6000 s) | 0.0549 | 3.0103e7 | 1.1714 | 7.000e6, 4.380e7 | 18.202 | 1.049 | 1.24e-6 [9.64e-7] | 3.51e-11 | 1.269e-5 | 1.136e-8 |
 
-The first sample of each arc (Δt = 60 s for L2, 1000 s for L3) has M·P_E,gen 1.6e-6 m (L2 C3),
-5.6e-6 m (L3 C3), 3.6e-6 m (escape-clear), 1.08e-5 m (L3 C1), 5.6e-6 m (inbound), 5.2e-6 m
-(outbound); the per-sample values follow from the formula and are committed with the datasets
-(§4.1 item 1). How these engine bounds enter the comparison tolerances: §7 VT-16 (L2b) and §9.3.1
+(Revision 4 after review B3: the χ²C row coefficient 7 → 8 raised ε_t,gen and the end values of
+the C3, inbound and outbound arcs by 0.2 % to 0.8 %; escape-clear and L3 C1 depart from periapsis,
+sinh F₀ = 0, so the row vanishes and their values are unchanged.) The first sample of each arc
+(Δt = 60 s for L2, 1000 s for L3) has M·P_E,gen 1.603e-6 m (L2 C3), 5.580e-6 m (L3 C3), 3.607e-6 m
+(escape-clear), 1.083e-5 m (L3 C1), 5.628e-6 m (inbound), 5.163e-6 m (outbound) (unchanged by B3
+at four digits). **Per-sample convention (review N4):** every per-sample value uses the
+**arc-wide** factors — r_max, r_min, v_max, g_max and κ_E taken over the whole propagated arc
+[m, D] — with only x, r(t), Δt and the Δt-dependent terms varying per sample; part D2 evaluates
+the per-sample tolerances with the same convention, and they are committed with the new dataset
+versions (§4.1 items 1 and 5). How these engine bounds enter the comparison tolerances: §7 VT-16 (L2b) and §9.3.1
 (L3). Excluded: `just-unbound` (E/(v²/2 + μ/r) = 10⁻³) and `exactly-parabolic` (near-parabolic,
 warnings only); `at-end-escape` (the hyperbolic segment is the single event sample, exact by R8).
 
@@ -1395,10 +1401,10 @@ the datasets):
 - **VT-16 L3, hyperbolic arcs:** ‖Δr‖ ≤ 3M·P_E,gen(Δt), ‖Δv‖ ≤ 3M·V_E,gen(Δt) (§6.8), under the
   precondition on A6′ above and the validity condition of §7 VT-16. End-of-span values:
   `l3-orekit-c3-midrun-escape` (in force, ratio 0.2145; Δt ≤ 15 000 s from the restart state of
-  §9.3.2) **5.70 × 10⁻⁵ m / 4.29 × 10⁻⁸ m/s**; `l3-orekit-c1-escape-prograde` (ratio 0.0786;
-  toleranced only if the owner lowers the condition to 0.05) 1.03 × 10⁻⁴ m / 1.15 × 10⁻⁷ m/s.
-  First samples: 1.67e-5 m / 3.30e-9 m/s (C3, Δt = 1000 s) and 3.25e-5 m / 7.11e-9 m/s (C1,
-  Δt = 1000 s).
+  §9.3.2) **5.712 × 10⁻⁵ m / 4.304 × 10⁻⁸ m/s**; `l3-orekit-c1-escape-prograde` (ratio 0.0786;
+  toleranced only if the owner lowers the condition to 0.05) 1.028 × 10⁻⁴ m / 1.150 × 10⁻⁷ m/s.
+  First samples: 1.674e-5 m / 3.304e-9 m/s (C3, Δt = 1000 s) and 3.248e-5 m / 7.110e-9 m/s (C1,
+  Δt = 1000 s). Arc-wide factors per sample, as in §6.8 (N4).
 - **VT-16 L3, elliptic segment after the burn** (`l3-orekit-c4-midrun-retro-subsurface`): the
   approved §9.3 formula 3M·P_E, 3M·V_E at the post-maneuver (a⁺, e⁺) = (8.4482 × 10⁶ m, 0.61416),
   from the restart state; at the last sample (Δt = 5999.5 s) 3.73 × 10⁻⁵ m / 1.71 × 10⁻⁷ m/s.
