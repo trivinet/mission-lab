@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Bounded review of tolerance record revision 5: approve with non-blocking notes (no blocking findings; all recomputed values match). The Verification Engineer is applying the seven notes before the owner signs.",
+  "headline": "Tolerance record revision 5 (PR #35) is reviewed and the seven notes are applied; no loosening. Waiting on the owner to sign; then phase 2 runs the engine on the hyperbolic states.",
   "gates": [
     {
       "id": "G0",
@@ -33,7 +33,7 @@
   "ownerActions": [
     {
       "id": "OA-31",
-      "text": "After the bounded Systems Architect review: approve tolerance record revision 5 (PR #35).",
+      "text": "Approve tolerance record revision 5 (PR #35, reviewed, notes applied): hyperbolic δt_α and O-1 check, the Orekit hyperbolic self-check, §4.1 item 6, the c1 restart. Also merge the status PR.",
       "blocking": "ML-TASK-018 D3 phase 2 (hyperbolic states asserted)"
     },
     {
@@ -382,6 +382,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Coordinator",
+      "text": "Checked the rev. 5 review fixes: all checks pass (1415 passed, 156 gated skipped), allowed paths only, the gate still refuses without the approval line. Agreed with the author on N4 (approved L3 VT-12 row, 1.972e-10 m/s, recomputed). Pushed to PR #35."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Verification",
+      "text": "Rev. 5 review notes N1–N7 applied (10 commits): O-1 grid extended to 144 cases / 546 samples near the 0.05 gate, same-run condition enforced in code, c1 event-state premise asserted, gate accepts any approved revision ≥ 5."
+    },
     {
       "date": "2026-11-16",
       "who": "Verification",
