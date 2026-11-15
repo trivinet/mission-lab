@@ -1249,6 +1249,147 @@ own output) in ML-TASK-012; if it fails, the L3-Orekit tolerance is re-derived f
 self-consistency (not from the engine comparison), committed before the engine comparison, and
 listed in §15 as a loosening (§4.1).
 
+**Status of A6 (revision 4).** ML-TASK-012 part B ran the check (`verification/l3/selfcheck.py`,
+Orekit 13.1.9, orekit_jpype 13.1.9.0, Hipparchus 4.0.3, JDK Temurin 21.0.13; 489 pass/fail checks,
+0 failures): energy and angular momentum on every elliptic sample within VT-06/VT-07 with the
+engine part ×2 (max ratio 0.001), closure after 1 and 10 periods within VT-08 with P_E, V_E ×2
+(max 0.004). A6 is therefore **confirmed for elliptic propagation** in the sense §9.3 asks, and the
+§9.3 method applies unchanged. Those bounds are loose (the measured values use ≤ 0.4 % of them);
+they confirm A6 but do not measure Orekit's accuracy.
+
+#### 9.3.1 L3 rows for VT-02, VT-12, VT-15 and VT-16 (revision 4)
+
+**Method (the §9.3 rule, applied per family).** Tolerance = M × (engine-side bound + Orekit-side
+bound), with the Orekit-side bound at most twice the engine-side bound of the same quantity:
+**3M × (engine-side, per-side bound)**. For the families whose L2 tolerance is M × 2 × (per-side
+budget) — engine and an equally accurate reference — the L3 tolerance is the same budget with the
+factor 2 replaced by 3, i.e. 1.5 times the L2 value. This needs A6 to cover the Orekit computation
+of each row, not only propagation:
+
+- **A6′ (new assumption, revision 4):** Orekit's element→state map (`KeplerianOrbit` from
+  elements), its QSW frame (`LOFType.QSW`), its state→element getters (a, e, plane) and its
+  Keplerian propagation of hyperbolic arcs each obey the corresponding per-side budget of this
+  record with coefficients at most 2×. **Evidence (pass/fail, ML-TASK-012 part B, read after the
+  formulas were set and not used to set them):** Orekit VT-02 vs the L2c dataset at ≤ 1.3 % of
+  M·2η; Orekit's Δv_I vs ΔvR R + ΔvS S + ΔvW W in binary64 at ≤ 1.6 % of the VT-12 tolerance; QSW
+  axes vs R, S, W at ≤ 11.4 % of the VT-11 tolerances; Orekit a⁺ vs vis-viva at ≤ 2.5 %, e⁺ ≤ 0.8 %,
+  i⁺ ≤ 1.4 % of their bounds. **Hyperbolic arcs: informational only.** `selfcheck.py` measured
+  energy deviation ≤ 2.3 × 10⁻¹⁵ relative, ‖Δh‖/h ≤ 9.2 × 10⁻¹⁶ and a Kepler time-of-flight
+  residual ≤ 1.1 × 10⁻¹¹ s, without a pass/fail bound. Against the §6.8 values these are ≤ 0.06 %
+  of 2τ_E (engine energy part, generalised as in VT-06) and ≤ 2.8 % of 2(ε_t,gen + δt_ph) at the
+  end of the two L3 arcs: consistent with A6′, not a confirmation. **Precondition for the L3 VT-16
+  hyperbolic rows:** part D2 turns these three measurements into pass/fail checks against 2× the
+  §6.8 engine bounds, committed before any engine comparison (needs a change to
+  `verification/l3/selfcheck.py`, outside this revision's paths).
+
+**Rows** (M = 4; each per-side bound is the engine-side term of the family named; inputs as in
+the datasets):
+
+- **VT-02 L3:** ‖Δr‖ ≤ 3M·η_r(e)·u·r_a, ‖Δv‖ ≤ 3M·η_v(e)·u·v_p (η of §7 VT-02).
+
+| Case | e | η_r | η_v | ‖Δr‖ (m) | ‖Δv‖ (m/s) |
+|---|---|---|---|---|---|
+| c1, c2 | 0 | 34.00 | 33.00 | 3.17e-7 | 3.32e-10 |
+| c3 | 0.3 | 35.91 | 31.48 | 6.22e-7 | 3.61e-10 |
+| c4 | 0.4 | 37.05 | 31.19 | 8.29e-7 | 3.66e-10 |
+| c5 | 0.74 | 47.81 | 31.23 | 2.88e-6 | 4.22e-10 |
+| c6 | 0 | 34.00 | 33.00 | 1.90e-6 | 1.35e-10 |
+| c7, c8-b | 0.01 | 34.04 | 32.93 | 3.21e-7 | 3.34e-10 |
+| c8-a | 0.005 | 34.02 | 32.97 | 3.19e-7 | 3.33e-10 |
+
+  The L3 VT-02 files store M·2η (the L2 formula; ML-TASK-012 report, "known limitations"); the
+  values of this table replace them for the engine comparison (§13, C-8).
+- **VT-12 L3:** ‖ΔΔv_I‖ ≤ 3M(12κ_h + 25)u‖Δv_RSW‖ = 12(12κ_h + 25)u‖Δv_RSW‖ (κ_h = 1/√(1 − e²)).
+  Valid when the engine's pre-maneuver state equals Orekit's bit-for-bit, i.e. for m = 0 (§1
+  precondition row; true for all eight L3 VT-12 files, whose event state equals `initialState`).
+
+| Case | κ_h | ‖Δv‖ (m/s) | relative | ‖ΔΔv_I‖ (m/s) |
+|---|---|---|---|---|
+| c4 radial, ν₀ = 1 | 1.0911 | 80 | 5.08e-14 | 4.06e-12 |
+| c4 along-track, ν₀ = 1 | 1.0911 | 100 | 5.08e-14 | 5.08e-12 |
+| c4 cross-track, ν₀ = 1 | 1.0911 | 200 | 5.08e-14 | 1.02e-11 |
+| c1 combined | 1.0000 | 80.78 | 4.93e-14 | 3.98e-12 |
+| c3 combined | 1.0483 | 80.78 | 5.01e-14 | 4.04e-12 |
+| c5 combined | 1.4868 | 80.78 | 5.71e-14 | 4.61e-12 |
+| c7 combined, c8-b combined | 1.0001 | 80.78 | 4.93e-14 | 3.98e-12 |
+
+- **VT-15 L3** (Orekit's post-maneuver a⁺, e⁺ and plane vs the engine's, each evaluated from its
+  own post-maneuver state). Per-side bounds, from §7 VT-15 revision 4:
+  X_a = [m > 0]·τ_E,eng(m)a⁺/a⁻ + 6u(4a⁺/r − 1) + (tangential: max(0, 24a⁺v⁺Δv/μ − 1)u; otherwise
+  2a⁺v⁺(12κ_h⁻ + 25)u‖Δv‖/μ) — one evaluation of E⁺ (5u) and the R12 addition (u) per side;
+  X_e = (r/a⁺)X_a + 30u (tangential at an apsis) or (4rv⁺/μ)((12κ_h⁻ + 25)u‖Δv‖ + uv⁺) + 30u;
+  X_n = κ_h⁺u(2(12κ_h⁻ + 25)‖Δv‖/v⁺ + 8) + [m > 0]·2(P_b v⁺ + rV_b)/h⁺ (state error plus one ĥ⁺
+  evaluation); X_ψ = X_n + 6uκ_h⁻ + 16u. Tolerances 3M·X. At m = 0 both pre-maneuver states are the
+  request's `initialState` (precondition row of §1; true in all eleven m = 0 L3 VT-15 files), so
+  the propagation term is zero on both sides. At m = T only tangential burns at an apsis occur;
+  each side uses its own event state, and the τ_E,eng(T) term enters three times (engine, Orekit
+  ×2), as §9.3 prescribes for propagation. Restart is not needed there because a phase difference
+  at an apsis changes a⁺, e⁺ only at second order (§7 VT-15).
+
+| Case | \|δa⁺\|/a⁺ | \|δe⁺\| | δψ_n (rad) | \|δψ\| (rad) |
+|---|---|---|---|---|
+| c1-circular-prograde | 2.49e-14 | 6.42e-14 | 1.20e-14 | 4.13e-14 |
+| c1-circular-prograde-after-1T | 3.17e-12 | 3.12e-12 | 8.19e-13 | 8.48e-13 |
+| c1-normal | 2.66e-14 | 5.05e-14 | 1.33e-14 | 4.26e-14 |
+| c3-apogee-circularise | 2.79e-14 | 6.78e-14 | 2.70e-14 | 5.67e-14 |
+| c4-perigee-prograde | 4.83e-14 | 6.74e-14 | 1.18e-14 | 4.18e-14 |
+| c4-perigee-prograde-after-1T | 2.73e-11 | 1.56e-11 | 1.70e-12 | 1.73e-12 |
+| c4-perigee-retrograde | 4.26e-14 | 6.69e-14 | 1.18e-14 | 4.19e-14 |
+| c4-apogee-prograde | 1.54e-14 | 6.10e-14 | 1.33e-14 | 4.33e-14 |
+| c4-apogee-prograde-after-1T | 2.64e-11 | 3.62e-11 | 1.93e-12 | 1.96e-12 |
+| c4-perigee-normal | 4.94e-14 | 5.23e-14 | 1.24e-14 | 4.24e-14 |
+| c4-radial | 4.08e-14 | 4.97e-14 | 1.22e-14 | 4.22e-14 |
+| c4-combined | 3.91e-14 | 4.96e-14 | 1.22e-14 | 4.22e-14 |
+| c5-perigee-prograde | 1.24e-13 | 7.00e-14 | 1.12e-14 | 4.44e-14 |
+| c5-apogee-raise-perigee | 1.12e-14 | 5.86e-14 | 2.40e-14 | 5.72e-14 |
+
+  At m = 0 these are smaller than the approved L2 tangential values, because the approved L2
+  formula keeps the term τ_E,eng(0) (§7 VT-15), which the L3 rows drop on the strength of the
+  bit-identity precondition. Elements other than a, e and the plane (Ω, ω, ν after the burn) are
+  not compared at L3 (ML-TASK-012 report: Orekit applies no ADR-008 convention).
+- **VT-16 L3, hyperbolic arcs:** ‖Δr‖ ≤ 3M·P_E,gen(Δt), ‖Δv‖ ≤ 3M·V_E,gen(Δt) (§6.8), under the
+  precondition on A6′ above and the validity condition of §7 VT-16. End-of-span values:
+  `l3-orekit-c3-midrun-escape` (in force, ratio 0.2145; Δt ≤ 15 000 s from the restart state of
+  §9.3.2) **5.70 × 10⁻⁵ m / 4.29 × 10⁻⁸ m/s**; `l3-orekit-c1-escape-prograde` (ratio 0.0786;
+  toleranced only if the owner lowers the condition to 0.05) 1.03 × 10⁻⁴ m / 1.15 × 10⁻⁷ m/s.
+  First samples: 1.67e-5 m / 3.30e-9 m/s (C3, Δt = 1000 s) and 3.25e-5 m / 7.11e-9 m/s (C1,
+  Δt = 1000 s).
+- **VT-16 L3, elliptic segment after the burn** (`l3-orekit-c4-midrun-retro-subsurface`): the
+  approved §9.3 formula 3M·P_E, 3M·V_E at the post-maneuver (a⁺, e⁺) = (8.4482 × 10⁶ m, 0.61416),
+  from the restart state; at the last sample (Δt = 5999.5 s) 3.73 × 10⁻⁵ m / 1.71 × 10⁻⁷ m/s.
+- VT-05 L3 is the approved §9.3 row, unchanged.
+
+#### 9.3.2 Maneuvers at t > 0 in the L3 comparison (revision 4)
+
+Orekit's event state at m > 0 differs from the engine's by the propagation errors of both
+(≤ 3M·P_E(m), 3M·V_E(m) by §9.3). Two treatments were considered: restarting the reference from the
+engine's event state, or comparing with Orekit's own post-maneuver arc and adding a transport term
+for the event-state difference. The transport term needs the factors K_r, K_v of §7 VT-14, which
+exist only for e = 0 (O-11 open) and not at all for hyperbolic arcs; it cannot be applied to the
+L3 cases (all have e > 0 or are hyperbolic after the burn). **Rule:**
+
+1. **Segment 0 (t ≤ m)** is compared with Orekit's own segment 0 under §9.3 (no restart).
+2. **States after the burn** are compared with an Orekit arc **restarted from the engine's event
+   state** (`position_m`, `velocityAfter_mps`) with the same propagator call as the dataset
+   (`KeplerianPropagator` on a `CartesianOrbit`, μ explicit, GCRF; `generate.propagate`), at
+   Δt = t − m, with 3M·P_E (elliptic, at the post-maneuver scale) or 3M·P_E,gen (hyperbolic). This
+   is the VT-05 post-maneuver rule (§7) applied to L3. The restarted arc depends on the engine
+   only through its event state; the event state itself is checked by segment 0 (item 1), VT-12
+   and VT-13.
+3. **Tolerance values** are evaluated from Orekit's own event state (reference side, §4.1 item 2)
+   and committed before the engine run. The engine's event state differs from it by ≤ 3M·P_E(m),
+   i.e. ≤ 1.4 × 10⁻⁵ m (C3 at 5000 s, the largest m of the hyperbolic set) and relative ≤ 2 × 10⁻¹²,
+   which changes no printed digit of any scale factor (the most sensitive, \|a\| through κ_E, moves
+   by less than 10⁻¹⁰ relative).
+4. **Post-maneuver elements** (VT-15): tangential burns at an apsis may use each tool's own event
+   state (phase difference second order; τ_E,eng(m) on both sides, §9.3.1); any other burn at
+   m > 0 uses mode B of §7 VT-15 (Orekit's maneuver applied to the engine's event state), with the
+   m = 0 formulas. **VT-12** at m > 0 (no grid case) likewise recomputes Orekit's QSW from the
+   engine's (`position_m`, `velocityBefore_mps`).
+5. The L3 files keep `segment1: null` or Orekit-start segment-1 values; part D2 regenerates the
+   restarted arcs (`selfcheck.py --repro` first) and commits the comparison code before any engine
+   result on these datasets is inspected (§4.1).
+
 ### 9.4 L3 textbook examples
 
 Printed values carry d significant digits (typically 3–5). For a printed x with d digits:
@@ -1340,14 +1481,16 @@ The review's table (PR #12) was the input; where this record's position differs 
 | O-1 | Solver stopping criterion. ADR-005 fixes none; the propagation tolerances use the **derived** budget ε_t(Δt) = u[(25 + 65e)|Δt| + (12 + 114e + 130e²)/n] seconds (§6.1, same expression). | Astrodynamics Engineer (ML-TASK-015) proposes; Verification Engineer accepts the evidence; Systems Architect reviews; owner signs the acceptance threshold (§15) | ML-TASK-015 **states its stopping criterion** in the task report and in the solver's public documentation (ML-NFR-002), and **demonstrates** that its residual is within budget. **Acceptance check (revision 3, review F2):** the time equation is evaluated in high precision at the returned χ̂ with α, σ₀ and r₀ **also formed in high precision from the exact binary64 inputs**, and the check passes when |t(χ̂) − Δt| ≤ ε_t(Δt) + δt_α(Δt), δt_α = 5uκ_E[(1 + 2e)|Δt| + (4e + 4e²)/n] (§6.1; κ_E may be taken as 4a/r₀ − 1 of the exact input). The δt_α part is the α data error already budgeted in C_t; it is part of the check threshold only and changes no propagation tolerance. At ten periods the threshold is 39.6u (C1), 82.4u (C3), 102.6u (C4), 256.0u (C5) equivalent (§6.1 table). Acceptable evidence that does not require the verifier to read the implementation: (1) **black-box residual check** (preferred): the solver, or an exported function returning χ̂ for (r₀, v₀, Δt, μ), is part of the documented interface; the Verification Engineer evaluates the check above (Python `mpmath`) over the test grid plus random cases (e up to 0.95, Δt up to 100 periods, negative Δt) and records max |t(χ̂) − Δt|/(ε_t + δt_α) ≤ 1; (2) the engineer's own test doing the same with an extended-precision evaluator, with the evaluator and the case list in the PR, reviewed by the verifier; (3) not sufficient alone: a step criterion |Δχ| ≤ ε_χ|χ| (it bounds the residual by ε_χ(1 + e)(|Δt| + 2e/n), which must then be ≤ ε_t(Δt) for every case, and only if the step bounds the error), or passing VT-05…VT-09 (the break-even table, §6.7, shows a correct engine passes with residuals up to 4.5–10× ε_t, and for an engine forming g consistently with χ̂ VT-06/VT-07 do not see the residual at all). A criterion below the noise bound δt_eval needs a stagnation exit and an iteration cap. **No number goes into ADR-005**; a looser engine criterion does not loosen these tolerances without owner approval (§4.1). | Propagation tolerances assume δt_res ≤ ε_t |
 | O-2 | Element extraction must be well conditioned (atan2 forms, B8); acos near ±1 fails VT-03/VT-04 by design. | Systems Architect (ML-TASK-014 contract), Astrodynamics Engineer | Agree with the review: add "angles extracted with atan2-grade conditioning (no acos/asin of a quantity that can approach ±1)" to the **acceptance criteria of ML-TASK-014**. It is a requirement on the algorithm, not a tolerance question. | VT-03/VT-04 may fail on an acos-based implementation |
 | O-3 | Degenerate convention: thresholds ε_e, ε_i; whether near-degenerate inputs below them are in VT-04 with the convention term; whether e and i are zeroed or kept. | **Owner** (product); convention detail via a Proposed ADR by the Systems Architect | Agree with the review: **keep e and i as computed, never zero them**, and record the convention (including ϖ = Ω ± ω) in a Proposed ADR. Consequences: (a) VT-04(a) exact-degenerate inputs carry a computed ê ≤ 30u and î' ≤ (6κ_h + 2)u, so their tolerance includes the convention term at those values (§7, adds ≈ 6 × 10⁻⁸ m at LEO, inside the existing scale); (b) VT-04(b): the convention term is 2e r_a/(1 − e) and 2√2 e v_p/(1 + e) (vs ≈ a e and √2 e √(μ/a) if e were zeroed) — about twice as large, up to 140 m per element at ε = 10⁻⁵; (c) thresholds: their lower bound (§10) is unaffected, but because e and i stay continuous across the threshold only the angle convention switches, which makes the near-threshold exclusion rule of VT-04/VI-03 sufficient. I also recommend that FR-003 AC2's "within tolerance" be read, for near-degenerate inputs, as "within the numerical tolerance plus the convention term" (C-3), with ε_e = ε_i = 10⁻⁵ (§10). | VT-04(b) not runnable; FR-002 AC3 thresholds undefined |
-| O-4 | Does a sample depend only on (segment initial state, segment start time, `t_s`, constants)? | Astrodynamics Engineer (ML-TASK-015); Systems Architect if made a contract rule | Agree with the review: require it (no warm start across samples, no step-dependent caching). Then **VT-09 is exact** (§1). It costs little: each sample is an independent solve from the segment start (already ADR-005's structure). | VT-09 uses the fallback tolerance (§7) |
-| O-5 | Escape and surface-intersection detection semantics; near-parabolic arcs (no tolerance derived). | ML-TASK-016/017 (Astrodynamics Engineer), Systems Architect | Decide semantics in ML-TASK-016/017; VT-16 values evaluated per dataset under §4.1. | VT-16 cases restricted per §7 |
+| O-4 | Does a sample depend only on (segment initial state, segment start time, `t_s`, constants)? | Astrodynamics Engineer (ML-TASK-015); Systems Architect if made a contract rule | **Resolved in revision 4 (P-4).** Authority: [ADR-005](../architecture/adr/ADR-005-kepler-propagation-algorithm.md) (Accepted, G0, 2026-11-11), *Decision*: "Each output sample is computed directly from the segment's initial state at Δt = t − t₀", with the *Rationale* "the output step is purely a sampling choice"; restated by contracts-v1 §5.2 (revision 3, "Initial sample of a segment"), which refines it only for Δt = 0 and says "Every other sample is unchanged". The approved ML-TASK-015 contract (merged with PR #16 on the owner's instruction; task done in `docs/status/status.json`) makes the reading explicit for the propagator: scope item 2 "direct evaluation from the initial state, no warm start", acceptance criterion 4 "Each sample is computed directly from the initial state (no hidden state)". **Reading stated:** "computed directly from the segment's initial state at Δt" is taken to exclude any other input (a warm start or cache from another sample would be such an input); with the constants this makes each sample a function of (segment initial state, t₀, t_s, μ). contracts-v1 §11.4 P1–P10 do not address it; the ML-TASK-017 contract states it only in its report, which is not authority. Recommendation (not blocking): the Systems Architect may write the "and nothing else" explicitly into the next contract revision; if the reading above is rejected, VT-09 falls back to §7. Note: ML-TASK-015.yaml still reads `status: in_review` while `status.json` shows it done (C-7). | — (VT-09 exact, §1) |
+| O-5 | Escape and surface-intersection detection semantics; near-parabolic arcs (no tolerance derived). | ML-TASK-016/017 (Astrodynamics Engineer), Systems Architect | **Closed in revision 4.** Semantics: contract §8.3 and §11.3 D1–D8 (owner, 2026-11-13), not changed here. Numeric part: hyperbolic budget written out and evaluated (§6.8), 10κ_E·a → 10κ_E·r_max justified there. Near-parabolic arcs keep no state tolerance by the validity condition of §7 VT-16 (a scope limit, not an open item); the owner decides whether that condition moves from 0.1 to 0.05 (§15). | — |
 | O-6 | Angular accuracy target. Revision 1 tied the thresholds to an assumed display resolution. | **Owner** | Agree with the review: introduce an owner-approved **angular accuracy target δθ**, decoupled from UI formatting. §10 gives ε_min(N, δθ) and N_max(ε, δθ). Recommendation: δθ = 10⁻⁵ rad with ε_e = ε_i = 10⁻⁵ (worst case to ≈ 100 periods). Position/velocity display resolution remains a UI matter (only §11 uses it). | §10 shows both 10⁻⁶ and 10⁻⁵ rad; thresholds provisional |
 | O-7 | VT-02 L2c and the engine may implement the same textbook map; algorithmic independence is partial. | Verification Engineer (ML-TASK-011/012) | L3 (Orekit element→state) is the independent check; L2c uses the explicit matrix product. | VT-02 rests on L2c + L3 |
 | O-8 | Scene conversion for VI-02. | Frontend Engineer proposes; Systems Architect records it (frontend design note or contract) | Define the conversion as **one binary64 multiplication followed by at most one binary32 rounding**, `Math.fround(x * s)`, with no other CPU-side arithmetic before storage; then **VI-02 is exact** (§8). If GPU-side scaling is used, check buffer and scale separately (both exact). | VI-02 relative 7.2 × 10⁻⁷ |
-| O-9 | Assumptions A2 (correctly rounded `Math.sqrt` under ECMA-262), A3 (transcendental accuracy ≤ 1 ulp on the CI Node version) and A6 (Orekit accuracy) unconfirmed. | Verification Engineer (ML-TASK-011/012) | Measure/confirm; any c_f > 2 or A6 failure is re-evaluated under §4.1 and listed in §15. | Formulas use c_f = 2 and A6 |
-| O-10 | Is the first sample of every segment bit-identical to the segment's initial state? For segments n ≥ 1 R8 already makes it so (event state); for segment 0 the contract is silent. | **Owner** (contract revision 3, drafted by the Systems Architect) | Agree with the review: adopt "first sample of every segment is bit-identical to the segment's initial state" (segment 0: the request's `initialState`). Tolerance both ways: **if adopted**, VT-05 at Δt = 0 is `Object.is` per component (§1); **if not**, ‖Δr‖ ≤ M P_E(0), ‖Δv‖ ≤ M V_E(0) (C1 5.7 × 10⁻⁷ m / 8.1 × 10⁻¹⁰ m/s, §7). | Fallback tolerance at Δt = 0 |
-| O-11 | VT-14 transport factors K_r(e), K_v(e) for e > 0 not derived (e = 0: Clohessy–Wiltshire, K_r = 14, K_v = 9, citation to be confirmed). New in revision 2. | Verification Engineer (ML-TASK-011) | Derive K(e) from the elliptic state-transition matrix (literature source to be cited) and commit it with the first e > 0 VT-14 dataset, before the engine is run on it (§4.1); until then VT-14 runs at e = 0 only. | VT-14 evaluated at C1 only |
+| O-9 | Assumptions A2 (correctly rounded `Math.sqrt` under ECMA-262), A3 (transcendental accuracy ≤ 1 ulp on the CI Node version) and A6 (Orekit accuracy) unconfirmed. | Verification Engineer (ML-TASK-011/012) | Measure/confirm; any c_f > 2 or A6 failure is re-evaluated under §4.1 and listed in §15. Revision 4: **A6 confirmed for elliptic propagation** by `selfcheck.py` (§9.3); A6′ (§9.3.1) supported by pass/fail checks except for hyperbolic arcs, which need the D2 check (O-13). A2, A3 unchanged here. | Formulas use c_f = 2 and A6 |
+| O-10 | Is the first sample of every segment bit-identical to the segment's initial state? For segments n ≥ 1 R8 already makes it so (event state); for segment 0 the contract is silent. | **Owner** (contract revision 3, drafted by the Systems Architect) | **Resolved** (bookkeeping in revision 4): adopted as contracts-v1 §5.2 revision 3 (owner decision 2026-11-12, §11.2 decision 3; recorded as decided in §15 on 2026-11-13). VT-05 at Δt = 0 is `Object.is` (§1). | — |
+| O-11 | VT-14 transport factors K_r(e), K_v(e) for e > 0 not derived (e = 0: Clohessy–Wiltshire, K_r = 14, K_v = 9, citation to be confirmed). New in revision 2. | Verification Engineer (ML-TASK-011) | Derive K(e) from the elliptic state-transition matrix (literature source to be cited) and commit it with the first e > 0 VT-14 dataset, before the engine is run on it (§4.1); until then VT-14 runs at e = 0 only. **Revision 4 (owner direction P-1, 2026-11-15): stays open and does not block G1; VT-14 is accepted for G1 at e = 0 only (§7 VT-14).** | VT-14 at e = 0 only; G1 report says so |
+| O-12 | Solver residual on hyperbolic arcs: ε_t,gen (§6.8) assumes the engine's solve ends at the noise level for E > 0; the O-1 acceptance check covered e < 1 only, and δt_α is derived for ellipses only. New in revision 4. | Verification Engineer (part D2 or later) | Derive the hyperbolic δt_α from the same ∂F/∂α expression (§6.1) with cosh/sinh magnitudes and extend the O-1 black-box check to the VT-16 hyperbolic arcs before the hyperbolic state comparison. | Hyperbolic VT-16 tolerances rest on an unverified solver assumption |
+| O-13 | A6′ for Orekit's hyperbolic propagation is only informational (§9.3.1). New in revision 4. | Verification Engineer (part D2; change to `verification/l3/selfcheck.py`) | Make the hyperbolic energy, angular-momentum and time-of-flight measurements pass/fail against 2× the §6.8 engine bounds; commit before the engine comparison. | L3 VT-16 hyperbolic rows not usable until done |
 
 Changes to other documents proposed by the review are listed here, not made (outside this task's
 affected paths): plan §3 VT-13 wording (C-2); ML-TASK-014 acceptance criterion (O-2); a Proposed
@@ -1370,6 +1513,17 @@ ADR for the degenerate convention (O-3); contract revision 3 rule (O-10); fronte
   sample, one multiplication by the single scene factor s, no other CPU-side arithmetic." Decides:
   Frontend Engineer with Systems Architect review.
 
+Revision 4 — changes needed outside this revision's paths (reported, not made):
+
+- `verification/l3/selfcheck.py`: pass/fail checks for hyperbolic arcs against 2× the §6.8 bounds
+  (O-13); part D2.
+- `docs/backlog/tasks/ML-TASK-015.yaml`: status field (C-7). Decides: Coordinator.
+- Optional contract clarification (O-4): "Each sample of a segment is a function of the segment's
+  initial state, its start time, `t_s` and `constants` only." Decides: Systems Architect drafts,
+  owner approves. Not required for revision 4 unless the owner rejects the reading of §12.
+- Conformance datasets for the L2b hyperbolic trajectories (VT-16) and the L3 restart arcs
+  (§9.3.2): part D2, before any engine comparison on them.
+
 ## 13. Conflicts and inconsistencies found
 
 | # | Finding | Sources | Status |
@@ -1380,6 +1534,8 @@ ADR for the degenerate convention (O-3); contract revision 3 rule (O-10); fronte
 | C-4 | FR-007 AC2 says a rendered vertex "equals" the scaled engine sample; with Float32 vertex buffers equality is attainable only under the O-8 conversion rule. | m1-requirements FR-007 AC2 | Frontend decision (O-8) |
 | C-5 | Contract §13 assigns `deltaV_magnitude_mps` to VT-13 while plan §3 lists VT-13 as "position continuity; v⁺ − v⁻ = Δv". Not a contradiction; VT-13 here covers both. | contract §13; plan §3 | Noted |
 | C-6 | FR-014 AC1 ("values equal the result") is attainable only with round-trip number formatting; fixed-decimal export would not meet it. | m1-requirements FR-014 AC1 | Recommendation in §1 to the task owning FR-014 |
+| C-7 | `docs/backlog/tasks/ML-TASK-015.yaml` reads `status: in_review`, while `docs/status/status.json` lists ML-TASK-015 as done and the activity log records the owner's instruction to merge PR #16. The O-4 resolution (§12) relies on that contract being approved. | ML-TASK-015.yaml; status.json | Revision 4: reported to the Coordinator; outside this task's paths |
+| C-8 | The L3 Orekit files store engine-vs-L2 tolerances (VT-02 M·2η, VT-12 8(12κ_h + 25)u, VT-15 approved formula) and `segment1` values from Orekit's own event state; revision 4 sets L3 rows (§9.3.1) and the restart rule (§9.3.2) that differ from them. | `test-data/l3-orekit/*`; §9.3.1, §9.3.2 | Revision 4: the record values govern; part D2 uses them (the files' stored values are not approved) |
 
 No conflict was found between ADR-003, ADR-004, ADR-005 and the plan's tolerance method.
 
@@ -1394,6 +1550,10 @@ No conflict was found between ADR-003, ADR-004, ADR-005 and the plan's tolerance
 | [Vallado] | D. A. Vallado, *Fundamentals of Astrodynamics and Applications*, KEPLER algorithm (cited by ADR-005); Hill/Clohessy–Wiltshire solution | §6.1, VT-14 | Edition, page **to be confirmed** |
 | [Hairer] | E. Hairer, S. P. Nørsett, G. Wanner, *Solving Ordinary Differential Equations I*, §II.4 (step-size/error estimation by Richardson extrapolation) | §9.2 | **To be confirmed** |
 | Architecture | `docs/architecture/proposed-architecture.md` §3 | μ and reference radius values, conventions | Values confirmed only by VT-19 |
+| Contract | `docs/architecture/contracts-v1.md` revision 4: §5.2 (sampling grid; initial sample, revision 3), §5.5 R8, R12, §8.3, §11.3 D1–D8, §11.4 P1–P10 | §1 exact rows, O-4, O-5, O-10, VT-16 | Accepted (owner); read for revision 4 |
+| ADR-005 | `docs/architecture/adr/ADR-005-kepler-propagation-algorithm.md`, Decision and Rationale | O-4 | Accepted at G0 (2026-11-11) |
+| ML-TASK-015 | `docs/backlog/tasks/ML-TASK-015.yaml`, scope item 2 and acceptance criterion 4 | O-4 | Merged with PR #16 on the owner's instruction; file status field inconsistent (C-7) |
+| Orekit | Orekit 13.1.9 via orekit_jpype 13.1.9.0 (Hipparchus 4.0.3), JDK Temurin 21.0.13, Python 3.13.17; datasets `test-data/l3-orekit/`, check `verification/l3/selfcheck.py` (ML-TASK-012 part B) | §9.3, §9.3.1 (A6, A6′) | Versions as recorded in the datasets' `producedBy`; Orekit's algorithms and accuracy not documented to this record (A6) |
 
 Derived in this document (elementary; checkable from the text): B4–B6, B8, all conditioning
 factors (κ_E, κ_h, κ_b, κ_bv), the time-equation noise and solver budget (§6.1), the g-formation
@@ -1415,8 +1575,25 @@ confirmed).
 | Re-evaluation rule §4.1 | Approved | Owner | 2026-11-13 |
 | Open items O-1…O-11 | Acknowledged as open. Already decided by the owner on 2026-11-12: O-3 (keep e and i), O-6 (principle), O-8 (scene coordinate), O-10 (contract revision 3). The others stay open with the owners named in §12 | Owner | 2026-11-13 |
 
+**Revision 4 items** (proposed 2026-11-15; each needs the owner's signature before the engine is run
+against it or against the L3 Orekit datasets):
+
+| Item | Proposed decision | Owner | Date |
+|---|---|---|---|
+| P-1: VT-14 accepted for G1 at e = 0 only; O-11 open, not blocking G1 (§7 VT-14, §12) | Records the owner direction of 2026-11-15 | | |
+| P-2: VT-15 direction term (iv); non-tangential a⁺, e⁺ rows; plane-normal and plane-rotation rows; modes A/B (§7 VT-15) | Approve the formulas and evaluated values | | |
+| P-2: correction of the tangential VT-15 formula (term (iv), magnitude part) | Approve; changes one value (loosening table below) | | |
+| P-3: hyperbolic budget §6.8, including 10κ_E·a → 10κ_E·r_max and the hyperbolic C_b recount; O-5 closed | Approve the method and the evaluated values | | |
+| P-3: VT-16 validity condition \|E\| ≥ 0.1(v²/2 + μ/r) → 0.05 (§7 VT-16) | Owner decision; recommended (adds four arcs to the toleranced set; not a loosening of any value) | | |
+| P-4: O-4 resolved on ADR-005 Decision + ML-TASK-015 contract, with the reading stated in §12; VT-09 exact | Approve, or reject the reading (then VT-09 uses §7 and a contract amendment by the Systems Architect is needed) | | |
+| L3 rows VT-02, VT-12, VT-15, VT-16 (§9.3.1) and assumption A6′ | Approve; VT-16 hyperbolic L3 rows usable only after O-13 | | |
+| L3 maneuvers at t > 0: restart from the engine's event state (§9.3.2) | Approve | | |
+| O-10 marked resolved (bookkeeping of the 2026-11-12 decision) | Acknowledge | | |
+| New open items O-12 (hyperbolic solver residual), O-13 (A6′ hyperbolic check) | Acknowledge | | |
+
 **Loosenings** (§4.1 item 3; each needs owner sign-off before the engine is run against it):
 
 | Tolerance | Old value | New value | Reason | Owner | Date |
 |---|---|---|---|---|---|
-| | | | | | |
+| VT-15 \|δa⁺\|/a⁺, `c3-apogee-circularise` (L2, closed form) | 1.7686 × 10⁻¹² | 1.7698 × 10⁻¹² (+0.073 %) | Revision 4 term (iv): the magnitude error of the computed S, \|v⁺·δΔv_I\| ≤ 12u v⁺Δv, omitted in revision 3; exceeds the 1u rounding slack of the approved coefficient only for this case (24a⁺v⁺Δv/μ = 3.92). Forced by the derivation, not by any result | | |
+| VT-15 \|δe⁺\|, `c3-apogee-circularise` (L2, closed form) | 1.7952 × 10⁻¹² | 1.7965 × 10⁻¹² (+0.072 %) | Follows from the a⁺ row through the approved e⁺ formula | | |
