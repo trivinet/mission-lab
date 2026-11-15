@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-15",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Tolerance record revision 4 is reviewed and fixed (PR #31): no loosening left. Waiting on the owner to sign it; then conformance run 3 on the gaps and the Orekit data.",
+  "headline": "Conformance run 3 passes: the engine meets every new revision-4 tolerance and agrees with Orekit on VT-02, 05, 12, 15 and 16 (worst ratio 0.034). Hyperbolic states stay informative until O-12/O-13. For G1 still: those two items, the WGS 84 constants check, CI wiring and the G1 report.",
   "gates": [
     {
       "id": "G0",
@@ -32,9 +32,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-29",
-      "text": "Approve tolerance record revision 4 (PR #31, reviewed and fixed): the new rows, the comparison-mode rule, new dataset versions for re-evaluated cases (§4.1 item 5) and the VT-16 validity condition 0.1 → 0.05. No loosening remains. Also merge PR #32 (status).",
-      "blocking": "ML-TASK-018 D2 (conformance run 3)"
+      "id": "OA-30",
+      "text": "Merge PR #33 (conformance run 3) and PR #34 (status). Choose the next G1 step: close O-12/O-13 (hyperbolic states) or go straight to the G1 report with them listed as gaps.",
+      "blocking": "G1 verification report"
     },
     {
       "id": "OA-15",
@@ -207,7 +207,7 @@
           "role": "Verification Engineer",
           "model": "opus",
           "status": "in_review",
-          "deps": "D1 rev. 4 in PR #31 awaiting owner; D2 after approval",
+          "deps": "D2 run 3 in PR #33; then CI wiring and G1 report",
           "approval": true
         },
         {
@@ -382,6 +382,26 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-15",
+      "who": "Coordinator",
+      "text": "Checked run 3: all checks pass (1248 tests), allowed paths only, existing builder changed only by exports, phase-2 commits touch no reference or test. Moving one Orekit VT-02 position by 3e-6 m (tolerance 8.29e-7 m) failed exactly that test; restored. PR #33 opened."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "ML-TASK-018 D2 delivered: conformance run 3, 74 new tests, 0 failures. New versions vt-15-r4 and vt-16-r4; engine vs Orekit L3 on VT-02, 05, 12, 15, 16 (worst ratio 0.034). Hyperbolic states informative (O-12, O-13). Orekit selfcheck re-run: 489/489."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "ML-TASK-018 D2 started: conformance run 3 (new L2 dataset versions for VT-15 and hyperbolic VT-16 per §4.1 item 5; engine vs Orekit L3 for VT-02, 05, 12, 15 and elliptic VT-16). Phase 1 committed before any engine run."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Coordinator",
+      "text": "Owner approved tolerance record rev. 4; §15 rows signed and status set in commit 2f7e6fd. Merged PR #31 (merge commit) and PR #32 (status), CI green."
+    },
     {
       "date": "2026-11-15",
       "who": "Coordinator",
