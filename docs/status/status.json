@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-14",
+  "updated": "2026-11-15",
   "phase": "Phase 1 — Astrodynamics foundation",
   "headline": "Issue #24 fixed and −0 normalisation on `main` (867 tests). The Verification Engineer is building references and conformance tests for the remaining families: invariants, determinism, maneuvers, invalid input and the integration checks.",
   "gates": [
@@ -377,6 +377,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-15",
+      "who": "Coordinator",
+      "text": "ML-TASK-018 part C was stopped by the account usage limit during phase 1 (references and datasets); its worktree and two commits survived. Resumed from there."
+    },
     {
       "date": "2026-11-14",
       "who": "Coordinator",
