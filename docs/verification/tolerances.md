@@ -1725,7 +1725,12 @@ L3 cases (all have e > 0 or are hyperbolic after the burn). **Rule:**
    Orekit's own event state, item 3; unchanged). The first sample of the restarted arc is the event
    state (exact, R8). The restarted arc is produced in phase 2 (engine event state recorded by the
    gated test, then Orekit run by `verification/l3-d2/restart.py` unchanged) and checked by
-   `selfcheck.py --restart` before use (§4.1 item 6 (b)).
+   `selfcheck.py --restart` before use (§4.1 item 6 (b)). **Premise asserted with the comparison
+   (review N4):** the engine's c1 event `position_m` and `velocityBefore_mps` equal the request's
+   `initialState` bit-for-bit (§1 precondition row), and ‖Δv_I,engine − Δv_I,Orekit‖ is within the
+   approved L3 VT-12 row of §9.3.1, 3M(12κ_h + 25)u‖Δv_RSW‖ with κ_h = 1 (grid e = 0) and
+   ‖Δv_RSW‖ = 4000 m/s: **1.972 × 10⁻¹⁰ m/s** (not a new formula: the VT-12 L3 row evaluated at this
+   case's scale, from the reference side; checked in binary64 and decimal).
 
 ### 9.4 L3 textbook examples
 

@@ -35,7 +35,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { join } from 'node:path';
 import { propagateKeplerUniversal } from '@mission-lab/astrodynamics';
 import type { SimulationRequest, SimulationResult } from '@mission-lab/contracts';
-import { decodeValue, integrateRK4, o1HypResidual } from '@mission-lab/verification';
+import { MARGIN, U, decodeValue, integrateRK4, o1HypResidual } from '@mission-lab/verification';
 import { afterAll, describe, expect, it } from 'vitest';
 import { bitIdentical, diffNorm, fmt, fmtV, RatioRecorder } from './support/compare';
 import { REFERENCE_CASES_DIR, loadFamily, type V3 } from './support/datasets';
@@ -96,7 +96,9 @@ interface L3Vt16 {
   readonly inputs: {
     readonly requestBody: Omit<SimulationRequest, 'requestId'>;
     readonly maneuverTime_s: number;
+    readonly elements: { readonly eccentricity: number };
   };
+  readonly outputs: { readonly event: { readonly deltaV_inertial_mps: V3 } };
 }
 
 interface Restart {
@@ -317,6 +319,30 @@ describe.skipIf(!enabled)('3. L3 VT-16 hyperbolic segment 1 (revision 5, ASSERTE
     expect(result.status, JSON.stringify(result.diagnostics)).toBe('ok');
     const e = result.events[0];
     if (e === undefined) throw new Error('no event');
+    if (caseId === 'c1-escape-prograde') {
+      // Review N4: the premise of §9.3.2 item 6 for the m = 0 arc. (i) The engine's pre-maneuver
+      // event state is the request's initialState bit-for-bit (§1 precondition row). (ii) Engine and
+      // Orekit Δv_I differ by at most the approved L3 VT-12 row (§9.3.1),
+      // 3M(12κ_h + 25)u‖Δv_RSW‖ = 12(12κ_h + 25)u‖Δv_RSW‖, κ_h = 1/√(1 − e²) of the grid case
+      // (reference side; 1.972e-10 m/s for this case, recorded in §9.3.2 item 6).
+      const init = data.inputs.requestBody.initialState;
+      expect(
+        bitIdentical(e.position_m, init.position_m) &&
+          bitIdentical(e.velocityBefore_mps, init.velocity_mps),
+        `${file}: engine pre-maneuver event state differs from initialState`,
+      ).toBe(true);
+      const man = data.inputs.requestBody.maneuvers[0];
+      if (man === undefined) throw new Error('maneuver');
+      const ecc = data.inputs.elements.eccentricity;
+      const kappaH = 1 / Math.sqrt(1 - ecc * ecc);
+      const dvTol = 3 * MARGIN * (12 * kappaH + 25) * U * norm3(man.deltaV_mps);
+      const dDv = diffNorm(e.deltaV_inertial_mps, data.outputs.event.deltaV_inertial_mps);
+      rec.record('L3 c1 Δv_I engine − Orekit', dDv, dvTol, file);
+      expect(
+        dDv,
+        `${file}: ‖Δv_I,engine − Δv_I,Orekit‖ ${fmt(dDv)} > ${fmt(dvTol)}`,
+      ).toBeLessThanOrEqual(dvTol);
+    }
     const dir = caseId === 'c1-escape-prograde' ? L3_RESTART_R5_DIR : L3_RESTART_DIR;
     const path = join(dir, `${caseId}.json`);
     expect(existsSync(path), `${file}: restarted Orekit arc missing (${path}); run phase 2`).toBe(
