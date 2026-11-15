@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-15",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Second conformance run: the engine passes all 254 new comparisons (invariants, determinism, maneuvers, invalid input, integration). For G1 still: Orekit evidence, the WGS 84 constants check, four tolerance gaps and the G1 report.",
+  "headline": "Conformance run 2 is merged. The Verification Engineer is now generating the Orekit reference dataset (L3). For G1 still: the WGS 84 constants check, four tolerance gaps and the G1 report.",
   "gates": [
     {
       "id": "G0",
@@ -33,7 +33,7 @@
   "ownerActions": [
     {
       "id": "OA-26",
-      "text": "Merge PR #27 (conformance run 2) and PR #28 (status). Decide the four tolerance gaps P-1…P-4 reported there (zero-Δv on eccentric orbits, non-tangential burns, hyperbolic arcs, sampling-independence rule).",
+      "text": "Decide the four tolerance gaps P-1…P-4 from conformance run 2 (zero-Δv on eccentric orbits, non-tangential burns, hyperbolic arcs, sampling-independence rule).",
       "blocking": "G1 verification report"
     },
     {
@@ -158,7 +158,7 @@
           "role": "Verification Engineer",
           "model": "opus",
           "status": "in_progress",
-          "deps": "D-5 (Orekit part needs Python + Java)",
+          "deps": "Part B (Orekit dataset) running; part A awaits OA-15",
           "approval": true
         },
         {
@@ -382,6 +382,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "ML-TASK-012 part B started: Orekit L3 reference datasets (VT-02, VT-05, VT-12/15, VT-16) with self-checks, in its own worktree."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Coordinator",
+      "text": "Merged PR #27 (conformance run 2, merge commit) and PR #28 (status) on the owner's go-ahead; CI green on both."
+    },
     {
       "date": "2026-11-15",
       "who": "Verification",
