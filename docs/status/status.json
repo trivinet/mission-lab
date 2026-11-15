@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-15",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Orekit reference dataset (43 cases, L3) is in PR #29. For G1 still: run the engine against it, the WGS 84 constants check, four tolerance gaps and the G1 report.",
+  "headline": "Tolerance record revision 4 is reviewed and fixed (PR #31): no loosening left. Waiting on the owner to sign it; then conformance run 3 on the gaps and the Orekit data.",
   "gates": [
     {
       "id": "G0",
@@ -32,14 +32,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-28",
-      "text": "Merge PR #29 (Orekit L3 datasets) and PR #30 (status).",
-      "blocking": "G1 conformance run on the L3 data"
-    },
-    {
-      "id": "OA-26",
-      "text": "Decide the four tolerance gaps P-1…P-4 from conformance run 2 (zero-Δv on eccentric orbits, non-tangential burns, hyperbolic arcs, sampling-independence rule).",
-      "blocking": "G1 verification report"
+      "id": "OA-29",
+      "text": "Approve tolerance record revision 4 (PR #31, reviewed and fixed): the new rows, the comparison-mode rule, new dataset versions for re-evaluated cases (§4.1 item 5) and the VT-16 validity condition 0.1 → 0.05. No loosening remains. Also merge PR #32 (status).",
+      "blocking": "ML-TASK-018 D2 (conformance run 3)"
     },
     {
       "id": "OA-15",
@@ -163,7 +158,7 @@
           "role": "Verification Engineer",
           "model": "opus",
           "status": "in_review",
-          "deps": "Part B in PR #29; part A awaits OA-15",
+          "deps": "Part B merged (PR #29); part A awaits OA-15",
           "approval": true
         },
         {
@@ -212,7 +207,7 @@
           "role": "Verification Engineer",
           "model": "opus",
           "status": "in_review",
-          "deps": "011, 017",
+          "deps": "D1 rev. 4 in PR #31 awaiting owner; D2 after approval",
           "approval": true
         },
         {
@@ -387,6 +382,56 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-15",
+      "who": "Coordinator",
+      "text": "Checked the rev. 4 review fixes: only the two allowed files changed, format passes, §4.1 item 5 and the B1 rule present, χ²C coefficient 8, the C3 value 1.595e-14 recomputed (143.7u). Pushed to PR #31."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "Rev. 4 review fixes done (6 commits): B1, B2 (§4.1 item 5), B3 (inbound 2.2341e-5 m, outbound 1.2691e-5 m, matching the reviewer), C3 loosening withdrawn, N1, N2, N4, N3 wording."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "Applying review fixes to rev. 4: B1 mode A at m > 0 only for apsis-tangential burns; B2 new dataset versions for re-evaluated run-2 cases (§4.1 item 1); B3 hyperbolic χ²C coefficient 7 → 8; keep the approved C3 values (no loosening); N1, N2, N4."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Architect",
+      "text": "Bounded review of rev. 4: changes required. 31 values recomputed independently, all agree; r_max substitution tested independently (model bounds the true sensitivity with wide slack). Blocking: B1 mode-A rule for non-tangential burns at m > 0; B2 values re-evaluated on datasets already run (§4.1 item 1); B3 missing subtraction rounding in the hyperbolic χ²C row. The C3 loosening is not forced. P-4 authority sufficient; 0.05 threshold safe."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Architect",
+      "text": "Bounded review of tolerance record rev. 4 (PR #31) started at the owner's request: new derivations, four independent recomputations, the loosening, the P-4 authority and the 0.05 proposal."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Coordinator",
+      "text": "Checked rev. 4: only the two allowed files changed; the P-4 clauses exist in ADR-005, contracts §5.2 and ML-TASK-015; L3 VT-02 C1 is 1.5000× the L2 value; the C3 loosening recomputes to +0.073 %. New formulas not re-derived. PR #31 opened."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "ML-TASK-018 D1 delivered: tolerance record rev. 4 (Proposed). VT-09 exact, VT-14 e = 0 for G1, VT-15 general burns and plane angle, VT-16 hyperbolic budget with 10κ_E·r_max, L3 rows for VT-02/12/15/16. All numbers evaluated twice (binary64 and 50-digit decimal)."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "ML-TASK-018 part D1 started: tolerance record revision 4 (P-1 VT-14 e = 0 only for G1; P-2 non-tangential burns; P-3 hyperbolic budget; P-4 close O-4; Orekit rows for VT-02, VT-12, VT-15, VT-16). No engine run until the owner approves it."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Owner",
+      "text": "Approved the recommendations for tolerance gaps P-1…P-4."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Coordinator",
+      "text": "Merged PR #29 (Orekit L3 datasets, merge commit) and PR #30 (status) on the owner's go-ahead; CI green on both."
+    },
     {
       "date": "2026-11-15",
       "who": "Coordinator",
