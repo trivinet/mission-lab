@@ -991,8 +991,8 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
   circular cases (C1, C2, C6 scale), with the formula above evaluated at each case's scale and
   maneuver time (§4.1). For e > 0 only the exact parts (§1: Δv_I = ±0, v⁺ `===` v⁻, R8) and
   segment 0 are checked; the state after m is not judged. Nothing is derived for e > 0 in this
-  revision. O-11 (K_r(e), K_v(e)) stays open and **does not block G1**; the G1 verification report
-  states VT-14 as "e = 0 only".
+  revision. O-11 (K_r(e), K_v(e)) stays open and **does not block G1**. The G1 verification report
+  must state, for this family, exactly: **"VT-14: e = 0 only"**.
 - Margin: M = 4.
 
 ### VT-15 Post-maneuver orbit (L1, L2) — also ML-FR-010 AC3
@@ -1174,7 +1174,14 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
     `l3-orekit-c1-escape-prograde` (0.0786), `hyperbolic-inbound` and `hyperbolic-outbound`
     (0.0549) do not. The §6.8 derivation uses no property of E beyond E > 0 (every factor, κ_E
     included, is taken on the arc), so the 0.1 limit is not needed by the bound; it protected the
-    elliptic closed forms, which §6.8 no longer uses. **Proposal for owner decision (§15):** lower
+    elliptic closed forms, which §6.8 no longer uses. **The start-of-arc test is a scope gate, not
+    a condition of the bound (review N2):** the bound takes κ_E, v_max, g_max and r_min over the
+    whole arc, so it stays valid where the ratio falls below the gate along the arc — e.g.
+    `hyperbolic-inbound` starts at 0.0549 and passes periapsis at 1/κ_E = 0.0411. The gate is
+    tested at the start because that is where the case is defined (the post-maneuver state) and
+    where D2 can apply it without propagating; a condition "on the whole arc" would add nothing to
+    the bound and would exclude arcs that pass a low periapsis for no numerical reason.
+    **Proposal for owner decision (§15):** lower
     the condition to \|E\| ≥ 0.05(v²/2 + μ/r), which brings the four arcs above into the toleranced
     set with the §6.8 values (κ_E ≤ 24.3). Near-parabolic arcs below 0.05 (`just-unbound`, 10⁻³;
     `exactly-parabolic`) stay excluded from state comparison: κ_E grows like the inverse of the
