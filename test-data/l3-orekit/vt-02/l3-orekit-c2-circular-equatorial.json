@@ -1,0 +1,76 @@
+{
+  "id": "l3-orekit/vt-02/c2-circular-equatorial",
+  "version": 1,
+  "family": "VT-02 Elements → Cartesian (ML-FR-003 AC1)",
+  "description": "Circular equatorial (doubly degenerate elements)",
+  "gridCase": "C2",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "constants": {
+      "mu_m3ps2": 398600441800000,
+      "referenceRadius_m": 6378137,
+      "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-ARCH-002); passed explicitly to every Orekit orbit and propagator, Orekit's own constants not used"
+    },
+    "elements": {
+      "semiMajorAxis_m": 7000000,
+      "eccentricity": 0,
+      "inclination_rad": 0,
+      "raan_rad": 0,
+      "argPeriapsis_rad": 0,
+      "trueAnomaly_rad": 0.7
+    }
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors and angles)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-ARCH-002); passed explicitly to every Orekit orbit and propagator, Orekit's own constants not used",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "Orekit (orekit-13.1.9.jar, hipparchus-core-4.0.3.jar) through orekit_jpype 13.1.9.0, JPype1 1.7.1",
+    "script": "verification/l3/generate.py",
+    "codeRevision": "df84b5e6d75a",
+    "date": "2026-11-15",
+    "runtime": "Python 3.13.17; JDK 21.0.13 (Eclipse Adoptium, OpenJDK 64-Bit Server VM 21.0.13+9-LTS); Windows 11 AMD64",
+    "environment": "verification/l3/README.md, verification/l3/requirements.txt",
+    "orekitApi": "new KeplerianOrbit(a, e, i, ω, Ω, ν, PositionAngleType.TRUE, GCRF, epoch, μ).getPVCoordinates()",
+    "frameAndTime": "Orekit frame FramesFactory.getGCRF() (root of Orekit's frame tree; no transformation applied). Epoch 2026-01-01T00:00:00.000Z represented in Orekit as 2026-01-01T00:00:00 TAI (UTC needs the leap-second table of orekit-data, not installed; two-body motion depends only on elapsed time, so the label of the origin changes no number); sample date = epoch.shiftedBy(t_s) with the binary64 t_s (tolerances.md §9.3).",
+    "layer": "L3 (external tool, organisational independence; m1-verification-plan.md §2)",
+    "independence": "Generated from Orekit and the contracts only. packages/astrodynamics, packages/simulation, conformance/ and the L2 reference code were not read or run.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value, in the ECMA-262 Number::toString form; JSON.parse restores the exact binary64. −0 is written as {\"$number\": \"-0\"} (test-data/reference-cases/README.md encoding); request inputs are normalised to +0 (contracts-v1.md §11.4 P3)."
+  },
+  "method": {
+    "reference": "L3 Orekit",
+    "elementToState": "Orekit KeplerianOrbit with the true anomaly. Orekit's argument order is (a, e, i, perigee argument ω, RAAN Ω, anomaly); the contract fields are mapped by name. Angles are given unchanged (no re-normalisation, contracts-v1.md §3)."
+  },
+  "outputs": {
+    "position_m": [5353895.3109914195, 4509523.810663837, 0],
+    "velocity_mps": [-4861.30099832545, 5771.539903771163, 0]
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 §7 VT-02",
+    "formula": "‖Δr‖ ≤ M·2η_r(e)·u·r_a, ‖Δv‖ ≤ M·2η_v(e)·u·v_p",
+    "status": "The record writes this formula for engine vs L2c (both sides with the same element→state budget). The record has no row for Orekit element→state; using it for L3 assumes Orekit's map obeys the same budget (A6-like, not stated for VT-02). To be confirmed by the reviewer before an engine run (ML-TASK-012 report).",
+    "evaluatedAt": {
+      "a_m": 7000000,
+      "e": 0,
+      "r_a_m": 7000000,
+      "v_p_mps": 7546.053290107542,
+      "g_p_mps2": 8.13470289387755,
+      "n_radps": 0.001078007612872506,
+      "T_s": 5828.516637686015,
+      "kappa_E": 3,
+      "kappa_h": 1,
+      "u": 1.1102230246251565e-16,
+      "M": 4,
+      "eta_r": 34,
+      "eta_v": 33
+    },
+    "position_m": 2.113864638886298e-7,
+    "velocity_mps": 2.2117397564396137e-10
+  }
+}
