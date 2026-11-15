@@ -1,0 +1,318 @@
+{
+  "id": "vt-12/c3-elliptical-equatorial-tmid",
+  "version": 1,
+  "family": "VT-12 Maneuver frame transformation (ML-FR-006 AC2), with VT-11 RSW basis (AC1) and VT-13 impulsive change (AC3) on the same runs",
+  "description": "Elliptical equatorial (node undefined). One maneuver at t_s = 3682.25 s (off the 60 s grid; pre-maneuver state = engine event state), seven Δv variants including the three unit axes (VT-11 basis extraction).",
+  "gridCase": "C3",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1; ML-TASK-018 part C phase 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "cases": [
+      {
+        "kind": "axis-R",
+        "deltaV_rsw_mps": [1, 0, 0],
+        "request": {
+          "requestId": "sha256:7aec0c27923d4287b4c6d9d88b9a448e4d8f6fa68a54228db955a6e581819f5c",
+          "schemaVersion": "1.0",
+          "centralBody": "EARTH",
+          "constants": {
+            "mu_m3ps2": 398600441800000,
+            "referenceRadius_m": 6378137,
+            "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+          },
+          "dynamicsModel": "TWO_BODY",
+          "frame": "GCRF",
+          "epoch": {
+            "scale": "UTC",
+            "iso": "2026-01-01T00:00:00.000Z"
+          },
+          "initialState": {
+            "position_m": [-10389153.930226346, 432361.83055123035, 0],
+            "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+          },
+          "maneuvers": [
+            {
+              "id": "m1",
+              "t_s": 3682.25,
+              "frame": "RSW",
+              "deltaV_mps": [1, 0, 0]
+            }
+          ],
+          "duration_s": 4282.25,
+          "outputStep_s": 60
+        },
+        "informativeDeltaV_inertial_mps_atL2aState": [-0.1321389609453404, -0.991231201587342, 0]
+      },
+      {
+        "kind": "axis-S",
+        "deltaV_rsw_mps": [0, 1, 0],
+        "request": {
+          "requestId": "sha256:406bb8f860a16793ff78d02bc8fb4cc4bc58942ad6f8bba4a17aa75e6c052890",
+          "schemaVersion": "1.0",
+          "centralBody": "EARTH",
+          "constants": {
+            "mu_m3ps2": 398600441800000,
+            "referenceRadius_m": 6378137,
+            "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+          },
+          "dynamicsModel": "TWO_BODY",
+          "frame": "GCRF",
+          "epoch": {
+            "scale": "UTC",
+            "iso": "2026-01-01T00:00:00.000Z"
+          },
+          "initialState": {
+            "position_m": [-10389153.930226346, 432361.83055123035, 0],
+            "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+          },
+          "maneuvers": [
+            {
+              "id": "m1",
+              "t_s": 3682.25,
+              "frame": "RSW",
+              "deltaV_mps": [0, 1, 0]
+            }
+          ],
+          "duration_s": 4282.25,
+          "outputStep_s": 60
+        },
+        "informativeDeltaV_inertial_mps_atL2aState": [0.991231201587342, -0.1321389609453404, 0]
+      },
+      {
+        "kind": "axis-W",
+        "deltaV_rsw_mps": [0, 0, 1],
+        "request": {
+          "requestId": "sha256:df05e31298c4aafa1d9a8a32d9baf1c4637b7404f8e5a7ab5aa3888909c5db59",
+          "schemaVersion": "1.0",
+          "centralBody": "EARTH",
+          "constants": {
+            "mu_m3ps2": 398600441800000,
+            "referenceRadius_m": 6378137,
+            "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+          },
+          "dynamicsModel": "TWO_BODY",
+          "frame": "GCRF",
+          "epoch": {
+            "scale": "UTC",
+            "iso": "2026-01-01T00:00:00.000Z"
+          },
+          "initialState": {
+            "position_m": [-10389153.930226346, 432361.83055123035, 0],
+            "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+          },
+          "maneuvers": [
+            {
+              "id": "m1",
+              "t_s": 3682.25,
+              "frame": "RSW",
+              "deltaV_mps": [0, 0, 1]
+            }
+          ],
+          "duration_s": 4282.25,
+          "outputStep_s": 60
+        },
+        "informativeDeltaV_inertial_mps_atL2aState": [0, 0, 1]
+      },
+      {
+        "kind": "radial",
+        "deltaV_rsw_mps": [50, 0, 0],
+        "request": {
+          "requestId": "sha256:98bce7745a4236c457e5ce60496205358b7ee07784186714533bcb0a62f87ccc",
+          "schemaVersion": "1.0",
+          "centralBody": "EARTH",
+          "constants": {
+            "mu_m3ps2": 398600441800000,
+            "referenceRadius_m": 6378137,
+            "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+          },
+          "dynamicsModel": "TWO_BODY",
+          "frame": "GCRF",
+          "epoch": {
+            "scale": "UTC",
+            "iso": "2026-01-01T00:00:00.000Z"
+          },
+          "initialState": {
+            "position_m": [-10389153.930226346, 432361.83055123035, 0],
+            "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+          },
+          "maneuvers": [
+            {
+              "id": "m1",
+              "t_s": 3682.25,
+              "frame": "RSW",
+              "deltaV_mps": [50, 0, 0]
+            }
+          ],
+          "duration_s": 4282.25,
+          "outputStep_s": 60
+        },
+        "informativeDeltaV_inertial_mps_atL2aState": [-6.60694804726702, -49.5615600793671, 0]
+      },
+      {
+        "kind": "along-track",
+        "deltaV_rsw_mps": [0, 100, 0],
+        "request": {
+          "requestId": "sha256:7d4a499c63f8f816b76a693cfe6b6de4e3d271a1b7be72abea622c8b3039e1c2",
+          "schemaVersion": "1.0",
+          "centralBody": "EARTH",
+          "constants": {
+            "mu_m3ps2": 398600441800000,
+            "referenceRadius_m": 6378137,
+            "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+          },
+          "dynamicsModel": "TWO_BODY",
+          "frame": "GCRF",
+          "epoch": {
+            "scale": "UTC",
+            "iso": "2026-01-01T00:00:00.000Z"
+          },
+          "initialState": {
+            "position_m": [-10389153.930226346, 432361.83055123035, 0],
+            "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+          },
+          "maneuvers": [
+            {
+              "id": "m1",
+              "t_s": 3682.25,
+              "frame": "RSW",
+              "deltaV_mps": [0, 100, 0]
+            }
+          ],
+          "duration_s": 4282.25,
+          "outputStep_s": 60
+        },
+        "informativeDeltaV_inertial_mps_atL2aState": [99.1231201587342, -13.21389609453404, 0]
+      },
+      {
+        "kind": "cross-track",
+        "deltaV_rsw_mps": [0, 0, -75],
+        "request": {
+          "requestId": "sha256:c7533428aafe03936e4fa0ee368f0acf3280a2098a35f8ade5c989963945cfe8",
+          "schemaVersion": "1.0",
+          "centralBody": "EARTH",
+          "constants": {
+            "mu_m3ps2": 398600441800000,
+            "referenceRadius_m": 6378137,
+            "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+          },
+          "dynamicsModel": "TWO_BODY",
+          "frame": "GCRF",
+          "epoch": {
+            "scale": "UTC",
+            "iso": "2026-01-01T00:00:00.000Z"
+          },
+          "initialState": {
+            "position_m": [-10389153.930226346, 432361.83055123035, 0],
+            "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+          },
+          "maneuvers": [
+            {
+              "id": "m1",
+              "t_s": 3682.25,
+              "frame": "RSW",
+              "deltaV_mps": [0, 0, -75]
+            }
+          ],
+          "duration_s": 4282.25,
+          "outputStep_s": 60
+        },
+        "informativeDeltaV_inertial_mps_atL2aState": [0, 0, -75]
+      },
+      {
+        "kind": "combined",
+        "deltaV_rsw_mps": [12.5, -40, 30.25],
+        "request": {
+          "requestId": "sha256:476ffe46b12d0293e3d52a8b6cfd005181f6432af58976966df1823bbb88070c",
+          "schemaVersion": "1.0",
+          "centralBody": "EARTH",
+          "constants": {
+            "mu_m3ps2": 398600441800000,
+            "referenceRadius_m": 6378137,
+            "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+          },
+          "dynamicsModel": "TWO_BODY",
+          "frame": "GCRF",
+          "epoch": {
+            "scale": "UTC",
+            "iso": "2026-01-01T00:00:00.000Z"
+          },
+          "initialState": {
+            "position_m": [-10389153.930226346, 432361.83055123035, 0],
+            "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+          },
+          "maneuvers": [
+            {
+              "id": "m1",
+              "t_s": 3682.25,
+              "frame": "RSW",
+              "deltaV_mps": [12.5, -40, 30.25]
+            }
+          ],
+          "duration_s": 4282.25,
+          "outputStep_s": 60
+        },
+        "informativeDeltaV_inertial_mps_atL2aState": [
+          -41.300985075310436, -7.104831582028159, 30.25
+        ]
+      }
+    ],
+    "requestIdNote": "requestId = \"sha256:\" + hex(SHA-256(UTF-8(canonicalRequestPayload(request)))) per contracts-v1.md §7.1, computed with @mission-lab/contracts canonicalRequestPayload and Node crypto SHA-256 (test code only).",
+    "gridElements": {
+      "semiMajorAxis_m": 10000000,
+      "eccentricity": 0.3,
+      "inclination_rad": 0,
+      "raan_rad": 0,
+      "argPeriapsis_rad": 1.1,
+      "trueAnomaly_rad": 2
+    },
+    "maneuverTime_s": 3682.25
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part C), verification/src/datasets/build-c.ts",
+    "references": ["L2c RSW reference (ref/rsw.ts, 320-bit, projection form)"],
+    "codeRevision": "dadff5d6e225",
+    "date": "2026-11-14",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0) except where a value is encoded as {\"$number\": \"-0\"}."
+  },
+  "method": {
+    "reference": "Δv_I = ΔvR·R + ΔvS·S + ΔvW·W with R = r/‖r‖, v⊥ = v − (v·R)R, S = v⊥/‖v⊥‖, W = R × S (projection form, mathematically equal to contract §2), evaluated in 320-bit arithmetic from the exact binary64 pre-maneuver state and rounded once to binary64.",
+    "preManeuverState": "the engine event position_m and velocityBefore_mps (no propagation error enters; tolerances.md §7 VT-11); the test evaluates the committed reference function there",
+    "basisExtraction": "VT-11: with Δv_RSW = unit axis k, Δv_I = 1·e_k + 0·(others) is exactly the k-th basis vector for any evaluation as a sum of products; used only if the engine does not export the basis."
+  },
+  "referenceAccuracy": {
+    "deltaV": "≤ ½ ulp per component (one rounding of a 320-bit value); self-test ref/rsw.test.ts"
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §7 VT-11, VT-12, VT-13 (κ_h of the grid elements)",
+    "kappa_h": 1.0482848367219182,
+    "vt11": {
+      "orthonormality_and_handedness": 1.6688614064303226e-14,
+      "rParallel": 3.552713678800501e-15,
+      "wParallel": 9.139097496852164e-15,
+      "formula": "M(2ε_S + 3u) = 4(12κ_h + 25)u; R ∥ r: 32u; W ∥ r × v: 4(12κ_h + 8)u"
+    },
+    "vt12": {
+      "relative": 3.337722812860645e-14,
+      "formula": "‖ΔΔv_I‖ ≤ 8(12κ_h + 25)u·‖Δv_RSW‖"
+    },
+    "vt13": {
+      "increment": "exact: velocityAfter_mps[i] Object.is velocityBefore_mps[i] + deltaV_inertial_mps[i] (R12)",
+      "continuity": "exact: event t_s, position_m, velocityBefore/After vs the adjacent segment samples (R8)",
+      "magnitude_rel": 2.6645352591003757e-15,
+      "rotationNorm_rel": 1.9353149323403602e-14,
+      "formula": "|deltaV_magnitude_mps − ‖deltaV_inertial_mps‖_test| ≤ 24u‖Δv‖; |‖deltaV_inertial_mps‖ − ‖Δv_RSW‖| ≤ 4(12κ_h + 31)u‖Δv‖"
+    },
+    "layers": "VT-11 L1; VT-12 L2c; VT-13 L1"
+  }
+}

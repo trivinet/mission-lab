@@ -1,0 +1,110 @@
+{
+  "id": "vt-16/c3-midrun-escape",
+  "version": 1,
+  "family": "VT-16 Escape / reference-sphere intersection (ML-FR-006 AC6)",
+  "description": "C3 orbit, prograde +5000 m/s at t = 5000 s (grid point)",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1; ML-TASK-018 part C phase 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "request": {
+      "requestId": "sha256:92a0770d603fd2fd94b05b4067fe0300d8876872528ba58f0a945347ee74abef",
+      "schemaVersion": "1.0",
+      "centralBody": "EARTH",
+      "constants": {
+        "mu_m3ps2": 398600441800000,
+        "referenceRadius_m": 6378137,
+        "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+      },
+      "dynamicsModel": "TWO_BODY",
+      "frame": "GCRF",
+      "epoch": {
+        "scale": "UTC",
+        "iso": "2026-01-01T00:00:00.000Z"
+      },
+      "initialState": {
+        "position_m": [-10389153.930226346, 432361.83055123035, 0],
+        "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+      },
+      "maneuvers": [
+        {
+          "id": "m1",
+          "t_s": 5000,
+          "frame": "RSW",
+          "deltaV_mps": [0, 5000, 0]
+        }
+      ],
+      "duration_s": 9000,
+      "outputStep_s": 60
+    },
+    "requestIdNote": "requestId = \"sha256:\" + hex(SHA-256(UTF-8(canonicalRequestPayload(request)))) per contracts-v1.md §7.1, computed with @mission-lab/contracts canonicalRequestPayload and Node crypto SHA-256 (test code only).",
+    "gridElements": {
+      "semiMajorAxis_m": 10000000,
+      "eccentricity": 0.3,
+      "inclination_rad": 0,
+      "raan_rad": 0,
+      "argPeriapsis_rad": 1.1,
+      "trueAnomaly_rad": 2
+    },
+    "maneuverTime_s": 5000,
+    "initialStateNote": "L2c element → state of gridElements"
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part C), verification/src/datasets/build-c.ts",
+    "references": [
+      "ref/maneuver.ts (320-bit closed form, analytic crossing time)",
+      "L2a/L2b for the state comparison"
+    ],
+    "codeRevision": "dadff5d6e225",
+    "date": "2026-11-14",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0) except where a value is encoded as {\"$number\": \"-0\"}."
+  },
+  "method": {
+    "semantics": "docs/architecture/contracts-v1.md revision 4 §8.3, §11.3 D1–D5, §11.4 P2 (t_s = maneuver time), P6 (post-maneuver segment only)",
+    "escapeRule": "ESCAPE_TRAJECTORY iff the post-maneuver specific energy is not negative beyond its rounding uncertainty (D1, D2). Cases are ≥ 1e-6·(v²/2 + μ/r) from zero (record §7 VT-16 case-selection margin) except the exactly-parabolic case, which is in the near-parabolic class by construction.",
+    "intersectionRule": "REFERENCE_SPHERE_INTERSECTION iff the radius is ≤ R_ref at some time in [m, D], inclusive (D3, D4), decided from the post-maneuver conic: r_p⁺ ≤ R_ref and the analytic time to first reach R_ref (Kepler / hyperbolic Kepler equation) ≤ D − m. Cases: |r_p⁺ − R_ref| ≥ 1e-6 R_ref (record) and |t_c − (D − m)| ≥ 5 % of the span (chosen here).",
+    "preManeuverState": "L2a in 200-bit arithmetic at m (hp-kepler.ts); the engine state differs by ≈ P_E(m) ≪ margins",
+    "deltaV": [0, 5000, 0]
+  },
+  "outputs": {
+    "expectedWarningCodes": ["ESCAPE_TRAJECTORY"],
+    "expectedDiagnosticTime_s": 5000,
+    "expectedStatus": "ok",
+    "postManeuver": {
+      "energy_Jpkg": 19383581.399262164,
+      "energyScale_Jpkg": 90368054.97259587,
+      "semiMajorAxis_m": -10281909.044300057,
+      "eccentricity": 2.074800611144983,
+      "periapsisRadius_m": 11051002.124550829,
+      "angularMomentum_m2ps": 116379958615.7865,
+      "radius_m": 11230637.398140535,
+      "rDotV_m2ps": -17273494726.299618,
+      "planeRotation_rad": 0,
+      "vTransverse_mps": 5362.720697852431,
+      "vRadial_mps": -1538.0689549428068
+    },
+    "margins": {
+      "energy": 0.21449594555443557,
+      "periapsisRadius": 0.7326379355838278,
+      "timeToSphere_s": null,
+      "timeMargin": null
+    },
+    "stateComparison": null
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §7 VT-16, §7 VT-05 (post-maneuver segments)",
+    "warnings": "exact (set of warning codes, each with t_s = maneuver time; no error diagnostic, status ok)",
+    "states": "Not compared for this case. Hyperbolic arcs: the record gives only a recipe (componentwise §6.1 sums on the arc, §7 VT-16), not evaluated in this task — gap.",
+    "layers": "Warnings: L2 (independent analytic classification). States: L2a, L2b."
+  }
+}

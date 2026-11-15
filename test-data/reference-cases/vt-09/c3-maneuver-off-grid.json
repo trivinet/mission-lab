@@ -1,0 +1,145 @@
+{
+  "id": "vt-09/c3-maneuver-off-grid",
+  "version": 1,
+  "family": "VT-09 Sampling independence (ML-FR-004 AC4); requests also used for VT-10",
+  "description": "Elliptical equatorial (node undefined). Same request with 3 output steps (60, 40, 25 s); states compared at bit-identical common t_s.",
+  "gridCase": "C3",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1; ML-TASK-018 part C phase 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "requests": [
+      {
+        "requestId": "sha256:7f57b218c6c53739e855943ec9bcf7e03139c06ae2b5caca2b39485790102935",
+        "schemaVersion": "1.0",
+        "centralBody": "EARTH",
+        "constants": {
+          "mu_m3ps2": 398600441800000,
+          "referenceRadius_m": 6378137,
+          "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+        },
+        "dynamicsModel": "TWO_BODY",
+        "frame": "GCRF",
+        "epoch": {
+          "scale": "UTC",
+          "iso": "2026-01-01T00:00:00.000Z"
+        },
+        "initialState": {
+          "position_m": [-10389153.930226346, 432361.83055123035, 0],
+          "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+        },
+        "maneuvers": [
+          {
+            "id": "m1",
+            "t_s": 4321.25,
+            "frame": "RSW",
+            "deltaV_mps": [10, -20, 5]
+          }
+        ],
+        "duration_s": 12000,
+        "outputStep_s": 60
+      },
+      {
+        "requestId": "sha256:4f90eeb15ec6d2c929c43186212af903a54c44854c2e832250fa7ead64ed3ade",
+        "schemaVersion": "1.0",
+        "centralBody": "EARTH",
+        "constants": {
+          "mu_m3ps2": 398600441800000,
+          "referenceRadius_m": 6378137,
+          "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+        },
+        "dynamicsModel": "TWO_BODY",
+        "frame": "GCRF",
+        "epoch": {
+          "scale": "UTC",
+          "iso": "2026-01-01T00:00:00.000Z"
+        },
+        "initialState": {
+          "position_m": [-10389153.930226346, 432361.83055123035, 0],
+          "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+        },
+        "maneuvers": [
+          {
+            "id": "m1",
+            "t_s": 4321.25,
+            "frame": "RSW",
+            "deltaV_mps": [10, -20, 5]
+          }
+        ],
+        "duration_s": 12000,
+        "outputStep_s": 40
+      },
+      {
+        "requestId": "sha256:d4cd14466de92070ced3f0d66c30beda13d77a6cff3ddeb0dabf665035590c06",
+        "schemaVersion": "1.0",
+        "centralBody": "EARTH",
+        "constants": {
+          "mu_m3ps2": 398600441800000,
+          "referenceRadius_m": 6378137,
+          "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+        },
+        "dynamicsModel": "TWO_BODY",
+        "frame": "GCRF",
+        "epoch": {
+          "scale": "UTC",
+          "iso": "2026-01-01T00:00:00.000Z"
+        },
+        "initialState": {
+          "position_m": [-10389153.930226346, 432361.83055123035, 0],
+          "velocity_mps": [-2044.6848026256766, -5711.988517974284, 0]
+        },
+        "maneuvers": [
+          {
+            "id": "m1",
+            "t_s": 4321.25,
+            "frame": "RSW",
+            "deltaV_mps": [10, -20, 5]
+          }
+        ],
+        "duration_s": 12000,
+        "outputStep_s": 25
+      }
+    ],
+    "requestIdNote": "requestId = \"sha256:\" + hex(SHA-256(UTF-8(canonicalRequestPayload(request)))) per contracts-v1.md §7.1, computed with @mission-lab/contracts canonicalRequestPayload and Node crypto SHA-256 (test code only).",
+    "gridElements": {
+      "semiMajorAxis_m": 10000000,
+      "eccentricity": 0.3,
+      "inclination_rad": 0,
+      "raan_rad": 0,
+      "argPeriapsis_rad": 1.1,
+      "trueAnomaly_rad": 2
+    }
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part C), verification/src/datasets/build-c.ts",
+    "references": ["§5.2 grid (independent construction, ref/grid.ts)"],
+    "codeRevision": "dadff5d6e225",
+    "date": "2026-11-14",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0) except where a value is encoded as {\"$number\": \"-0\"}."
+  },
+  "method": {
+    "rule": "Exact (Object.is per component) at every t_s present bit-identically in all runs, including the maneuver event fields, as instructed for ML-TASK-018 part C under open item O-4 (tolerances.md §1, §7 VT-09)."
+  },
+  "outputs": {
+    "commonTimes_s": [
+      0, 600, 1200, 1800, 2400, 3000, 3600, 4200, 4321.25, 4800, 5400, 6000, 6600, 7200, 7800, 8400,
+      9000, 9600, 10200, 10800, 11400, 12000
+    ]
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §1, §7 VT-09, VT-10",
+    "vt09": "exact (Object.is) — conditional on O-4 (a sample is a function of segment initial state, segment start time, t_s and constants only); the fallback tolerance of §7 VT-09 is not used here",
+    "vt10": "exact: repeated runs of one request bit-identical in every field, including typed-array contents and requestId",
+    "layers": "L1 (VT-09); none (VT-10)"
+  }
+}

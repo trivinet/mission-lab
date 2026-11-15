@@ -1,0 +1,138 @@
+{
+  "id": "vt-14/c5-molniya-off-grid",
+  "version": 1,
+  "family": "VT-14 Zero-magnitude maneuver (ML-FR-006 AC4)",
+  "description": "Highly elliptical, Molniya-like (conditioning near perigee). Zero Δv at m = 42706 s vs the coast run, ≈ 10 periods.",
+  "gridCase": "C5",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1; ML-TASK-018 part C phase 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "coastRequest": {
+      "requestId": "sha256:a277416b1e4264642a27597c025814480bfd559e37caae6da58a8399fef6d93c",
+      "schemaVersion": "1.0",
+      "centralBody": "EARTH",
+      "constants": {
+        "mu_m3ps2": 398600441800000,
+        "referenceRadius_m": 6378137,
+        "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+      },
+      "dynamicsModel": "TWO_BODY",
+      "frame": "GCRF",
+      "epoch": {
+        "scale": "UTC",
+        "iso": "2026-01-01T00:00:00.000Z"
+      },
+      "initialState": {
+        "position_m": [-3271491.8218852445, 381241.34203022276, -5969452.061539402],
+        "velocity_mps": [-4507.506981845436, -8968.526380194644, 920.0639984865521]
+      },
+      "maneuvers": [],
+      "duration_s": 417280,
+      "outputStep_s": 2608
+    },
+    "zeroDeltaVRequest": {
+      "requestId": "sha256:fbe5f865d23d7ab8426a5c041ced9ae71787a3c5f65c7dc9955d26fedf6cae2b",
+      "schemaVersion": "1.0",
+      "centralBody": "EARTH",
+      "constants": {
+        "mu_m3ps2": 398600441800000,
+        "referenceRadius_m": 6378137,
+        "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+      },
+      "dynamicsModel": "TWO_BODY",
+      "frame": "GCRF",
+      "epoch": {
+        "scale": "UTC",
+        "iso": "2026-01-01T00:00:00.000Z"
+      },
+      "initialState": {
+        "position_m": [-3271491.8218852445, 381241.34203022276, -5969452.061539402],
+        "velocity_mps": [-4507.506981845436, -8968.526380194644, 920.0639984865521]
+      },
+      "maneuvers": [
+        {
+          "id": "m1",
+          "t_s": 42706,
+          "frame": "RSW",
+          "deltaV_mps": [0, 0, 0]
+        }
+      ],
+      "duration_s": 417280,
+      "outputStep_s": 2608
+    },
+    "requestIdNote": "requestId = \"sha256:\" + hex(SHA-256(UTF-8(canonicalRequestPayload(request)))) per contracts-v1.md §7.1, computed with @mission-lab/contracts canonicalRequestPayload and Node crypto SHA-256 (test code only).",
+    "gridElements": {
+      "semiMajorAxis_m": 26000000,
+      "eccentricity": 0.74,
+      "inclination_rad": 1.1,
+      "raan_rad": 4.2,
+      "argPeriapsis_rad": 4.7,
+      "trueAnomaly_rad": 0.2
+    },
+    "maneuverTime_s": 42706
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part C), verification/src/datasets/build-c.ts",
+    "references": ["L1 (the coast run of the same engine)"],
+    "codeRevision": "dadff5d6e225",
+    "date": "2026-11-14",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0) except where a value is encoded as {\"$number\": \"-0\"}."
+  },
+  "method": {
+    "exactParts": "deltaV_inertial_mps components === 0 (±0 allowed); velocityAfter_mps[i] === velocityBefore_mps[i] (tolerances.md §1; contract §11.3 D7)",
+    "segment0": "Samples t ≤ m of the zero-Δv run vs the coast run at the same t_s: exact (Object.is) under O-4, the same premise as VT-09 (both propagate the same initial state to the same t_s).",
+    "afterManeuver": "e > 0: no approved transport factor K(e) (open item O-11); the trajectory comparison after m has no tolerance and is NOT evaluated (gap). Only the exact parts and segment 0 are checked."
+  },
+  "outputs": {
+    "afterManeuver_t_s": [
+      44336, 46944, 49552, 52160, 54768, 57376, 59984, 62592, 65200, 67808, 70416, 73024, 75632,
+      78240, 80848, 83456, 86064, 88672, 91280, 93888, 96496, 99104, 101712, 104320, 106928, 109536,
+      112144, 114752, 117360, 119968, 122576, 125184, 127792, 130400, 133008, 135616, 138224,
+      140832, 143440, 146048, 148656, 151264, 153872, 156480, 159088, 161696, 164304, 166912,
+      169520, 172128, 174736, 177344, 179952, 182560, 185168, 187776, 190384, 192992, 195600,
+      198208, 200816, 203424, 206032, 208640, 211248, 213856, 216464, 219072, 221680, 224288,
+      226896, 229504, 232112, 234720, 237328, 239936, 242544, 245152, 247760, 250368, 252976,
+      255584, 258192, 260800, 263408, 266016, 268624, 271232, 273840, 276448, 279056, 281664,
+      284272, 286880, 289488, 292096, 294704, 297312, 299920, 302528, 305136, 307744, 310352,
+      312960, 315568, 318176, 320784, 323392, 326000, 328608, 331216, 333824, 336432, 339040,
+      341648, 344256, 346864, 349472, 352080, 354688, 357296, 359904, 362512, 365120, 367728,
+      370336, 372944, 375552, 378160, 380768, 383376, 385984, 388592, 391200, 393808, 396416,
+      399024, 401632, 404240, 406848, 409456, 412064, 414672, 417280
+    ]
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §7 VT-14 (K_r = 14, K_v = 9, e = 0 only; O-11)",
+    "evaluated": false,
+    "formula": "‖Δr‖ ≤ M[P_E(t) + v_p(uC_t L_m + δt_res(m)) + P_E(t − m) + (3/2)τ_E,eng(m) v_p (t − m) + K_r P_off(m) + K_v V_off(m)/n]; velocity with g_p, V_E, K_r V_off(m) + K_v n P_off(m)",
+    "evaluatedAt": {
+      "mu_m3ps2": 398600441800000,
+      "a_m": 26000000,
+      "e": 0.74,
+      "r_a_m": 45240000,
+      "v_p_mps": 10129.083797156703,
+      "g_p_mps2": 8.722568401841672,
+      "n_radps": 0.00015059441505178189,
+      "T_s": 41722.565242669276,
+      "kappa_E": 14.384615384615383,
+      "kappa_h": 1.4867525836251314,
+      "u": 1.1102230246251565e-16,
+      "M": 4,
+      "m_s": 42706
+    },
+    "position_m": [],
+    "velocity_mps": [],
+    "gap": "O-11: K_r(e), K_v(e) for e > 0 not derived; no tolerance.",
+    "layers": "L1"
+  }
+}

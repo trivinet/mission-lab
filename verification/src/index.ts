@@ -18,3 +18,35 @@ export { wrapPi } from './ref/vec';
 /** Scales of the tolerance record (§4), for reporting O-1 case parameters. */
 export { scales } from './tol/tolerances';
 export type { Scales } from './tol/tolerances';
+
+// ML-TASK-018 part C (re-exports of committed references; no behaviour change).
+
+/** L2c RSW reference: 320-bit projection-form basis and inertial Δv rounded once. */
+export {
+  rswBasisProjection,
+  rswBasisHpRounded,
+  rswToInertialHp,
+  velocityAfterR12,
+} from './ref/rsw';
+export type { RswBasis } from './ref/rsw';
+
+/** Post-maneuver closed forms and the VT-16 classification. */
+export { classifyVt16, conicOfState, postManeuverClosedForm, timeToRadius } from './ref/maneuver';
+export type { ConicSummary, PostManeuverClosedForm } from './ref/maneuver';
+
+/** Independent §5.2 sampling grid. */
+export { samplingGridWithManeuvers, sampleCountLarge } from './ref/grid';
+export type { GridResult } from './ref/grid';
+
+/** L2a (classical elements + Kepler) and L2b (RK4) references, for post-maneuver segments. */
+export { prepareL2a, propagateL2a } from './ref/kepler';
+export { integrateRK4 } from './ref/rk';
+export { cross, dot, norm, dist } from './ref/vec';
+export type { V3 } from './ref/vec';
+
+/** Approved tolerance formulas used at test time with reference-side scales. */
+export { MARGIN, U, pE, vE, vt05L2a } from './tol/tolerances';
+
+/** Special-number encoding and mutation lists of the VT-18 / VI-01 datasets. */
+export { applyMutations, decodeValue } from './datasets/encoding';
+export type { Mutation } from './datasets/encoding';
