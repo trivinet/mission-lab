@@ -304,8 +304,10 @@ after the record and must not be influenced by engine results. Therefore:
    VT-15), and their non-tangential and plane measurements and the VT-16 hyperbolic arcs stay
    **informative** for the new rows, never asserted against them; (iii) the L2 hyperbolic VT-16
    arcs are treated the same way although their states were never compared (borderline case;
-   treated as run, to be safe). The L3 Orekit datasets have never been run against the engine and
-   are not affected.
+   treated as run, to be safe). The L3 Orekit datasets had not been run against the engine when
+   revision 4 was written and were not affected by this item; conformance run 3 then ran them, with
+   their revision-4 values committed before the run (976380b; item 6 covers their hyperbolic rows).
+   (Revision 5 correction, review N6.)
 6. **Run-3 informative hyperbolic rows (revision 5).** Conformance run 3 ran the engine on
    `vt-16-r4` (four L2 arcs) and on the L3 VT-16 cases of `l3-r4-vt-16` and reported the hyperbolic
    arc states as informative only, because O-12 and O-13 were open. Their values (§6.8 M·P_E,gen +
@@ -1567,8 +1569,8 @@ validity gate (below it the measurements stay informative; no bound is claimed t
   V_off = V_b,gen + (2v_max²/r_min) δt_off (§6.8). Hence per side
   B_tof(Δt) = δt_ph + ε_t,gen + (w/n_h)[(P_off v_max + r_max V_off)/√(μ\|a\|) + P_off/\|a\|], and the
   criterion is **\|δt_k\| ≤ M·2·B_tof(Δt)**. The 40-digit evaluation (exact decimal images of the
-  binary64 states, relative rounding ≤ 10⁻³⁹ per operation, \|t\| ≤ 2 × 10⁴ s, w ≤ 1.2 on the
-  arcs) adds less than 10⁻³⁰ s and is neglected.
+  binary64 states, relative rounding ≤ 10⁻³⁹ per operation, \|t\| ≤ 2 × 10⁴ s, w = 1 on both L3
+  arcs, see below) adds less than 10⁻³⁰ s and is neglected.
 
 Revision 4 (§9.3.1 above) compared the informational time-of-flight measurement with
 2(ε_t,gen + δt_ph); that is the phase part only and is not a bound of this measured quantity
@@ -1576,7 +1578,8 @@ Revision 4 (§9.3.1 above) compared the informational time-of-flight measurement
 is the first one, so nothing is loosened (§15 lists it for transparency).
 
 Evaluated (u = 2⁻⁵³, M = 4; the Orekit segment 1 of `test-data/l3-orekit/vt-16`; first sample with
-Δt > 0 and last sample; w = 1 on both arcs since F₀ ≥ −0.13 and e ≥ 1.34):
+Δt > 0 and last sample; w = max(1, e^(−F₀)/e) = 1 on both arcs, since e^(−F₀)/e ≤ e^(0.13)/2.07 =
+0.55 for c3 (F₀ = −0.130, e = 2.07) and = 1/1.34 for c1 (F₀ = 0 to rounding, e = 1.34)):
 
 | Arc | E/(v²/2 + μ/r) | κ_E | κ_h | energy (relative) first / last | ‖Δh‖/h first / last | time of flight (s) first / last |
 |---|---|---|---|---|---|---|
@@ -1659,8 +1662,8 @@ the datasets):
 - **VT-16 L3, hyperbolic arcs:** ‖Δr‖ ≤ 3M·P_E,gen(Δt), ‖Δv‖ ≤ 3M·V_E,gen(Δt) (§6.8), under the
   precondition on A6′ above and the validity condition of §7 VT-16. End-of-span values:
   `l3-orekit-c3-midrun-escape` (in force, ratio 0.2145; Δt ≤ 15 000 s from the restart state of
-  §9.3.2) **5.712 × 10⁻⁵ m / 4.304 × 10⁻⁸ m/s**; `l3-orekit-c1-escape-prograde` (ratio 0.0786;
-  toleranced only if the owner lowers the condition to 0.05) 1.028 × 10⁻⁴ m / 1.150 × 10⁻⁷ m/s.
+  §9.3.2) **5.712 × 10⁻⁵ m / 4.304 × 10⁻⁸ m/s**; `l3-orekit-c1-escape-prograde` (ratio 0.0786,
+  inside the 0.05 gate approved with P-3 on 2026-11-15) **1.028 × 10⁻⁴ m / 1.150 × 10⁻⁷ m/s**.
   First samples: 1.674e-5 m / 3.304e-9 m/s (C3, Δt = 1000 s) and 3.248e-5 m / 7.110e-9 m/s (C1,
   Δt = 1000 s). Arc-wide factors per sample, as in §6.8 (N4).
 - **VT-16 L3, elliptic segment after the burn** (`l3-orekit-c4-midrun-retro-subsurface`): the
