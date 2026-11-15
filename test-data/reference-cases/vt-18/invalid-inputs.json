@@ -1,0 +1,1008 @@
+{
+  "id": "vt-18/invalid-inputs",
+  "version": 1,
+  "family": "VT-18 Invalid input handling (ML-FR-002 AC2, ML-FR-005 AC2, ML-FR-011 AC3)",
+  "description": "One mutation of a valid base scenario per invalid-input class, with the expected issues (code and path) decided from the contract text; accepted controls at the boundaries.",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1; ML-TASK-018 part C phase 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "baseScenario": {
+      "schemaVersion": "1.0",
+      "id": "vt18-base",
+      "name": "VT-18 base scenario",
+      "centralBody": "EARTH",
+      "frame": "GCRF",
+      "epoch": {
+        "scale": "UTC",
+        "iso": "2026-01-01T00:00:00.000Z"
+      },
+      "initialOrbit": {
+        "kind": "KEPLERIAN",
+        "elements": {
+          "semiMajorAxis_m": 7000000,
+          "eccentricity": 0.001,
+          "inclination_rad": 0.9,
+          "raan_rad": 1.2,
+          "argPeriapsis_rad": 0.5,
+          "trueAnomaly_rad": 0.3
+        }
+      },
+      "maneuvers": [
+        {
+          "id": "m1",
+          "t_s": 1000,
+          "frame": "RSW",
+          "deltaV_mps": [0, 10, 0]
+        }
+      ],
+      "duration_s": 6000,
+      "outputStep_s": 60
+    },
+    "encoding": "A value {\"$number\": \"NaN\" | \"Infinity\" | \"-Infinity\" | \"-0\"} stands for that binary64 value (JSON cannot carry it). Mutations are applied in order to a deep copy of baseScenario: \"set\" assigns at the path (creating array slots), \"delete\" removes the key.",
+    "cases": [
+      {
+        "id": "schema-version-other",
+        "description": "schemaVersion \"1.1\"",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["schemaVersion"],
+            "value": "1.1"
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "SCHEMA_VERSION_UNSUPPORTED",
+            "path": ["schemaVersion"]
+          }
+        ]
+      },
+      {
+        "id": "schema-version-missing",
+        "description": "schemaVersion missing (other errors present are not reported)",
+        "mutations": [
+          {
+            "op": "delete",
+            "path": ["schemaVersion"]
+          },
+          {
+            "op": "set",
+            "path": ["duration_s"],
+            "value": -1
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "SCHEMA_VERSION_UNSUPPORTED",
+            "path": ["schemaVersion"]
+          }
+        ]
+      },
+      {
+        "id": "not-an-object",
+        "description": "Input is a string",
+        "mutations": [],
+        "replaceInput": "scenario",
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "TYPE_MISMATCH",
+            "path": []
+          }
+        ]
+      },
+      {
+        "id": "id-empty",
+        "description": "Scenario id \"\"",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["id"],
+            "value": ""
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "ID_EMPTY",
+            "path": ["id"]
+          }
+        ]
+      },
+      {
+        "id": "name-not-string",
+        "description": "name is a number",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["name"],
+            "value": 5
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "TYPE_MISMATCH",
+            "path": ["name"]
+          }
+        ]
+      },
+      {
+        "id": "central-body",
+        "description": "centralBody \"MOON\"",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["centralBody"],
+            "value": "MOON"
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "UNSUPPORTED_VALUE",
+            "path": ["centralBody"]
+          }
+        ]
+      },
+      {
+        "id": "frame",
+        "description": "frame \"EME2000\"",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["frame"],
+            "value": "EME2000"
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "UNSUPPORTED_VALUE",
+            "path": ["frame"]
+          }
+        ]
+      },
+      {
+        "id": "epoch-scale",
+        "description": "epoch.scale \"TAI\"",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["epoch", "scale"],
+            "value": "TAI"
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "UNSUPPORTED_VALUE",
+            "path": ["epoch", "scale"]
+          }
+        ]
+      },
+      {
+        "id": "epoch-feb-30",
+        "description": "epoch 2026-02-30 (not a calendar day)",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["epoch", "iso"],
+            "value": "2026-02-30T00:00:00.000Z"
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "EPOCH_INVALID",
+            "path": ["epoch", "iso"]
+          }
+        ]
+      },
+      {
+        "id": "epoch-leap-second",
+        "description": "epoch second 60",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["epoch", "iso"],
+            "value": "2026-12-31T23:59:60.000Z"
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "EPOCH_INVALID",
+            "path": ["epoch", "iso"]
+          }
+        ]
+      },
+      {
+        "id": "epoch-no-millis",
+        "description": "epoch without the 3 fractional digits",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["epoch", "iso"],
+            "value": "2026-01-01T00:00:00Z"
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "EPOCH_INVALID",
+            "path": ["epoch", "iso"]
+          }
+        ]
+      },
+      {
+        "id": "orbit-kind",
+        "description": "initialOrbit.kind \"CARTESIAN\"",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "kind"],
+            "value": "CARTESIAN"
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "UNSUPPORTED_VALUE",
+            "path": ["initialOrbit", "kind"]
+          }
+        ]
+      },
+      {
+        "id": "a-zero",
+        "description": "a = 0",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "semiMajorAxis_m"],
+            "value": 0
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "SEMI_MAJOR_AXIS_NOT_POSITIVE",
+            "path": ["initialOrbit", "elements", "semiMajorAxis_m"]
+          }
+        ]
+      },
+      {
+        "id": "a-negative-zero",
+        "description": "a = −0 (fails every > 0 rule, contract §2)",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "semiMajorAxis_m"],
+            "value": {
+              "$number": "-0"
+            }
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "SEMI_MAJOR_AXIS_NOT_POSITIVE",
+            "path": ["initialOrbit", "elements", "semiMajorAxis_m"]
+          }
+        ]
+      },
+      {
+        "id": "a-negative",
+        "description": "a = −7e6",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "semiMajorAxis_m"],
+            "value": -7000000
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "SEMI_MAJOR_AXIS_NOT_POSITIVE",
+            "path": ["initialOrbit", "elements", "semiMajorAxis_m"]
+          }
+        ]
+      },
+      {
+        "id": "a-nan",
+        "description": "a = NaN",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "semiMajorAxis_m"],
+            "value": {
+              "$number": "NaN"
+            }
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "NON_FINITE_NUMBER",
+            "path": ["initialOrbit", "elements", "semiMajorAxis_m"]
+          }
+        ]
+      },
+      {
+        "id": "e-one",
+        "description": "e = 1 (closed orbits only)",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "eccentricity"],
+            "value": 1
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "ECCENTRICITY_OUT_OF_RANGE",
+            "path": ["initialOrbit", "elements", "eccentricity"]
+          }
+        ]
+      },
+      {
+        "id": "e-negative",
+        "description": "e = −1e-300",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "eccentricity"],
+            "value": -1e-300
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "ECCENTRICITY_OUT_OF_RANGE",
+            "path": ["initialOrbit", "elements", "eccentricity"]
+          }
+        ]
+      },
+      {
+        "id": "i-above-pi",
+        "description": "i = next binary64 above Math.PI",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "inclination_rad"],
+            "value": 3.1415926535897936
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "INCLINATION_OUT_OF_RANGE",
+            "path": ["initialOrbit", "elements", "inclination_rad"]
+          }
+        ]
+      },
+      {
+        "id": "i-negative",
+        "description": "i = −1e-300",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "inclination_rad"],
+            "value": -1e-300
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "INCLINATION_OUT_OF_RANGE",
+            "path": ["initialOrbit", "elements", "inclination_rad"]
+          }
+        ]
+      },
+      {
+        "id": "raan-two-pi",
+        "description": "Ω = 2 * Math.PI",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "raan_rad"],
+            "value": 6.283185307179586
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "ANGLE_OUT_OF_RANGE",
+            "path": ["initialOrbit", "elements", "raan_rad"]
+          }
+        ]
+      },
+      {
+        "id": "argp-negative",
+        "description": "ω = −1e-300",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "argPeriapsis_rad"],
+            "value": -1e-300
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "ANGLE_OUT_OF_RANGE",
+            "path": ["initialOrbit", "elements", "argPeriapsis_rad"]
+          }
+        ]
+      },
+      {
+        "id": "nu-seven",
+        "description": "ν = 7 rad",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "trueAnomaly_rad"],
+            "value": 7
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "ANGLE_OUT_OF_RANGE",
+            "path": ["initialOrbit", "elements", "trueAnomaly_rad"]
+          }
+        ]
+      },
+      {
+        "id": "duration-infinite",
+        "description": "duration_s = +∞ (type error suppresses the cross-field rule)",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["duration_s"],
+            "value": {
+              "$number": "Infinity"
+            }
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "NON_FINITE_NUMBER",
+            "path": ["duration_s"]
+          }
+        ]
+      },
+      {
+        "id": "dv-minus-infinity",
+        "description": "Δv component −∞",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers", 0, "deltaV_mps", 1],
+            "value": {
+              "$number": "-Infinity"
+            }
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "NON_FINITE_NUMBER",
+            "path": ["maneuvers", 0, "deltaV_mps", 1]
+          }
+        ]
+      },
+      {
+        "id": "duration-zero",
+        "description": "duration_s = 0 (maneuver at 1000 s also out of range: range failures do not suppress cross-field rules)",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["duration_s"],
+            "value": 0
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "DURATION_NOT_POSITIVE",
+            "path": ["duration_s"]
+          },
+          {
+            "code": "MANEUVER_TIME_OUT_OF_RANGE",
+            "path": ["maneuvers", 0, "t_s"]
+          }
+        ]
+      },
+      {
+        "id": "duration-negative-zero",
+        "description": "duration_s = −0",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["duration_s"],
+            "value": {
+              "$number": "-0"
+            }
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "DURATION_NOT_POSITIVE",
+            "path": ["duration_s"]
+          },
+          {
+            "code": "MANEUVER_TIME_OUT_OF_RANGE",
+            "path": ["maneuvers", 0, "t_s"]
+          }
+        ]
+      },
+      {
+        "id": "step-zero",
+        "description": "outputStep_s = 0",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["outputStep_s"],
+            "value": 0
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "OUTPUT_STEP_NOT_POSITIVE",
+            "path": ["outputStep_s"]
+          }
+        ]
+      },
+      {
+        "id": "step-negative",
+        "description": "outputStep_s = −60",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["outputStep_s"],
+            "value": -60
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "OUTPUT_STEP_NOT_POSITIVE",
+            "path": ["outputStep_s"]
+          }
+        ]
+      },
+      {
+        "id": "maneuver-time-negative",
+        "description": "maneuver t_s = −1",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers", 0, "t_s"],
+            "value": -1
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "MANEUVER_TIME_OUT_OF_RANGE",
+            "path": ["maneuvers", 0, "t_s"]
+          }
+        ]
+      },
+      {
+        "id": "maneuver-time-after-end",
+        "description": "maneuver t_s = next binary64 above duration_s",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers", 0, "t_s"],
+            "value": 6000.000000000001
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "MANEUVER_TIME_OUT_OF_RANGE",
+            "path": ["maneuvers", 0, "t_s"]
+          }
+        ]
+      },
+      {
+        "id": "maneuver-frame",
+        "description": "maneuver frame \"GCRF\"",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers", 0, "frame"],
+            "value": "GCRF"
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "UNSUPPORTED_VALUE",
+            "path": ["maneuvers", 0, "frame"]
+          }
+        ]
+      },
+      {
+        "id": "maneuver-dv-length",
+        "description": "Δv with 2 components",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers", 0, "deltaV_mps"],
+            "value": [0, 10]
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "TYPE_MISMATCH",
+            "path": ["maneuvers", 0, "deltaV_mps"]
+          }
+        ]
+      },
+      {
+        "id": "maneuver-id-empty",
+        "description": "maneuver id \"\"",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers", 0, "id"],
+            "value": ""
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "ID_EMPTY",
+            "path": ["maneuvers", 0, "id"]
+          }
+        ]
+      },
+      {
+        "id": "two-maneuvers",
+        "description": "second maneuver (M1 limit)",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers", 1],
+            "value": {
+              "id": "m2",
+              "t_s": 2000,
+              "frame": "RSW",
+              "deltaV_mps": [0, 5, 0]
+            }
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "MANEUVER_COUNT_EXCEEDED",
+            "path": ["maneuvers"]
+          }
+        ]
+      },
+      {
+        "id": "two-maneuvers-same-id",
+        "description": "second maneuver with the same id",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers", 1],
+            "value": {
+              "id": "m1",
+              "t_s": 2000,
+              "frame": "RSW",
+              "deltaV_mps": [0, 5, 0]
+            }
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "MANEUVER_COUNT_EXCEEDED",
+            "path": ["maneuvers"]
+          },
+          {
+            "code": "ID_DUPLICATE",
+            "path": ["maneuvers", 1, "id"]
+          }
+        ]
+      },
+      {
+        "id": "unknown-top-level",
+        "description": "unknown field \"extra\"",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["extra"],
+            "value": 1
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "UNKNOWN_FIELD",
+            "path": ["extra"]
+          }
+        ]
+      },
+      {
+        "id": "unknown-in-elements",
+        "description": "unknown field in elements",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "meanAnomaly_rad"],
+            "value": 0.1
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "UNKNOWN_FIELD",
+            "path": ["initialOrbit", "elements", "meanAnomaly_rad"]
+          }
+        ]
+      },
+      {
+        "id": "missing-duration",
+        "description": "duration_s missing",
+        "mutations": [
+          {
+            "op": "delete",
+            "path": ["duration_s"]
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "TYPE_MISMATCH",
+            "path": ["duration_s"]
+          }
+        ]
+      },
+      {
+        "id": "maneuvers-null",
+        "description": "maneuvers null",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers"],
+            "value": null
+          }
+        ],
+        "layer": "structural",
+        "expected": [
+          {
+            "code": "TYPE_MISMATCH",
+            "path": ["maneuvers"]
+          }
+        ]
+      },
+      {
+        "id": "perigee-at-reference-radius",
+        "description": "a = R_ref, e = 0: a(1 − e) = R_ref exactly, not above",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "semiMajorAxis_m"],
+            "value": 6378137
+          },
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "eccentricity"],
+            "value": 0
+          }
+        ],
+        "layer": "semantic",
+        "expected": [
+          {
+            "code": "PERIGEE_BELOW_REFERENCE_RADIUS",
+            "path": ["initialOrbit", "elements"]
+          }
+        ]
+      },
+      {
+        "id": "perigee-below",
+        "description": "a = 7e6, e = 0.1: perigee 6.3e6 m",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "eccentricity"],
+            "value": 0.1
+          }
+        ],
+        "layer": "semantic",
+        "expected": [
+          {
+            "code": "PERIGEE_BELOW_REFERENCE_RADIUS",
+            "path": ["initialOrbit", "elements"]
+          }
+        ]
+      },
+      {
+        "id": "sample-count-1000001",
+        "description": "D = 1e6 s, h = 1 s, no maneuver: 1 000 001 samples (limit 1 000 000, §11.4 P1)",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers"],
+            "value": []
+          },
+          {
+            "op": "set",
+            "path": ["duration_s"],
+            "value": 1000000
+          },
+          {
+            "op": "set",
+            "path": ["outputStep_s"],
+            "value": 1
+          }
+        ],
+        "layer": "semantic",
+        "expected": [
+          {
+            "code": "SAMPLE_COUNT_EXCEEDED",
+            "path": ["outputStep_s"]
+          }
+        ]
+      },
+      {
+        "id": "sample-count-with-maneuver",
+        "description": "D = 999 999 s, h = 1 s, maneuver at 500 000 s (counted in both segments): 1 000 001 samples",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["duration_s"],
+            "value": 999999
+          },
+          {
+            "op": "set",
+            "path": ["outputStep_s"],
+            "value": 1
+          },
+          {
+            "op": "set",
+            "path": ["maneuvers", 0, "t_s"],
+            "value": 500000
+          }
+        ],
+        "layer": "semantic",
+        "expected": [
+          {
+            "code": "SAMPLE_COUNT_EXCEEDED",
+            "path": ["outputStep_s"]
+          }
+        ]
+      },
+      {
+        "id": "accepted-base",
+        "description": "base scenario",
+        "mutations": [],
+        "layer": "accepted",
+        "expected": [],
+        "run": true
+      },
+      {
+        "id": "accepted-perigee-1m-above",
+        "description": "a = R_ref + 1 m, e = 0",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "semiMajorAxis_m"],
+            "value": 6378138
+          },
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "eccentricity"],
+            "value": 0
+          }
+        ],
+        "layer": "accepted",
+        "expected": [],
+        "run": true
+      },
+      {
+        "id": "accepted-sample-count-limit",
+        "description": "D = 999 999 s, h = 1 s, no maneuver: exactly 1 000 000 samples (validated, not run)",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["maneuvers"],
+            "value": []
+          },
+          {
+            "op": "set",
+            "path": ["duration_s"],
+            "value": 999999
+          },
+          {
+            "op": "set",
+            "path": ["outputStep_s"],
+            "value": 1
+          }
+        ],
+        "layer": "accepted",
+        "expected": [],
+        "run": false
+      },
+      {
+        "id": "accepted-boundaries",
+        "description": "i = Math.PI, Ω just below 2π, e = −0, ν = −0, maneuver at t_s = duration_s",
+        "mutations": [
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "inclination_rad"],
+            "value": 3.141592653589793
+          },
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "raan_rad"],
+            "value": 6.283185307179585
+          },
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "eccentricity"],
+            "value": {
+              "$number": "-0"
+            }
+          },
+          {
+            "op": "set",
+            "path": ["initialOrbit", "elements", "trueAnomaly_rad"],
+            "value": {
+              "$number": "-0"
+            }
+          },
+          {
+            "op": "set",
+            "path": ["maneuvers", 0, "t_s"],
+            "value": 6000
+          }
+        ],
+        "layer": "accepted",
+        "expected": [],
+        "run": true
+      }
+    ]
+  },
+  "model": {
+    "note": "No physics except the semantic rules (reference radius 6 378 137 m, sample-count limit 1 000 000 of §11.4 P1)."
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part C), verification/src/datasets/build-c.ts",
+    "references": [
+      "docs/architecture/contracts-v1.md revision 4 §2, §3, §6, §6.1, §8.1, §8.2, §11.4 P1"
+    ],
+    "codeRevision": "dadff5d6e225",
+    "date": "2026-11-14",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0) except where a value is encoded as {\"$number\": \"-0\"}."
+  },
+  "method": {
+    "structural": "validateScenario (packages/contracts): the issue multiset {code, path} must equal expected exactly (all independent violations reported, §6).",
+    "semantic": "Only for structurally valid inputs: the semantic function of packages/simulation (§3) must return exactly the expected {code, path}.",
+    "noResult": "A rejected scenario never yields a request or a SimulationResult (§3, §6 engine boundary).",
+    "boundaryRule": "Boundary inputs are exactly evaluable in binary64 (record §1 VT-18: a = R_ref, e = 0; next binary64 above π; 2π as 2 * Math.PI); no input within a few ulps of a rule whose evaluation could round."
+  },
+  "outputs": {
+    "expectedPerCase": "see inputs.cases[].expected"
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §1 VT-18",
+    "rule": "exact (discrete codes and paths)",
+    "layers": "none (contract conformance)"
+  }
+}

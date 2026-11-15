@@ -1,0 +1,102 @@
+{
+  "id": "vt-15/c4-perigee-normal",
+  "version": 1,
+  "family": "VT-15 Post-maneuver orbit (ML-FR-006 AC5, ML-FR-010 AC3)",
+  "description": "Moderately elliptical, inclined (general case), ν₀ = 0 rad; normal burn Δv_RSW = [0, 0, -150] m/s at t_s = 0 s.",
+  "gridCase": "C4",
+  "kind": "normal",
+  "status": "Committed before any engine run on it (tolerances.md §4.1 item 1; ML-TASK-018 part C phase 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).",
+  "inputs": {
+    "request": {
+      "requestId": "sha256:3566d50f0368cf8048307b7deccc9a3ecc50156421381a0d9d9dcada7bae4cdc",
+      "schemaVersion": "1.0",
+      "centralBody": "EARTH",
+      "constants": {
+        "mu_m3ps2": 398600441800000,
+        "referenceRadius_m": 6378137,
+        "source": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)"
+      },
+      "dynamicsModel": "TWO_BODY",
+      "frame": "GCRF",
+      "epoch": {
+        "scale": "UTC",
+        "iso": "2026-01-01T00:00:00.000Z"
+      },
+      "initialState": {
+        "position_m": [6632220.107635427, 1014461.1272177348, -2612379.1962960595],
+        "velocity_mps": [-2315.4525191344273, 8033.245987332483, -2758.8548348457366]
+      },
+      "maneuvers": [
+        {
+          "id": "m1",
+          "t_s": 0,
+          "frame": "RSW",
+          "deltaV_mps": [0, 0, -150]
+        }
+      ],
+      "duration_s": 600,
+      "outputStep_s": 60
+    },
+    "requestIdNote": "requestId = \"sha256:\" + hex(SHA-256(UTF-8(canonicalRequestPayload(request)))) per contracts-v1.md §7.1, computed with @mission-lab/contracts canonicalRequestPayload and Node crypto SHA-256 (test code only).",
+    "elements": {
+      "semiMajorAxis_m": 12000000,
+      "eccentricity": 0.4,
+      "inclination_rad": 0.5,
+      "raan_rad": 2.5,
+      "argPeriapsis_rad": 4,
+      "trueAnomaly_rad": 0
+    },
+    "maneuverTime_s": 0
+  },
+  "model": {
+    "dynamics": "TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)",
+    "centralBody": "EARTH",
+    "frame": "GCRF (all vectors)",
+    "mu_m3ps2": 398600441800000,
+    "referenceRadius_m": 6378137,
+    "constantsSource": "WGS 84 values as written in docs/architecture/proposed-architecture.md §3 (ML-TASK-011 dataset input; VT-19 primary-source status in docs/verification/l2-references-report.md)",
+    "units": "SI: m, m/s, s, rad, m³/s²",
+    "time": "t_s: elapsed SI seconds from the epoch (contracts-v1.md §2)"
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part C), verification/src/datasets/build-c.ts",
+    "references": ["Closed form in RSW coordinates (ref/maneuver.ts, 320-bit)"],
+    "codeRevision": "dadff5d6e225",
+    "date": "2026-11-14",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0) except where a value is encoded as {\"$number\": \"-0\"}."
+  },
+  "method": {
+    "closedForm": "Exact RSW maneuver on the exact binary64 initial state: v_r = r·v/r, v_s = ‖r × v‖/r; E⁺ = ((v_r + ΔvR)² + (v_s + ΔvS)² + ΔvW²)/2 − μ/r; h⁺ = r√((v_s + ΔvS)² + ΔvW²); a⁺ = −μ/(2E⁺); e⁺ = √(1 + 2E⁺h⁺²/μ²); plane rotation δ = atan2(|ΔvW|, v_s + ΔvS). For a tangential burn at an apsis this is the vis-viva form a⁺ = 1/(2/r − (v + Δv)²/μ), e⁺ = |1 − r/a⁺| of tolerances.md §7 VT-15.",
+    "engineSide": "a⁺ = 1/(2/r − v⁺²/μ) and e⁺ = ‖[(v⁺² − μ/r) r − (r·v⁺) v⁺]/μ‖ evaluated by the test in binary64 from the event position_m and velocityAfter_mps."
+  },
+  "outputs": {
+    "preManeuver": {
+      "energy_Jpkg": -16608351.741666667,
+      "energyScale_Jpkg": 94113993.20277777,
+      "semiMajorAxis_m": 11999999.999999998,
+      "eccentricity": 0.39999999999999997,
+      "periapsisRadius_m": 7200000,
+      "angularMomentum_m2ps": 63386847636.90335,
+      "radius_m": 7200000,
+      "rDotV_m2ps": 0.000006541068710701796
+    },
+    "burnRadius_m": 7200000,
+    "semiMajorAxisAfter_m": 12008133.95025838,
+    "eccentricityAfter": 0.40040642202820553,
+    "energyAfter_Jpkg": -16597101.741666667,
+    "periapsisRadiusAfter_m": 7200000,
+    "planeRotation_rad": 0.017036586451877212
+  },
+  "referenceAccuracy": {
+    "closedForm": "320-bit evaluation, rounded once: ≤ 1 ulp; for m = T the apsis approximation is second order in the phase error (record §7 VT-15)."
+  },
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 3 (approved by the owner 2026-11-13) §7 VT-15",
+    "semiMajorAxis_rel": null,
+    "eccentricity_abs": null,
+    "gap": "No approved tolerance: the §7 VT-15 a⁺/e⁺ formula is derived for a tangential burn at an apsis only (its error model neglects first-order direction and phase terms that a non-tangential burn has); no tolerance for the plane-rotation angle. Closed form given for information; the engine comparison is reported, not asserted.",
+    "layers": "L1 (closed form) — informative only"
+  }
+}
