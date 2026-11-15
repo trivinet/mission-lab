@@ -64,44 +64,44 @@ const CONTRACT = 'docs/architecture/contracts-v1.md revision 4';
 const STATUS =
   'Committed before any engine run on it (tolerances.md §4.1 item 1; ML-TASK-018 part C phase 1). Not yet reviewed or approved; immutable once approved, corrections create a new version (plan §6).';
 
-function z(x: number): number {
+export function z(x: number): number {
   return x === 0 ? 0 : x;
 }
 
-function v3(v: readonly number[]): V3 {
+export function v3(v: readonly number[]): V3 {
   return [z(v[0] ?? 0), z(v[1] ?? 0), z(v[2] ?? 0)];
 }
 
-function stateOf(s: {
+export function stateOf(s: {
   position_m: readonly number[];
   velocity_mps: readonly number[];
 }): CartesianState {
   return { position_m: v3(s.position_m), velocity_mps: v3(s.velocity_mps) };
 }
 
-function gridCase(id: string): GridCase {
+export function gridCase(id: string): GridCase {
   const g = GRID.find((c) => c.id === id);
   if (g === undefined) throw new Error(`grid case ${id}`);
   return g;
 }
 
-function withAnomaly(el: KeplerianElements, nu: number): KeplerianElements {
+export function withAnomaly(el: KeplerianElements, nu: number): KeplerianElements {
   return { ...el, trueAnomaly_rad: nu };
 }
 
-function stateFromElements(el: KeplerianElements): CartesianState {
+export function stateFromElements(el: KeplerianElements): CartesianState {
   return stateOf(elementsToState(el, MU));
 }
 
-function scaleOf(el: KeplerianElements): Scales {
+export function scaleOf(el: KeplerianElements): Scales {
   return scales(MU, el.semiMajorAxis_m, el.eccentricity);
 }
 
-function maneuver(id: string, t_s: number, dv: V3): ImpulsiveManeuver {
+export function maneuver(id: string, t_s: number, dv: V3): ImpulsiveManeuver {
   return { id, t_s, frame: 'RSW', deltaV_mps: v3(dv) };
 }
 
-function request(
+export function request(
   state: CartesianState,
   duration_s: number,
   outputStep_s: number,
@@ -137,7 +137,7 @@ function producedBy(prov: Provenance, references: string[]): Record<string, unkn
   };
 }
 
-function model(): Record<string, unknown> {
+export function model(): Record<string, unknown> {
   return {
     dynamics: 'TWO_BODY: point-mass two-body, Earth-centred (ML-SYS-001 §5.1)',
     centralBody: 'EARTH',
@@ -150,7 +150,7 @@ function model(): Record<string, unknown> {
   };
 }
 
-function scaleInputs(s: Scales): Record<string, number> {
+export function scaleInputs(s: Scales): Record<string, number> {
   return {
     mu_m3ps2: s.mu,
     a_m: s.a,
@@ -167,7 +167,7 @@ function scaleInputs(s: Scales): Record<string, number> {
   };
 }
 
-const REQUEST_ID_NOTE =
+export const REQUEST_ID_NOTE =
   'requestId = "sha256:" + hex(SHA-256(UTF-8(canonicalRequestPayload(request)))) per contracts-v1.md §7.1, computed with @mission-lab/contracts canonicalRequestPayload and Node crypto SHA-256 (test code only).';
 
 // =============================================================================================
@@ -539,7 +539,7 @@ function vt14File(sp: Vt14Spec, prov: Provenance, requestIdOf: RequestIdFn): Dat
 // =============================================================================================
 // VT-15 post-maneuver orbit (L1, closed form)
 
-interface Vt15Spec {
+export interface Vt15Spec {
   readonly id: string;
   readonly orbit: string;
   readonly nu: number;
@@ -549,7 +549,7 @@ interface Vt15Spec {
   readonly kind: 'apsis-tangential' | 'normal' | 'radial' | 'combined';
 }
 
-const VT15: readonly Vt15Spec[] = [
+export const VT15: readonly Vt15Spec[] = [
   {
     id: 'c4-perigee-prograde',
     orbit: 'c4-moderate-inclined',
@@ -748,7 +748,7 @@ function vt15File(sp: Vt15Spec, prov: Provenance, requestIdOf: RequestIdFn): Dat
 // =============================================================================================
 // VT-16 escape / reference-sphere intersection
 
-interface Vt16Spec {
+export interface Vt16Spec {
   readonly id: string;
   readonly description: string;
   readonly orbit?: string;
@@ -761,7 +761,7 @@ interface Vt16Spec {
   readonly compareStates?: boolean;
 }
 
-const VT16: readonly Vt16Spec[] = [
+export const VT16: readonly Vt16Spec[] = [
   {
     id: 'bound-no-warning',
     description: 'Small prograde burn: bound, perigee far above the sphere',

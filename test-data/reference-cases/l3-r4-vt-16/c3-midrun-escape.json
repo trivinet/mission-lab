@@ -1,0 +1,115 @@
+{
+  "id": "l3-r4-vt-16/c3-midrun-escape",
+  "version": 1,
+  "family": "L3 Orekit comparison, VT-16 (tolerances.md §9.3, §9.3.1, §9.3.2)",
+  "status": "Evaluated L3 tolerances, committed before any engine comparison with the Orekit dataset (tolerances.md §4.1 item 1; §9.3.2 item 3). Not yet reviewed or approved.",
+  "inputs": {
+    "l3": {
+      "dataset": "l3-orekit/vt-16/c3-midrun-escape",
+      "version": 1,
+      "path": "test-data/l3-orekit/vt-16/l3-orekit-c3-midrun-escape.json",
+      "generatorRevision": "df84b5e6d75a",
+      "storedTolerances": "Not used: the tolerances stored in the Orekit file are not the approved L3 rows (tolerances.md §13 C-8); the values below govern."
+    }
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part D2), verification/src/datasets/build-d2.ts",
+    "references": [
+      "Formulas of tolerances.md revision 4 transcribed in verification/src/tol/tolerances-r4.ts; inputs from the reference side of the Orekit dataset (§4.1 item 2)"
+    ],
+    "codeRevision": "29699cfa1b3b",
+    "date": "2026-11-15",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0)."
+  },
+  "kind": "escape",
+  "tolerance": {
+    "warnings": {
+      "record": "contracts-v1.md §8.3, §11.3 D1–D6 (expectation stored in the Orekit file)",
+      "expectedCodes": ["ESCAPE_TRAJECTORY"],
+      "expectedTime_s": 5000,
+      "assertion": "asserted (exact set, t_s = maneuver time)"
+    },
+    "segment0": {
+      "record": "docs/verification/tolerances.md revision 4 (approved by the owner 2026-11-15) §9.3, §9.3.2 item 1",
+      "formula": "3M·P_E(t), 3M·V_E(t) at the grid (a, e), vs Orekit's own segment 0; t_s = 0 exact",
+      "evaluatedAt": {
+        "mu_m3ps2": 398600441800000,
+        "a_m": 10000000,
+        "e": 0.3,
+        "r_a_m": 13000000,
+        "v_p_mps": 8603.824517869116,
+        "g_p_mps2": 8.13470289387755,
+        "n_radps": 0.0006313481145928924,
+        "T_s": 9952.014050491189,
+        "kappa_E": 4.714285714285714,
+        "kappa_h": 1.0482848367219182,
+        "u": 1.1102230246251565e-16,
+        "M": 4
+      },
+      "t_s": [0, 1000, 2000, 3000, 4000, 5000],
+      "position_m": [
+        0, 0.000007389490035579708, 0.000009061391668478637, 0.000010733293301377567,
+        0.000012405194934276495, 0.000014077096567175427
+      ],
+      "velocity_mps": [
+        0, 9.964567533172672e-9, 1.2620399153350621e-8, 1.5276230773528567e-8,
+        1.7932062393706517e-8, 2.0587894013884466e-8
+      ],
+      "assertion": "asserted"
+    },
+    "segment1": {
+      "kind": "hyperbolic",
+      "record": "docs/verification/tolerances.md revision 4 (approved by the owner 2026-11-15) §9.3.1 (VT-16 L3, hyperbolic arcs), §6.8, §9.3.2",
+      "formula": "‖Δr‖ ≤ 3M·P_E,gen(Δt), ‖Δv‖ ≤ 3M·V_E,gen(Δt) (§6.8, arc-wide factors from Orekit’s own event state); first sample exact (R8)",
+      "evaluatedAt": {
+        "energy_Jpkg": 19383581.39926219,
+        "energyOverScaleAtStart": 0.21449594555443563,
+        "aAbs_m": 10281909.044300044,
+        "e": 2.0748006111449833,
+        "p_m": 33979628.086333364,
+        "n_h_radps": 0.0006055614933675664,
+        "sinhF0": -0.13004632316302958,
+        "coshF0": 1.0084205700838431,
+        "q0": 1.8378249403460307,
+        "cosPhi0": 0.9891639743802335,
+        "dtEnd_s": 15000,
+        "xEnd": 2.5298676085941647,
+        "rEnd_m": 108285535.76195543,
+        "periapsisPassed": true,
+        "r_min_m": 11051002.124550818,
+        "r_max_m": 108285535.76195543,
+        "v_max_mps": 10531.167879991413,
+        "g_max_mps2": 3.26388201291612,
+        "kappa_E": 4.721620511304703,
+        "K_b_m": 300567047.24354315,
+        "K_bv_mps": 55864.86677453191,
+        "P_bgen_m": 0.0000012373143432356116,
+        "V_bgen_mps": 1.538116883305461e-10,
+        "u": 1.1102230246251565e-16,
+        "M": 4
+      },
+      "t_s": [
+        5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000,
+        19000, 20000
+      ],
+      "position_m": [
+        0, 0.000016741321413307842, 0.00001909111627030838, 0.000021702259976701167,
+        0.000024442879222213116, 0.000027260153684591163, 0.000030129607472301817,
+        0.000033038053786641696, 0.000035977527374024934, 0.000038942789717957106,
+        0.00004193016659618268, 0.00004493694967262507, 0.00004796106295959825,
+        0.00005100086456396607, 0.000054055022448428014, 0.000057122433065312004
+      ],
+      "velocity_mps": [
+        0, 3.303835589596292e-9, 5.366903626379862e-9, 7.801888766326311e-9, 1.042828814306781e-8,
+        1.31692999932609e-8, 1.5988150092686043e-8, 1.8864656637364873e-8, 2.1786512574256335e-8,
+        2.4745595319425788e-8, 2.773621108856602e-8, 3.07541770349088e-8, 3.3796303723846445e-8,
+        3.686008489222726e-8, 3.994350184719376e-8, 4.3044894837919335e-8
+      ],
+      "comparedWith": "Orekit restarted from the engine event state (§9.3.2 item 2)",
+      "assertion": "informative",
+      "assertionReason": "L3 VT-16 hyperbolic rows are usable only after O-13 (§9.3.1 precondition, §15: \"usable only after O-13\"); O-13 needs a change to verification/l3/selfcheck.py, outside ML-TASK-018 D2 paths, and is open. The engine bound also rests on O-12 (open). Measured and reported only."
+    }
+  }
+}

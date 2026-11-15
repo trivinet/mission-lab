@@ -25,6 +25,7 @@ import { describe, expect, it } from 'vitest';
 import { scales, l2aVsL2b, E_RK_TARGET_REL } from '../tol/tolerances';
 import { buildAllDatasets, type DatasetFile } from './build';
 import { buildPartCDatasets } from './build-c';
+import { buildPartD2Datasets } from './build-d2';
 
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const DATA_DIR = join(ROOT, 'test-data', 'reference-cases');
@@ -36,7 +37,8 @@ function requestIdOf(body: Omit<SimulationRequest, 'requestId'>): string {
 const PROVENANCE_KEYS = ['codeRevision', 'date', 'runtime'];
 
 // ML_WRITE_DATASETS=1 writes the ML-TASK-011 files, ML_WRITE_DATASETS=C the ML-TASK-018 part C
-// files only (so that the provenance of earlier, committed datasets is never rewritten).
+// files only, ML_WRITE_DATASETS=D the part D2 files only (so that the provenance of earlier,
+// committed datasets is never rewritten).
 const writeMode = process.env.ML_WRITE_DATASETS;
 
 const builtA: DatasetFile[] = buildAllDatasets(
@@ -57,11 +59,20 @@ const builtC: DatasetFile[] = buildPartCDatasets(
   requestIdOf,
 );
 
-const built: DatasetFile[] = [...builtA, ...builtC];
+const builtD: DatasetFile[] = buildPartD2Datasets(
+  {
+    codeRevision: process.env.ML_CODE_REVISION ?? 'unset',
+    date: '2026-11-15',
+    runtime: `Node.js ${process.version}`,
+  },
+  requestIdOf,
+);
 
-if (writeMode === '1' || writeMode === 'C') {
+const built: DatasetFile[] = [...builtA, ...builtC, ...builtD];
+
+if (writeMode === '1' || writeMode === 'C' || writeMode === 'D') {
   if (process.env.ML_CODE_REVISION === undefined) throw new Error('set ML_CODE_REVISION');
-  for (const f of writeMode === '1' ? builtA : builtC) {
+  for (const f of writeMode === '1' ? builtA : writeMode === 'C' ? builtC : builtD) {
     const path = join(ROOT, f.path);
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, `${JSON.stringify(f.data, null, 2)}\n`, 'utf8');

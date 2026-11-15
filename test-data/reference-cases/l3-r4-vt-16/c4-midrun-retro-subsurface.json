@@ -1,0 +1,111 @@
+{
+  "id": "l3-r4-vt-16/c4-midrun-retro-subsurface",
+  "version": 1,
+  "family": "L3 Orekit comparison, VT-16 (tolerances.md §9.3, §9.3.1, §9.3.2)",
+  "status": "Evaluated L3 tolerances, committed before any engine comparison with the Orekit dataset (tolerances.md §4.1 item 1; §9.3.2 item 3). Not yet reviewed or approved.",
+  "inputs": {
+    "l3": {
+      "dataset": "l3-orekit/vt-16/c4-midrun-retro-subsurface",
+      "version": 1,
+      "path": "test-data/l3-orekit/vt-16/l3-orekit-c4-midrun-retro-subsurface.json",
+      "generatorRevision": "df84b5e6d75a",
+      "storedTolerances": "Not used: the tolerances stored in the Orekit file are not the approved L3 rows (tolerances.md §13 C-8); the values below govern."
+    }
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part D2), verification/src/datasets/build-d2.ts",
+    "references": [
+      "Formulas of tolerances.md revision 4 transcribed in verification/src/tol/tolerances-r4.ts; inputs from the reference side of the Orekit dataset (§4.1 item 2)"
+    ],
+    "codeRevision": "29699cfa1b3b",
+    "date": "2026-11-15",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0)."
+  },
+  "kind": "subsurface",
+  "tolerance": {
+    "warnings": {
+      "record": "contracts-v1.md §8.3, §11.3 D1–D6 (expectation stored in the Orekit file)",
+      "expectedCodes": ["REFERENCE_SPHERE_INTERSECTION"],
+      "expectedTime_s": 3000.5,
+      "assertion": "asserted (exact set, t_s = maneuver time)"
+    },
+    "segment0": {
+      "record": "docs/verification/tolerances.md revision 4 (approved by the owner 2026-11-15) §9.3, §9.3.2 item 1",
+      "formula": "3M·P_E(t), 3M·V_E(t) at the grid (a, e), vs Orekit's own segment 0; t_s = 0 exact",
+      "evaluatedAt": {
+        "mu_m3ps2": 398600441800000,
+        "a_m": 12000000,
+        "e": 0.4,
+        "r_a_m": 16800000,
+        "v_p_mps": 8803.7288384588,
+        "g_p_mps2": 7.689051732253087,
+        "n_radps": 0.00048028278333456074,
+        "T_s": 13082.262211349715,
+        "kappa_E": 5.666666666666667,
+        "kappa_h": 1.0910894511799618,
+        "u": 1.1102230246251565e-16,
+        "M": 4
+      },
+      "t_s": [0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3000.5],
+      "position_m": [
+        0, 0.000009624029842402542, 0.000010110780144861411, 0.000010597530447320282,
+        0.000011084280749779152, 0.000011571031052238019, 0.00001205778135469689,
+        0.00001254453165715576, 0.00001303128195961463, 0.0000135180322620735,
+        0.000014004782564532368, 0.00001449153286699124, 0.000014978283169450109,
+        0.000014979256670055025
+      ],
+      "velocity_mps": [
+        0, 1.1876989125719114e-8, 1.2617877365191547e-8, 1.3358765604663977e-8,
+        1.4099653844136406e-8, 1.4840542083608839e-8, 1.558143032308127e-8, 1.63223185625537e-8,
+        1.7063206802026134e-8, 1.780409504149857e-8, 1.8544983280971002e-8, 1.9285871520443433e-8,
+        2.0026759759915864e-8, 2.0028241536394807e-8
+      ],
+      "assertion": "asserted"
+    },
+    "segment1": {
+      "kind": "elliptic",
+      "record": "docs/verification/tolerances.md revision 4 (approved by the owner 2026-11-15) §9.3.1 (VT-16 L3, elliptic segment after the burn), §9.3.2 items 2–3",
+      "formula": "3M·P_E(t − m), 3M·V_E(t − m) at the post-maneuver (a⁺, e⁺) from Orekit’s own event state; compared with an Orekit arc restarted from the engine event state (KeplerianPropagator on a CartesianOrbit, μ explicit, GCRF); first sample exact (R8)",
+      "evaluatedAt": {
+        "mu_m3ps2": 398600441800000,
+        "a_m": 8448164.31667456,
+        "e": 0.6141610881113577,
+        "r_a_m": 13636698.105946952,
+        "v_p_mps": 14049.411615340277,
+        "g_p_mps2": 37.51466069913255,
+        "n_radps": 0.0008130651741596664,
+        "T_s": 7727.775714503448,
+        "kappa_E": 9.367020735208914,
+        "kappa_h": 1.2671369378100228,
+        "u": 1.1102230246251565e-16,
+        "M": 4
+      },
+      "t_s": [
+        3000.5, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000, 5250, 5500, 5750, 6000, 6250, 6500,
+        6750, 7000, 7250, 7500, 7750, 8000, 8250, 8500, 8750, 9000
+      ],
+      "position_m": [
+        0, 0.000013443758907922217, 0.000014480682673152415, 0.000015517606438382612,
+        0.00001655453020361281, 0.000017591453968843008, 0.000018628377734073206,
+        0.0000196653014993034, 0.000020702225264533602, 0.000021739149029763797,
+        0.000022776072794993995, 0.00002381299656022419, 0.000024849920325454387,
+        0.000025886844090684585, 0.000026923767855914783, 0.00002796069162114498,
+        0.00002899761538637518, 0.000030034539151605377, 0.000031071462916835575,
+        0.00003210838668206577, 0.000033145310447295965, 0.00003418223421252617,
+        0.00003521915797775636, 0.00003625608174298655, 0.00003729300550821676
+      ],
+      "velocity_mps": [
+        0, 5.459745629795928e-8, 5.966104827006117e-8, 6.472464024216304e-8, 6.978823221426491e-8,
+        7.485182418636682e-8, 7.991541615846869e-8, 8.497900813057058e-8, 9.004260010267248e-8,
+        9.510619207477436e-8, 1.0016978404687622e-7, 1.052333760189781e-7, 1.1029696799107999e-7,
+        1.1536055996318188e-7, 1.2042415193528376e-7, 1.2548774390738565e-7, 1.3055133587948753e-7,
+        1.3561492785158942e-7, 1.406785198236913e-7, 1.4574211179579319e-7, 1.5080570376789507e-7,
+        1.5586929573999696e-7, 1.6093288771209884e-7, 1.6599647968420073e-7, 1.710600716563026e-7
+      ],
+      "comparedWith": "Orekit restarted from the engine event state (§9.3.2 item 2)",
+      "assertion": "asserted"
+    }
+  }
+}

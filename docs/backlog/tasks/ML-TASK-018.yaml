@@ -234,3 +234,61 @@ report_part_d1:
       - "Node binary64 and Python decimal scripts re-run after the B3 and Q3/N1 changes; agreement to four digits."
       - "pnpm format:check → exit 0"
     disagreements: []
+
+report_part_d2:
+  # Part D2 (2026-11-15), branch test/ml-task-018d2-conformance-run-3, not pushed.
+  commits:
+    - "29699cf revision-4 transcription (tolerances-r4.ts + check against every printed value), 200-bit hyperbolic reference, D2 dataset builder (phase 1)"
+    - "976380b datasets vt-15-r4 (14), vt-16-r4 (4), l3-r4-vt-02/-05/-12/-15/-16 (43) with evaluated tolerances (phase 1)"
+    - "a55eb1f PHASE 1 BOUNDARY: conformance tests and verification/l3-d2/restart.py committed before any engine run on the new cases"
+    - "b2881c2 phase 2: engine event states and Orekit arcs restarted from them (conformance/l3-restart/)"
+    - "this commit: conformance-run-3.md and this report"
+  files_changed:
+    - verification/src/tol/tolerances-r4.ts, tolerances-r4.test.ts (new)
+    - verification/src/ref/hyperbolic.ts, hyperbolic.test.ts (new)
+    - verification/src/datasets/build-d2.ts, datasets-d2.test.ts (new); datasets.test.ts (ML_WRITE_DATASETS=D); build-c.ts (exports only, no behaviour change)
+    - verification/l3-d2/restart.py (new; uses verification/l3 unchanged)
+    - "test-data/reference-cases/{vt-15-r4,vt-16-r4,l3-r4-vt-02,l3-r4-vt-05,l3-r4-vt-12,l3-r4-vt-15,l3-r4-vt-16}/ (new files only)"
+    - conformance/src/support/l3.ts, orbit-test-eval.ts (new)
+    - conformance/src/vt15-r4-post-maneuver, vt16-r4-hyperbolic, l3-vt02-elements-to-state, l3-vt05-propagation, l3-vt12-maneuver-frame, l3-vt15-post-maneuver, l3-vt16-escape-intersection tests (new)
+    - conformance/l3-restart/ (engine event states + 2 restarted Orekit arcs, phase 2)
+    - docs/verification/conformance-run-3.md (new)
+  summary: >
+    Engine run against what tolerance record revision 4 newly tolerances and against the L3 Orekit
+    datasets. Every asserted comparison passed, nothing failed, no engine or reference defect.
+    Worst asserted ratios: VT-15 rev. 4 (14 new versions) a⁺ 0.034, e⁺ 0.0069, δψ_n 0.019, δψ 0.0029;
+    L3 VT-02 0.0090; L3 VT-05 (runner) 0.0046; L3 VT-12 0.0094; L3 VT-15 0.010; L3 VT-16 warnings
+    exact, segment 0 and elliptic restarted segment 1 0.00079. Informative (not asserted): VT-16
+    hyperbolic vs L2b 0.0033 (O-12), L3 VT-16 hyperbolic 0.0016 (O-13, O-12). selfcheck.py --repro
+    rerun first: 489 checks, 0 failures, byte-identical.
+  tests_executed:
+    - "python -B verification/l3/selfcheck.py --repro (orekit-venv) -> exit 0; 489 pass/fail, 0 failures, 72 informational; byte-identical regeneration of 43 files"
+    - "phase 1, verification project only: tolerances-r4.test.ts reproduces every printed revision-4 value (§6.8 table and first samples, §7 VT-15 table, §9.3.1 VT-02/VT-12/VT-15/VT-16 values), nearest or upward rounding of the last printed digit; L2b hyperbolic vs 200-bit hyperbolic within 2E_RK; E_RK ≤ 1e-10 r_max; no revision-4 value above the approved run-2 value"
+    - "phase 2: ML_WRITE_L3_EVENT_STATES=1 vitest l3-vt16 (event states), restart.py --code-revision a55eb1f023f0, then the conformance project: 23 files, 452 tests passed"
+    - "pnpm install --frozen-lockfile -> exit 0"
+    - "pnpm lint -> exit 0; pnpm typecheck -> exit 0; pnpm format:check -> exit 0; pnpm check:boundaries -> exit 0 (20/20)"
+    - "pnpm test -> exit 0, Test Files 63 passed (63), Tests 1248 passed (1248)"
+  reference_data_used:
+    - "test-data/reference-cases vt-15-r4, vt-16-r4, l3-r4-* version 1/2 (codeRevision 29699cfa1b3b), unchanged after a55eb1f"
+    - "test-data/l3-orekit (Orekit 13.1.9, generator df84b5e6d75a), read only; stored tolerances not used (record C-8)"
+    - "Orekit arcs restarted from the engine event states (conformance/l3-restart, restart.py at a55eb1f023f0)"
+  not_verified:
+    - "VT-16 hyperbolic arc states, L2b and L3: measured only (O-12 open; O-13 open and needs verification/l3/selfcheck.py, ML-TASK-012)"
+    - "VT-14 for e > 0 (O-11; owner direction P-1: 'VT-14: e = 0 only')"
+    - "Post-maneuver trajectories of the VT-12 and VT-15 L3 files (no L3 row in the record)"
+    - "VT-15 L2 element comparison (VI-03 rows); VT-17, VT-19, VI-02, VI-03, VE; CI run"
+  known_limitations:
+    - "Restarted Orekit arcs are tied to the engine's event state bit-for-bit; any engine change that moves an event state makes the L3 VT-16 segment-1 test fail as stale until restart.py is rerun with the Orekit environment (not in CI)."
+    - "L3 VT-15 Orekit side: a⁺, e⁺ from Orekit's getters, plane from the test's evaluation of Orekit's state (record not explicit; conformance-run-3.md §7 item 4)."
+    - "Informative c1-escape-prograde row flags its first sample as differing (Orekit's own event state vs the engine's, |Δv⁺| 1.8e-12 m/s): harness limitation of an informative row, not an engine finding."
+    - "Datasets and report committed, not approved."
+  documentation_changes:
+    - docs/verification/conformance-run-3.md
+  risks_or_blockers:
+    - "Record ambiguity: §7 VT-16/§15 put the four hyperbolic arcs in the toleranced set, §6.8 Scope and §12 O-12 make the comparison wait for O-12; treated as informative. Needs owner/reviewer decision."
+    - "O-13 needs a change to verification/l3/selfcheck.py (ML-TASK-012 paths)."
+  review_artifact: ""   # no PR opened (instructed not to push)
+  recommended_next_action: >
+    Systems Architect review of the D2 datasets, the restart procedure and conformance-run-3.md §7;
+    owner decision on the O-12 reading; ML-TASK-012 follow-up for O-13; a plan for the restarted
+    arcs in CI; then CI wiring and the G1 verification report.

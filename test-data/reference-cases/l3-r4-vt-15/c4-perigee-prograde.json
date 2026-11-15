@@ -1,0 +1,61 @@
+{
+  "id": "l3-r4-vt-15/c4-perigee-prograde",
+  "version": 1,
+  "family": "L3 Orekit comparison, VT-15 (tolerances.md §9.3, §9.3.1, §9.3.2)",
+  "status": "Evaluated L3 tolerances, committed before any engine comparison with the Orekit dataset (tolerances.md §4.1 item 1; §9.3.2 item 3). Not yet reviewed or approved.",
+  "inputs": {
+    "l3": {
+      "dataset": "l3-orekit/vt-15/c4-perigee-prograde",
+      "version": 1,
+      "path": "test-data/l3-orekit/vt-15/l3-orekit-c4-perigee-prograde.json",
+      "generatorRevision": "df84b5e6d75a",
+      "storedTolerances": "Not used: the tolerances stored in the Orekit file are not the approved L3 rows (tolerances.md §13 C-8); the values below govern."
+    }
+  },
+  "producedBy": {
+    "tool": "@mission-lab/verification (ML-TASK-018 part D2), verification/src/datasets/build-d2.ts",
+    "references": [
+      "Formulas of tolerances.md revision 4 transcribed in verification/src/tol/tolerances-r4.ts; inputs from the reference side of the Orekit dataset (§4.1 item 2)"
+    ],
+    "codeRevision": "29699cfa1b3b",
+    "date": "2026-11-15",
+    "runtime": "Node.js v24.22.2",
+    "independence": "packages/astrodynamics and packages/simulation not read and not run (ADR-003); references import nothing from the engine.",
+    "numberFormat": "Every number is the shortest decimal that round-trips to the binary64 value; JSON.parse restores the exact binary64. Signs of zero are not preserved (−0 written as 0)."
+  },
+  "kind": "apsis-tangential",
+  "tolerance": {
+    "record": "docs/verification/tolerances.md revision 4 (approved by the owner 2026-11-15) §9.3.1 VT-15 L3",
+    "formula": "3M·X_a, 3M·X_e, 3M·X_n, 3M·X_ψ with the per-side bounds of §9.3.1 (each side from its own post-maneuver state; at m = T tangential at an apsis, each tool uses its own event state, τ_E,eng(T) entering three times)",
+    "evaluatedAt": {
+      "mu_m3ps2": 398600441800000,
+      "a_m": 12000000,
+      "e": 0.4,
+      "r_a_m": 16800000,
+      "v_p_mps": 8803.7288384588,
+      "g_p_mps2": 7.689051732253087,
+      "n_radps": 0.00048028278333456074,
+      "T_s": 13082.262211349715,
+      "kappa_E": 5.666666666666667,
+      "kappa_h": 1.0910894511799618,
+      "u": 1.1102230246251565e-16,
+      "M": 4,
+      "m_s": 0,
+      "deltaV_mps": 100,
+      "aPlus_m": 12675729.116106128,
+      "ePlus": 0.43198533717074444,
+      "r_m": 7200000,
+      "vPlus_mps": 8903.7288384588,
+      "hPlus_m2ps": 64106847636.90335,
+      "kappa_hPlus": 1,
+      "source": "Orekit event state (position_m, velocityAfter_mps), conic in 320-bit"
+    },
+    "semiMajorAxis_rel": 4.82979394971489e-14,
+    "eccentricity_abs": 6.740196670532645e-14,
+    "eccentricityFormula": "tangential",
+    "planeNormal_rad": 1.1798116647530923e-14,
+    "planeRotation_rad": 4.183613766083839e-14,
+    "orekitSide": "a⁺, e⁺: Orekit's getters (outputs.elementsAfter); ĥ⁺, ĥ⁻ and ψ: evaluated by the test in binary64 from Orekit's event state, like the engine side",
+    "assertion": "asserted"
+  }
+}
