@@ -8,6 +8,9 @@ export const PACKAGE_VERSION = '0.0.0';
 export { o1Check, timeOfChi } from './hp/o1-check';
 export type { O1Result, UvInputs } from './hp/o1-check';
 
+/** Extended O-1 check on hyperbolic arcs (tolerances.md revision 5 §6.8, O-12): 320-bit residual. */
+export { o1HypResidual } from './hp/o1-check-hyp';
+
 /** L2c element → state map (reference, regular map), used to generate O-1 input states. */
 export { elementsToState as referenceElementsToState } from './ref/elements';
 export type { Elements as ReferenceElements, State as ReferenceState } from './ref/elements';
