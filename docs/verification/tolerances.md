@@ -329,8 +329,11 @@ after the record and must not be influenced by engine results. Therefore:
    test file (`conformance/src/vt16-r5-hyperbolic.test.ts`), run in order, and every asserted test
    fails unless every O-1 case ran and passed in that run. (b) is a Python step; the phase-2 report
    shows its output.
-   The field `assertion: "informative"` stored in those dataset files is superseded by this rule
-   (the same way as the stored L3 tolerances, §13 C-8); the files are not changed. Values that
+   The fields stored in those dataset files that this rule supersedes (the same way as the stored
+   L3 tolerances, §13 C-8; the files are not changed): `tolerance.assertion: "informative"` and
+   `assertionReason` of the four `vt-16-r4` files; `tolerance.segment1.assertion`,
+   `assertionReason` and, for `l3-r4-vt-16/c1-escape-prograde`, `tolerance.segment1.comparedWith`
+   ("Orekit's own segment 1 …", replaced by the restarted arc of §9.3.2 item 6; review N3). Values that
    revision 5 does evaluate — the O-1 hyperbolic thresholds — apply only to the new dataset
    `o1-hyp-r5`, committed before any engine run on it (item 1). The L3 arc `c1-escape-prograde`
    changes its **reference arc** (not its values) under §9.3.2 item 6; that arc is produced in phase
