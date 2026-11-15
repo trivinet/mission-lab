@@ -1,10 +1,30 @@
 # M1 Tolerance Record
 
-**Document ID:** ML-VER-002 · **Date:** 2026-11-12 · **Author:** Verification Engineer (ML-TASK-010) · **Revision:** 3 (Systems Architect reviews of PR #12: B1–B3, N1–N9; F1–F4) · **Status:** Approved by the owner on 2026-11-13 (revision 3; see §15). Changes follow §4.1: any loosening needs owner sign-off before the engine is run against it
+**Document ID:** ML-VER-002 · **Date:** 2026-11-12 (revision 4: 2026-11-15) · **Author:** Verification Engineer (ML-TASK-010; revision 4: ML-TASK-018 part D1) · **Revision:** 4 · **Status:** Proposed, awaiting owner approval (revision 4). Revision 3 was approved by the owner on 2026-11-13 and stays in force until revision 4 is signed in §15. Changes follow §4.1: any loosening needs owner sign-off before the engine is run against it
 
 Implements the tolerance policy of the [verification plan](m1-verification-plan.md) §4 (method fixed
 there) for the numerical families VT-01…VT-19 and the numeric parts of VI-01…VI-03. Nothing in this
-document was approved until the owner signed §15 (2026-11-13).
+document was approved until the owner signed §15 (2026-11-13). The revision-4 additions are not
+approved until the owner signs the revision-4 rows of §15; until then the engine must not be run
+against them, nor against the L3 Orekit datasets (§4.1).
+
+**Changes in revision 4** (ML-TASK-018 part D1; owner directions of 2026-11-15 on proposals P-1…P-4
+of [conformance run 2](conformance-run-2.md) §7, and the L3 Orekit datasets of ML-TASK-012 part B).
+(1) **P-1:** VT-14 is accepted for G1 at e = 0 only; O-11 stays open and does not block G1 (§7
+VT-14, §12, §15). Nothing is derived for e > 0. (2) **P-2:** VT-15 gets a general error model with a
+first-order direction term from the computed RSW basis, tolerances for normal, radial and combined
+burns, and two new rows for the orbit plane (plane-normal error and plane-rotation angle) (§7
+VT-15). The same term, restricted to its magnitude part, is added to the approved tangential
+formula; it changes one approved value (C3 apogee circularisation, +0.07 %), listed as a loosening
+in §15. (3) **P-3:** the VT-16 componentwise budget is evaluated for hyperbolic arcs (§6.8), with
+the 10κ_E·a term replaced by 10κ_E·r_max (justified in §6.8); O-5 is closed for its numeric part.
+Only one hyperbolic case of the grid meets the approved validity condition \|E\| ≥ 0.1(v²/2 + μ/r);
+lowering it to 0.05 is proposed for owner decision (§7 VT-16, §15). (4) **P-4:** O-4 is resolved
+by ADR-005 (Decision) together with the approved ML-TASK-015 contract; VT-09 is exact (§1, §12).
+(5) **L3 Orekit rows** for VT-02, VT-12, VT-15 and hyperbolic VT-16 (§9.3.1), and the rule for
+maneuvers at t > 0 (§9.3.2). (6) Bookkeeping: O-10 marked resolved (contract revision 3, already
+signed in §15 on 2026-11-13). No other approved value changed. No value in this revision was
+derived from, or adjusted to, engine output (§0).
 
 **Changes in revision 3** (second, bounded Systems Architect review of PR #12). No tolerance value
 changed. The O-1 acceptance check now evaluates the time equation entirely in high precision and
@@ -37,6 +57,25 @@ VI-03 split into an exact plumbing check and a toleranced correctness check with
 - Revision 2 inputs added: the Systems Architect review posted on PR #12 (treated as technical
   input) and `contracts-v1.md` revision 2 as marked Accepted (commit bdf763d, branch
   `chore/status-phase-1`).
+- **Revision 4 inputs** (2026-11-15): owner directions on P-1…P-4; `conformance-run-2.md`;
+  `docs/backlog/tasks/ML-TASK-012.yaml` (`report_part_b`), `verification/l3/README.md` and
+  `verification/l3/cases.py`; the inputs and reference-side outputs of the datasets in
+  `test-data/l3-orekit/` and `test-data/reference-cases/vt-15`, `vt-16` (states, energies, event
+  states: reference side only, §4.1 item 2); `contracts-v1.md` revision 4 (§5.2, §5.5, §8.3,
+  §11.3, §11.4); ADR-005; the task contracts ML-TASK-015, ML-TASK-016 and ML-TASK-017 (contract and
+  report text only). `packages/astrodynamics` and `packages/simulation` were not opened. The
+  engine was not run. The measured values of conformance run 2 (§3, §5 item 2) and the
+  informational measurements of `selfcheck.py` were seen when the two reports were read at the
+  start of the task. They enter no formula, coefficient or evaluation scale of this revision and
+  are used only to check, after evaluation, that no derived value is contradicted by them (§7
+  VT-15, §9.3.1). **No tolerance was tuned to them**; a measured value close to a bound would have
+  been reported as a finding, not used to change the bound. Every revision-4 number was computed twice from the printed formulas:
+  a Node.js v24.22.2 script in binary64 and a separately written Python 3.13.17 script in
+  `decimal` arithmetic (50 significant digits, own series for sin/cos, `Decimal.exp`/`ln` for the
+  hyperbolic functions, Newton solve of the hyperbolic Kepler equation). Both kept outside the
+  repository. They agree to the four digits printed. The binary64 script also reproduces the
+  approved VT-15 values stored in `test-data/reference-cases/vt-15` (all ten tangential cases, four
+  digits), which checks the transcription of the approved formulas.
 - All operation counts below are counts of the **canonical textbook formulation** of each
   algorithm (ADR-005 method B, element↔state maps of architecture §3), not of the engine's code,
   which the Verification Engineer may not read. The margin factor (§3) covers the difference.
@@ -65,8 +104,9 @@ A tolerance applies only where the contract leaves a value to arithmetic. The fo
 | Display position at a sample time vs the engine sample | VI-02 (FR-008 AC3) | FR-008 AC3 ("equal the engine sample at sample times"). Exact only if the interpolator returns the stored sample at a sample time (an endpoint-exact form: the sample itself, or (1 − s)x₀ + s x₁, which gives x₀ at s = 0 and x₁ at s = 1 exactly; x₀ + s(x₁ − x₀) is **not** exact at s = 1). Compared in the representation the scene uses (binary64, or `Math.fround` of the scaled value under O-8) |
 | No interpolation across a maneuver | VI-02 (FR-008 AC3) | Discrete: every interpolated display point lies between two samples of the **same** segment; at an event time the display shows the segment's own end/start sample (R8) |
 | CSV export values vs the result | VI-01 (FR-014 AC1) | FR-014 AC1 ("values equal the result"). Exact if each number is written with the shortest round-trip decimal (ECMA-262 Number-to-String) and read back with `Number()`: `Object.is(Number(cell), value)`. If the export uses fixed decimals (e.g. `toFixed`), it is a tolerance of half a unit in the last written digit and FR-014 AC1 is not met as worded; the exporter must use round-trip output (recommendation to ML-TASK owning FR-014) |
-| First sample of segment 0 vs the request's `initialState` | VT-05 (Δt = 0) | **Only if adopted** in a contract revision (open item O-10): `Object.is` on every component. Otherwise the Δt = 0 tolerance of §7 VT-05 applies |
-| Same-time samples of two runs with different output steps | VT-09 | **Only if** ML-TASK-015 states that a sample is a function of (segment initial state, segment start time, `t_s`, constants) only (open item O-4). Otherwise §7 VT-09 |
+| First sample of segment 0 vs the request's `initialState` | VT-05 (Δt = 0) | Contract §5.2 revision 3 ("Initial sample of a segment"; owner decision 2026-11-12, §11.2 decision 3): `Object.is` on every component. O-10 resolved (revision 4 bookkeeping) |
+| Pre-maneuver state of a maneuver at t_s = 0 vs the request's `initialState` | VT-12, VT-15 (precondition, revision 4) | Contract §5.2 revision 3 (segment 0 is the single sample [0], copied from `initialState`) and R8 (the event's `position_m` and `velocityBefore_mps` equal that sample). `Object.is` per component. The m = 0 rows of §7 VT-15 and §9.3.1 rely on it; it is checked in the same test |
+| Same-time samples of two runs with different output steps | VT-09 | Each sample is computed directly from the segment's initial state at Δt = t − t₀ ([ADR-005](../architecture/adr/ADR-005-kepler-propagation-algorithm.md), Decision), with no warm start and no hidden state (ML-TASK-015 contract, scope item 2 and acceptance criterion 4). O-4 resolved in revision 4 (§12, where the reading is stated). Two runs evaluate the same function of the same binary64 inputs, so the samples are bit-identical within one build (ML-NFR-003, contract §7.1) |
 | Rendered vertex vs scaled engine sample | VI-02 (FR-007 AC2) | **Only if** the scene conversion is defined as one binary64 multiplication followed by at most one binary32 rounding (open item O-8). Otherwise §8 |
 
 Everything else below needs a tolerance.
@@ -393,7 +433,8 @@ L = 10T + T/(2π)):
 
 For hyperbolic arcs (VT-16) the elliptic bounds |T1| ≤ 2e a^(3/2) etc. do not hold (cosh, sinh grow);
 the budget for VT-16 is the same componentwise sum evaluated on the reference arc (Σ over the
-table's rows with the actual term magnitudes), committed with the dataset under §4.1.
+table's rows with the actual term magnitudes), committed with the dataset under §4.1. Revision 4
+writes the rows out and evaluates them (§6.8).
 
 ### 6.2 Size of the bounded term
 
@@ -506,6 +547,113 @@ error: it does not enter VT-06/VT-07 at first order (their break-even becomes un
 enters VT-05/VT-08 only through the phase term v_p δt_res. VT-06/VT-07 then give no control on
 the solver residual, and the O-1 residual check (§12) is the only control on it. The tolerances
 are unchanged in that case (they remain valid upper bounds, §6.1 scope).
+
+### 6.8 Hyperbolic arcs (VT-16; revision 4, P-3)
+
+This section carries out the method §6.1 and §7 VT-16 already prescribe ("the same componentwise
+sum evaluated on the reference arc"); it introduces no new kind of term. Every quantity is taken
+from the **reference** post-maneuver state (r₀, v₀) and arc (§4.1 item 2).
+
+**Parametrisation.** For E > 0 write \|a\| = μ/(2E), e from h and E, p = h²/μ, n_h = √(μ/\|a\|³),
+σ₀ = r₀·v₀/√μ, cosh F₀ = (1 + r₀/\|a\|)/e, sinh F₀ = σ₀/(√\|a\| e), and at a sample Δt the change of
+hyperbolic anomaly x = F − F₀ ≥ 0 from e sinh F − F = e sinh F₀ − F₀ + n_h Δt. With χ = √\|a\| x and
+ψ = αχ² = −x², C = (cosh x − 1)/x², S = (sinh x − x)/x³, the three terms of √μ t(χ) (§6.1) are,
+in units of \|a\|^(3/2) (dividing by √μ turns them into seconds × n_h):
+
+    t1 = e sinh F₀ (cosh x − 1),   t2 = e cosh F₀ (sinh x − x),   t3 = (r₀/|a|) x,   t1 + t2 + t3 = n_h Δt
+
+(1 − α r₀ = 1 + r₀/\|a\| = e cosh F₀ has no cancellation on a hyperbola.)
+
+**Time-equation noise, row by row** (each row is the elliptic row of §6.1 with the bound replaced
+by the actual magnitude; units u \|a\|^(3/2); q₀ = r₀v₀/√(μ\|a\|)):
+
+| Part | Error bound (× u) | Steps (as §6.1) |
+|---|---|---|
+| σ₀ (data) | (3q₀ + 2e\|sinh F₀\|)(cosh x − 1) | r₀·v₀ γ_3 r₀v₀, ÷√μ 2u, times χ²C = \|a\|(cosh x − 1) |
+| χ²C (in T1) | e\|sinh F₀\| [2.5x sinh x + 2 cosh x + 7(cosh x − 1)] | argument 2.5ux through d cosh/dx = sinh x; cosh c_f u **relative to cosh x**; subtraction, ÷ψ, ×χ², ×σ₀ 7u relative |
+| 1 − α r₀ (data) | (4r₀/\|a\| + e cosh F₀)(sinh x − x) | r̂₀ 3u and product u on r₀/\|a\|, addition u; times \|χ³S\| |
+| χ³S (in T2) | e cosh F₀ [2.5x(cosh x − 1) + 2 sinh x + 11.5(sinh x − x)] | argument through d(sinh x − x)/dx; sinh c_f u relative to sinh x; subtraction u; 10.5u for ψ^(3/2), χ³, ÷, ×c₂ |
+| r₀χ (T3) | 4(r₀/\|a\|) x | r̂₀ 3u, product u |
+| Two additions | 2(\|t1\| + \|t2\| + \|t3\|) | u × Σ\|terms\| each |
+| Right-hand side | 2 n_h Δt | √μ and product |
+
+    S_eval(Δt) = sum of the rows;   δt_eval = u S_eval / n_h
+    ε_t,gen(Δt) = u [ 2 S_eval + (r/|a|) x ] / n_h          (§6.1: twice the noise plus the spacing term (dt/dχ) u χ = u (r/|a|) x / n_h)
+    δt_g,gen(Δt) = u [ 2.5x(cosh x − 1) + 2 sinh x + 12.5(sinh x − x) ] / n_h      (§6.1 g-formation, same steps)
+
+**Phase terms.** Mean-motion sensitivity: n_h ∝ \|a\|^(−3/2) and \|δα/α\| ≤ 5u(4\|a\|/r₀ + 1) =
+5uκ_E(r₀), so the position error along the orbit is ≤ (15/2)κ_E u v_max Δt, as in §6.1. Argument
+formation: a shift 2.5ux of x moves the state along the orbit by the time dt/dF·2.5ux with
+dt/dF = r/(\|a\| n_h) (from dM/dF = e cosh F − 1 = r/\|a\|). Time formation u Δt. Together, as a
+time:
+
+    δt_ph(Δt) = u [ (15/2) κ_E Δt + Δt + 2.5 x r_max / (|a| n_h) ]
+
+(No 1/n term as in L = Δt + 1/n: x is used directly, so no elliptic bound X ≤ nΔt + 2e is needed.)
+
+**Bounded term.** §6.2 applied without the ellipse bounds, as §7 VT-16 prescribes:
+\|f\|r₀ + \|g\|v₀ + r_max ≤ K_b := r₀(1 + 2r_max/p) + r_max/cos φ₀ + r_max, and
+\|ḟ\|r₀ + \|ġ\|v₀ + v_max ≤ K_bv := 2v_max + 2(1 + 2r₀/p)v₀ (A5: \|f\| ≤ 1 + 2r/p, \|ġ\| ≤ 1 + 2r₀/p,
+\|g\|v₀ ≤ r/cos φ₀, \|ḟ\|r₀ ≤ v + \|ġ\|v₀). **Recount of C_b for cosh and sinh:** the hyperbolic
+functions have errors relative to cosh x and sinh x, not absolute. ḟ = √μχ(ψS − 1)/(rr₀) with
+ψS − 1 = −sinh x/x: ψS has absolute error ≤ (2 sinh x/x + 4(sinh x − x)/x)u ≤ 6u\|ψS − 1\|, plus
+subtraction u, χ u, √μ 2u, ÷(rr₀) 8u: ≤ 18u relative; with γ_2 for the combination ≤ 20u: C_b = 20
+holds. In f = 1 − χ²C/r₀ and ġ = 1 − χ²C/r, the cosh error 2u cosh x·\|a\|/r₀ (resp. /r) exceeds
+the relative budget by 2u\|a\|/r₀ (resp. 2u\|a\|/r), which does not grow with x; it is added
+explicitly: 2u\|a\| in position (× r₀) and 2u\|a\|v₀/r_min in velocity (× v₀).
+
+**The 10κ_E·a substitution (conformance run 2 §5 item 4).** In §6.2 the term 10uκ_E a is the
+radial effect of the α data error: \|δa/a\| ≤ 5uκ_E changes the size of the conic, and a change of
+size by the factor (1 + δ) at fixed shape moves a point at radius r by rδ. On an ellipse r ≤ r_a ≤ 2a,
+so 2a·5uκ_E = 10uκ_E a bounds rδ everywhere on the orbit. On a hyperbola r is unbounded and \|a\|
+does not bound it (on the grid arcs r_max/\|a\| reaches 10.5), so \|a\| is **not** a valid replacement.
+The bound of the same argument is r_max·5uκ_E; the factor 2 of the elliptic coefficient (which
+there also covers the accompanying change of shape) is kept: **10uκ_E·r_max**, with r_max the
+largest radius on the propagated arc (r is monotonic on each branch, so r_max = max(r₀, r(end))).
+This is never smaller than the elliptic term would be at the same r_max (10κ_E a ≥ 5κ_E r_a), and
+it is larger than the \|a\| form on every grid arc (both listed in the table below; P_b,gen is
+1.2 to 2.3 times the \|a\| form). The velocity term 5uκ_E v_p becomes 5uκ_E v_max: from v² = μ(2/r + 1/\|a\|),
+\|δv\| = (μ/(2\|a\|v²))v\|δa/a\| ≤ (v/2)\|δa/a\| ≤ 2.5uκ_E v, so 5uκ_E v_max is a bound.
+
+**Conditioning factors on the arc.** r_min = \|a\|(e − 1) if the periapsis is passed within the
+arc, else min(r₀, r(end)); v_max = √(μ(2/r_min + 1/\|a\|)), g_max = μ/r_min², κ_E = 1 + 4\|a\|/r_min
+(§7 VT-16: the maximum over the arc of (v²/2 + μ/r)/E).
+
+**Engine bound on a hyperbolic arc (unmargined).**
+
+    P_b,gen = u [ 20 K_b + 10 κ_E r_max + 2|a| ]          V_b,gen = u [ 20 K_bv + 5 κ_E v_max + 2|a| v₀ / r_min ]
+    P_E,gen(Δt) = P_b,gen + v_max [ δt_ph + 2 ε_t,gen + δt_g,gen ]
+    V_E,gen(Δt) = V_b,gen + g_max [ δt_ph + ε_t,gen ] + (2 v_max² / r_min)(ε_t,gen + δt_g,gen)
+
+(position: phase plus the off-orbit displacement along v₀ of §6.1 item 4; velocity: phase plus the
+off-orbit factor 2v·v/r of §6.1 item 4 with v_p → v_max, r_p → r_min). All terms are
+non-decreasing in Δt with the arc-wide factors, so the largest value of an arc is at its last
+sample.
+
+**Scope.** ε_t,gen assumes that the engine's solver ends at the noise level on hyperbolic arcs as
+well. The O-1 acceptance check was run for e < 1 only (conformance run 1), and its α term δt_α
+(§6.1) is derived for ellipses only; for hyperbolic arcs this assumption is **not verified**
+(open item O-12, §12). The arc must satisfy the validity condition of §7 VT-16.
+
+**Evaluated** (u = 2⁻⁵³, M = 4; post-maneuver state from the reference side: the L2 request's
+initial state and RSW maneuver at t = 0, or Orekit's event state for the maneuver at t = 5000 s;
+values at the last sample, which is the largest):
+
+| Arc (dataset) | E/(v²/2 + μ/r) | \|a\| (m) | e | r_min, r_max (m) | κ_E | x(end) | P_b,gen (m) [\|a\| form] | ε_t,gen (s) | M·P_E,gen (m) | M·V_E,gen (m/s) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| L2 `vt-16/c3-midrun-escape` (Δt ≤ 4000 s) | 0.2145 | 1.0282e7 | 2.0748 | 1.105e7, 3.245e7 | 4.722 | 1.448 | 3.90e-7 [2.74e-7] | 2.48e-11 | **4.54 × 10⁻⁶** | **3.40 × 10⁻⁹** |
+| L3 `l3-orekit-c3-midrun-escape` (Δt ≤ 15 000 s) | 0.2145 | 1.0282e7 | 2.0748 | 1.105e7, 1.083e8 | 4.722 | 2.530 | 1.24e-6 [7.24e-7] | 1.22e-10 | 1.90e-5 | 1.43e-8 |
+| L2 `vt-16/escape-clear` (Δt ≤ 6000 s) | 0.0786 | 2.0519e7 | 1.3411 | 7.000e6, 4.239e7 | 12.725 | 1.468 | 8.88e-7 [5.79e-7] | 3.58e-11 | 1.04e-5 | 1.10e-8 |
+| L3 `l3-orekit-c1-escape-prograde` (Δt ≤ 20 000 s) | 0.0786 | 2.0519e7 | 1.3411 | 7.000e6, 1.175e8 | 12.725 | 2.296 | 2.43e-6 [1.06e-6] | 1.34e-10 | 3.43e-5 | 3.83e-8 |
+| L2 `vt-16/hyperbolic-inbound` (Δt ≤ 6000 s; periapsis passed) | 0.0549 | 3.0103e7 | 1.1714 | 5.159e6, 3.821e7 | 24.340 | 1.602 | 1.35e-6 [1.13e-6] | 8.95e-11 | 2.22e-5 | 4.27e-8 |
+| L2 `vt-16/hyperbolic-outbound` (Δt ≤ 6000 s) | 0.0549 | 3.0103e7 | 1.1714 | 7.000e6, 4.380e7 | 18.202 | 1.049 | 1.24e-6 [9.64e-7] | 3.46e-11 | 1.27e-5 | 1.13e-8 |
+
+The first sample of each arc (Δt = 60 s for L2, 1000 s for L3) has M·P_E,gen 1.6e-6 m (L2 C3),
+5.6e-6 m (L3 C3), 3.6e-6 m (escape-clear), 1.08e-5 m (L3 C1), 5.6e-6 m (inbound), 5.2e-6 m
+(outbound); the per-sample values follow from the formula and are committed with the datasets
+(§4.1 item 1). How these engine bounds enter the comparison tolerances: §7 VT-16 (L2b) and §9.3.1
+(L3). Excluded: `just-unbound` (E/(v²/2 + μ/r) = 10⁻³) and `exactly-parabolic` (near-parabolic,
+warnings only); `at-end-escape` (the hyperbolic segment is the single event sample, exact by R8).
 
 ## 7. Per-family records
 
@@ -736,9 +884,11 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
   samples (e.g. a warm start from the previous sample's χ): then the two roots differ, and with
   them the argument-formation phase (4u n L at most), the solver term and the g-formation term.
 - Reference accuracy: L1 — the other run of the same engine; no external reference.
-- Tolerance: **exact** (`Object.is`) if ML-TASK-015 states that a sample is a function of
-  (segment initial state, segment start time, `t_s`, constants) only (open item O-4, recommended).
-  Otherwise ‖Δr‖ ≤ 2M[P_b + v_p(4uL + 2δt_res + δt_g)], ‖Δv‖ ≤ 2M[V_b + g_p(4uL + δt_res +
+- Tolerance: **exact** (`Object.is`). Revision 4: O-4 is resolved — ADR-005 (Decision) requires
+  each sample to be computed directly from the segment's initial state at Δt = t − t₀, and the
+  approved ML-TASK-015 contract adds "no warm start" and "no hidden state" (§1, §12). The fallback
+  below is kept only for reference; it applies if that rule is ever withdrawn:
+  ‖Δr‖ ≤ 2M[P_b + v_p(4uL + 2δt_res + δt_g)], ‖Δv‖ ≤ 2M[V_b + g_p(4uL + δt_res +
   2(1 + e)(δt_res + δt_g))]: C1/C2 **2.89 × 10⁻⁵ m / 4.95 × 10⁻⁸ m/s**; C3 8.74e-5 / 1.55e-7;
   C4 1.32e-4 / 2.27e-7; C5 6.64e-4 / 1.32e-6; C6 1.74e-4 / 2.02e-8 (10T).
 - Post-maneuver segments: the maneuver time m is a sample of every grid (§5.2), so the event
@@ -815,6 +965,13 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
   The transported energy term is 89 % (86 % in velocity); it is a worst-case bound. Break-even:
   ε* = 180u (×7.8 over ε_t at Δt = T). (Revision 1 evaluated C4: 2.2e-3 m with K not included;
   C4 is withdrawn until K(e) is derived.)
+- **Scope for G1 (revision 4, owner direction P-1 of 2026-11-15).** VT-14 is accepted for G1 at
+  **e = 0 only**: the toleranced comparison of the maneuvered run with the coast run is made on
+  circular cases (C1, C2, C6 scale), with the formula above evaluated at each case's scale and
+  maneuver time (§4.1). For e > 0 only the exact parts (§1: Δv_I = ±0, v⁺ `===` v⁻, R8) and
+  segment 0 are checked; the state after m is not judged. Nothing is derived for e > 0 in this
+  revision. O-11 (K_r(e), K_v(e)) stays open and **does not block G1**; the G1 verification report
+  states VT-14 as "e = 0 only".
 - Margin: M = 4.
 
 ### VT-15 Post-maneuver orbit (L1, L2) — also ML-FR-010 AC3
@@ -844,6 +1001,93 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
   difference are meaningless when the difference is small).
 - Margin: M = 4.
 
+**Revision 4 (P-2): general burns, direction term and orbit plane.**
+
+- **Missing term (iv): direction of the computed Δv_I.** The engine's Δv_I differs from the exact
+  ΔvR R + ΔvS S + ΔvW W of its own pre-maneuver state by ‖δΔv_I‖ ≤ ε_Δv‖Δv‖, ε_Δv = (12κ_h⁻ + 25)u
+  (VT-12 per-side budget, κ_h⁻ = 1/√(1 − e⁻²) of the pre-maneuver orbit). It changes the
+  post-maneuver energy by v⁺·δΔv_I, which is first order in general:
+  \|δE⁺\| ≤ v⁺ ε_Δv ‖Δv‖, i.e. \|δa⁺\|/a⁺ gains **β_dir = 2a⁺v⁺ε_Δv‖Δv‖/μ**. For a tangential burn
+  at an apsis v⁺ is parallel to S, so only the component of δS along S enters: ‖Ŝ‖ − 1 ≤ 4u + 4u
+  (norms of R̂, Ŵ, B6) + 3u (cross product, B5) = 11u, and the product ΔvS·S_k u, so
+  \|v⁺·δΔv_I\| ≤ 12u v⁺Δv, i.e. 24u a⁺v⁺Δv/μ relative. The approved coefficient 11u(4a⁺/r − 1)
+  rounds up the exact sum u(4a⁺/r − 2) + 10u(4a⁺/r − 1) = 11u(4a⁺/r − 1) − u, so it has a slack of
+  1u that absorbs the tangential term whenever 24a⁺v⁺Δv/μ ≤ 1. Revision 3 omitted term (iv); the
+  §6.1 phase argument (second order at an apsis) is unaffected.
+- **Corrected tangential formula** (apsis, along ±S): \|δa⁺\|/a⁺ ≤ M[τ_E,eng(m)·a⁺/a⁻ +
+  11u(4a⁺/r − 1) + max(0, 24a⁺v⁺Δv/μ − 1)u]; e⁺ as before with this \|δa⁺\|/a⁺. Of the ten
+  tangential grid cases only C3 apogee circularisation (Δv = 904.46 m/s, 24a⁺v⁺Δv/μ = 3.92) has a
+  non-zero extra term: a⁺ 1.7686 × 10⁻¹² → **1.7698 × 10⁻¹²** (+0.073 %), e⁺ 1.7952 × 10⁻¹² →
+  **1.7965 × 10⁻¹²** (+0.072 %). This is a loosening forced by the derivation and is listed in
+  §15. The other nine approved values are unchanged to all digits.
+- **Two comparison modes for the pre-maneuver state.** (A) The reference applies the burn exactly
+  to the **exact** pre-maneuver state at m. At m = 0 that state is the request's `initialState`,
+  and the engine's pre-maneuver state equals it bit-for-bit (§1, precondition row), so term (i) is
+  zero. At m > 0 the engine's pre-maneuver state carries propagation error; for a burn away from an
+  apsis or not along S its phase part changes a⁺, e⁺ and the plane at **first** order (the burn
+  point moves), which is not derived here. Mode A at m > 0 is therefore allowed only for tangential
+  burns at an apsis (approved formula with τ_E,eng(m)) and for the plane rows below (with the tilt
+  term). (B) The reference applies the burn exactly to the engine's **event** state
+  (`position_m`, `velocityBefore_mps`); term (i) is zero for every m. Every non-tangential burn at
+  m > 0 uses mode B. (All non-tangential grid cases are at m = 0.)
+- **Non-tangential burns (normal, radial, combined).** Measures as above (a⁺ relative, e⁺
+  absolute); mode A at m = 0 or mode B:
+  - \|δa⁺\|/a⁺ ≤ M[11u(4a⁺/r − 1) + 2a⁺v⁺(12κ_h⁻ + 25)u‖Δv‖/μ].
+  - \|δe⁺\| ≤ M[(4rv⁺/μ)((12κ_h⁻ + 25)u‖Δv‖ + u v⁺) + 60u]. Derivation: from
+    e = [(v² − μ/r)r − (r·v)v]/μ, a velocity error δv gives ‖δe‖ ≤ 4rv‖δv‖/μ, and
+    \|δ‖e‖\| ≤ ‖δe‖; the engine's post-maneuver velocity error is ≤ ‖δΔv_I‖ + u v⁺ (the R12
+    addition, componentwise ≤ u\|v⁺_k\|); 60u is the e-vector evaluation of test and reference
+    (§VT-03, 30u each; valid for bound post-maneuver orbits, v²r/μ < 2). The formula uses no
+    apsis property, so it holds for every bound post-maneuver orbit.
+- **Orbit plane (new rows, every VT-15 case).** ĥ = (r × v)/‖r × v‖ formed by the test.
+  - *Plane-normal error* δψ_n = ‖ĥ⁺_engine − ĥ⁺_ref‖ (radians, = the angle to first order; also
+    bounds \|sin\| of the angle). Engine state: δh⁺ = r × δv⁺, direction error ≤ 2r‖δv⁺‖/h⁺ (B6);
+    with κ_h⁺ = rv⁺/h⁺ (the post-maneuver flight-path factor at the burn point, from the
+    reference state) that is κ_h⁺u[2(12κ_h⁻ + 25)‖Δv‖/v⁺ + 2]. Evaluation of ĥ⁺ by the test and by
+    a binary64 reference: 6uκ_h⁺ each (B5, B6). At m > 0 (mode A) add the tilt of the engine's
+    pre-maneuver plane: only the bounded rounding P_b, V_b of §6.2 leaves the plane (§10, inclination
+    noise), giving 2(P_b v⁺ + rV_b)/h⁺.
+    **δψ_n ≤ M[κ_h⁺u(2(12κ_h⁻ + 25)‖Δv‖/v⁺ + 14) + [m > 0]·2(P_b v⁺ + rV_b)/h⁺].**
+  - *Plane-rotation angle* ψ = atan2(‖ĥ⁻ × ĥ⁺‖, ĥ⁻·ĥ⁺) (the atan2 form is required; acos of the dot
+    product loses half the digits for small ψ, B8). Adds the evaluation of ĥ⁻ (6uκ_h⁻ per side) and
+    of the atan2 (cross product 3u, its norm 3u, dot product 3u: normwise 6.7u, √2·6.7u = 9.5u by B8,
+    plus atan2 rounding 2πu = 6.3u: 16u per side):
+    **\|δψ\| ≤ M[κ_h⁺u(2(12κ_h⁻ + 25)‖Δv‖/v⁺ + 14) + 12uκ_h⁻ + 32u + [m > 0]·2(P_b v⁺ + rV_b)/h⁺]**.
+    A common tilt of ĥ⁻ and ĥ⁺ cancels in ψ; keeping the tilt term is conservative.
+- **Evaluated (L2, M = 4; inputs: the grid elements, ν₀, m and Δv_RSW of the datasets; κ_h⁻ =
+  1/√(1 − e²) of the grid case; κ_h⁺ from the reference post-maneuver state).** "Approved" is the
+  revision-3 value; "rev. 4" the value of this revision.
+
+| Case | Burn | m | a⁺ (m) | κ_h⁺ | \|δa⁺\|/a⁺ approved → rev. 4 | \|δe⁺\| approved → rev. 4 | δψ_n (rad) | \|δψ\| (rad) |
+|---|---|---|---|---|---|---|---|---|
+| c1-circular-prograde | +100 S | 0 | 7.1919e6 | 1.0000 | 3.318e-13 (unchanged) | 3.496e-13 (unchanged) | 6.65e-15 | 2.62e-14 |
+| c1-circular-prograde-after-1T | +100 S | T | 7.1919e6 | 1.0000 | 1.063e-12 (unchanged) | 1.061e-12 (unchanged) | 2.76e-13 | 2.95e-13 |
+| c1-normal | +200 W | 0 | 7.0049e6 | 1.0000 | — → **1.55e-14** | — → **3.02e-14** | 7.09e-15 | 2.66e-14 |
+| c3-apogee-circularise | +904.46 S | 0 | 1.3000e7 | 1.0000 | 1.7686e-12 → **1.7698e-12** | 1.7952e-12 → **1.7965e-12** | 1.17e-14 | 3.15e-14 |
+| c4-perigee-prograde | +100 S | 0 | 1.2676e7 | 1.0000 | 2.603e-12 (unchanged) | 1.505e-12 (unchanged) | 6.60e-15 | 2.66e-14 |
+| c4-perigee-prograde-after-1T | +100 S | T | 1.2676e7 | 1.0000 | 9.114e-12 (unchanged) | 5.203e-12 (unchanged) | 5.69e-13 | 5.89e-13 |
+| c4-perigee-retrograde | −100 S | 0 | 1.1399e7 | 1.0000 | 2.340e-12 (unchanged) | 1.505e-12 (unchanged) | 6.61e-15 | 2.66e-14 |
+| c4-apogee-prograde | +100 S | 0 | 1.2283e7 | 1.0000 | 2.503e-12 (unchanged) | 3.450e-12 (unchanged) | 7.09e-15 | 2.71e-14 |
+| c4-apogee-prograde-after-1T | +100 S | T | 1.2283e7 | 1.0000 | 8.812e-12 (unchanged) | 1.208e-11 (unchanged) | 6.45e-13 | 6.65e-13 |
+| c4-perigee-normal | −150 W | 0 | 1.2008e7 | 1.0000 | — → **2.91e-14** | — → **3.08e-14** | 6.79e-15 | 2.68e-14 |
+| c4-radial (ν₀ = 1) | +80 R | 0 | 1.2126e7 | 1.0404 | — → **2.44e-14** | — → **2.99e-14** | 6.82e-15 | 2.69e-14 |
+| c4-combined (ν₀ = 1) | (30, −60, 45) | 0 | 1.1723e7 | 1.0392 | — → **2.34e-14** | — → **2.98e-14** | 6.82e-15 | 2.69e-14 |
+| c5-perigee-prograde | +50 S | 0 | 2.7844e7 | 1.0000 | 4.237e-11 (unchanged) | 1.031e-11 (unchanged) | 6.40e-15 | 2.85e-14 |
+| c5-apogee-raise-perigee | +200 S | 0 | 2.7143e7 | 1.0000 | 4.124e-11 (unchanged) | 6.876e-11 (unchanged) | 1.07e-14 | 3.28e-14 |
+
+  (T is fl(2π/n) of the grid a, as in the datasets. The tangential m = 0 values keep the
+  approved term τ_E,eng(0), although the pre-maneuver state is exact there; dropping it would
+  tighten them and is not done in this revision.) **Consistency check, not used to set any
+  value:** conformance run 2 §5 item 2 reports, for the four non-tangential cases, observed
+  \|δa⁺\|/a⁺ ≤ 4.0e-16, \|δe⁺\| ≤ 2.1e-16 and plane rotation (sine) ≤ 6.7e-17, i.e. at most 2.6 %,
+  0.7 % and 1.0 % of the smallest rev. 4 values above; nothing in the measurements contradicts the
+  derivation.
+- Detection power (plane rows): a burn applied about the wrong axis or with a mis-signed W
+  component rotates the plane by ≈ ‖Δv‖/v (≈ 10⁻² rad on the grid), twelve orders of magnitude
+  above the tolerance.
+- Layers: L1 closed form (exact maneuver, high precision) for every row; L2 element comparison per
+  VI-03 rows; L3 per §9.3.1.
+
 ### VT-16 Escape / surface intersection (L2b)
 
 - Quantity: hyperbolic or sub-surface arcs vs the RK reference; warning present.
@@ -864,6 +1108,32 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
   noise of the decision quantity, so the expected warning is unambiguous. Detection semantics
   (analytic perigee vs sampled radius; whether the perigee passage must fall inside the span) are
   owned by ML-TASK-016/017 (contract §8.3) and not decided (**open item O-5**).
+- **Revision 4 (P-3).** Detection semantics are fixed by contract §8.3 and §11.3 D1–D8 (owner,
+  2026-11-13); this record does not change them. The hyperbolic budget is written out and
+  evaluated in §6.8 (P_E,gen, V_E,gen, with 10κ_E·a → 10κ_E·r_max). O-5 is closed (§12).
+  - *Hyperbolic arc vs L2b:* ‖Δr‖ ≤ M·P_E,gen(Δt) + 2E_RK,r, ‖Δv‖ ≤ M·V_E,gen(Δt) + 2E_RK,v, the
+    approved form. The engine part M·P_E,gen, M·V_E,gen is evaluated in §6.8. The L2 hyperbolic
+    datasets of conformance run 2 carry no reference trajectory (`stateComparison: null`); the L2b
+    trajectory and its E_RK are produced and committed in part D2 before the engine comparison
+    (§4.1 item 1; an E_RK above the §9.2 target is a loosening for §15). Hyperbolic arcs vs L2a are
+    not defined (L2a is the elliptic Newton–Kepler method).
+  - *Maneuver at m > 0* (`c3-midrun-escape`): the reference arc starts from the engine's event
+    state (`position_m`, `velocityAfter_mps`), as for VT-05 post-maneuver segments; Δt = t − m.
+  - *Validity condition.* The approved condition \|E\| ≥ 0.1(v²/2 + μ/r) at the start of the arc
+    is kept as the rule in force. Only `c3-midrun-escape` (0.2145) meets it. `escape-clear` and
+    `l3-orekit-c1-escape-prograde` (0.0786), `hyperbolic-inbound` and `hyperbolic-outbound`
+    (0.0549) do not. The §6.8 derivation uses no property of E beyond E > 0 (every factor, κ_E
+    included, is taken on the arc), so the 0.1 limit is not needed by the bound; it protected the
+    elliptic closed forms, which §6.8 no longer uses. **Proposal for owner decision (§15):** lower
+    the condition to \|E\| ≥ 0.05(v²/2 + μ/r), which brings the four arcs above into the toleranced
+    set with the §6.8 values (κ_E ≤ 24.3). Near-parabolic arcs below 0.05 (`just-unbound`, 10⁻³;
+    `exactly-parabolic`) stay excluded from state comparison: κ_E grows like the inverse of the
+    ratio and the \|a\|-scaled rows of §6.8 lose meaning as \|a\| → ∞; no budget is claimed there.
+    Until the owner decides, the four arcs are compared for warnings only and their state values are
+    reported, not asserted.
+  - *Elliptic sub-surface arcs* keep the approved treatment (§6.3 at the post-maneuver (a, e), VT-05
+    post-maneuver rule), as used in conformance run 2.
+  - Layers: warnings L2 (analytic classification); hyperbolic states L2b (D2) and L3 (§9.3.1).
 
 ### VT-17, VT-18, VT-19 — exact (§1).
 
