@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-15",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Bounded review of tolerance record rev. 4: arithmetic confirmed (31 values), three blocking items; the Verification Engineer is applying the fixes. The forced loosening is withdrawn (not needed).",
+  "headline": "Tolerance record revision 4 is reviewed and fixed (PR #31): no loosening left. Waiting on the owner to sign it; then conformance run 3 on the gaps and the Orekit data.",
   "gates": [
     {
       "id": "G0",
@@ -33,7 +33,7 @@
   "ownerActions": [
     {
       "id": "OA-29",
-      "text": "After the bounded Systems Architect review: approve tolerance record revision 4 (PR #31): the new rows, the forced +0.073 % loosening of VT-15 c3-apogee-circularise, and lowering the VT-16 validity condition from 0.1 to 0.05.",
+      "text": "Approve tolerance record revision 4 (PR #31, reviewed and fixed): the new rows, the comparison-mode rule, new dataset versions for re-evaluated cases (§4.1 item 5) and the VT-16 validity condition 0.1 → 0.05. No loosening remains. Also merge PR #32 (status).",
       "blocking": "ML-TASK-018 D2 (conformance run 3)"
     },
     {
@@ -382,6 +382,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-15",
+      "who": "Coordinator",
+      "text": "Checked the rev. 4 review fixes: only the two allowed files changed, format passes, §4.1 item 5 and the B1 rule present, χ²C coefficient 8, the C3 value 1.595e-14 recomputed (143.7u). Pushed to PR #31."
+    },
+    {
+      "date": "2026-11-15",
+      "who": "Verification",
+      "text": "Rev. 4 review fixes done (6 commits): B1, B2 (§4.1 item 5), B3 (inbound 2.2341e-5 m, outbound 1.2691e-5 m, matching the reviewer), C3 loosening withdrawn, N1, N2, N4, N3 wording."
+    },
     {
       "date": "2026-11-15",
       "who": "Verification",
