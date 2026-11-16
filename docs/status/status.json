@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "ML-TASK-021 delivered (PR #45): scenario store, five result states and the engine in a Web Worker; 1630 tests and 4 e2e pass. Waiting on the owner for the default scenario values; the editor and 3D scene still wait on the mock-up choice (OA-14).",
+  "headline": "ML-TASK-021 merged: the workspace has its store, five result states and the engine in a Web Worker. The rest of Phase 2 (editor, 3D scene, timeline, model panel) waits on the mock-up choice (OA-14).",
   "gates": [
     {
       "id": "G0",
@@ -32,11 +32,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-36",
-      "text": "PR #45 (ML-TASK-021): confirm the default scenario (2026-01-01, a 7000 km, e 0.01, i 45°, 6000 s, step 60 s) and that a physical edit in the error state keeps it in error until the next run; then merge.",
-      "blocking": "ML-TASK-022 (editor)"
-    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -239,8 +234,8 @@
           "title": "Scenario store, result states, worker host",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "PR #45; owner confirms defaults (OA-36)"
+          "status": "done",
+          "deps": "Merged (PR #45)"
         },
         {
           "id": "ML-TASK-022",
@@ -383,6 +378,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Owner",
+      "text": "Confirmed the default scenario values and the error-state rule of ML-TASK-021; PR #45 merged (merge commit), CI green."
+    },
     {
       "date": "2026-11-16",
       "who": "Coordinator",
