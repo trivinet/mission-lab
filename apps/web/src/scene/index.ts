@@ -1,0 +1,1 @@
+export { WorkspaceScene } from './WorkspaceScene';

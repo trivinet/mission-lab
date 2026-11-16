@@ -1,4 +1,5 @@
 import { DebugSurface } from './debug/DebugSurface';
+import { WorkspaceScene } from './scene';
 
 export function App() {
   return (
@@ -8,6 +9,9 @@ export function App() {
       </header>
       <main aria-label="Workspace" data-testid="workspace" className="flex-1 p-4 text-neutral-300">
         <DebugSurface />
+        <div className="mt-4">
+          <WorkspaceScene />
+        </div>
       </main>
     </div>
   );
