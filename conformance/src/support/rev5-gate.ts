@@ -1,28 +1,19 @@
 /**
  * Gate for the conformance tests that use tolerance record revision 5 (ML-TASK-018 part D3;
- * tolerances.md §4.1 item 6). The engine must not be run against revision 5 before the owner signs
- * it (§4.1, §15). Two locks, both needed to run the gated tests:
+ * tolerances.md §4.1 item 6). The engine must not be run against revision 5 unless the owner has
+ * signed it (§4.1, §15).
  *
- *  1. The switch: environment variable ML_CONFORMANCE_REV5=1. Without it the gated suites are
- *     skipped (`describe.skipIf`), so `pnpm test` never runs them and never calls the engine for them.
- *  2. The record: with the switch set, `rev5Enabled()` reads docs/verification/tolerances.md and
- *     throws unless its header records the owner's approval of revision 5 or of a later revision
- *     (`recordApprovesRev5`, below). The throw happens when the test file is collected, before any
- *     test body (and so before any engine call) runs.
- *
- * Phase 2 (after the owner has signed revision 5 and the Coordinator has updated the status line):
- *   ML_CONFORMANCE_REV5=1 pnpm vitest run --project conformance
- * (writer step for the restarted c1 arc: see conformance/l3-restart-r5/README.md).
- *
- * After the phase-2 run report is accepted (review N5; record §4.1 item 6): the switch (lock 1) is
- * removed, so the tests run in every normal `pnpm test` and in CI; lock 2 stays and is then always
- * satisfied, also when a later revision is proposed.
+ * History: during phase 1 the suites also needed the switch ML_CONFORMANCE_REV5=1. The owner signed
+ * revision 5 on 2026-11-16 and accepted the phase-2 run report (conformance-run-4.md) on 2026-11-16,
+ * so the switch was removed (review N5; record §4.1 item 6) and the suites run in every normal
+ * `pnpm test` and in CI. The record lock stays: `rev5Enabled()` reads
+ * docs/verification/tolerances.md and throws unless its header records the owner's approval of
+ * revision 5 or of a later revision (`recordApprovesRev5`, below). The throw happens when the test
+ * file is collected, before any test body (and so before any engine call) runs.
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-export const REV5_SWITCH = 'ML_CONFORMANCE_REV5';
 
 const RECORD = join(
   fileURLToPath(new URL('.', import.meta.url)),
@@ -58,15 +49,14 @@ export function recordApprovesRev5(text: string): boolean {
 }
 
 /**
- * Whether the gated revision-5 suites run. False unless the switch is set; with the switch set,
- * throws (failing the file at collection, before any engine call) unless the record is approved.
+ * Record lock for the revision-5 suites. Returns true when the record approves revision 5; throws
+ * otherwise (failing the file at collection, before any engine call).
  */
 export function rev5Enabled(): boolean {
-  if (process.env[REV5_SWITCH] !== '1') return false;
   const text = readFileSync(RECORD, 'utf8');
   if (!recordApprovesRev5(text)) {
     throw new Error(
-      `${REV5_SWITCH}=1 but docs/verification/tolerances.md does not record the owner's approval of revision 5; the gated revision-5 conformance tests must not run against the engine before that (tolerances.md §4.1 item 6, §15).`,
+      `docs/verification/tolerances.md does not record the owner's approval of revision 5; the revision-5 conformance tests must not run against the engine before that (tolerances.md §4.1 item 6, §15).`,
     );
   }
   return true;

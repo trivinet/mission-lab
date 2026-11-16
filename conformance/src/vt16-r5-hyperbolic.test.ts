@@ -1,7 +1,8 @@
 /**
  * Revision-5 hyperbolic conformance (tolerances.md revision 5 §4.1 item 6, §6.8, §7 VT-16, §9.3.1,
- * §9.3.2 item 6; ML-TASK-018 part D3). GATED: runs only with ML_CONFORMANCE_REV5=1 and once the
- * record's header records the owner's approval of revision 5 (support/rev5-gate.ts). Committed in
+ * §9.3.2 item 6; ML-TASK-018 part D3). Runs in every normal `pnpm test` (switch removed after the owner accepted
+ * conformance-run-4.md); the record lock of support/rev5-gate.ts still refuses to run unless the
+ * record's header records the owner's approval of revision 5. Committed in
  * phase 1 before any engine run on these cases.
  *
  * One file on purpose (review N2): the asserted state rows depend on the extended O-1 check in
@@ -151,7 +152,7 @@ function expectO1Passed(): void {
   ).toBe(true);
 }
 
-describe.skipIf(!enabled)('1. O-1 on hyperbolic arcs (revision 5, GATED)', () => {
+describe('1. O-1 on hyperbolic arcs (revision 5)', () => {
   it.each(o1Cases)(
     '$file $label',
     (c) => {
@@ -238,7 +239,7 @@ function compareSeg(
   return f;
 }
 
-describe.skipIf(!enabled)('2. VT-16 hyperbolic arcs vs L2b (revision 5, ASSERTED, GATED)', () => {
+describe('2. VT-16 hyperbolic arcs vs L2b (revision 5, ASSERTED)', () => {
   it.each(l2)('$file', ({ file, data }) => {
     const req = data.inputs.request;
     const mu = req.constants.mu_m3ps2;
@@ -312,7 +313,7 @@ if (enabled && process.env.ML_WRITE_R5_EVENT_STATES === '1') {
   );
 }
 
-describe.skipIf(!enabled)('3. L3 VT-16 hyperbolic segment 1 (revision 5, ASSERTED, GATED)', () => {
+describe('3. L3 VT-16 hyperbolic segment 1 (revision 5, ASSERTED)', () => {
   it.each(l3)('$file', ({ file, caseId, data, tol }) => {
     const s1 = obj(obj(tol.tolerance).segment1);
     const result = resultOf(file, data.inputs.requestBody);
