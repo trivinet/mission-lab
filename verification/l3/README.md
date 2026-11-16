@@ -60,6 +60,9 @@ unchanged. The generator is committed before the datasets are generated; `selfch
 checks with `git diff` that the generator has not changed since the recorded commit, regenerates
 every file into a temporary directory and compares the bytes.
 
+When an engine change makes the restarted arcs stale (`--restart` directories), follow
+[`docs/verification/l3-restart-procedure.md`](../../docs/verification/l3-restart-procedure.md).
+
 ## Conventions decided here (Orekit ↔ contracts)
 
 | Topic | Contract (contracts-v1.md, ADR-004) | Orekit call | Notes |

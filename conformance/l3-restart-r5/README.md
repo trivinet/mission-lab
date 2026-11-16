@@ -36,3 +36,6 @@ the variable (step 1 still needs `ML_WRITE_R5_EVENT_STATES=1` to rewrite the eve
 record lock stays; it accepts any header that records revision 5 as approved, including a later
 revision while it is proposed ("Revision 5 was approved by the owner on YYYY-MM-DD"; tolerances.md
 §4.1 item 6).
+
+**When an engine change makes these arcs stale:** see
+[`docs/verification/l3-restart-procedure.md`](../../docs/verification/l3-restart-procedure.md).
