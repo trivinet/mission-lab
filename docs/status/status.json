@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Phase 2: editor (022) built but partly blocked: apps/web may not import the engine core, so derived values, degenerate note and angle normalisation wait on ML-TASK-027 (simulation API, running). 3D scene (023) still running.",
+  "headline": "Phase 2: 3D scene (023) done with exact VI-02 (918 components, 0 mismatches); editor (022) built. Both wait on ML-TASK-027 (simulation API for derived values, degenerate convention, angles, UTC, Earth radius and ERA); then one integration step joins them.",
   "gates": [
     {
       "id": "G0",
@@ -240,8 +240,8 @@
           "title": "3D scene: Earth, trajectory, markers, camera",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_progress",
-          "deps": "Contract in PR #47; agent running"
+          "status": "in_review",
+          "deps": "Done on its branch; integrate with 022 after 027"
         },
         {
           "id": "ML-TASK-024",
@@ -261,7 +261,7 @@
         },
         {
           "id": "ML-TASK-027",
-          "title": "Scenario-view API in simulation for the editor (derived values, degenerate convention, angles, UTC label)",
+          "title": "Scenario-view API in simulation (derived values, degenerate convention, angles, UTC label, Earth radius, ERA)",
           "role": "Astrodynamics Engineer",
           "model": "opus",
           "status": "in_progress",
@@ -376,6 +376,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Frontend",
+      "text": "ML-TASK-023 delivered: three/R3F scene, scale 1e-6 per metre, VI-02 exact (Object.is on 918 components across 3 scenarios, 0 mismatches; a 1.0000001 scale mutation fails 4 tests), display options never run, 9 e2e pass. Reference radius and ERA arithmetic moved to ML-TASK-027."
+    },
     {
       "date": "2026-11-16",
       "who": "Astrodynamics",
