@@ -33,11 +33,6 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-15",
-      "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
-      "blocking": "Publishing the textbook assessment"
-    },
-    {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
       "blocking": "Nothing in Mission Lab"
@@ -148,8 +143,8 @@
           "title": "External references (Orekit / GMAT / textbook)",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_review",
-          "deps": "Part B merged (PR #29); part A awaits OA-15",
+          "status": "done",
+          "deps": "Closed: Orekit merged; textbook assessment published without book values (PR #48)",
           "approval": true
         },
         {
@@ -373,6 +368,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Owner",
+      "text": "OA-15 decided (option 1): the Wakker assessment is published without any value from the book; ML-TASK-012 closed (PR #48)."
+    },
     {
       "date": "2026-11-16",
       "who": "Frontend",
