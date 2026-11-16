@@ -2,7 +2,9 @@
 
 **Document ID:** ML-VER-001 · **Date:** 2026-11-11 · **Author:** Coordinator (to be owned by the Verification Engineer) · **Status:** Approved at gate G0 (owner, 2026-11-11)
 
-Implements ADR-003. No test described here has been written or executed yet.
+Implements ADR-003. Written at G0, before any test existed. By G1 the VT-01…VT-16, VT-18 and
+VT-19 tests exist and pass; see the [G1 verification report](G1-verification-report.md). VT-17
+has no test yet (§8, revision history).
 
 ## 1. Principles
 
@@ -25,9 +27,10 @@ L2 methods: (a) classical elements with Newton solution of Kepler's equation; (b
 high-order Runge–Kutta integration of the equations of motion with a step-halving convergence
 check; (c) direct rotation-matrix construction for element→state and RSW→inertial.
 
-L3 status: **not available yet.** It needs either textbook examples transcribed from a physical
-or licensed copy with page citation, or an external tool run. Both need owner input (decision
-D-5). Example values are never written from an agent's memory.
+L3 status (G1, 2026-11-16): **Orekit L3 exists** (`test-data/l3-orekit/`, ML-TASK-012 part B,
+owner decision D-5). **Textbook L3 does not exist**; it awaits owner decision OA-15. The L3
+gaps are listed in the [G1 verification report](G1-verification-report.md) §3. Example values
+are never written from an agent's memory.
 
 ## 3. Test families
 
@@ -120,7 +123,14 @@ PRs that touch `apps/web`. A PR cannot merge with a failing or skipped numerical
 
 | Gate | Evidence |
 |---|---|
-| G1 (engine) | VT-01…VT-19 pass; tolerance record approved; verification report listing which layers back each family, with L3 gaps stated explicitly |
+| G1 (engine) | VT-01…VT-16, VT-18 (without the FR-011 AC3 part) and VT-19 pass; tolerance record approved; verification report listing which layers back each family, with L3 gaps stated explicitly |
 | G2 (workspace) | VI-01, VI-02, VE-02 pass |
-| G3 (analysis) | VI-03, VE-01 pass |
+| G3 (analysis) | VI-03, VE-01 pass; VT-17 and the FR-011 AC3 part of VT-18 pass (moved from G1 with persistence, ML-TASK-033) |
 | G4 (release) | Full suite green on the release commit; performance record; owner walkthrough of §14 |
+
+Revision history:
+
+- 2026-11-16: §8 amended. G1 no longer requires VT-17 or the FR-011 AC3 part of VT-18; both move
+  to G3 with ML-TASK-033, because persistence does not exist before Phase 3 (owner decision,
+  [G1-review.md](../releases/G1-review.md) B.1). Preamble and §2 L3 status updated (Orekit L3
+  exists; textbook L3 awaits OA-15). No other change.
