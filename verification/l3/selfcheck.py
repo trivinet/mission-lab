@@ -19,14 +19,25 @@ no bound is invented here; where the record has none, the measured value is repo
    bounds), Orekit Δv_I vs ΔvR·R + ΔvS·S + ΔvW·W (VT-12 bound), velocityAfter = velocityBefore
    + Δv_I bit-exact (R12), ‖Δv_I‖ vs ‖Δv_RSW‖ (VT-13 physics cross-check), Orekit a⁺, e⁺, i⁺ vs
    binary64 closed forms (VT-15 terms (ii)+(iii), e-vector 60u, VI-03(b) i row).
-4. Hyperbolic segments: energy and angular-momentum deviations and the Kepler time-of-flight
-   residual (hyperbolic Kepler equation in 40-digit decimal arithmetic) are measured (info; the
-   record has no evaluated hyperbolic budget, §7 VT-16 / open item O-5).
+4. Hyperbolic segments (A6′ for Orekit's hyperbolic propagation; open item O-13, criterion of
+   tolerances.md revision 5, §9.3.1 "A6′ hyperbolic criterion"): on every sample, the energy
+   deviation, the angular-momentum deviation and the Kepler time-of-flight residual (hyperbolic
+   Kepler equation in 40-digit decimal arithmetic) are checked pass/fail against 2× the §6.8 engine
+   bounds mapped into each measured quantity, with the margin M and the test's own evaluation
+   error: energy M[10uκ_E + 2τ_E,gen(Δt)], angular momentum M[6uκ_h + 2τ_h,gen(Δt)], time of flight
+   M·2·B_tof(Δt). Arc-wide factors from the segment's first state (reference side, §6.8 N4). Arcs
+   below the §7 VT-16 validity gate (E/(v²/2 + μ/r) < 0.05 at the start) are measured only (info;
+   the record claims no bound there).
 5. --repro: the generator files are unchanged since the commit recorded in the datasets, and a
    fresh run of generate.py with the recorded revision and date reproduces every file
    byte-for-byte.
+6. --restart DIR (optional): the invariant checks of items 2 and 4 on Orekit arcs restarted from
+   engine event states (tolerances.md §9.3.2; files with outputs.t_s, position_m, velocity_mps).
 
 Exit status 0 only if every pass/fail check passes.
+
+The generator files (generate.py, l3lib.py, cases.py) are not changed by the hyperbolic checks
+(ML-TASK-018 part D3): the hyperbolic formulas live in this file only.
 """
 
 from __future__ import annotations
@@ -103,7 +114,7 @@ class Report:
     def print(self):
         for case, name, meas, bound, ratio, status, src in self.rows:
             b = "-" if bound is None else f"{bound:.3e}"
-            r = "-" if ratio is None else f"{ratio:.3f}"
+            r = "-" if ratio is None else f"{ratio:.3g}"
             print(f"{status:4} {case:52} {name:34} {meas:.3e} {b:>10} {r:>7}  {src}")
         n = sum(1 for r in self.rows if r[5] != "info")
         print(f"\n{n} pass/fail checks, {self.failures} failures; "
@@ -189,16 +200,146 @@ def check_invariants(rep, case, label, t0, ts, rs, vs):
         rep.check(case, f"{label} ang. momentum (worst)", worst_h[0], worst_h[1],
                   "VT-07 with 2×engine part (A6)")
     else:
-        de = max(abs(energy(r, v) - E0) for r, v in zip(rs, vs)) / abs(E0)
-        dh = max(dist(cross(r, v), h0) for r, v in zip(rs, vs)) / norm(h0)
-        rep.info(case, f"{label} hyperbolic energy max dev", de, "no evaluated bound (O-5)")
-        rep.info(case, f"{label} hyperbolic |Δh|/h max", dh, "no evaluated bound (O-5)")
-        rep.info(case, f"{label} hyperbolic Kepler TOF max |δt| (s)",
-                 hyperbolic_tof_residual(t0, ts, rs, vs), "40-digit decimal, no bound")
+        check_hyperbolic(rep, case, label, t0, ts, rs, vs)
 
 
-def hyperbolic_tof_residual(t0, ts, rs, vs):
-    """max |(t − t0) − √(−a³/μ)[(e sinh H − H) − (e sinh H0 − H0)]| with H from each state:
+# --- 4. hyperbolic arcs: A6′ criterion (tolerances.md revision 5, §6.8, §9.3.1; O-13) -----------
+
+VT16_VALIDITY_GATE = 0.05  # §7 VT-16, owner decision 2026-11-15 (E/(v²/2 + μ/r) at the start)
+
+
+def _solve_hyperbolic_kepler(Mh, e):
+    """e sinh F − F = Mh by Newton (binary64; tolerance evaluation only)."""
+    F = math.asinh(Mh / e)
+    for _ in range(100):
+        step = (e * math.sinh(F) - F - Mh) / (e * math.cosh(F) - 1)
+        F -= step
+        if abs(step) <= 4e-16 * max(1.0, abs(F)):
+            return F
+    raise RuntimeError("hyperbolic Kepler: no convergence")
+
+
+class HypArc:
+    """§6.8 arc-wide factors of a hyperbolic arc from its first state (r0, v0) and the Δt of its
+    last sample, evaluated in binary64 from the reference side (here: the Orekit segment's first
+    state, which is the input of Orekit's propagation; §4.1 item 2, §6.8 review N4)."""
+
+    def __init__(self, r0v, v0v, dt_end):
+        mu = MU_M3PS2
+        self.r0 = norm(r0v)
+        v2 = dot(v0v, v0v)
+        self.v0 = math.sqrt(v2)
+        rv = dot(r0v, v0v)
+        self.E = v2 / 2 - mu / self.r0
+        if not self.E > 0:
+            raise ValueError("HypArc: E ≤ 0")
+        self.h = norm(cross(r0v, v0v))
+        self.ratio = self.E / (v2 / 2 + mu / self.r0)
+        self.a = mu / (2 * self.E)  # |a|
+        self.e = math.sqrt(1 + 2 * self.E * self.h * self.h / (mu * mu))
+        self.p = self.h * self.h / mu
+        self.n = math.sqrt(mu / self.a**3)
+        self.sinhF0 = rv / (math.sqrt(mu * self.a) * self.e)
+        self.coshF0 = (1 + self.r0 / self.a) / self.e
+        self.F0 = math.asinh(self.sinhF0)
+        self.q0 = self.r0 * self.v0 / math.sqrt(mu * self.a)
+        self.cosphi0 = self.h / (self.r0 * self.v0)
+        x_end, r_end = self.at(dt_end)
+        passed = self.F0 < 0 <= self.F0 + x_end
+        self.r_min = self.a * (self.e - 1) if passed else min(self.r0, r_end)
+        self.r_max = max(self.r0, r_end)
+        self.v_max = math.sqrt(mu * (2 / self.r_min + 1 / self.a))
+        self.g_max = mu / self.r_min**2
+        self.kappa_E = 1 + 4 * self.a / self.r_min
+        # max of r v / h on the arc: r v = √(μ(2r + r²/|a|)) increases with r
+        self.kappa_h = self.r_max * math.sqrt(mu * (2 / self.r_max + 1 / self.a)) / self.h
+        Kb = self.r0 * (1 + 2 * self.r_max / self.p) + self.r_max / self.cosphi0 + self.r_max
+        Kbv = 2 * self.v_max + 2 * (1 + 2 * self.r0 / self.p) * self.v0
+        self.P_b = U * (20 * Kb + 10 * self.kappa_E * self.r_max + 2 * self.a)
+        self.V_b = U * (20 * Kbv + 5 * self.kappa_E * self.v_max + 2 * self.a * self.v0 / self.r_min)
+        # TOF measurement conditioning: 1/(e cosh F + e sinh F) = e^(−F)/e ≤ e^(−F0)/e on the arc
+        self.w = max(1.0, math.exp(-self.F0) / self.e)
+
+    def at(self, dt):
+        F = _solve_hyperbolic_kepler(self.e * self.sinhF0 - self.F0 + self.n * dt, self.e)
+        return F - self.F0, self.a * (self.e * math.cosh(F) - 1)
+
+    def terms(self, dt):
+        """ε_t,gen, δt_g,gen, δt_ph of §6.8 at Δt (seconds)."""
+        x, r = self.at(dt)
+        ch, sh = math.cosh(x), math.sinh(x)
+        cm1, smx = ch - 1, sh - x
+        e, sF, ra = self.e, abs(self.sinhF0), self.r0 / self.a
+        t1, t2, t3 = e * self.sinhF0 * cm1, e * self.coshF0 * smx, ra * x
+        s_eval = (
+            (3 * self.q0 + 2 * e * sF) * cm1
+            + e * sF * (2.5 * x * sh + 2 * ch + 8 * cm1)
+            + (4 * ra + e * self.coshF0) * smx
+            + e * self.coshF0 * (2.5 * x * cm1 + 2 * sh + 11.5 * smx)
+            + 4 * ra * x
+            + 2 * (abs(t1) + abs(t2) + abs(t3))
+            + 2 * self.n * dt
+        )
+        eps = U * (2 * s_eval + (r / self.a) * x) / self.n
+        dtg = U * (2.5 * x * cm1 + 2 * sh + 12.5 * smx) / self.n
+        dtph = U * (7.5 * self.kappa_E * dt + dt + 2.5 * x * self.r_max / (self.a * self.n))
+        return eps, dtg, dtph
+
+    def bounds(self, dt):
+        """A6′ criterion (revision 5 §9.3.1): energy (relative), |Δh|/h, TOF residual (s)."""
+        eps, dtg, dtph = self.terms(dt)
+        off = eps + dtg  # off-orbit time-like error δt_off (§6.1 item 4, §6.8)
+        tau_E = (
+            self.v_max * self.V_b
+            + self.g_max * self.P_b
+            + (self.g_max * self.v_max + 2 * self.v_max**3 / self.r_min) * off
+        ) / self.E
+        tau_h = (
+            self.P_b * self.v_max
+            + self.r_max * self.V_b
+            + (self.v_max**2 + 2 * self.v_max**2 * self.r_max / self.r_min) * off
+        ) / self.h
+        P_off = self.P_b + self.v_max * off
+        V_off = self.V_b + (2 * self.v_max**2 / self.r_min) * off
+        b_tof = dtph + eps + (self.w / self.n) * (
+            (P_off * self.v_max + self.r_max * V_off) / math.sqrt(MU_M3PS2 * self.a) + P_off / self.a
+        )
+        return (
+            M_MARGIN * (10 * U * self.kappa_E + 2 * tau_E),
+            M_MARGIN * (6 * U * self.kappa_h + 2 * tau_h),
+            M_MARGIN * 2 * b_tof,
+        )
+
+
+def check_hyperbolic(rep, case, label, t0, ts, rs, vs):
+    r0, v0 = rs[0], vs[0]
+    E0 = energy(r0, v0)
+    h0 = cross(r0, v0)
+    des = [abs(energy(r, v) - E0) / abs(E0) for r, v in zip(rs, vs)]
+    dhs = [dist(cross(r, v), h0) / norm(h0) for r, v in zip(rs, vs)]
+    tofs = hyperbolic_tof_residuals(t0, ts, rs, vs)
+    arc = HypArc(r0, v0, ts[-1] - t0)
+    if not arc.ratio >= VT16_VALIDITY_GATE:
+        rep.info(case, f"{label} hyperbolic energy max dev", max(des), "below the §7 VT-16 gate")
+        rep.info(case, f"{label} hyperbolic |Δh|/h max", max(dhs), "below the §7 VT-16 gate")
+        rep.info(case, f"{label} hyperbolic Kepler TOF max |δt| (s)", max(tofs), "below the gate")
+        return
+    worst = {"E": (0.0, 1.0), "h": (0.0, 1.0), "t": (0.0, 1.0)}
+    for t, de, dh, dtof in zip(ts, des, dhs, tofs):
+        if t == t0:
+            continue  # first sample = event state (R8), deviation 0 by construction
+        be, bh, bt = arc.bounds(t - t0)
+        for key, meas, bound in (("E", de, be), ("h", dh, bh), ("t", dtof, bt)):
+            if meas / bound > worst[key][0] / worst[key][1]:
+                worst[key] = (meas, bound)
+    src = "A6′ hyperbolic, tolerances.md rev. 5 §9.3.1"
+    rep.check(case, f"{label} hyp. energy (worst sample)", *worst["E"], f"{src}: M[10uκ_E + 2τ_E,gen]")
+    rep.check(case, f"{label} hyp. ang. momentum (worst)", *worst["h"], f"{src}: M[6uκ_h + 2τ_h,gen]")
+    rep.check(case, f"{label} hyp. Kepler TOF |δt| (s)", *worst["t"], f"{src}: M·2·B_tof")
+
+
+def hyperbolic_tof_residuals(t0, ts, rs, vs):
+    """Per sample |(t − t0) − √(−a³/μ)[(e sinh H − H) − (e sinh H0 − H0)]| with H from each state:
     e cosh H = 1 − r/a, e sinh H = r·v/√(−μa), H = ln((e cosh H + e sinh H)/e). Exact decimal
     images of the binary64 states, 40 significant digits."""
     getcontext().prec = 40
@@ -228,12 +369,11 @@ def hyperbolic_tof_residual(t0, ts, rs, vs):
 
     m0 = mean_anom(r0, v0)
     k = (-(a**3) / mu).sqrt()
-    worst = Decimal(0)
+    out = []
     for t, r, v in zip(ts, rs, vs):
         dt = Decimal(t) - Decimal(t0)
-        res = abs(dt - k * (mean_anom(D3(r), D3(v)) - m0))
-        worst = max(worst, res)
-    return float(worst)
+        out.append(float(abs(dt - k * (mean_anom(D3(r), D3(v)) - m0))))
+    return out
 
 
 def check_closure(ok, rep, case, r0, v0):
@@ -379,6 +519,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--data", default=str(l3lib.REPO_ROOT / l3lib.DATA_SUBDIR))
     ap.add_argument("--repro", action="store_true")
+    ap.add_argument("--restart", default=None,
+                    help="also check the Orekit arcs restarted from engine event states in DIR")
     args = ap.parse_args(argv)
     data_dir = Path(args.data)
     files = sorted(data_dir.rglob("*.json"))
@@ -399,6 +541,14 @@ def main(argv=None):
             cross_l2_vt05(rep, case, gid, d)
         else:
             check_maneuver(ok, rep, case, d)
+    if args.restart:
+        for p in sorted(Path(args.restart).glob("*.json")):
+            d = load(p)
+            out = d.get("outputs", {})
+            if not {"t_s", "position_m", "velocity_mps"} <= set(out) or len(out["t_s"]) < 2:
+                continue
+            check_invariants(rep, d.get("id", p.stem), "restarted", out["t_s"][0], out["t_s"],
+                             out["position_m"], out["velocity_mps"])
     if args.repro:
         check_repro(rep, data_dir, files)
     rep.print()

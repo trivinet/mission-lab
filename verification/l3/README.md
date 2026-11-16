@@ -38,7 +38,15 @@ ephemeris is loaded.
 | `cases.py` | Grid (plan §5) and maneuver case definitions |
 | `l3lib.py` | Orekit access, conventions, tolerance-record formulas, lossless JSON writer |
 | `generate.py` | Writes every dataset |
-| `selfcheck.py` | Validates the datasets before use; `--repro` adds the reproducibility check |
+| `selfcheck.py` | Validates the datasets before use; `--repro` adds the reproducibility check; `--restart DIR` also checks Orekit arcs restarted from engine event states (e.g. `conformance/l3-restart`) |
+
+Hyperbolic segments are checked pass/fail against the A6′ hyperbolic criterion of
+`docs/verification/tolerances.md` revision 5 §9.3.1 (open item O-13; ML-TASK-018 part D3): energy
+deviation, angular-momentum deviation and Kepler time-of-flight residual on every sample, against 2×
+the §6.8 engine bounds mapped into each quantity, with the margin M. Arcs below the §7 VT-16 validity
+gate (E/(v²/2 + μ/r) < 0.05 at the start) are reported as `info` only. These formulas live in
+`selfcheck.py`; the generator files (`generate.py`, `l3lib.py`, `cases.py`) are unchanged, so the
+datasets' `codeRevision` and the `--repro` check stay valid.
 
 Run from the repository root (`python` = the venv's interpreter; `-B` writes no bytecode):
 

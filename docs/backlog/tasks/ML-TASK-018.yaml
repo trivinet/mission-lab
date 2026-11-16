@@ -27,6 +27,7 @@ scope:
   - "Part B: first conformance run — VT-02, VT-03, VT-04, VT-05, VT-08 against the committed datasets with their stored tolerances; O-1 black-box residual check on the VT-05 grid plus a deterministic grid within the O-1 range; run report."
   - "Part C (two phases, commit boundary between them): phase 1 — independent references (RSW projection form in 320-bit, exact-maneuver closed forms, VT-16 classification, §5.2 grid) and datasets for VT-01, VT-06/07, VT-09, VT-11/12/13, VT-14, VT-15, VT-16, VT-18, VI-01 with tolerances evaluated from the approved record, without reading the engine; phase 2 — conformance tests on runSimulation results for VT-01, VT-06/07, VT-09 (exact), VT-10, VT-11…VT-16, VT-18, VI-01 and the −0 rule (§11.4 P3); run report conformance-run-2.md. Part C affected paths: verification/**, conformance/**, test-data/reference-cases/**, docs/verification/conformance-run-2.md, this file."
   - "Part D (owner directions of 2026-11-15 on P-1…P-4 of conformance-run-2.md §7, and the L3 Orekit datasets of ML-TASK-012 part B). D1: tolerance record revision 4 — VT-14 accepted at e = 0 only for G1 (O-11 open, not blocking); VT-15 tolerances for non-tangential burns and the orbit plane (direction term Δv·v·ε); VT-16 hyperbolic budget with the 10κ_E·a substitution (O-5 numeric part); O-4 checked against the approved documents; L3 Orekit rows for VT-02, VT-12, VT-15 and hyperbolic VT-16 and the rule for maneuvers at t > 0; status 'Proposed, awaiting owner approval'. D1 affected paths: docs/verification/tolerances.md, this file. D1 does not run the engine. D2 (later, only after the owner signs revision 4): conformance run on the P-1…P-4 gaps and on the L3 datasets, with the needed datasets (L2b hyperbolic trajectories, L3 restart arcs) and the selfcheck extension committed before any engine comparison."
+  - "Part D3 (owner decision of 2026-11-15: close O-12 and O-13 before the G1 report). Phase 1: tolerance record revision 5 (Proposed) — hyperbolic δt_α and the extended O-1 check (O-12), the A6′ hyperbolic selfcheck criterion (O-13), the rule by which the run-3 informative hyperbolic rows become asserted (§4.1 item 6), the L3 c1 restart (§9.3.2 item 6); O-13 pass/fail checks in verification/l3/selfcheck.py (generator files unchanged) and selfcheck --repro; the O-1 hyperbolic reference, its dataset o1-hyp-r5 and the gated conformance tests (extended O-1; asserted hyperbolic states L2b and L3), not run against the engine. Phase 1 affected paths: docs/verification/tolerances.md, this file, verification/l3/selfcheck.py and README.md (O-13 only), verification/src/**, conformance/**, test-data/reference-cases/** (new files only). Phase 2 (after the owner signs revision 5): run the gated tests, produce the c1 restarted arc, report."
   - "Later parts: CI wiring; G1 verification report."
 out_of_scope:
   - Changing engine code (packages/astrodynamics, packages/simulation) or apps/web.
@@ -292,3 +293,109 @@ report_part_d2:
     Systems Architect review of the D2 datasets, the restart procedure and conformance-run-3.md §7;
     owner decision on the O-12 reading; ML-TASK-012 follow-up for O-13; a plan for the restarted
     arcs in CI; then CI wiring and the G1 verification report.
+
+report_part_d3_phase1:
+  # Part D3 phase 1 (2026-11-15/16), branch test/ml-task-018d3-hyperbolic, not pushed. Engine not
+  # run on any new case; nothing under packages/ read beyond the export lines of the two index.ts.
+  commits:
+    - "6967f93 tolerance record revision 5 (Proposed): δt_α,hyp and the extended O-1 check (O-12), A6′ hyperbolic criterion (O-13), §4.1 item 6, §9.3.2 item 6, §12, §15"
+    - "35a548f selfcheck.py: pass/fail A6′ hyperbolic checks, --restart option (criterion committed before the run)"
+    - "a9d8a27 record: selfcheck result (500 checks, 0 failures); ratios printed with 3 significant digits"
+    - "35bbaa7 verification: tolerances-r5.ts (δt_α,hyp, threshold), o1-check-hyp.ts (320-bit residual), build-d3.ts, reference validation tests"
+    - "4f9ad50 dataset o1-hyp-r5 (codeRevision 35bbaa797879), before any engine run on it"
+    - "89469c6 PHASE 1 END: gated conformance tests (extended O-1; asserted VT-16 hyperbolic states L2b and L3), gate, c1 restart driver; not run against the engine"
+    - "this commit: this report"
+  files_changed:
+    - docs/verification/tolerances.md (revision 5, Proposed)
+    - verification/l3/selfcheck.py, verification/l3/README.md (O-13 only; generate.py, l3lib.py, cases.py unchanged)
+    - verification/src/tol/tolerances-r5.ts, verification/src/hp/o1-check-hyp.ts, o1-check-hyp.test.ts (new)
+    - verification/src/datasets/build-d3.ts, datasets-d3.test.ts (new); datasets.test.ts (D3 builder, ML_WRITE_DATASETS=D3); verification/src/index.ts (re-export o1HypResidual)
+    - test-data/reference-cases/o1-hyp-r5/ (7 new files)
+    - conformance/src/support/rev5-gate.ts, rev5-gate.test.ts, conformance/src/o1-hyperbolic-r5.test.ts, vt16-r5-hyperbolic-asserted.test.ts (new)
+    - conformance/l3-restart-r5/README.md, restart_r5.py (new; runs verification/l3-d2/restart.py unchanged)
+    - docs/backlog/tasks/ML-TASK-018.yaml (part D3 scope, this report)
+  summary: >
+    O-12: δt_α,hyp = 5uκ_E(r₀)D(x)/n_h derived from the §6.1 ∂F/∂α with cosh/sinh magnitudes
+    (closed form checked against finite differences in 60-digit decimal and 320-bit); extended O-1
+    check defined with threshold ε_t,gen + δt_α,hyp (no margin) on every Δt > 0 sample of the six
+    VT-16 hyperbolic arcs and a 96-case grid; thresholds committed as o1-hyp-r5 before any engine
+    run; reference validated (correctly rounded root within spacing on all 498 samples; a 1e-9
+    perturbation fails on all 498). O-13: A6′ hyperbolic criterion (energy M[10uκ_E + 2τ_E,gen],
+    ‖Δh‖/h M[6uκ_h + 2τ_h,gen], time of flight M·2·B_tof) in the record and selfcheck.py; selfcheck
+    --repro --restart conformance/l3-restart: exit 0, 500 checks, 0 failures, byte-identical
+    regeneration; worst hyperbolic ratios 9.6e-4 (energy, restarted c3), 9.6e-5 (‖Δh‖/h), 1.4e-4
+    (time of flight). Run-3 informative hyperbolic rows: asserted on the same dataset versions under
+    §4.1 item 6 (values committed before run 3, unchanged); L3 c1 compared with Orekit restarted
+    from the engine event state (§9.3.2 item 6). No loosening. Nothing tuned to run-3 or selfcheck
+    measured values.
+  tolerances:
+    - "O-1 check on hyperbolic arcs: none (NaN for α ≤ 0) → ε_t,gen + δt_α,hyp per sample; NEW (end of arcs: L2 escape-clear 1.097e-10 s, inbound 4.380e-10, outbound 1.354e-10, c3 4.105e-11; L3 c1 4.808e-10, c3 2.301e-10; grid 1.14e-13…2.25e-8 s)"
+    - "A6′ hyperbolic energy: info → M[10uκ_E + 2τ_E,gen(Δt)]; NEW (c1 2.087e-11…9.218e-11, c3 2.794e-12…1.649e-11)"
+    - "A6′ hyperbolic ‖Δh‖/h: info → M[6uκ_h + 2τ_h,gen(Δt)]; NEW (c1 7.946e-12…8.195e-11, c3 2.736e-12…2.393e-11)"
+    - "A6′ hyperbolic time of flight: info (rev-4 text compared it informally with 2(ε_t,gen + δt_ph), phase part only) → M·2·B_tof(Δt) incl. the off-orbit part; NEW, not a loosening (never a bound) (c1 3.764e-8…3.517e-7 s, c3 9.896e-9…7.683e-8 s)"
+    - "VT-16 hyperbolic states vs L2b (vt-16-r4) and vs L3 (l3-r4-vt-16 segment 1): values unchanged; informative → asserted (§4.1 item 6)"
+  tests_executed:
+    - "Decimal (60 digits) scratch script: ∂F/∂α closed form vs central finite difference, relative difference ≤ 1e-36 at 18 points; reproduces the approved §6.8 M·P_E,gen, M·V_E,gen end values of the six arcs to four digits"
+    - "Every o1-hyp-r5 number (498 samples: x, ε_t,gen, δt_α,hyp, threshold) vs decimal: threshold to 3.8e-15 relative (δt_α,hyp alone 1.5e-12 at small x, x 3.6e-14)"
+    - "selfcheck.py HypArc bounds (binary64) vs decimal on every L3 sample: 6.3e-16 relative"
+    - "python -B verification/l3/selfcheck.py --repro (orekit-venv) -> exit 0, 495 pass/fail, 0 failures, 66 info; with --restart conformance/l3-restart -> exit 0, 500 pass/fail, 0 failures (the second run already used the ratio print format of a9d8a27, output format only)"
+    - "verification project: o1-check-hyp.test.ts (finite difference, spacing, detection on 498 samples), datasets-d3.test.ts, datasets.test.ts (o1-hyp-r5 reproduces bit-for-bit) -> pass"
+    - "Gate: a normal run skips the 108 gated tests; with ML_CONFORMANCE_REV5=1 both gated files fail at collection ('does not record the owner's approval of revision 5'), no test body run"
+    - "pnpm install --frozen-lockfile -> exit 0; pnpm lint -> 0; pnpm typecheck -> 0; pnpm format:check -> 0; pnpm check:boundaries -> 0 (20/20)"
+    - "pnpm test -> exit 0, Test Files 68 passed (68), Tests 1366 passed | 108 skipped (1474); the 108 skipped are the gated revision-5 tests"
+  reference_data_used:
+    - "test-data/reference-cases/vt-16-r4 (reference start states, Δt), read only"
+    - "test-data/l3-orekit/vt-16 (Orekit event states, segment-1 times and states), read only; conformance/l3-restart (run-3 restarted arcs) for selfcheck --restart"
+  not_verified:
+    - "The engine's solver residual on hyperbolic arcs: the extended O-1 check is defined and gated, not run (phase 2)"
+    - "VT-16 hyperbolic states as asserted rows: gated (phase 2); L3 c1 needs its restarted arc (phase 2)"
+    - "Negative Δt on hyperbolic arcs (outside §6.8; the runner never propagates backwards)"
+    - "Near-parabolic arcs below the 0.05 gate (no bound claimed)"
+    - "VT-14 for e > 0 (O-11, unchanged: 'VT-14: e = 0 only')"
+  known_limitations:
+    - "The gate's second lock reads the record's status line; anyone able to edit the record could open it. It prevents accidental runs, not deliberate ones."
+    - "The A6′ hyperbolic bounds are loose (measurements ≤ 0.1 % of them), like the elliptic A6 check; they confirm A6′, they do not measure Orekit's accuracy."
+    - "restart_r5.py reuses restart.py by overriding its OUT_SUBDIR; the produced file keeps restart.py's id prefix 'l3-restart/' and script label."
+    - "Record, dataset, selfcheck change and gated tests are committed, not reviewed or approved."
+  documentation_changes:
+    - docs/verification/tolerances.md (revision 5)
+    - verification/l3/README.md (selfcheck hyperbolic criterion, --restart)
+    - conformance/l3-restart-r5/README.md (phase-2 procedure)
+  risks_or_blockers:
+    - "Owner signature of the revision-5 rows of §15 and an update of the record status line to 'Approved by the owner on YYYY-MM-DD' are required before phase 2 (the gate checks that line)."
+    - "verification/l3/selfcheck.py belongs to ML-TASK-012; changed here for O-13 only, as the owner was told."
+  review_artifact: ""   # no PR opened (instructed not to push)
+  recommended_next_action: >
+    Systems Architect review of revision 5 (δt_α,hyp, the A6′ time-of-flight mapping, §4.1 item 6)
+    and of the gate; owner signature of the revision-5 rows of §15. Phase 2: follow
+    conformance/l3-restart-r5/README.md (c1 event state, Orekit restart, selfcheck --restart, then
+    ML_CONFORMANCE_REV5=1 pnpm vitest run --project conformance) and write the run report.
+  review_fixes:
+    # Systems Architect bounded review of PR #35: "approve with non-blocking notes" N1–N7. Fixes on
+    # test/ml-task-018d3-hyperbolic, not pushed. Engine not read, not run.
+    commits:
+      - "8ac71f4 N1 grid supplement in code (O1_HYP_GRID_NEAR_GATE)"
+      - "f65f2b8 N1 o1-hyp-r5 regenerated (codeRevision 8ac71f4), never run against the engine"
+      - "2a1df51 N1 record: grid definition, counts and ranges"
+      - "f9babbf N2 O-1 check and asserted rows in one gated file; asserted tests require O-1 passed in the same run; both restart directories named"
+      - "7960a32 N3 superseded stored fields listed, incl. comparedWith of l3-r4-vt-16/c1"
+      - "a5b0b7b N4 c1 premise asserted inside the gated L3 block"
+      - "b7f5df6 N5 record lock accepts any approved revision ≥ 5; post-approval step defined"
+      - "1f2b0b0 N6 stale text (w, VT-16 L3 gate remark, §4.1 item 5)"
+      - "75502ee N7 R_ref note; check calls propagateKeplerUniversal directly"
+      - "this commit: this subsection"
+    resolution:
+      - "N1: 48 near-gate cases added (|a| 7e6, 3e7; e 1.1 and 1.17 at r₀/|a| = 0.22, gate ratio 0.0521, κ_E(r₀) 19.18, inbound and outbound; e 1.1 at F₀ = ±1; n_h Δt 0.05…20). Grid 96 → 144 cases, dataset 498 → 546 samples. Grid thresholds 1.14e-13…2.25e-8 s → 1.14e-13…2.71e-8 s (supplement 5.24e-13…2.71e-8 s); threshold/ε_t,gen up to 6.45 (was 5.16). The first 96 cases and the six arcs are unchanged. Checked twice: all 546 thresholds vs 60-digit decimal agree to 5.8e-15 relative; the 320-bit reference validation (spacing at the correctly rounded root, detection at 1e-9) passes on all 546."
+      - "N2: enforced in code (one file, conformance/src/vt16-r5-hyperbolic.test.ts, O-1 suite first; each asserted test fails unless all 150 O-1 cases ran and passed). Selfcheck (b) is a Python step, stated in §4.1 item 6 and the README as a condition for the run to count. Both restart directories named."
+      - "N3: §4.1 item 6 lists the superseded fields: assertion, assertionReason (vt-16-r4, l3-r4-vt-16 segment1) and comparedWith of l3-r4-vt-16/c1."
+      - "N4: asserted, gated: engine c1 event position_m and velocityBefore_mps bit-identical to initialState; ‖Δv_I,engine − Δv_I,Orekit‖ ≤ the approved L3 VT-12 row 3M(12κ_h + 25)u‖Δv‖ = 1.972e-10 m/s (κ_h = 1, ‖Δv‖ = 4000 m/s; binary64 and decimal). Deviation from the note: see disagreements."
+      - "N5: recordApprovesRev5 accepts revision ≥ 5 with status 'Approved by the owner on DATE', or revision ≥ 6 whose header says 'Revision 5 was approved by the owner on DATE'; refuses revision 5 Proposed and revision < 5 (unit tests). Switch kept until phase 2; after the phase-2 report is accepted the switch is removed and the tests run in pnpm test and CI (record §4.1 item 6, README, gate doc comment)."
+      - "N6: §9.3.1 w stated as w = 1 on both L3 arcs (with the numbers); VT-16 L3 row no longer says 'toleranced only if …'; §4.1 item 5 says the L3 datasets were run in run 3 with values committed before."
+      - "N7: 50 of 144 grid arcs have r_min < R_ref (15 of the first 96, 35 of the supplement; 32 start inside R_ref); the check calls propagateKeplerUniversal directly; a rejection would be a test-design artefact."
+    loosenings: "None. No approved value changed; the only new values are the 48 added grid thresholds."
+    tests_executed:
+      - "Decimal re-check of o1-hyp-r5 (546 samples): threshold 5.8e-15, ε_t,gen 3.5e-15 relative max difference"
+      - "Gate: normal run skips 156 gated tests (150 O-1 + 4 L2 + 2 L3); with ML_CONFORMANCE_REV5=1 the gated file fails at collection, no test body run"
+      - "pnpm install --frozen-lockfile, lint, typecheck, format:check, check:boundaries -> exit 0; pnpm test -> exit 0, 67 files, 1415 passed | 156 skipped"
+    disagreements:
+      - "N4 bound: the note asked for ≤ 2 × the VT-12 per-side bound, i.e. 2(12κ_h + 25)u‖Δv‖ = 3.29e-11 m/s, unmargined. I used the approved L3 VT-12 row 3M(12κ_h + 25)u‖Δv‖ = 1.972e-10 m/s instead: it is already approved for exactly this quantity (engine Δv_I vs Orekit Δv_I, §9.3.1), and an unmargined bound would be a new tolerance outside the margin policy of §3. Not a loosening (no approved value existed for 2× per side). The choice was not driven by the run-3 value (1.8e-12 m/s), which both bounds pass. If the reviewer prefers the tighter form, it is a one-line change in the gated test before phase 2."

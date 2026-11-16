@@ -1,12 +1,35 @@
 # M1 Tolerance Record
 
-**Document ID:** ML-VER-002 · **Date:** 2026-11-12 (revision 4: 2026-11-15) · **Author:** Verification Engineer (ML-TASK-010; revision 4: ML-TASK-018 part D1) · **Revision:** 4 · **Status:** Approved by the owner on 2026-11-15 (revision 4; see §15). Revision 3 was approved on 2026-11-13. Changes follow §4.1: any loosening needs owner sign-off before the engine is run against it
+**Document ID:** ML-VER-002 · **Date:** 2026-11-12 (revision 4: 2026-11-15; revision 5: 2026-11-15) · **Author:** Verification Engineer (ML-TASK-010; revision 4: ML-TASK-018 part D1; revision 5: ML-TASK-018 part D3) · **Revision:** 5 · **Status:** Approved by the owner on 2026-11-16 (revision 5; see §15). Revision 4 was approved by the owner on 2026-11-15, revision 3 on 2026-11-13; their approved content stays in force. Changes follow §4.1: any loosening needs owner sign-off before the engine is run against it
 
 Implements the tolerance policy of the [verification plan](m1-verification-plan.md) §4 (method fixed
 there) for the numerical families VT-01…VT-19 and the numeric parts of VI-01…VI-03. Nothing in this
-document was approved until the owner signed §15 (2026-11-13). The revision-4 additions are not
-approved until the owner signs the revision-4 rows of §15; until then the engine must not be run
-against them, nor against the L3 Orekit datasets (§4.1).
+document was approved until the owner signed §15 (2026-11-13). The revision-4 additions were
+approved by the owner on 2026-11-15. **The revision-5 additions (§4.1 item 6, §6.8 "α data error
+and extended O-1 check on hyperbolic arcs", §9.3.1 "A6′ hyperbolic criterion", §9.3.2 item 6) are
+not approved until the owner signs the revision-5 rows of §15; until then the engine must not be run
+against them.** The conformance tests that use them are gated (§4.1 item 6).
+
+**Changes in revision 5** (ML-TASK-018 part D3 phase 1; owner decision of 2026-11-15 to close open
+items O-12 and O-13 before the G1 report). (1) **O-12:** the α data error at fixed χ on a hyperbolic
+arc, δt_α,hyp, is derived from the §6.1 expression of ∂F/∂α with cosh/sinh magnitudes (§6.8); the
+closed form was checked against a high-precision finite difference. The O-1 black-box residual
+check is extended to hyperbolic arcs with the threshold ε_t,gen + δt_α,hyp, the time equation
+evaluated in high precision as in §6.1, on every sample with Δt > 0 of the six VT-16 hyperbolic arcs
+and on a 144-case grid (§6.8). Its per-sample thresholds are a new dataset (`o1-hyp-r5`), committed
+before any engine run on it. O-12 is closed for its definition; the evidence is the phase-2 run
+(§12). (2) **O-13:** the A6′ criterion for Orekit's hyperbolic propagation is stated as pass/fail
+bounds on the energy, angular-momentum and time-of-flight measurements of `selfcheck.py` — 2× the
+§6.8 engine bounds mapped into each measured quantity, with M and the test's own evaluation error
+(§9.3.1) — and implemented there. (3) **§4.1 item 6:** the rule by which the hyperbolic state rows
+that conformance run 3 reported as informative become asserted; no new dataset version is needed for
+them (their values were committed before run 3 and are not re-evaluated). (4) **§9.3.2 item 6:** the
+L3 hyperbolic arc with the maneuver at m = 0 (`c1-escape-prograde`) is compared with an Orekit arc
+restarted from the engine's event state, like the m > 0 arcs (revision 4 compared it with Orekit's
+own segment 1, which starts from a different Δv_I; no transport bound exists for that difference).
+(5) No approved value changed. **No loosening** (§15). No value of this revision was derived from,
+or adjusted to, engine output or the measured values of conformance run 3 or of `selfcheck.py`
+(§0).
 
 **Changes in revision 4** (ML-TASK-018 part D1; owner directions of 2026-11-15 on proposals P-1…P-4
 of [conformance run 2](conformance-run-2.md) §7, and the L3 Orekit datasets of ML-TASK-012 part B).
@@ -77,6 +100,25 @@ VI-03 split into an exact plumbing check and a toleranced correctness check with
   repository. They agree to the four digits printed. The binary64 script also reproduces the
   approved VT-15 values stored in `test-data/reference-cases/vt-15` (all ten tangential cases, four
   digits), which checks the transcription of the approved formulas.
+- **Revision 5 inputs** (2026-11-15): owner decision to close O-12 and O-13 before the G1 report;
+  this record at revision 4 (approved); `conformance-run-3.md`; `report_part_d2` of
+  `docs/backlog/tasks/ML-TASK-018.yaml`; `verification/l3/README.md` and `selfcheck.py`; the
+  reference sides of `test-data/reference-cases/vt-16-r4` (reference start states, Δt) and of
+  `test-data/l3-orekit/vt-16` (Orekit event states and segment-1 times). `packages/astrodynamics`
+  and `packages/simulation` were not opened beyond the `export` lines of their `index.ts`. The
+  engine was not run. **Measured values seen before this revision:** the ratios of conformance run 3
+  (worst informative hyperbolic ratio 0.0033 vs L2b, 0.0016 vs L3) and the informational hyperbolic
+  measurements of `selfcheck.py` (energy deviation ≤ 2.3 × 10⁻¹⁵, ‖Δh‖/h ≤ 9.2 × 10⁻¹⁶, Kepler
+  time-of-flight residual ≤ 1.1 × 10⁻¹¹ s). They enter no formula, coefficient, case selection or
+  evaluation scale of revision 5; **nothing was tuned to them**. Every revision-5 number was computed
+  twice: by binary64 code (the committed TypeScript of `verification/src/tol/tolerances-r5.ts` for
+  the O-1 thresholds, the Python of `verification/l3/selfcheck.py` for the A6′ criterion) and by a
+  separately written Python 3.13.17 script in `decimal` arithmetic (60 significant digits, `exp`/`ln`
+  for the hyperbolic functions, Newton solve of the hyperbolic Kepler equation; kept outside the
+  repository). Agreement: every O-1 threshold of the dataset (546 samples) to 6 × 10⁻¹⁵ relative,
+  every A6′ bound of the two L3 arcs to 7 × 10⁻¹⁶ relative. The decimal script also reproduces the
+  approved §6.8 values (M·P_E,gen, M·V_E,gen at the end of the six arcs) to four digits, which checks
+  the transcription.
 - All operation counts below are counts of the **canonical textbook formulation** of each
   algorithm (ADR-005 method B, element↔state maps of architecture §3), not of the engine's code,
   which the Verification Engineer may not read. The margin factor (§3) covers the difference.
@@ -262,8 +304,51 @@ after the record and must not be influenced by engine results. Therefore:
    VT-15), and their non-tangential and plane measurements and the VT-16 hyperbolic arcs stay
    **informative** for the new rows, never asserted against them; (iii) the L2 hyperbolic VT-16
    arcs are treated the same way although their states were never compared (borderline case;
-   treated as run, to be safe). The L3 Orekit datasets have never been run against the engine and
-   are not affected.
+   treated as run, to be safe). The L3 Orekit datasets had not been run against the engine when
+   revision 4 was written and were not affected by this item; conformance run 3 then ran them, with
+   their revision-4 values committed before the run (976380b; item 6 covers their hyperbolic rows).
+   (Revision 5 correction, review N6.)
+6. **Run-3 informative hyperbolic rows (revision 5).** Conformance run 3 ran the engine on
+   `vt-16-r4` (four L2 arcs) and on the L3 VT-16 cases of `l3-r4-vt-16` and reported the hyperbolic
+   arc states as informative only, because O-12 and O-13 were open. Their values (§6.8 M·P_E,gen +
+   2E_RK, M·V_E,gen + 2E_RK; §9.3.1 3M·P_E,gen, 3M·V_E,gen) were evaluated and committed with those
+   datasets (commit 976380b) **before** the first engine run on them (phase boundary a55eb1f, run
+   b2881c2), so they satisfy item 1; revision 5 neither re-evaluates nor changes any of them, and
+   no input of theirs (§4.1 item 2) depends on the engine. The situation of item 5 (a value
+   evaluated after the run) does not arise, so **no new dataset version is needed**. These rows
+   become **asserted** on the same dataset versions when all of the following hold:
+   (a) the owner has signed the revision-5 rows of §15;
+   (b) for the L3 rows: the A6′ hyperbolic criterion (§9.3.1, O-13) passes in
+   `selfcheck.py --repro` on the unchanged L3 datasets, and, for the arcs restarted from the
+   engine's event state, `selfcheck.py --restart` passes on **both** restart directories,
+   `conformance/l3-restart` (c3, run 3) and `conformance/l3-restart-r5` (c1, §9.3.2 item 6);
+   (c) the extended O-1 check (§6.8, O-12) passes on every sample of every case of `o1-hyp-r5` in
+   the same run. If (c) fails, the hyperbolic state rows stay informative and the failure is a
+   finding (the assumption under ε_t,gen does not hold for the engine), not a reason to change a
+   value.
+   **A phase-2 run counts as evidence only if all three — (b), (c) and the asserted state rows —
+   pass** (review N2). (c) is enforced in code: the O-1 check and the asserted state rows are in one
+   test file (`conformance/src/vt16-r5-hyperbolic.test.ts`), run in order, and every asserted test
+   fails unless every O-1 case ran and passed in that run. (b) is a Python step; the phase-2 report
+   shows its output.
+   The fields stored in those dataset files that this rule supersedes (the same way as the stored
+   L3 tolerances, §13 C-8; the files are not changed): `tolerance.assertion: "informative"` and
+   `assertionReason` of the four `vt-16-r4` files; `tolerance.segment1.assertion`,
+   `assertionReason` and, for `l3-r4-vt-16/c1-escape-prograde`, `tolerance.segment1.comparedWith`
+   ("Orekit's own segment 1 …", replaced by the restarted arc of §9.3.2 item 6; review N3). Values that
+   revision 5 does evaluate — the O-1 hyperbolic thresholds — apply only to the new dataset
+   `o1-hyp-r5`, committed before any engine run on it (item 1). The L3 arc `c1-escape-prograde`
+   changes its **reference arc** (not its values) under §9.3.2 item 6; that arc is produced in phase
+   2 from the engine's event state, as the run-3 restarts were. Until (a), the asserted tests are
+   gated: they are skipped in every normal run, and when the switch is set they refuse to run while
+   this record's status line does not record the owner's approval of revision 5
+   (`conformance/src/support/rev5-gate.ts`). The record lock accepts the header at revision ≥ 5
+   with status "Approved by the owner on YYYY-MM-DD", or a later revision (e.g. revision 6
+   Proposed) whose header states "Revision 5 was approved by the owner on YYYY-MM-DD"; **later
+   revisions of this record keep that sentence in the header** so the lock stays open (review N5).
+   **After approval (review N5):** phase 2 runs with the switch set; once the owner accepts the
+   phase-2 run report, the switch is removed from the test file, so the tests run in every normal
+   `pnpm test` and in CI; the record lock stays and is then always satisfied.
 
 ## 5. Display resolution used to judge the indicative expectation
 
@@ -648,7 +733,9 @@ sample.
 **Scope.** ε_t,gen assumes that the engine's solver ends at the noise level on hyperbolic arcs as
 well. The O-1 acceptance check was run for e < 1 only (conformance run 1), and its α term δt_α
 (§6.1) is derived for ellipses only; for hyperbolic arcs this assumption is **not verified**
-(open item O-12, §12). The arc must satisfy the validity condition of §7 VT-16.
+(open item O-12, §12). The arc must satisfy the validity condition of §7 VT-16. **Revision 5:** the
+assumption is tested by the extended O-1 check defined at the end of this section; the hyperbolic
+state rows are asserted only under §4.1 item 6.
 
 **Evaluated** (u = 2⁻⁵³, M = 4; post-maneuver state from the reference side: the L2 request's
 initial state and RSW maneuver at t = 0, or Orekit's event state for the maneuver at t = 5000 s;
@@ -675,6 +762,118 @@ the per-sample tolerances with the same convention, and they are committed with 
 versions (§4.1 items 1 and 5). How these engine bounds enter the comparison tolerances: §7 VT-16 (L2b) and §9.3.1
 (L3). Excluded: `just-unbound` (E/(v²/2 + μ/r) = 10⁻³) and `exactly-parabolic` (near-parabolic,
 warnings only); `at-end-escape` (the hyperbolic segment is the single event sample, exact by R8).
+
+#### α data error and extended O-1 check on hyperbolic arcs (revision 5; O-12)
+
+This subsection does for E > 0 what §6.1 (revision 3, review F2) did for ellipses; it introduces no
+new kind of term and changes no propagation tolerance (δt_α is already budgeted in the phase term
+δt_ph as the mean-motion sensitivity; it enters the O-1 check threshold only).
+
+**∂F/∂α on a hyperbola.** The §6.1 expression is unchanged:
+∂F/∂α = σ₀χ⁴C′(ψ) − r₀χ³S(ψ) + (1 − αr₀)χ⁵S′(ψ). With α = −1/\|a\|, ψ = −x², χ = √\|a\| x,
+σ₀ = √\|a\| e sinh F₀, r₀ = \|a\|(e cosh F₀ − 1), 1 − αr₀ = e cosh F₀, and C = (cosh x − 1)/x²,
+S = (sinh x − x)/x³, the derivatives with respect to ψ (dψ = −2x dx) are
+
+    C′(ψ) = −sinh x/(2x³) + (cosh x − 1)/x⁴,     S′(ψ) = −(cosh x − 1)/(2x⁴) + 3(sinh x − x)/(2x⁵)
+
+(the analytic continuation x → ix of the elliptic C′, S′ of §6.1). Substituting:
+
+    ∂F/∂α = |a|^(5/2) { e sinh F₀ [(cosh x − 1) − x sinh x/2] + (sinh x − x)
+                         + (e cosh F₀/2) [(sinh x − x) − x(cosh x − 1)] }
+
+**Check of the closed form (not used to set any value).** A central finite difference of F(χ; α) at
+fixed χ, σ₀, r₀ agrees with it to better than 10⁻³⁶ relative at three samples of each of the six
+VT-16 arcs (decimal script, 60 digits) and to better than 10⁻¹² in the committed 320-bit test
+(`verification/src/hp/o1-check-hyp.test.ts`, which compares with a binary64 evaluation of the
+closed form).
+
+**Magnitude bound.** Each of the five elementary terms is bounded by its magnitude, as §6.1 bounds
+the elliptic brackets term by term (no cancellation between terms is assumed), with X = \|x\|:
+
+    |∂F/∂α| ≤ |a|^(5/2) D(X),
+    D(X) = e |sinh F₀| [(cosh X − 1) + X sinh X/2] + (sinh X − X) + (e cosh F₀/2) [(sinh X − X) + X(cosh X − 1)]
+
+**α data error.** As §6.1 item 2, \|δα\| ≤ γ_5(2/r₀ + v₀²/μ); on a hyperbola
+2/r₀ + v₀²/μ = 4/r₀ + 1/\|a\| = κ_E(r₀)/\|a\| with **κ_E(r₀) = 1 + 4\|a\|/r₀** of the exact input state
+(≤ the arc-wide κ_E of §6.8, which may replace it). Dividing by √μ (\|a\|^(3/2)/√μ = 1/n_h):
+
+    δt_α,hyp(Δt) = 5u κ_E(r₀) D(x(Δt)) / n_h
+
+with x(Δt) from the reference arc (§6.8 "Parametrisation"). First order in δα (relative ≤ 5uκ_E,
+below 10⁻¹⁴ on every arc), as in §6.1. Consistency: for small x, D ≈ e\|sinh F₀\| x² + x³/6 +
+(e cosh F₀/3) x³, the term-by-term magnitudes of the leading terms of the elliptic expression of
+§6.1 at the same x (sin, cos of the anomalies replaced by sinh, cosh).
+
+**Extended O-1 acceptance check (definition).** For an input state (r₀, v₀) with E > 0 inside the
+§7 VT-16 validity gate (E/(v₀²/2 + μ/r₀) ≥ 0.05) and a sample Δt > 0, put the engine's χ̂ (the
+public diagnostic `universalAnomaly_sqrtm` of `propagateKeplerUniversal`, as in conformance run 1)
+into the universal time equation evaluated **entirely in high precision** (320 bits) with α, σ₀
+and r₀ also formed in high precision from the exact binary64 inputs (§6.1, §12 O-1 route (1)). The
+check passes when
+
+    |t(χ̂) − Δt| ≤ ε_t,gen(Δt) + δt_α,hyp(Δt)
+
+with ε_t,gen of this section (revision 4, unchanged) and δt_α,hyp above, both evaluated on the
+reference arc of the exact input state (arc-wide convention N4). **No margin factor**, as for the
+elliptic threshold ε_t + δt_α: ε_t,gen is already a worst-case budget (twice the evaluation noise
+plus the spacing term). Δt = 0 is excluded (the sample at Δt = 0 is the event state, exact by R8
+and contracts §5.2), and so is Δt < 0 (§6.8 is written for x ≥ 0; the runner never propagates
+backwards). The thresholds are committed per sample in `test-data/reference-cases/o1-hyp-r5`
+(§4.1 item 1). **Cases:**
+
+- the six VT-16 hyperbolic arcs, every sample with Δt > 0 (402 samples): the four L2 arcs of
+  `vt-16-r4` from their reference post-maneuver state (`outputs.startState`), and the two L3 arcs
+  from Orekit's own event state (`test-data/l3-orekit/vt-16`, Δt of Orekit's segment 1);
+- a deterministic grid of 96 cases: \|a\| ∈ {7.0 × 10⁶, 3.0 × 10⁷} m, e ∈ {1.25, 1.5, 2.5, 5},
+  start anomaly F₀ ∈ {−1, 0, 1} (inbound, at periapsis, outbound), one span per case with
+  n_h Δt ∈ {0.05, 0.5, 5, 20}; i, Ω, ω fixed per e index ((0.4, 0.7, 4.4), (1.1, 3.3, 0.2),
+  (2.0, 5.1, 2.6), (2.9, 1.9, 5.8) rad); the start state is formed in binary64 from these elements
+  and that binary64 state is the input;
+- a near-gate supplement of 48 cases (review N1: the 96-case grid did not reach the region of the
+  L2 inbound/outbound arcs, e 1.17, κ_E(r₀) 18.2, gate ratio 0.0549): the same \|a\| and spans, and
+  (i) e ∈ {1.1, 1.17} starting at r₀/\|a\| = 0.22, i.e. gate ratio 1/(1 + 4/0.22) ≈ 0.0521 and
+  κ_E(r₀) ≈ 19.18, inbound and outbound (F₀ = ∓acosh(1.22/e)), (ii) e = 1.1 with F₀ = ±1; (i, Ω, ω)
+  = (0.9, 2.2, 3.7), (1.6, 4.6, 1.3), (2.4, 0.3, 5.2) rad for the three start families.
+
+  All 144 grid starts lie inside the gate (ratios 0.0521 to 0.63); κ_E(r₀) from 1.60 to 19.18.
+  **Note (review N7):** 50 of the 144 grid arcs have part of the arc inside R_ref (r_min < R_ref;
+  15 of the first 96 — the reviewer's 9 are the periapsis passages among them — and 35 of the
+  supplement; 32 of the 50 start inside R_ref). That is harmless here: the check calls the
+  propagator `propagateKeplerUniversal` directly (a pure two-body Kepler solve), not
+  `runSimulation`, so no surface or warning logic is involved. If the propagator rejects such an
+  input (for example a rectilinear or collision guard), the phase-2 report treats it as a
+  test-design artefact, not as an O-12 finding.
+
+The engine-side input is the reference-side state, not the engine's event state: the O-1 check
+concerns the solver for a given input, so its input need not come from the engine (§4.1 item 2).
+**Pass criterion:** every sample of every case passes; the result is reported as the largest ratio
+\|t(χ̂) − Δt\|/(ε_t,gen + δt_α,hyp). A failure keeps O-12 open as a finding and the hyperbolic state
+rows informative (§4.1 item 6 (c)).
+
+**Reference validation (before any engine run; `o1-check-hyp.test.ts`).** At the correctly rounded
+root χ* = √\|a\|(F − F₀), taken from the independent 200-bit hyperbolic-anomaly propagation
+(`ref/hyperbolic.ts`), the 320-bit residual is within the representation spacing
+(r/√μ)·u·\|χ*\| on all 546 samples (402 arc samples, 144 grid cases), hence within the threshold;
+and χ*(1 + 10⁻⁹) fails the threshold on all 546 samples (detection power).
+
+**Evaluated** (u = 2⁻⁵³; last sample of each arc, which carries the largest threshold of the arc;
+printed to four digits, the dataset values govern):
+
+| Arc (input state) | κ_E(r₀) | Δt (s) | x | ε_t,gen (s) | δt_α,hyp (s) | threshold (s) |
+|---|---|---|---|---|---|---|
+| L2 `vt-16-r4/escape-clear` | 12.725 | 6000 | 1.468 | 3.579e-11 | 7.392e-11 | **1.097e-10** |
+| L2 `vt-16-r4/hyperbolic-inbound` | 18.202 | 6000 | 1.602 | 9.062e-11 | 3.474e-10 | **4.380e-10** |
+| L2 `vt-16-r4/hyperbolic-outbound` | 18.202 | 6000 | 1.049 | 3.507e-11 | 1.003e-10 | **1.354e-10** |
+| L2 `vt-16-r4/c3-midrun-escape` | 4.662 | 4000 | 1.448 | 2.496e-11 | 1.610e-11 | **4.105e-11** |
+| L3 `c1-escape-prograde` (Orekit event state) | 12.725 | 20 000 | 2.296 | 1.336e-10 | 3.472e-10 | **4.808e-10** |
+| L3 `c3-midrun-escape` (Orekit event state) | 4.662 | 15 000 | 2.530 | 1.224e-10 | 1.078e-10 | **2.301e-10** |
+
+Over all cases the threshold is 1.00003 to 6.45 times ε_t,gen at the last sample (the α term
+dominates at large κ_E(r₀), as δt_α does at high e in §6.1). Grid thresholds range from
+1.14 × 10⁻¹³ s (n_h Δt = 0.05) to 2.71 × 10⁻⁸ s (n_h Δt = 20); the near-gate supplement alone
+5.24 × 10⁻¹³ s to 2.71 × 10⁻⁸ s (before review N1 the grid maximum was 2.25 × 10⁻⁸ s and the
+largest ratio to ε_t,gen 5.16; no value of the first 96 cases changed). ε_t,gen at the last sample reproduces
+the §6.8 table (2.50e-11, 1.22e-10, 3.58e-11, 1.34e-10, 9.06e-11, 3.51e-11 s).
 
 ## 7. Per-family records
 
@@ -1191,6 +1390,13 @@ Format: **Quantity** · **Measure** · **Error model** · **Reference accuracy**
   - *Elliptic sub-surface arcs* keep the approved treatment (§6.3 at the post-maneuver (a, e), VT-05
     post-maneuver rule), as used in conformance run 2.
   - Layers: warnings L2 (analytic classification); hyperbolic states L2b (D2) and L3 (§9.3.1).
+- **Revision 5 (O-12, O-13).** The hyperbolic arc states vs L2b (`vt-16-r4`) and vs L3
+  (`l3-r4-vt-16`, segment 1 of `c1-escape-prograde` and `c3-midrun-escape`) are asserted with their
+  committed values, unchanged, under §4.1 item 6: after the owner signs revision 5, with the
+  extended O-1 check (§6.8) passing in the same run, and for L3 with the A6′ hyperbolic criterion
+  (§9.3.1) passing. L3 `c1-escape-prograde` is compared with an Orekit arc restarted from the
+  engine's event state (§9.3.2 item 6). Layers then: hyperbolic states L2b and L3, asserted; solver
+  residual on hyperbolic arcs L1-type black-box check (O-1 route (1)).
 
 ### VT-17, VT-18, VT-19 — exact (§1).
 
@@ -1339,6 +1545,61 @@ of each row, not only propagation:
   §6.8 engine bounds, committed before any engine comparison (needs a change to
   `verification/l3/selfcheck.py`, outside this revision's paths).
 
+**A6′ hyperbolic criterion (revision 5; O-13).** A6′ says Orekit's Keplerian propagation of a
+hyperbolic arc obeys §6.8 with coefficients at most 2×. `selfcheck.py` cannot compare Orekit with a
+state reference; it measures three quantities of Orekit's own arc, so the criterion is 2× the §6.8
+engine bounds **mapped into each measured quantity**, plus M and the test's own evaluation error —
+the same construction as the elliptic A6 check of §9.3 (VT-06/VT-07 with the engine part doubled).
+All factors are arc-wide (§6.8, N4), from the segment's first state (the input of Orekit's
+propagation; reference side, §4.1 item 2): \|a\|, e, n_h, F₀, r_min, r_max, v_max, g_max,
+κ_E = 1 + 4\|a\|/r_min, P_b,gen, V_b,gen, and per sample ε_t,gen, δt_g,gen, δt_ph (§6.8). Write
+δt_off = ε_t,gen + δt_g,gen (§6.1 item 4). For every sample with Δt > 0, on arcs inside the §7 VT-16
+validity gate (below it the measurements stay informative; no bound is claimed there):
+
+- **Energy:** \|E_k − E₀\|/E₀ ≤ M[10uκ_E + 2τ_E,gen(Δt)],
+  τ_E,gen = [v_max V_b,gen + g_max P_b,gen + (g_max v_max + 2v_max³/r_min) δt_off]/E. This is VT-06
+  (§7) with v_p → v_max, g_p → g_max, P_b → P_b,gen, V_b → V_b,gen and the off-orbit factor
+  2(1 + e)g_p = 2v_p²/r_p → 2v_max²/r_min of §6.8; 10uκ_E is the test's two evaluations of E
+  (γ_5(v²/2 + μ/r) each, (v²/2 + μ/r)/E ≤ κ_E on the arc). Phase errors do not change E.
+- **Angular momentum:** ‖h_k − h₀‖/h₀ ≤ M[6uκ_h + 2τ_h,gen(Δt)],
+  τ_h,gen = [P_b,gen v_max + r_max V_b,gen + (v_max² + 2v_max² r_max/r_min) δt_off]/h, with
+  κ_h = r_max v(r_max)/h the largest r v/h on the arc (r v = √(μ(2r + r²/\|a\|)) increases with r);
+  VT-07 with the same substitutions; 6uκ_h is the test's two cross products (B5).
+- **Time of flight:** the measured residual is \|δt_k\| = \|Δt − [M_h(r_k, v_k) − M_h(r₀, v₀)]/n_h\|
+  with M_h = s − H, c = e cosh H = 1 + r/\|a\|, s = e sinh H = r·v/√(μ\|a\|), H = ln((c + s)/e),
+  \|a\| and e of the first state, in 40-digit decimal arithmetic. A phase (along-orbit) error of
+  Orekit's state is a time shift and enters \|δt_k\| one to one: per side ≤ δt_ph + ε_t,gen (§6.8,
+  the phase part of P_E,gen as a time). An off-orbit error (δr, δv) changes c by ≤ ‖δr‖/\|a\| and s
+  by ≤ (‖δr‖v_max + r_max‖δv‖)/√(μ\|a\|), and δM_h = δs(1 − 1/(c + s)) − δc/(c + s) with
+  c + s = e·e^F ≥ e·e^F₀ on an arc with Δt > 0, so \|δM_h\| ≤ w(\|δs\| + \|δc\|),
+  **w = max(1, e^(−F₀)/e)**. The off-orbit errors per side are P_off = P_b,gen + v_max δt_off and
+  V_off = V_b,gen + (2v_max²/r_min) δt_off (§6.8). Hence per side
+  B_tof(Δt) = δt_ph + ε_t,gen + (w/n_h)[(P_off v_max + r_max V_off)/√(μ\|a\|) + P_off/\|a\|], and the
+  criterion is **\|δt_k\| ≤ M·2·B_tof(Δt)**. The 40-digit evaluation (exact decimal images of the
+  binary64 states, relative rounding ≤ 10⁻³⁹ per operation, \|t\| ≤ 2 × 10⁴ s, w = 1 on both L3
+  arcs, see below) adds less than 10⁻³⁰ s and is neglected.
+
+Revision 4 (§9.3.1 above) compared the informational time-of-flight measurement with
+2(ε_t,gen + δt_ph); that is the phase part only and is not a bound of this measured quantity
+(an off-orbit error moves the inferred anomaly). It was never a pass/fail bound; the criterion above
+is the first one, so nothing is loosened (§15 lists it for transparency).
+
+Evaluated (u = 2⁻⁵³, M = 4; the Orekit segment 1 of `test-data/l3-orekit/vt-16`; first sample with
+Δt > 0 and last sample; w = max(1, e^(−F₀)/e) = 1 on both arcs, since e^(−F₀)/e ≤ e^(0.13)/2.07 =
+0.55 for c3 (F₀ = −0.130, e = 2.07) and = 1/1.34 for c1 (F₀ = 0 to rounding, e = 1.34)):
+
+| Arc | E/(v²/2 + μ/r) | κ_E | κ_h | energy (relative) first / last | ‖Δh‖/h first / last | time of flight (s) first / last |
+|---|---|---|---|---|---|---|
+| `c1-escape-prograde` (Δt 1000…20 000 s) | 0.0786 | 12.725 | 7.443 | 2.087e-11 / 9.218e-11 | 7.946e-12 / 8.195e-11 | 3.764e-8 / 3.517e-7 |
+| `c3-midrun-escape` (Δt 1000…15 000 s) | 0.2145 | 4.722 | 6.320 | 2.794e-12 / 1.649e-11 | 2.736e-12 / 2.393e-11 | 9.896e-9 / 7.683e-8 |
+
+The same criterion applies to Orekit arcs restarted from an engine event state (§9.3.2), checked by
+`selfcheck.py --restart conformance/l3-restart` before such an arc is used in an asserted
+comparison (§4.1 item 6 (b)).
+
+**Status of A6′ for hyperbolic arcs (revision 5):** see the selfcheck result below the rows of this
+section (§9.3.1 "Selfcheck result, revision 5").
+
 **Rows** (M = 4; each per-side bound is the engine-side term of the family named; inputs as in
 the datasets):
 
@@ -1408,14 +1669,35 @@ the datasets):
 - **VT-16 L3, hyperbolic arcs:** ‖Δr‖ ≤ 3M·P_E,gen(Δt), ‖Δv‖ ≤ 3M·V_E,gen(Δt) (§6.8), under the
   precondition on A6′ above and the validity condition of §7 VT-16. End-of-span values:
   `l3-orekit-c3-midrun-escape` (in force, ratio 0.2145; Δt ≤ 15 000 s from the restart state of
-  §9.3.2) **5.712 × 10⁻⁵ m / 4.304 × 10⁻⁸ m/s**; `l3-orekit-c1-escape-prograde` (ratio 0.0786;
-  toleranced only if the owner lowers the condition to 0.05) 1.028 × 10⁻⁴ m / 1.150 × 10⁻⁷ m/s.
+  §9.3.2) **5.712 × 10⁻⁵ m / 4.304 × 10⁻⁸ m/s**; `l3-orekit-c1-escape-prograde` (ratio 0.0786,
+  inside the 0.05 gate approved with P-3 on 2026-11-15) **1.028 × 10⁻⁴ m / 1.150 × 10⁻⁷ m/s**.
   First samples: 1.674e-5 m / 3.304e-9 m/s (C3, Δt = 1000 s) and 3.248e-5 m / 7.110e-9 m/s (C1,
   Δt = 1000 s). Arc-wide factors per sample, as in §6.8 (N4).
 - **VT-16 L3, elliptic segment after the burn** (`l3-orekit-c4-midrun-retro-subsurface`): the
   approved §9.3 formula 3M·P_E, 3M·V_E at the post-maneuver (a⁺, e⁺) = (8.4482 × 10⁶ m, 0.61416),
   from the restart state; at the last sample (Δt = 5999.5 s) 3.73 × 10⁻⁵ m / 1.71 × 10⁻⁷ m/s.
 - VT-05 L3 is the approved §9.3 row, unchanged.
+
+**Selfcheck result, revision 5 (O-13).** The criterion and its implementation were committed
+(6967f93, 35a548f) before the run. `python -B verification/l3/selfcheck.py --repro --restart
+conformance/l3-restart` (Orekit venv: Python 3.13.17, Orekit 13.1.9, orekit_jpype 13.1.9.0,
+Hipparchus 4.0.3, JDK Temurin 21.0.13): **exit 0, 500 pass/fail checks, 0 failures,
+66 informational measurements; generator unchanged since df84b5e6d75a, same 43 files,
+byte-identical regeneration** (without `--restart`: 495 checks, 0 failures). The six former
+informational hyperbolic measurements are now pass/fail. Worst sample per measured quantity
+(observed / bound = ratio):
+
+| Arc | energy | ‖Δh‖/h | time of flight (s) |
+|---|---|---|---|
+| Orekit segment 1, `c1-escape-prograde` | 2.301e-15 / 2.087e-11 = 1.1e-4 | 3.532e-16 / 7.946e-12 = 4.4e-5 | 1.030e-11 / 1.960e-7 = 5.3e-5 |
+| Orekit segment 1, `c3-midrun-escape` | 7.688e-16 / 2.794e-12 = 2.8e-4 | 3.933e-16 / 5.041e-12 = 7.8e-5 | 8.499e-12 / 6.110e-8 = 1.4e-4 |
+| Restarted arc `l3-restart/c3-midrun-escape` (§9.3.2) | 2.691e-15 / 2.794e-12 = 9.6e-4 | 2.622e-16 / 2.736e-12 = 9.6e-5 | 2.280e-12 / 1.721e-8 = 1.3e-4 |
+
+(The restarted elliptic arc `c4-midrun-retro-subsurface` passes the approved A6 energy and
+angular-momentum checks at ratios 7.0e-5 and 5.2e-5.) **A6′ is therefore confirmed for Orekit's
+hyperbolic propagation on these arcs** in the sense of this criterion. As for the elliptic A6
+check, the bounds are worst-case and loose (the measurements use at most 0.1 % of them); they
+confirm A6′, they do not measure Orekit's accuracy.
 
 #### 9.3.2 Maneuvers at t > 0 in the L3 comparison (revision 4)
 
@@ -1447,6 +1729,24 @@ L3 cases (all have e > 0 or are hyperbolic after the burn). **Rule:**
 5. The L3 files keep `segment1: null` or Orekit-start segment-1 values; part D2 regenerates the
    restarted arcs (`selfcheck.py --repro` first) and commits the comparison code before any engine
    result on these datasets is inspected (§4.1).
+6. **Hyperbolic arc with the maneuver at m = 0 (revision 5).** For `l3-orekit-c1-escape-prograde`
+   (m = 0, hyperbolic after the burn) both pre-maneuver states are the request's `initialState`, but
+   the post-burn velocities differ by the difference of the two Δv_I (each within its VT-12 per-side
+   bound; 1.8 × 10⁻¹² m/s in run 3). Revision 4 compared the engine with Orekit's own segment 1,
+   which leaves that start difference to be transported along the arc, and no transport bound
+   exists for a hyperbola (the reason for item 2). The rule of item 2 therefore applies here as
+   well: segment 1 is compared with an Orekit arc restarted from the engine's event state
+   (`position_m`, `velocityAfter_mps`), with the same propagator call, at Δt = t − 0, against the
+   committed values 3M·P_E,gen(Δt), 3M·V_E,gen(Δt) of `l3-r4-vt-16/c1-escape-prograde` (evaluated from
+   Orekit's own event state, item 3; unchanged). The first sample of the restarted arc is the event
+   state (exact, R8). The restarted arc is produced in phase 2 (engine event state recorded by the
+   gated test, then Orekit run by `verification/l3-d2/restart.py` unchanged) and checked by
+   `selfcheck.py --restart` before use (§4.1 item 6 (b)). **Premise asserted with the comparison
+   (review N4):** the engine's c1 event `position_m` and `velocityBefore_mps` equal the request's
+   `initialState` bit-for-bit (§1 precondition row), and ‖Δv_I,engine − Δv_I,Orekit‖ is within the
+   approved L3 VT-12 row of §9.3.1, 3M(12κ_h + 25)u‖Δv_RSW‖ with κ_h = 1 (grid e = 0) and
+   ‖Δv_RSW‖ = 4000 m/s: **1.972 × 10⁻¹⁰ m/s** (not a new formula: the VT-12 L3 row evaluated at this
+   case's scale, from the reference side; checked in binary64 and decimal).
 
 ### 9.4 L3 textbook examples
 
@@ -1544,11 +1844,11 @@ The review's table (PR #12) was the input; where this record's position differs 
 | O-6 | Angular accuracy target. Revision 1 tied the thresholds to an assumed display resolution. | **Owner** | Agree with the review: introduce an owner-approved **angular accuracy target δθ**, decoupled from UI formatting. §10 gives ε_min(N, δθ) and N_max(ε, δθ). Recommendation: δθ = 10⁻⁵ rad with ε_e = ε_i = 10⁻⁵ (worst case to ≈ 100 periods). Position/velocity display resolution remains a UI matter (only §11 uses it). | §10 shows both 10⁻⁶ and 10⁻⁵ rad; thresholds provisional |
 | O-7 | VT-02 L2c and the engine may implement the same textbook map; algorithmic independence is partial. | Verification Engineer (ML-TASK-011/012) | L3 (Orekit element→state) is the independent check; L2c uses the explicit matrix product. | VT-02 rests on L2c + L3 |
 | O-8 | Scene conversion for VI-02. | Frontend Engineer proposes; Systems Architect records it (frontend design note or contract) | Define the conversion as **one binary64 multiplication followed by at most one binary32 rounding**, `Math.fround(x * s)`, with no other CPU-side arithmetic before storage; then **VI-02 is exact** (§8). If GPU-side scaling is used, check buffer and scale separately (both exact). | VI-02 relative 7.2 × 10⁻⁷ |
-| O-9 | Assumptions A2 (correctly rounded `Math.sqrt` under ECMA-262), A3 (transcendental accuracy ≤ 1 ulp on the CI Node version) and A6 (Orekit accuracy) unconfirmed. | Verification Engineer (ML-TASK-011/012) | Measure/confirm; any c_f > 2 or A6 failure is re-evaluated under §4.1 and listed in §15. Revision 4: **A6 confirmed for elliptic propagation** by `selfcheck.py` (§9.3); A6′ (§9.3.1) supported by pass/fail checks except for hyperbolic arcs, which need the D2 check (O-13). A2, A3 unchanged here. | Formulas use c_f = 2 and A6 |
+| O-9 | Assumptions A2 (correctly rounded `Math.sqrt` under ECMA-262), A3 (transcendental accuracy ≤ 1 ulp on the CI Node version) and A6 (Orekit accuracy) unconfirmed. | Verification Engineer (ML-TASK-011/012) | Measure/confirm; any c_f > 2 or A6 failure is re-evaluated under §4.1 and listed in §15. Revision 4: **A6 confirmed for elliptic propagation** by `selfcheck.py` (§9.3); A6′ (§9.3.1) supported by pass/fail checks except for hyperbolic arcs, which need the D2 check (O-13). A2, A3 unchanged here. Revision 5: hyperbolic A6′ now pass/fail (§9.3.1, O-13). | Formulas use c_f = 2 and A6 |
 | O-10 | Is the first sample of every segment bit-identical to the segment's initial state? For segments n ≥ 1 R8 already makes it so (event state); for segment 0 the contract is silent. | **Owner** (contract revision 3, drafted by the Systems Architect) | **Resolved** (bookkeeping in revision 4): adopted as contracts-v1 §5.2 revision 3 (owner decision 2026-11-12, §11.2 decision 3; recorded as decided in §15 on 2026-11-13). VT-05 at Δt = 0 is `Object.is` (§1). | — |
 | O-11 | VT-14 transport factors K_r(e), K_v(e) for e > 0 not derived (e = 0: Clohessy–Wiltshire, K_r = 14, K_v = 9, citation to be confirmed). New in revision 2. | Verification Engineer (ML-TASK-011) | Derive K(e) from the elliptic state-transition matrix (literature source to be cited) and commit it with the first e > 0 VT-14 dataset, before the engine is run on it (§4.1); until then VT-14 runs at e = 0 only. **Revision 4 (owner direction P-1, 2026-11-15): stays open and does not block G1; VT-14 is accepted for G1 at e = 0 only (§7 VT-14).** | VT-14 at e = 0 only; G1 report says so |
-| O-12 | Solver residual on hyperbolic arcs: ε_t,gen (§6.8) assumes the engine's solve ends at the noise level for E > 0; the O-1 acceptance check covered e < 1 only, and δt_α is derived for ellipses only. New in revision 4. | Verification Engineer (part D2 or later) | Derive the hyperbolic δt_α from the same ∂F/∂α expression (§6.1) with cosh/sinh magnitudes and extend the O-1 black-box check to the VT-16 hyperbolic arcs before the hyperbolic state comparison. | Hyperbolic VT-16 tolerances rest on an unverified solver assumption |
-| O-13 | A6′ for Orekit's hyperbolic propagation is only informational (§9.3.1). New in revision 4. | Verification Engineer (part D2; change to `verification/l3/selfcheck.py`) | Make the hyperbolic energy, angular-momentum and time-of-flight measurements pass/fail against 2× the §6.8 engine bounds; commit before the engine comparison. | L3 VT-16 hyperbolic rows not usable until done |
+| O-12 | Solver residual on hyperbolic arcs: ε_t,gen (§6.8) assumes the engine's solve ends at the noise level for E > 0; the O-1 acceptance check covered e < 1 only, and δt_α is derived for ellipses only. New in revision 4. | Verification Engineer (part D2 or later) | Derive the hyperbolic δt_α from the same ∂F/∂α expression (§6.1) with cosh/sinh magnitudes and extend the O-1 black-box check to the VT-16 hyperbolic arcs before the hyperbolic state comparison. **Closed in revision 5 (ML-TASK-018 part D3), subject to the owner's signature (§15):** δt_α,hyp = 5uκ_E(r₀)D(x)/n_h derived (§6.8); extended O-1 check defined with threshold ε_t,gen + δt_α,hyp, no margin, on the six VT-16 hyperbolic arcs and a 144-case grid (§6.8, with the near-gate supplement of review N1); thresholds committed in `o1-hyp-r5` before any engine run; the reference validated (§6.8). The evidence is the phase-2 run of that check; if any sample fails, O-12 reopens as a finding and the hyperbolic state rows stay informative (§4.1 item 6 (c)). | Until the phase-2 run: hyperbolic VT-16 state rows informative |
+| O-13 | A6′ for Orekit's hyperbolic propagation is only informational (§9.3.1). New in revision 4. | Verification Engineer (part D2; change to `verification/l3/selfcheck.py`) | Make the hyperbolic energy, angular-momentum and time-of-flight measurements pass/fail against 2× the §6.8 engine bounds; commit before the engine comparison. **Closed in revision 5, subject to the owner's signature (§15):** criterion stated in §9.3.1 ("A6′ hyperbolic criterion") and implemented in `selfcheck.py` (ML-TASK-018 part D3); result in §9.3.1 ("Selfcheck result, revision 5"). No engine comparison was involved. | — (L3 VT-16 hyperbolic rows usable under §4.1 item 6 after signature) |
 
 Changes to other documents proposed by the review are listed here, not made (outside this task's
 affected paths): plan §3 VT-13 wording (C-2); ML-TASK-014 acceptance criterion (O-2); a Proposed
@@ -1574,7 +1874,8 @@ ADR for the degenerate convention (O-3); contract revision 3 rule (O-10); fronte
 Revision 4 — changes needed outside this revision's paths (reported, not made):
 
 - `verification/l3/selfcheck.py`: pass/fail checks for hyperbolic arcs against 2× the §6.8 bounds
-  (O-13); part D2.
+  (O-13); part D2. **Done in revision 5** (ML-TASK-018 part D3, with the owner's knowledge that this
+  file belongs to ML-TASK-012; the generator files are unchanged).
 - `docs/backlog/tasks/ML-TASK-015.yaml`: status field (C-7). Decides: Coordinator.
 - Optional contract clarification (O-4): "Each sample of a segment is a function of the segment's
   initial state, its start time, `t_s` and `constants` only." Decides: Systems Architect drafts,
@@ -1659,3 +1960,25 @@ against it or against the L3 Orekit datasets):
 Revision 4 proposes no loosening. (A loosening of the C3 circularisation values proposed in the
 first draft of revision 4 was withdrawn after review Q3: at m = 0 term (i) is zero and the
 corrected formula gives 1.60 × 10⁻¹⁴, well inside the approved 1.7686 × 10⁻¹².)
+
+**Revision 5 items** (proposed 2026-11-15, ML-TASK-018 part D3 phase 1; each needs the owner's
+signature before the engine is run against it; the conformance tests that use them are gated):
+
+| Item | Proposed decision | Owner | Date |
+|---|---|---|---|
+| O-12: δt_α,hyp = 5uκ_E(r₀)D(x)/n_h (§6.8 revision 5), derived from the §6.1 ∂F/∂α with cosh/sinh magnitudes | Approve the derivation **Approved by the owner.** | Owner | 2026-11-16 |
+| O-12: extended O-1 check — threshold ε_t,gen + δt_α,hyp (no margin), time equation in high precision as §6.1, cases = six VT-16 hyperbolic arcs (every Δt > 0) + 144-case grid (incl. the near-gate supplement), dataset `o1-hyp-r5`; pass = every sample; O-12 closed on a pass | Approve the check and its dataset **Approved by the owner.** | Owner | 2026-11-16 |
+| O-13: A6′ hyperbolic criterion (§9.3.1) — energy M[10uκ_E + 2τ_E,gen], angular momentum M[6uκ_h + 2τ_h,gen], time of flight M·2·B_tof; implemented in `selfcheck.py`; also applied to restarted arcs (`--restart`); O-13 closed on the recorded result | Approve the criterion and the result **Approved by the owner.** | Owner | 2026-11-16 |
+| §4.1 item 6: run-3 informative hyperbolic rows (`vt-16-r4`, `l3-r4-vt-16` segment 1) become asserted with their committed, unchanged values when (a) revision 5 is signed, (b) A6′ hyperbolic passes, (c) the extended O-1 check passes in the same run; no new dataset version (values committed before run 3) | Approve **Approved by the owner.** | Owner | 2026-11-16 |
+| §9.3.2 item 6: L3 `c1-escape-prograde` segment 1 (m = 0, hyperbolic) compared with an Orekit arc restarted from the engine's event state; committed values unchanged | Approve **Approved by the owner.** | Owner | 2026-11-16 |
+
+**Loosenings (revision 5): none.** For transparency, what changes relative to revision 4:
+
+| Quantity | Revision 4 | Revision 5 | Kind |
+|---|---|---|---|
+| O-1 check on hyperbolic arcs | not defined (threshold NaN for α ≤ 0) | ε_t,gen + δt_α,hyp per sample (`o1-hyp-r5`) | new check |
+| A6′ hyperbolic energy, ‖Δh‖/h, time of flight (`selfcheck.py`) | informational, no bound (rev. 4 text compared the time of flight with 2(ε_t,gen + δt_ph), phase part only) | pass/fail M[10uκ_E + 2τ_E,gen], M[6uκ_h + 2τ_h,gen], M·2·B_tof | new criterion (the time-of-flight bound includes the off-orbit part that the rev. 4 comparison omitted; it was never a bound, so this is not a loosening) |
+| VT-16 hyperbolic states vs L2b, vs L3 | values committed, informative | same values, asserted under §4.1 item 6 | status change, values unchanged |
+| L3 `c1-escape-prograde` segment 1 reference arc | Orekit's own segment 1 | Orekit restarted from the engine's event state | reference arc change, values unchanged |
+
+No approved value changes in revision 5.
