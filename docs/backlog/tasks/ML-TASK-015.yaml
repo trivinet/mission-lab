@@ -1,6 +1,6 @@
 task_id: ML-TASK-015
 title: "Universal-variable Kepler propagator in packages/astrodynamics"
-status: in_review
+status: done          # G1 passed 2026-11-16; see docs/releases/G1-review.md
 requirement_ids: [ML-FR-004, ML-NFR-002, ML-NFR-003]
 owner_role: astrodynamics-engineer
 reviewer_role: verification-engineer

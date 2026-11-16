@@ -1,6 +1,6 @@
 task_id: ML-TASK-017
 title: "Simulation runner in packages/simulation: semantic validation, request building and requestId, sampling grid, segments, maneuver event, diagnostics, model metadata"
-status: in_review
+status: done          # G1 passed 2026-11-16; see docs/releases/G1-review.md
 requirement_ids: [ML-FR-002, ML-FR-004, ML-FR-005, ML-FR-006, ML-FR-012, ML-NFR-001, ML-NFR-003, ML-NFR-004]
 owner_role: astrodynamics-engineer
 reviewer_role: verification-engineer

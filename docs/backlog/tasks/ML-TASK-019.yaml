@@ -1,6 +1,6 @@
 task_id: ML-TASK-019
 title: "Engine corrections: explicit failure for a rectilinear trajectory reaching the centre (issue #24) and −0 → +0 normalisation in the request builder (contracts-v1 §11.4 P3)"
-status: in_review
+status: done          # G1 passed 2026-11-16; see docs/releases/G1-review.md
 requirement_ids: [ML-FR-004, ML-FR-006, ML-FR-012, ML-NFR-003]
 owner_role: astrodynamics-engineer
 reviewer_role: verification-engineer

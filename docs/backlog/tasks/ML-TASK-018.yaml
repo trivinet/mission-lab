@@ -1,7 +1,7 @@
 # Mission Lab task contract. One file per task: docs/backlog/tasks/ML-TASK-NNN.yaml
 task_id: ML-TASK-018
 title: "Numerical suite against the engine (conformance workspace), wired into CI; G1 verification report"
-status: in_progress
+status: done          # G1 passed 2026-11-16; see docs/releases/G1-review.md
 requirement_ids: [ML-FR-002, ML-FR-003, ML-FR-004, ML-FR-006]
 owner_role: verification-engineer
 reviewer_role: systems-architect
@@ -16,6 +16,7 @@ affected_paths:
   - vitest.config.ts
   - verification/src/index.ts
   - docs/verification/conformance-run-*.md
+  - docs/verification/G1-verification-report.md
   - docs/backlog/tasks/ML-TASK-018.yaml
 objective: >
   Run the engine against the independent references and the approved tolerances (ADR-003,

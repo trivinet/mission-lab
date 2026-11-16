@@ -1,6 +1,6 @@
 task_id: ML-TASK-010
 title: "Tolerance derivation and record (docs/verification/tolerances.md)"
-status: in_review
+status: done          # G1 passed 2026-11-16; see docs/releases/G1-review.md
 requirement_ids: [ML-FR-002, ML-FR-003, ML-FR-004, ML-FR-006, ML-FR-007, ML-FR-009, ML-FR-010]
 owner_role: verification-engineer
 reviewer_role: systems-architect

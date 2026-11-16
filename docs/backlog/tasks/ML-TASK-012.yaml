@@ -168,7 +168,7 @@ report_part_b:
     formula, VT-16 expected warnings exactly; restart segment-1 references from the engine's event state
     for m > 0; commit the comparison code before any engine result on these datasets is inspected (§4.1).
   l3_gaps_for_g1:
-    - "VT-16 hyperbolic arcs: no evaluated tolerance (O-5); the Orekit escape states back only the warning expectations and an informational state comparison."
+    - "VT-16 hyperbolic arcs: superseded. Revision 5 evaluated the tolerance (O-5, O-12, O-13) and conformance run 4 asserts the hyperbolic states (L3 segment 1 for c1-escape-prograde and c3-midrun-escape, against restarted Orekit arcs); accepted by the owner on 2026-11-16 (docs/releases/G1-review.md). Original text: no evaluated tolerance, informational state comparison only."
     - "No L3 dataset for VT-03, VT-04, VT-06…VT-11, VT-13, VT-14 (L1 families; not required by the contract)."
     - "VT-19 constants: L3 uses the same constants as the engine by construction and gives no evidence on their values."
     - "VT-15 elements other than a, e, i (Ω, ω, ν after the burn) are stored as Orekit returns them and are not comparable for near-degenerate orbits."
