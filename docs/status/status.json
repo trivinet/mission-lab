@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Gate G1 passed on 2026-11-16: the engine is verified (1574 tests; L1, L2 and Orekit L3 evidence). VT-17 deferred to G3. Next: G1 follow-ups (restart-arc procedure, documentation clean-up), then Phase 2.",
+  "headline": "Visual direction approved (layout A, blue accent, banner + chip). ML-TASK-022 (layout and editor) and ML-TASK-023 (3D scene, VI-02) are running in parallel.",
   "gates": [
     {
       "id": "G0",
@@ -36,11 +36,6 @@
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
       "blocking": "Publishing the textbook assessment"
-    },
-    {
-      "id": "OA-14",
-      "text": "Open the workspace mock-up at claude.ai/artifact/DvtuJBRU1kxkHeTxyHqqQM and decide three things: panel arrangement, accent colour, how the result state is shown.",
-      "blocking": "ML-TASK-022, 023 (editor and 3D scene)"
     },
     {
       "id": "OA-3",
@@ -225,8 +220,8 @@
           "title": "Visual direction: layout and design tokens mock-up",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "003",
+          "status": "done",
+          "deps": "Owner approved 2026-11-16 (PR #47)",
           "approval": true
         },
         {
@@ -234,24 +229,24 @@
           "title": "Scenario store, result states, worker host",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "004"
+          "status": "done",
+          "deps": "Merged (PR #45)"
         },
         {
           "id": "ML-TASK-022",
           "title": "Scenario editor with validation",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "020, 021"
+          "status": "in_progress",
+          "deps": "Contract in PR #47; agent running"
         },
         {
           "id": "ML-TASK-023",
           "title": "3D scene: Earth, trajectory, markers, camera",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "020, 021"
+          "status": "in_progress",
+          "deps": "Contract in PR #47; agent running"
         },
         {
           "id": "ML-TASK-024",
@@ -378,6 +373,41 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Frontend",
+      "text": "ML-TASK-022 (layout shell, editor, field validation, maneuver, keyboard) and ML-TASK-023 (three/R3F scene, exact Math.fround(x·s) vertices, VI-02 hook) started in parallel, Sonnet, separate worktrees."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Owner",
+      "text": "Approved the visual direction: layout A, blue accent, result state as banner plus chip. Recorded in visual-direction.md and design-tokens.md (PR #47)."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Owner",
+      "text": "Confirmed the default scenario values and the error-state rule of ML-TASK-021; PR #45 merged (merge commit), CI green."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Coordinator",
+      "text": "Checked ML-TASK-021: all checks and 4 e2e pass, only apps/web, lockfile and task YAML changed; breaking current→stale failed 6 web tests (reverted). PR #45 opened."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Frontend",
+      "text": "ML-TASK-021 delivered: zustand store, five-state result machine, engine in a module worker (latest run wins), VE-02 and ML-UX-003 e2e (max frame gap 16.8 ms during a 600 001-sample run)."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Frontend",
+      "text": "ML-TASK-021 started (Sonnet): zustand store, five-state result machine (ML-UX-001/002), engine in a Web Worker with transferred typed arrays, VE-02 e2e."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Coordinator",
+      "text": "Merged PR #43 (G1 follow-ups) and PR #44 (status, roadmap page). Wrote the ML-TASK-021 contract on the owner's go-ahead."
+    },
     {
       "date": "2026-11-16",
       "who": "Coordinator",
