@@ -1,7 +1,7 @@
 # Mission Lab task contract. One file per task: docs/backlog/tasks/ML-TASK-NNN.yaml
 task_id: ML-TASK-011
 title: "Independent reference implementations (L2) and reference datasets; constants check (VT-19)"
-status: in_review
+status: done          # G1 passed 2026-11-16; see docs/releases/G1-review.md
 requirement_ids: [ML-FR-002, ML-FR-003, ML-FR-004]
 owner_role: verification-engineer
 reviewer_role: systems-architect

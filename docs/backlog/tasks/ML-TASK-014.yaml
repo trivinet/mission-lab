@@ -1,6 +1,6 @@
 task_id: ML-TASK-014
 title: "Keplerian elements <-> Cartesian state, degenerate-element convention, derived orbit quantities"
-status: in_review
+status: done          # G1 passed 2026-11-16; see docs/releases/G1-review.md
 requirement_ids: [ML-FR-002, ML-FR-003, ML-FR-009, ML-FR-010, ML-NFR-002, ML-NFR-003]
 owner_role: astrodynamics-engineer
 reviewer_role: verification-engineer
