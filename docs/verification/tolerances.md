@@ -1,6 +1,6 @@
 # M1 Tolerance Record
 
-**Document ID:** ML-VER-002 · **Date:** 2026-11-12 (revision 4: 2026-11-15; revision 5: 2026-11-15) · **Author:** Verification Engineer (ML-TASK-010; revision 4: ML-TASK-018 part D1; revision 5: ML-TASK-018 part D3) · **Revision:** 5 · **Status:** Proposed, awaiting owner approval (revision 5; see §15). Revision 4 was approved by the owner on 2026-11-15, revision 3 on 2026-11-13; their approved content stays in force. Changes follow §4.1: any loosening needs owner sign-off before the engine is run against it
+**Document ID:** ML-VER-002 · **Date:** 2026-11-12 (revision 4: 2026-11-15; revision 5: 2026-11-15) · **Author:** Verification Engineer (ML-TASK-010; revision 4: ML-TASK-018 part D1; revision 5: ML-TASK-018 part D3) · **Revision:** 5 · **Status:** Approved by the owner on 2026-11-16 (revision 5; see §15). Revision 4 was approved by the owner on 2026-11-15, revision 3 on 2026-11-13; their approved content stays in force. Changes follow §4.1: any loosening needs owner sign-off before the engine is run against it
 
 Implements the tolerance policy of the [verification plan](m1-verification-plan.md) §4 (method fixed
 there) for the numerical families VT-01…VT-19 and the numeric parts of VI-01…VI-03. Nothing in this
@@ -1966,11 +1966,11 @@ signature before the engine is run against it; the conformance tests that use th
 
 | Item | Proposed decision | Owner | Date |
 |---|---|---|---|
-| O-12: δt_α,hyp = 5uκ_E(r₀)D(x)/n_h (§6.8 revision 5), derived from the §6.1 ∂F/∂α with cosh/sinh magnitudes | Approve the derivation | | |
-| O-12: extended O-1 check — threshold ε_t,gen + δt_α,hyp (no margin), time equation in high precision as §6.1, cases = six VT-16 hyperbolic arcs (every Δt > 0) + 144-case grid (incl. the near-gate supplement), dataset `o1-hyp-r5`; pass = every sample; O-12 closed on a pass | Approve the check and its dataset | | |
-| O-13: A6′ hyperbolic criterion (§9.3.1) — energy M[10uκ_E + 2τ_E,gen], angular momentum M[6uκ_h + 2τ_h,gen], time of flight M·2·B_tof; implemented in `selfcheck.py`; also applied to restarted arcs (`--restart`); O-13 closed on the recorded result | Approve the criterion and the result | | |
-| §4.1 item 6: run-3 informative hyperbolic rows (`vt-16-r4`, `l3-r4-vt-16` segment 1) become asserted with their committed, unchanged values when (a) revision 5 is signed, (b) A6′ hyperbolic passes, (c) the extended O-1 check passes in the same run; no new dataset version (values committed before run 3) | Approve | | |
-| §9.3.2 item 6: L3 `c1-escape-prograde` segment 1 (m = 0, hyperbolic) compared with an Orekit arc restarted from the engine's event state; committed values unchanged | Approve | | |
+| O-12: δt_α,hyp = 5uκ_E(r₀)D(x)/n_h (§6.8 revision 5), derived from the §6.1 ∂F/∂α with cosh/sinh magnitudes | Approve the derivation **Approved by the owner.** | Owner | 2026-11-16 |
+| O-12: extended O-1 check — threshold ε_t,gen + δt_α,hyp (no margin), time equation in high precision as §6.1, cases = six VT-16 hyperbolic arcs (every Δt > 0) + 144-case grid (incl. the near-gate supplement), dataset `o1-hyp-r5`; pass = every sample; O-12 closed on a pass | Approve the check and its dataset **Approved by the owner.** | Owner | 2026-11-16 |
+| O-13: A6′ hyperbolic criterion (§9.3.1) — energy M[10uκ_E + 2τ_E,gen], angular momentum M[6uκ_h + 2τ_h,gen], time of flight M·2·B_tof; implemented in `selfcheck.py`; also applied to restarted arcs (`--restart`); O-13 closed on the recorded result | Approve the criterion and the result **Approved by the owner.** | Owner | 2026-11-16 |
+| §4.1 item 6: run-3 informative hyperbolic rows (`vt-16-r4`, `l3-r4-vt-16` segment 1) become asserted with their committed, unchanged values when (a) revision 5 is signed, (b) A6′ hyperbolic passes, (c) the extended O-1 check passes in the same run; no new dataset version (values committed before run 3) | Approve **Approved by the owner.** | Owner | 2026-11-16 |
+| §9.3.2 item 6: L3 `c1-escape-prograde` segment 1 (m = 0, hyperbolic) compared with an Orekit arc restarted from the engine's event state; committed values unchanged | Approve **Approved by the owner.** | Owner | 2026-11-16 |
 
 **Loosenings (revision 5): none.** For transparency, what changes relative to revision 4:
 
