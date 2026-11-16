@@ -1,6 +1,6 @@
-# Mission Lab design tokens (proposed)
+# Mission Lab design tokens
 
-**Status:** Proposed (ML-TASK-020), pending owner approval. Not authority until approved. No Tailwind
+**Status:** Approved by the owner on 2026-11-16 (ML-TASK-020; blue accent kept). No Tailwind
 configuration has been changed; these tokens are mirrored as CSS custom properties in
 [mockups/workspace.html](mockups/workspace.html). Source requirements: ML-SYS-001 §9.3,
 ML-UX-001, ML-UX-004.

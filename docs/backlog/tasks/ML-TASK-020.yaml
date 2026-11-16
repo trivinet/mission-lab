@@ -1,6 +1,6 @@
 task_id: ML-TASK-020
 title: "Visual direction: workspace layout and design tokens (mock-up for owner approval)"
-status: in_review
+status: done          # owner approved layout A, blue accent, banner plus chip on 2026-11-16
 requirement_ids: [ML-UX-001, ML-UX-002, ML-UX-003, ML-UX-004, ML-FR-007, ML-FR-012]
 owner_role: frontend-engineer
 reviewer_role: systems-architect

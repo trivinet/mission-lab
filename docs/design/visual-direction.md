@@ -1,6 +1,6 @@
-# Visual direction, M1 workspace (proposed)
+# Visual direction, M1 workspace
 
-**Status:** Proposed (ML-TASK-020), pending owner approval. Mock-up:
+**Status:** Approved by the owner on 2026-11-16 (ML-TASK-020): layout **A**, accent **blue** `#6aa9ff`, result state as **banner plus chip** (banner only for stale, computing, error and none), as recommended below. Mock-up:
 [mockups/workspace.html](mockups/workspace.html). Tokens: [design-tokens.md](design-tokens.md).
 All values in the mock-up are placeholders, not computed.
 
