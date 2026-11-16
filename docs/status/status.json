@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Run 4 accepted: hyperbolic states proven and now asserted in every test run (switch removal in PR #39, with explicit timeouts for heavy tests). For G1 still: the WGS 84 constants check (VT-19), CI wiring of the numerical suite and the G1 report.",
+  "headline": "Switch removal merged (PR #39): the hyperbolic tests run in every CI run. VT-19 (constants vs the NGA WGS 84 standard and IERS Conventions 2010) is running; then the G1 verification report.",
   "gates": [
     {
       "id": "G0",
@@ -31,11 +31,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-33",
-      "text": "Merge PR #39 (revision-5 switch removed, 60 s timeout for heavy test projects; status included). Then choose the next G1 step.",
-      "blocking": "CI wiring and G1 report"
-    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -149,8 +144,8 @@
           "title": "Independent reference implementations and datasets",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "done",
-          "deps": "004"
+          "status": "in_progress",
+          "deps": "VT-19 constants check running"
         },
         {
           "id": "ML-TASK-012",
@@ -207,7 +202,7 @@
           "role": "Verification Engineer",
           "model": "opus",
           "status": "in_review",
-          "deps": "Run 4 accepted and merged; switch removal PR #39; then VT-19, CI wiring, G1 report",
+          "deps": "Waiting on VT-19; then the G1 report",
           "approval": true
         },
         {
@@ -382,6 +377,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Verification",
+      "text": "VT-19 started (ML-TASK-011 remainder, Sonnet): μ and reference radius against NGA.STND.0036 (WGS 84), ERA coefficients against IERS Conventions 2010, with a bit-equality test of the engine constants."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Coordinator",
+      "text": "Merged PR #39 (switch removal, heavy-test timeout, status) on the owner's go-ahead; CI green."
+    },
     {
       "date": "2026-11-16",
       "who": "Coordinator",
