@@ -1,6 +1,6 @@
 task_id: ML-TASK-012
 title: "External references (L3): textbook assessment (part A) and one Orekit reference dataset (part B)"
-status: in_progress          # part A done, awaiting review; part B done on branch test/ml-task-012b-orekit-dataset, awaiting review; dataset location decided by the owner on 2026-11-15 (test-data/l3-orekit/)
+status: done          # part B merged (PR #29, 2026-11-15); part A published without book values on owner decision OA-15 option 1 (2026-11-16)
 requirement_ids: [ML-FR-003, ML-FR-004, ML-FR-006]
 owner_role: verification-engineer
 reviewer_role: systems-architect
@@ -52,7 +52,10 @@ deliverables:
 human_approval_required: true   # installing Python/Java/Orekit on the dev machine; use of textbook values in a public repository
 
 report:
-  # Part A only (unchanged). Part B: see report_part_b below.
+  # Part A. Closure 2026-11-16: owner decision OA-15 option 1 - the assessment is published as
+  # docs/verification/l3-textbook-assessment.md (ML-VER-009) with every value from the book removed;
+  # the book is cited, never transcribed, and stays an accepted L3 gap (G1-review.md decision 3).
+  # Part B: see report_part_b below.
   files_changed:
     - docs/verification/l3-textbook-assessment.md (new)
     - docs/backlog/tasks/ML-TASK-012.yaml (new)
@@ -63,7 +66,7 @@ report:
     present universal variables. It is a weak L3 source. The pages read contain five usable worked
     examples (WK-01…WK-05, with 3–5 significant digits): two for VT-05 and three for VT-15, one of which
     comes from linearised equations. There is no element-to-state example, no maneuver-frame example and
-    no ERA. The book gives mu and an equatorial radius in Appendix B. The radius is 0.4 m away from the WGS 84
+    no ERA. The book gives mu and an equatorial radius in Appendix B. The radius differs at the sub-metre level from the WGS 84
     value assumed in ML-ARCH-002 and the ellipsoid is not named. The book's maneuver axes are labelled
     S (radial), N (along-track), W, so its letter S is not Mission Lab's S. The book allows copying parts
     for personal non-commercial use with credit; whether stored values in a public repository are covered
@@ -87,7 +90,7 @@ report:
     - "Part B blocked: Python and Java are not installed on the dev machine; installing Python + Orekit (and a JDK) needs the owner's go-ahead (D-5 chose the tool; the installation itself is an owner action per ADR-003)."
     - "Owner decision needed on storing textbook-derived values in the public repository (terms of use, assessment §2)."
     - "Naming hazard: the book's S axis is radial and Mission Lab's S is along-track. Any ch. 22 case must be relabelled explicitly."
-    - "Reference-radius mismatch: the book's 6378.1366 km vs ML-ARCH-002's WGS 84 6 378 137 m (document-to-document comparison). Altitude-defined book cases inherit an unstated radius."
+    - "Reference-radius mismatch: the book's equatorial radius differs from Mission Lab's 6 378 137 m at the sub-metre level (document-to-document comparison). Altitude-defined book cases inherit an unstated radius."
   review_artifact: ""   # no PR opened (coordinator instruction)
   recommended_next_action: >
     Systems Architect review of the assessment. Owner: (1) authorise installing Python + JDK + Orekit for
