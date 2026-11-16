@@ -399,3 +399,58 @@ report_part_d3_phase1:
       - "pnpm install --frozen-lockfile, lint, typecheck, format:check, check:boundaries -> exit 0; pnpm test -> exit 0, 67 files, 1415 passed | 156 skipped"
     disagreements:
       - "N4 bound: the note asked for ≤ 2 × the VT-12 per-side bound, i.e. 2(12κ_h + 25)u‖Δv‖ = 3.29e-11 m/s, unmargined. I used the approved L3 VT-12 row 3M(12κ_h + 25)u‖Δv‖ = 1.972e-10 m/s instead: it is already approved for exactly this quantity (engine Δv_I vs Orekit Δv_I, §9.3.1), and an unmargined bound would be a new tolerance outside the margin policy of §3. Not a loosening (no approved value existed for 2× per side). The choice was not driven by the run-3 value (1.8e-12 m/s), which both bounds pass. If the reviewer prefers the tighter form, it is a one-line change in the gated test before phase 2."
+
+report_part_d3_phase2:
+  # Part D3 phase 2 (2026-11-16), branch test/ml-task-018d3-phase2 from origin/main c9aaaf8 (record
+  # revision 5 approved by the owner 2026-11-16, b60a06a). Not pushed.
+  commits:
+    - "959e9ac step 1: engine event state of L3 c1-escape-prograde (writer output redirected, not read before step 2 was committed)"
+    - "55d1670 step 2: Orekit arc restarted from it (restart_r5.py; restart.py unchanged), committed before any comparison result was looked at"
+    - "50bf19b docs/verification/conformance-run-4.md"
+    - "this commit: this report"
+  files_changed:
+    - conformance/l3-restart-r5/engine-event-states.json, c1-escape-prograde.json (new)
+    - docs/verification/conformance-run-4.md (new)
+    - docs/backlog/tasks/ML-TASK-018.yaml (this report)
+  summary: >
+    All three conditions of tolerances.md §4.1 item 6 held in one run. (b) selfcheck --repro
+    --restart conformance/l3-restart: exit 0, 500 checks, 0 failures, byte-identical regeneration;
+    --restart conformance/l3-restart-r5: exit 0, 495 checks, 0 failures; worst A6′ hyperbolic ratio
+    9.6e-4. (c) extended O-1 check: 150 cases / 546 samples, worst ratio 0.083 (grid) and 0.069
+    (VT-16 arcs). Asserted hyperbolic state rows: L2b 367 samples, worst 0.0033; L3 35 samples, worst
+    0.0016; c1 premises (pre-state = initialState exactly; Δv_I difference 0.0053 of the L3 VT-12 row).
+    Conformance project with the switch: 25 files, 614 tests passed. O-12 and O-13 proven (run
+    report §4); hyperbolic VT-16 states are asserted evidence at L2b and L3. No engine or reference
+    defect.
+  tests_executed:
+    - "ML_CONFORMANCE_REV5=1 ML_WRITE_R5_EVENT_STATES=1 pnpm vitest run --project conformance src/vt16-r5-hyperbolic.test.ts -> exit 1 by design (c1 restart not yet produced); output not read"
+    - "python -B conformance/l3-restart-r5/restart_r5.py --code-revision 959e9ac --date 2026-11-16 -> exit 0, 1 arc"
+    - "python -B verification/l3/selfcheck.py --repro --restart conformance/l3-restart -> exit 0, 500 pass/fail, 0 failures, 66 info"
+    - "python -B verification/l3/selfcheck.py --restart conformance/l3-restart-r5 -> exit 0, 495 pass/fail, 0 failures, 66 info"
+    - "ML_CONFORMANCE_REV5=1 npx vitest run --project conformance -> exit 0, 25 files, 614 passed, 0 skipped"
+    - "pnpm install --frozen-lockfile, lint, typecheck, format:check, check:boundaries -> exit 0"
+    - "pnpm test -> exit 1 in 4 attempts: 2–3 Vitest 5 s timeouts in hp/a3-math-accuracy, ref/grid (large-span counting), ref/kepler (L2a solver); identical on main c9aaaf8 without phase-2 files; suite ~32 s vs ~12 s the day before. npx vitest run --maxWorkers=4 -> exit 0, 67 files, 1415 passed | 156 skipped (the gated tests); the three files pass alone"
+  reference_data_used:
+    - "test-data/reference-cases/o1-hyp-r5 (codeRevision 8ac71f4), vt-16-r4, l3-r4-vt-16, unchanged"
+    - "test-data/l3-orekit/vt-16, conformance/l3-restart (run 3), conformance/l3-restart-r5 (this run)"
+  not_verified:
+    - "Hyperbolic solver residual for Δt < 0 and below the 0.05 gate"
+    - "VT-14 for e > 0 ('VT-14: e = 0 only', O-11)"
+    - "CI run; restarted arcs not reproducible in CI (Orekit environment)"
+  known_limitations:
+    - "Restarted arcs are tied to the engine event states bit-for-bit (stale on any engine change)"
+    - "pnpm test timeouts under load (environmental, also on main); needs explicit timeouts before CI wiring"
+    - "Report committed, not approved"
+  documentation_changes:
+    - docs/verification/conformance-run-4.md
+  risks_or_blockers:
+    - "pnpm test is not green on this machine at the default worker count (timeouts, not assertion failures); not changed here because no test may be changed in this phase"
+  switch_removal_after_acceptance: >
+    In conformance/src/vt16-r5-hyperbolic.test.ts the three describe.skipIf(!enabled) become describe;
+    rev5Enabled() is replaced by a call that keeps the record lock (throws unless recordApprovesRev5)
+    without reading ML_CONFORMANCE_REV5; the writer block stays behind ML_WRITE_R5_EVENT_STATES;
+    rev5-gate.test.ts, the gate's doc comment and conformance/l3-restart-r5/README.md updated.
+  review_artifact: ""   # no PR opened (instructed not to push)
+  recommended_next_action: >
+    Owner acceptance of conformance-run-4.md; then the switch removal above; explicit timeouts for the
+    three slow verification tests; CI wiring and the G1 verification report.
