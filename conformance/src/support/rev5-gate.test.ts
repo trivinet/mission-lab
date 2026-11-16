@@ -1,12 +1,13 @@
 /**
- * The revision-5 gate itself (no engine): the committed record is not approved for revision 5, so
- * with the switch set the gate throws; an approved status line would open it.
+ * The revision-5 record lock itself (no engine). The switch was removed after the owner accepted
+ * conformance-run-4.md (2026-11-16); the lock now only checks that the committed record approves
+ * revision 5.
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterEach, describe, expect, it } from 'vitest';
-import { REV5_SWITCH, recordApprovesRev5, rev5Enabled } from './rev5-gate';
+import { describe, expect, it } from 'vitest';
+import { recordApprovesRev5, rev5Enabled } from './rev5-gate';
 
 const record = readFileSync(
   join(
@@ -20,17 +21,10 @@ const record = readFileSync(
   ),
   'utf8',
 );
-const saved = process.env[REV5_SWITCH];
-
-afterEach(() => {
-  if (saved === undefined) Reflect.deleteProperty(process.env, REV5_SWITCH);
-  else process.env[REV5_SWITCH] = saved;
-});
-
 describe('revision-5 gate', () => {
-  it('the switch is off in normal runs, so the gated suites are skipped', () => {
-    Reflect.deleteProperty(process.env, REV5_SWITCH);
-    expect(rev5Enabled()).toBe(false);
+  it('the committed record approves revision 5, so the lock is open', () => {
+    expect(recordApprovesRev5(record)).toBe(true);
+    expect(rev5Enabled()).toBe(true);
   });
 
   it('recognises an approved status line and rejects a proposed one', () => {
@@ -68,11 +62,5 @@ describe('revision-5 gate', () => {
       false,
     );
     expect(recordApprovesRev5('# no status line\n')).toBe(false);
-  });
-
-  it('with the switch set, refuses to run while the committed record is not approved', () => {
-    if (recordApprovesRev5(record)) return; // after the owner's signature this lock is open
-    process.env[REV5_SWITCH] = '1';
-    expect(() => rev5Enabled()).toThrow(/does not record the owner's approval of revision 5/);
   });
 });

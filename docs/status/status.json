@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "Conformance run 4 passes: hyperbolic states asserted, O-12/O-13 proven (PR #37). For G1 still: test timeouts before CI wiring, the WGS 84 constants check (VT-19), CI wiring and the G1 report.",
+  "headline": "Run 4 accepted: hyperbolic states proven and now asserted in every test run (switch removal in PR #39, with explicit timeouts for heavy tests). For G1 still: the WGS 84 constants check (VT-19), CI wiring of the numerical suite and the G1 report.",
   "gates": [
     {
       "id": "G0",
@@ -32,8 +32,8 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-32",
-      "text": "Accept conformance run 4 and merge PR #37 (this allows removing the revision-5 switch so the hyperbolic tests run in CI). Merge PR #38 (status).",
+      "id": "OA-33",
+      "text": "Merge PR #39 (revision-5 switch removed, 60 s timeout for heavy test projects; status included). Then choose the next G1 step.",
       "blocking": "CI wiring and G1 report"
     },
     {
@@ -207,7 +207,7 @@
           "role": "Verification Engineer",
           "model": "opus",
           "status": "in_review",
-          "deps": "Run 4 in PR #37; then switch removal, test timeouts, CI wiring, G1 report",
+          "deps": "Run 4 accepted and merged; switch removal PR #39; then VT-19, CI wiring, G1 report",
           "approval": true
         },
         {
@@ -382,6 +382,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Coordinator",
+      "text": "Removed the revision-5 switch as specified (N5): the hyperbolic suites now run in every pnpm test; record lock kept. Added a 60 s test timeout to the verification and conformance projects (no assertion changed). Full suite passes locally: 1570 tests, 0 skipped. PR #39."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Owner",
+      "text": "Accepted conformance run 4; PR #37 (merge commit) and PR #38 merged, CI green."
+    },
     {
       "date": "2026-11-16",
       "who": "Coordinator",
