@@ -1,6 +1,6 @@
 task_id: ML-TASK-023
 title: "3D scene: Earth, trajectory, spacecraft and maneuver markers, camera, scene-state test hook (apps/web)"
-status: in_progress
+status: review
 requirement_ids: [ML-FR-007, ML-UX-003]
 owner_role: frontend-engineer
 reviewer_role: verification-engineer   # VI-02 is a verification item
@@ -48,4 +48,44 @@ deliverables:
   - apps/web/src/scene/ with tests, e2e spec, dependency update, the report section of this file
 human_approval_required: false
 
-report: {}
+report:
+  files_changed:
+    - "apps/web/package.json, pnpm-lock.yaml: three 0.186.1, @react-three/fiber 9.8.2, @types/three 0.186.0 (exact; the only additions, no drei)"
+    - "apps/web/src/scene/ (new): scene-scale.ts, scene-geometry.ts, earth-orientation.ts, scene-source.ts, scene-options.ts, scene-hook.ts, scene-style.ts, SceneCanvas.tsx, SceneErrorBoundary.tsx, WorkspaceScene.tsx, index.ts, scene-geometry.test.ts, scene-options.test.ts"
+    - "apps/web/src/App.tsx: one mount of WorkspaceScene under the debug surface (Coordinator reconciles with ML-TASK-022)"
+    - "apps/web/e2e/scene.spec.ts (new)"
+  summary: >
+    The scene scale is s = 1e-6 scene units per metre (1 unit = 1000 km), the single constant
+    applied to samples. A vertex component is exactly Math.fround(x * s) (toSceneCoordinate in
+    scene-scale.ts). buildSceneGeometry turns each result segment into its own Float32Array, so
+    segments are never joined; the array is handed to the three BufferAttribute by reference. The
+    Earth sphere radius is result.model.constants.referenceRadius_m times s (Earth only: the radius
+    from the request the engine builds, because web may not import astrodynamics). Earth
+    orientation is rotation about +Z by the ADR-004 ERA, labelled illustrative. Coast (segment 0)
+    is dashed grey, maneuvered segments solid teal, the maneuver point a large amber marker, the
+    spacecraft marker sits at a flat sample index (slider, until ML-TASK-024). Stale shows the old
+    trajectory at 50 percent opacity with a chip; none, computing and error show Earth only.
+    Camera: three OrbitControls addon (no drei), keyboard arrows, plus/minus and Home, and a Reset
+    button. The test hook is window.__missionLabScene.get(), present only with the URL flag
+    ?sceneHook=1.
+  tests_executed:
+    - "pnpm install --frozen-lockfile, lint, typecheck, build, format:check, check:boundaries (20/20 fixtures): exit 0"
+    - "pnpm test: 75 files, 1648 tests passed"
+    - "pnpm --filter @mission-lab/web test:e2e (Chromium, built app): 9 passed (5 new in scene.spec.ts)"
+    - "VI-02 (Vitest, real engine, Object.is on every component vs Math.fround(sample * s)): default scenario 303 components; maneuver on the grid at 3000 s 306; maneuver off the grid at 2500.25 s 309; 0 mismatches; also segment separation, event markers, hook arrays identical to the rendered arrays"
+    - "VI-02 in the browser (e2e): hook sourcePosition_m vs vertices, 303 components, 0 mismatches"
+    - "Mutation check: scaling by 1.0000001 made 4 VI-02 tests fail; reverted, not committed"
+    - "AC4: unit test (display option store never calls the runner, result state identical) and e2e (single worker, state stays current)"
+    - "Visual check of a Playwright screenshot of the real WebGL canvas: Earth with graticule, dashed trajectory, axes"
+  e2e_webgl_flags: "None needed: headless Chromium via Playwright rendered WebGL with default flags."
+  not_verified:
+    - "Earth ERA constants are pinned to ADR-004 as written; the unit test restates the formula and is not an independent check (ADR-004 asks the Verification Engineer to confirm them)."
+    - "The e2e render check compares canvas screenshots before and after a run and checks no console errors; it does not prove the pixels show the right geometry. Exactness rests on the VI-02 hook arrays."
+    - "A maneuvered scenario in the browser is not tested (the editor has no maneuver input yet; maneuvered cases are Vitest only). The spacecraft marker is hidden behind the Earth in the default view. GPU upload of the arrays is not observed (the hook shows the CPU arrays given to three)."
+    - "Keyboard orbit is checked by e2e (camera moves); no screen-reader test. Stale 50 percent opacity and graticule colours are not contrast-measured (design-tokens.md caveat)."
+    - "computeLineDistances (three) fills a dash attribute for the coast line; positions are untouched."
+  conflicts_or_gaps:
+    - "The web app cannot import astrodynamics and the engine exports no standalone reference radius, so with no result the radius is read from buildSimulationRequest(newScenario()).constants. A small simulation export would be cleaner (contract gap; packages not changed)."
+    - "ADR-004 needs a date-to-days computation (Date.parse) in the UI for ERA; no engine time-conversion module is exported yet."
+    - "The lint rule no-loss-of-precision flags the ADR-004 literal 1.00273781191135448; one eslint-disable line with a comment keeps it as written."
+    - "AxesHelper colours (X red, Y green, Z blue) are the three convention, not design tokens."
