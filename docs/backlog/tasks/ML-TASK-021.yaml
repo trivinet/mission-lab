@@ -1,0 +1,58 @@
+task_id: ML-TASK-021
+title: "Scenario store, result states and simulation worker host (apps/web)"
+status: in_progress
+requirement_ids: [ML-FR-001, ML-UX-001, ML-UX-002, ML-UX-003, ML-NFR-001, ML-NFR-007]
+owner_role: frontend-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-004, ML-TASK-017]   # contracts v1.0 and the real runner (merged)
+affected_paths:
+  - apps/web/
+  - pnpm-lock.yaml
+  - docs/backlog/tasks/ML-TASK-021.yaml
+objective: >
+  Give the workspace its state backbone before any visual work: one store holding the current
+  scenario and the result state, and a Web Worker that runs the real engine off the main thread.
+  Later tasks (022 editor, 023 scene, 024 timeline, 025 model panel) build on this without
+  touching it.
+scope:
+  - "Add zustand 5.0.16 to apps/web (pinned in docs/architecture/tech-baseline.md §3.6; exact version, lockfile updated)."
+  - "Scenario store (zustand, apps/web only): holds one `Scenario` (type from @mission-lab/contracts); `newScenario()` produces a valid default scenario that can be run without further input (ML-FR-001 AC1). The default orbit, epoch, duration and output step are one exported constant with a comment stating each value and its unit; they are a product default, not a physical reference, and are listed in the report for the owner to confirm."
+  - "Setters for name, epoch (UTC), duration and output step, each typed with its SI unit (ML-FR-001 AC2 data model; the editor UI is ML-TASK-022)."
+  - "Result state machine with exactly the five states of ML-UX-001: none, computing, current, stale, error. Rules: a run moves to computing; a successful result moves to current and keeps its warning diagnostics; a result with `status: \"failed\"` moves to error and keeps its diagnostics; validation issues prevent the run and are stored per field path; editing any physical parameter while current (or computing) moves to stale and never silently recomputes or keeps the old result as current (ML-UX-002); editing the name does not make the result stale."
+  - "Worker host: a Web Worker module in apps/web that imports @mission-lab/simulation and runs `runSimulation` on a request built with `buildSimulationRequest`; typed arrays transferred, not copied (architecture §5); a run id on every message so a result from a superseded run is discarded (latest run wins); worker errors become the error state with a plain message. The main thread never calls runSimulation (ML-UX-003)."
+  - "A minimal, neutral debug surface in the existing shell so the e2e test can drive it: a Run button, a control that edits one physical parameter, and a text read-out of the result state with data-testid attributes. No styling decisions (ML-TASK-020 pending owner choice OA-14)."
+out_of_scope:
+  - "The scenario editor UI, field-level validation display, derived values (ML-TASK-022)."
+  - "ML-FR-001 AC3 (confirmation when replacing an unsaved scenario): needs the unsaved-changes tracking of ML-TASK-033; record it as deferred in the report."
+  - "3D scene, timeline, plots, model panel (023–025, 030–032); persistence (033)."
+  - "Any visual design (020). Any change to packages/, conformance/, verification/, test-data/ or the contracts."
+  - "Dependencies other than zustand 5.0.16. If another is needed, stop and report."
+inputs:
+  - AGENTS.md
+  - docs/engineering/coding-standards.md, docs/engineering/contributing.md
+  - docs/requirements/m1-requirements.md (ML-FR-001, §3 ML-UX-001…004, §4 NFRs)
+  - docs/architecture/proposed-architecture.md (§1–§2 boundaries, §5 state and computation)
+  - docs/architecture/tech-baseline.md (§3.6 zustand, §3.8 testing)
+  - docs/architecture/adr/ADR-002, ADR-006
+  - docs/architecture/contracts-v1.md (Scenario, SimulationRequest, SimulationResult, diagnostics §8)
+  - docs/verification/m1-verification-plan.md (VE-02)
+  - packages/contracts and packages/simulation public exports (read the index files and types; do not change them)
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; `pnpm test:e2e` passes."
+  - "`newScenario()` output passes the contracts' scenario validation and the engine's semantic validation, and a run of it returns `status: \"succeeded\"` (unit test against the real runSimulation)."
+  - "Unit tests cover every allowed transition of the five-state machine and reject or ignore every disallowed one; editing a physical parameter from current gives stale; editing the name does not."
+  - "A superseded run's result is discarded (unit test with two overlapping runs)."
+  - "VE-02 e2e (Playwright, Chromium): none → computing → current → stale through the debug surface, with the real engine in the worker."
+  - "ML-UX-003 evidence: the e2e test shows the page responds to input while a run is in progress (state the method and its limits in the report)."
+  - "`zustand` is the only new dependency, at exactly 5.0.16; no package outside apps/web imports zustand or React (boundaries check)."
+test_requirements:
+  - "Vitest unit tests in apps/web/src for the store, the state machine and the worker protocol (the worker logic factored so it is testable without a browser)."
+  - "Playwright e2e for VE-02 in apps/web/e2e."
+deliverables:
+  - apps/web/src (store, state machine, worker host and worker module, debug surface) with tests
+  - apps/web/e2e VE-02 test
+  - apps/web/package.json and pnpm-lock.yaml (zustand)
+  - The report section of this file
+human_approval_required: false   # the default scenario values are confirmed by the owner at PR review
+
+report: {}
