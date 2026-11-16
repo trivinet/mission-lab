@@ -1,0 +1,51 @@
+task_id: ML-TASK-023
+title: "3D scene: Earth, trajectory, spacecraft and maneuver markers, camera, scene-state test hook (apps/web)"
+status: in_progress
+requirement_ids: [ML-FR-007, ML-UX-003]
+owner_role: frontend-engineer
+reviewer_role: verification-engineer   # VI-02 is a verification item
+dependencies: [ML-TASK-020, ML-TASK-021]
+affected_paths:
+  - apps/web/src/scene/
+  - apps/web/src/App.tsx       # one mount point only; ML-TASK-022 owns the layout and the Coordinator reconciles at merge
+  - apps/web/package.json
+  - pnpm-lock.yaml
+  - apps/web/e2e/scene*.spec.ts
+  - docs/backlog/tasks/ML-TASK-023.yaml
+objective: >
+  Show the engine's result in 3D without the renderer computing physics, and prove with an exact
+  test hook that every rendered vertex is the engine sample scaled once (VI-02).
+scope:
+  - "Add three 0.186.1, @types/three 0.186.0 and @react-three/fiber 9.8.2 (pinned in docs/architecture/tech-baseline.md; exact versions, lockfile updated). drei is not allowed unless justified and reported first."
+  - "Scene component `WorkspaceScene` in apps/web/src/scene/, mounted in the centre region (ML-TASK-022 builds the layout in parallel; mount it in App.tsx with a minimal change and expect the Coordinator to reconcile)."
+  - "Earth as a sphere of the engine's exported reference radius times the scene scale; Earth orientation illustrative (ADR-004, rotation about +Z by ERA) and labelled illustrative (ML-FR-007 AC3); optional inertial axes."
+  - "Trajectory from the result's samples, per segment (never joined across the maneuver discontinuity); coast and maneuvered parts distinguishable with the approved colours; spacecraft marker at a given t_s (sample index for now; ML-TASK-024 adds interpolation and playback); maneuver point marker."
+  - "Scene coordinates exactly `Math.fround(x * s)` with one documented scene scale s (contracts-v1 decision 4, ML-FR-007 AC2). No other arithmetic on engine samples in the renderer."
+  - "Camera orbit, zoom and reset (AC1), implemented without drei unless reported; display options (axes on/off, etc.) never trigger a simulation (AC4)."
+  - "Scene-state test hook (VI-02): exposes, in test builds or behind a documented flag, the exact Float32 vertex arrays and the scale used, so a test compares them bit for bit with `Math.fround(sample * s)` computed from the engine result."
+  - "The scene reads the ML-TASK-021 store; when the result is stale it shows the old trajectory marked stale (per visual-direction.md), when none or error it shows Earth only."
+out_of_scope:
+  - "Timeline and playback (024), plots (030–032), editor and layout (022), model panel (025)."
+  - "Any physics, interpolation or frame transformation of engine samples beyond the single scale; any change to packages/."
+  - "Textures loaded from the network (CSP and no external services); a procedural or flat Earth is fine."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/requirements/m1-requirements.md (FR-007, FR-008 AC2 for the marker contract)
+  - docs/architecture/contracts-v1.md (result samples layout, decision 4, §14 note), ADR-004, ADR-006
+  - docs/architecture/tech-baseline.md §3.3 (React ↔ R3F ↔ three)
+  - docs/design/visual-direction.md, docs/design/design-tokens.md (approved 2026-11-16)
+  - docs/verification/m1-verification-plan.md (VI-02)
+  - docs/backlog/tasks/ML-TASK-021.yaml (store API)
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; `pnpm --filter @mission-lab/web test:e2e` passes."
+  - "VI-02: a test runs the default scenario and a maneuvered scenario through the real engine and asserts every rendered vertex equals `Math.fround(sample * s)` bit for bit (Object.is on each component), segment by segment, with no vertex joining two segments."
+  - "A display option toggle is shown not to start a run (AC4), by test."
+  - "Earth radius in the scene comes from the engine export times s; the renderer contains no other numeric constant applied to samples (reviewable)."
+  - "Only the three listed dependencies are added, at the pinned versions; boundaries check still forbids three/R3F outside apps/web."
+test_requirements:
+  - "Vitest unit tests for the scaling and segment-to-geometry code; the VI-02 check; Playwright e2e that the scene renders and camera reset works."
+deliverables:
+  - apps/web/src/scene/ with tests, e2e spec, dependency update, the report section of this file
+human_approval_required: false
+
+report: {}

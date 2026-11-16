@@ -1,0 +1,51 @@
+task_id: ML-TASK-022
+title: "Workspace layout shell and scenario editor with validation and derived values (apps/web)"
+status: in_progress
+requirement_ids: [ML-FR-001, ML-FR-002, ML-FR-005, ML-UX-001, ML-UX-002, ML-UX-004]
+owner_role: frontend-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-020, ML-TASK-021]
+affected_paths:
+  - apps/web/src/App.tsx
+  - apps/web/src/index.css
+  - apps/web/src/layout/
+  - apps/web/src/editor/
+  - apps/web/src/state/          # additions only (element and maneuver setters); no change to the five-state rules
+  - apps/web/src/debug/          # the ML-TASK-021 debug surface may be removed once the editor covers its e2e needs
+  - apps/web/e2e/
+  - docs/backlog/tasks/ML-TASK-022.yaml
+objective: >
+  Turn the empty shell into the approved workspace (layout A, blue accent, banner plus chip) and
+  give it the scenario editor: every input of M1 can be edited, validated at the field and run.
+scope:
+  - "Layout shell per docs/design/visual-direction.md (approved 2026-11-16) and docs/design/design-tokens.md: editor column left, centre region for the 3D view (an empty, labelled region with a stable container; ML-TASK-023 mounts the scene there), results column right; toolbar with Run and the result-state chip; banner over the centre column for stale, computing, error and none. Tokens as CSS custom properties / Tailwind 4 theme, dark only."
+  - "Scenario fields (ML-FR-001 AC2): name, epoch (UTC), duration, output step, each with its unit shown."
+  - "Keplerian elements (ML-FR-002): a, e, i, Ω, ω, ν edited in km and degrees, stored in m and rad; field-level validation messages for the AC2 classes (from the engine's validation, not re-implemented); Ω, ω, ν normalised to [0°, 360°); degenerate configurations stated (AC3) using the engine's exported thresholds/convention; derived read-only quantities visually distinct (AC4) computed by the engine's exported functions, never in the UI."
+  - "One impulsive maneuver (ML-FR-005): add, edit, remove; time (elapsed, also shown as UTC) and R, S, W Δv in m/s; validation messages including the M1 one-maneuver limit; total |Δv| shown; the RSW convention documented in the UI, including that along-track is not the velocity direction on a non-circular orbit (AC3)."
+  - "Result-state presentation (ML-UX-001/002) wired to the ML-TASK-021 store: chip always, banner for stale/computing/error/none; error shows the diagnostics; warnings listed when current."
+  - "Keyboard (ML-UX-004): every input and action reachable and operable by keyboard; visible focus."
+out_of_scope:
+  - "The 3D scene (ML-TASK-023), timeline (024), model panel (025), plots (030–032), persistence (033)."
+  - "Any physics or unit conversion beyond the documented display conversions (m↔km, rad↔deg); any change to packages/."
+  - "Changing the five-state rules of ML-TASK-021."
+  - "New dependencies. If one is needed, stop and report."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/design/visual-direction.md, docs/design/design-tokens.md, docs/design/mockups/workspace.html (approved)
+  - docs/requirements/m1-requirements.md (FR-001, FR-002, FR-005, §3 UX)
+  - docs/architecture/contracts-v1.md (Scenario, validation issue paths, diagnostics §8)
+  - docs/architecture/adr/ADR-008 (degenerate convention)
+  - docs/backlog/tasks/ML-TASK-021.yaml (report: store API)
+  - packages/contracts, packages/simulation, packages/astrodynamics public exports (read only)
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; `pnpm --filter @mission-lab/web test:e2e` passes, including the ML-TASK-021 VE-02 and ML-UX-003 tests (adapted to the editor if the debug surface is removed, with the same assertions)."
+  - "Unit tests: display conversions round-trip exactly where they must (stored values are what the user typed, converted once); angle normalisation; mapping of each engine validation issue path to its field."
+  - "e2e: edit each field class; each FR-002 AC2 validation class shows a field-level message and prevents the run; a degenerate orbit shows its convention note; add, edit and remove a maneuver; the second-maneuver message; derived values shown and distinct; keyboard-only run of the default scenario."
+  - "No physics computed in apps/web: derived quantities and validation come from engine exports (reviewable in the diff)."
+test_requirements:
+  - "Vitest unit tests in apps/web/src; Playwright e2e in apps/web/e2e."
+deliverables:
+  - apps/web layout shell, editor, tests; the report section of this file
+human_approval_required: false
+
+report: {}
