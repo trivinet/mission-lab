@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "VT-19 checked against IERS Conventions 2010: GM, radius and ERA coefficients match (PR #40). The NGA WGS 84 standard is unreachable from this network, so the WGS 84 attribution is unverified. Next: the G1 verification report.",
+  "headline": "VT-19 accepted against IERS Conventions 2010 and merged (PR #40); WGS 84 attribution listed as an open gap. The G1 verification report is being written.",
   "gates": [
     {
       "id": "G0",
@@ -31,11 +31,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-34",
-      "text": "VT-19 (PR #40): either download NGA.STND.0036 (WGS 84, 2014) yourself from earth-info.nga.mil (blocked from this machine) and tell me where it is, or accept IERS TN36 as the VT-19 source for G1 with the WGS 84 attribution listed as an open gap.",
-      "blocking": "VT-19 closure in the G1 report"
-    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -149,8 +144,8 @@
           "title": "Independent reference implementations and datasets",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_review",
-          "deps": "VT-19 in PR #40; WGS 84 source unreachable (OA-34)"
+          "status": "done",
+          "deps": "VT-19 merged (PR #40); WGS 84 attribution open gap"
         },
         {
           "id": "ML-TASK-012",
@@ -206,8 +201,8 @@
           "title": "Numerical suite in CI and G1 verification report",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_review",
-          "deps": "Waiting on VT-19; then the G1 report",
+          "status": "in_progress",
+          "deps": "G1 verification report being written",
           "approval": true
         },
         {
@@ -382,6 +377,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Verification",
+      "text": "G1 verification report started (ML-TASK-018 final part, Opus): verdict per G1 criterion, evidence layers per family, L3 gaps, CI status, open items and owner approvals needed."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Owner",
+      "text": "Accepted IERS Conventions 2010 (TN36) as the VT-19 source for G1; WGS 84 attribution stays an open gap. PR #40 merged, CI green."
+    },
     {
       "date": "2026-11-16",
       "who": "Coordinator",
