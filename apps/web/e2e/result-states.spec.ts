@@ -11,10 +11,10 @@ async function recordStates(page: Page): Promise<void> {
     if (target === null) {
       throw new Error('no result-state element');
     }
-    const seen: string[] = [target.textContent ?? ''];
+    const seen: string[] = [target.textContent];
     (window as unknown as { __states: string[] }).__states = seen;
     new MutationObserver(() => {
-      const text = target.textContent ?? '';
+      const text = target.textContent;
       if (seen[seen.length - 1] !== text) {
         seen.push(text);
       }
