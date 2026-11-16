@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Visual direction approved (layout A, blue accent, banner + chip). ML-TASK-022 (layout and editor) and ML-TASK-023 (3D scene, VI-02) are running in parallel.",
+  "headline": "Phase 2: editor (022) built but partly blocked: apps/web may not import the engine core, so derived values, degenerate note and angle normalisation wait on ML-TASK-027 (simulation API, running). 3D scene (023) still running.",
   "gates": [
     {
       "id": "G0",
@@ -233,7 +233,7 @@
           "role": "Frontend Engineer",
           "model": "sonnet",
           "status": "in_progress",
-          "deps": "Contract in PR #47; agent running"
+          "deps": "Layout, editor, maneuver done; FR-002 AC2–AC4 wait on ML-TASK-027"
         },
         {
           "id": "ML-TASK-023",
@@ -258,6 +258,14 @@
           "model": "sonnet",
           "status": "todo",
           "deps": "017, 021"
+        },
+        {
+          "id": "ML-TASK-027",
+          "title": "Scenario-view API in simulation for the editor (derived values, degenerate convention, angles, UTC label)",
+          "role": "Astrodynamics Engineer",
+          "model": "opus",
+          "status": "in_progress",
+          "deps": "Unblocks 022"
         },
         {
           "id": "ML-TASK-026",
@@ -368,6 +376,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-027 started (Opus): expose through packages/simulation the approved degeneracy thresholds, a scenario-orbit description (normalised angles, derived quantities, degenerate class and convention) and a UTC label of epoch + t_s, so apps/web computes no physics and the boundary stays as approved."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Frontend",
+      "text": "ML-TASK-022 delivered partly: layout A, editor, maneuver, banner + chip, keyboard; 26 e2e pass. Blocked on FR-002 AC2–AC4 because the needed functions are only in packages/astrodynamics, which apps/web may not import (ADR-002); nothing was reimplemented."
+    },
     {
       "date": "2026-11-16",
       "who": "Owner",
