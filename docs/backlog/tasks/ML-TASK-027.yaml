@@ -1,0 +1,44 @@
+task_id: ML-TASK-027
+title: "Scenario-view API in packages/simulation for the editor: derived quantities, degenerate classification, angle normalisation, UTC of an elapsed time"
+status: in_progress
+requirement_ids: [ML-FR-002, ML-FR-005, ML-NFR-001, ML-NFR-002]
+owner_role: astrodynamics-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-014, ML-TASK-017]
+affected_paths:
+  - packages/simulation/src/
+  - docs/backlog/tasks/ML-TASK-027.yaml
+objective: >
+  Unblock ML-TASK-022. apps/web may import only @mission-lab/simulation and @mission-lab/contracts
+  (ADR-002, eslint boundaries); the editor needs ML-FR-002 AC2 (angle normalisation), AC3
+  (degenerate classification and convention) and AC4 (derived quantities), and a UTC label for a
+  maneuver time (ML-FR-005 AC1). These exist in @mission-lab/astrodynamics or nowhere. Expose them
+  through packages/simulation so the UI computes no physics and the boundary stays as approved.
+scope:
+  - "Export from packages/simulation a constant with the approved degeneracy thresholds of ADR-008 decision 2 (owner, 2026-11-13; tolerances.md §10, §15): circular threshold 1e-5 on e and equatorial threshold 1e-5 on min(i, π − i), strict comparison. Cite ADR-008 and the record in the doc comment; the value must equal what the record states (read it; do not write it from memory)."
+  - "A pure function (name your choice, e.g. `describeScenarioOrbit`) that takes the scenario's Keplerian elements and constants and returns, without mutating anything: the angles Ω, ω, ν normalised to [0, 2π) with the engine's `normalizeAngle_rad`; the derived read-only quantities of ML-FR-002 AC4 (perigee and apogee radius and altitude above the reference radius, period, specific energy) from `closedOrbitQuantities`; and the degenerate classification (circular, equatorial, both, none) with the convention applied and which elements are undefined (ADR-008), computed with the exported thresholds. Invalid inputs return a typed failure, never throw."
+  - "A pure function giving the UTC ISO-8601 string of epoch + t_s under the contract's time convention (contracts-v1 TIME_CONVENTION: UTC epoch plus elapsed SI seconds, no leap seconds in M1), so the UI does no date arithmetic. Document the convention in the doc comment."
+  - "Unit tests in packages/simulation: thresholds equal the record's values; each degenerate class including the retrograde-equatorial case and values just above/below each threshold; normalisation of negative and ≥ 2π angles; derived quantities equal the astrodynamics functions' own output for the default scenario (plumbing test; the physics itself is already verified at G1); UTC label for 0 s, fractional seconds and a multi-day offset."
+out_of_scope:
+  - "Any change to packages/astrodynamics, packages/contracts, apps/web, verification/, conformance/."
+  - "Any change to the physics, thresholds or conventions; any new tolerance."
+  - "New dependencies."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/architecture/adr/ADR-002, ADR-004, ADR-008
+  - docs/verification/tolerances.md §10, §15 (thresholds)
+  - docs/architecture/contracts-v1.md (TIME_CONVENTION, Scenario)
+  - docs/requirements/m1-requirements.md (FR-002 AC2–AC4, FR-005 AC1)
+  - packages/astrodynamics public exports; packages/simulation (model.ts TIME_CONVENTION)
+  - docs/backlog/tasks/ML-TASK-022.yaml (report: what the editor needs)
+acceptance_criteria:
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0; all existing tests unchanged and passing."
+  - "No new physics: the new functions only call existing astrodynamics functions and do unit-free plumbing; reviewable in the diff."
+  - "Every new public function documents units, frame and source (ML-NFR-002)."
+test_requirements:
+  - "Vitest unit tests in packages/simulation/src."
+deliverables:
+  - packages/simulation/src new module(s), index exports, tests; the report section of this file
+human_approval_required: false
+
+report: {}
