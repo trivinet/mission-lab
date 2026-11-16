@@ -1,0 +1,274 @@
+<title>Hoja de ruta Mission Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: flight plan. Gate track with "you are here", then one card per phase (status, progress, deliverables, tasks), then the release horizon and what waits on the owner. */
+:root {
+  color-scheme: dark;
+  --bg: #0a0e13; --panel: #111821; --panel-2: #0e141c; --line: #213041; --fg: #dbe5ee; --muted: #8394a6;
+  --accent: #5cc8ff; --ok: #4fd18b; --warn: #f2b84b; --idle: #4d5d6e;
+  --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  color-scheme: light;
+  --bg: #f2f5f8; --panel: #ffffff; --panel-2: #f7f9fb; --line: #d2dbe4; --fg: #13202c; --muted: #5a6b7c;
+  --accent: #0a6fb0; --ok: #1a8a52; --warn: #a86a00; --idle: #9aa7b4;
+} }
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f2f5f8; --panel: #ffffff; --panel-2: #f7f9fb; --line: #d2dbe4; --fg: #13202c; --muted: #5a6b7c;
+  --accent: #0a6fb0; --ok: #1a8a52; --warn: #a86a00; --idle: #9aa7b4;
+}
+body { background: var(--bg); color: var(--fg); font: 14px/1.45 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 32px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+h1 { font-size: 28px; font-weight: 700; letter-spacing: -.01em; }
+h2 { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.mono { font-family: var(--mono); }
+.sub { color: var(--muted); margin-top: 4px; font-size: 13px; }
+
+/* KPI strip */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.kpi b { font-family: var(--display); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.kpi b small { font-size: 15px; color: var(--muted); font-weight: 500; }
+.kpi span { color: var(--muted); font-size: 12px; }
+
+/* Gate track */
+.track { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding-top: 34px; }
+.track::before { content: ""; position: absolute; left: 10%; right: 10%; top: 45px; height: 3px; background: var(--line); border-radius: 2px; }
+.track::after { content: ""; position: absolute; left: 10%; width: 30%; top: 45px; height: 3px; background: var(--ok); border-radius: 2px; }
+.gate { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; min-width: 0; }
+.gate .dot { width: 25px; height: 25px; border-radius: 50%; border: 3px solid var(--idle); background: var(--bg); display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--bg); }
+.gate.passed .dot { background: var(--ok); border-color: var(--ok); }
+.gate.next .dot { border-color: var(--accent); box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 22%, transparent); }
+.gate b { font-family: var(--mono); font-size: 13px; }
+.gate span { font-size: 12px; color: var(--muted); line-height: 1.3; }
+.gate em { font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--ok); }
+.here { position: absolute; top: 0; left: 40%; transform: translateX(-50%); z-index: 2; font-family: var(--mono); font-size: 11px;
+  background: var(--accent); color: var(--bg); padding: 3px 8px; border-radius: 3px; white-space: nowrap; font-weight: 500; }
+.here::after { content: ""; position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%); border: 5px solid transparent; border-bottom: 0; border-top-color: var(--accent); }
+
+/* Phases */
+.phases { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.phase { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.phase.current { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.ph-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.ph-top .tag { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.ph-top h3 { font-size: 17px; font-weight: 600; margin-top: 2px; }
+.pill { font-family: var(--mono); font-size: 11px; padding: 2px 8px; border-radius: 10px; border: 1px solid currentColor; white-space: nowrap; flex: none; }
+.p-done { color: var(--ok); } .p-now { color: var(--accent); } .p-next { color: var(--idle); }
+.prog { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; display: flex; }
+.bar i { display: block; height: 100%; }
+.lbl { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; padding: 3px 8px; border-radius: 4px; background: var(--panel-2); border: 1px solid var(--line); }
+.chip.key { border-color: color-mix(in srgb, var(--ok) 55%, transparent); }
+.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.tasks li { display: grid; grid-template-columns: 10px 34px 1fr; gap: 8px; align-items: baseline; font-size: 12.5px; }
+.tasks li .id { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.s { width: 8px; height: 8px; border-radius: 50%; align-self: center; }
+.s.done { background: var(--ok); } .s.review { background: var(--accent); } .s.todo { background: transparent; border: 1.5px solid var(--idle); }
+.gatebox { font-size: 12px; padding: 8px 10px; border-radius: 5px; background: var(--panel-2); border: 1px dashed var(--line); display: flex; gap: 8px; align-items: baseline; }
+.gatebox b { font-family: var(--mono); }
+.note { font-size: 12px; color: var(--muted); }
+
+/* Releases */
+.rel { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.r { border-top: 3px solid var(--idle); background: var(--panel); border-radius: 0 0 6px 6px; padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.r.done { border-top-color: var(--ok); } .r.now { border-top-color: var(--accent); }
+.r h3 { font-size: 15px; }
+.r .what { font-size: 12px; color: var(--muted); }
+.r ul { margin: 0; padding-left: 16px; font-size: 12px; display: flex; flex-direction: column; gap: 2px; }
+
+/* Owner */
+.owner { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+.oa { background: var(--panel); border: 1px solid color-mix(in srgb, var(--warn) 55%, transparent); border-radius: 6px; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+.oa b { font-family: var(--mono); font-size: 12px; color: var(--warn); }
+.oa span { font-size: 13px; }
+.oa small { color: var(--muted); font-size: 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+@media (max-width: 760px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rel { grid-template-columns: 1fr; }
+  .gate span { font-size: 11px; }
+}
+@media (max-width: 460px) { .gate span { display: none; } .here { font-size: 10px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Mission Lab · hoja de ruta</h1>
+    <div class="sub mono">Release M1 «Orbital Sandbox» · estado a 16 nov 2026</div>
+  </header>
+
+  <section class="kpis" aria-label="Resumen">
+    <div class="kpi"><b>2<small> / 5</small></b><span>gates superados</span></div>
+    <div class="kpi"><b>17<small> / 35</small></b><span>tareas terminadas</span></div>
+    <div class="kpi"><b>1574</b><span>tests en verde (CI)</span></div>
+    <div class="kpi"><b>0.094</b><span>peor error / tolerancia</span></div>
+  </section>
+
+  <section aria-label="Gates">
+    <h2>Gates de aprobación</h2>
+    <div class="track">
+      <div class="here">ESTÁS AQUÍ · fase 2</div>
+      <div class="gate passed"><div class="dot">✓</div><b>G0</b><span>Base aprobada</span><em>11 nov</em></div>
+      <div class="gate passed"><div class="dot">✓</div><b>G1</b><span>Motor verificado</span><em>16 nov</em></div>
+      <div class="gate next"><div class="dot"></div><b>G2</b><span>Workspace usable</span></div>
+      <div class="gate"><div class="dot"></div><b>G3</b><span>Flujo M1 completo</span></div>
+      <div class="gate"><div class="dot"></div><b>G4</b><span>Release M1</span></div>
+    </div>
+  </section>
+
+  <section aria-label="Fases">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+      <h2>Fases del proyecto</h2>
+      <div class="legend">
+        <span><i class="s done"></i>hecha</span><span><i class="s review"></i>en revisión</span><span><i class="s todo"></i>pendiente</span>
+      </div>
+    </div>
+    <div class="phases">
+
+      <article class="phase">
+        <div class="ph-top"><div><div class="tag">FASE 0a · M0</div><h3>Base del proyecto</h3></div><span class="pill p-done">completada</span></div>
+        <div class="prog"><div class="bar"><i style="width:100%;background:var(--ok)"></i></div>1 / 1</div>
+        <div class="lbl">Entregas</div>
+        <div class="chips">
+          <span class="chip key">Arquitectura + 7 ADR</span><span class="chip key">14 requisitos con criterios</span>
+          <span class="chip key">Plan de verificación (19 familias)</span><span class="chip">Backlog</span><span class="chip">Auditoría del repo antiguo</span>
+        </div>
+        <ul class="tasks"><li><i class="s done"></i><span class="id">001</span>Evaluación, arquitectura, requisitos, plan</li></ul>
+        <div class="gatebox"><b>G0</b> aprobado el 11 nov</div>
+      </article>
+
+      <article class="phase">
+        <div class="ph-top"><div><div class="tag">FASE 0b · M0</div><h3>Andamiaje técnico</h3></div><span class="pill p-done">completada</span></div>
+        <div class="prog"><div class="bar"><i style="width:100%;background:var(--ok)"></i></div>6 / 6</div>
+        <div class="lbl">Entregas</div>
+        <div class="chips">
+          <span class="chip key">Monorepo pnpm</span><span class="chip key">Contratos v1.0</span><span class="chip key">CI + main protegido</span>
+          <span class="chip">Versiones fijadas</span><span class="chip">Normas de código</span><span class="chip">Especificación v0.3</span>
+        </div>
+        <ul class="tasks">
+          <li><i class="s done"></i><span class="id">002</span>Versiones de herramientas</li>
+          <li><i class="s done"></i><span class="id">003</span>Monorepo y app vacía</li>
+          <li><i class="s done"></i><span class="id">004</span>Contratos de simulación</li>
+          <li><i class="s done"></i><span class="id">005</span>Pipeline de CI</li>
+          <li><i class="s done"></i><span class="id">006</span>Normas y guía de contribución</li>
+          <li><i class="s done"></i><span class="id">007</span>Especificación v0.3</li>
+        </ul>
+        <div class="gatebox"><b>—</b> sin gate propio</div>
+      </article>
+
+      <article class="phase">
+        <div class="ph-top"><div><div class="tag">FASE 1 · M1</div><h3>Motor orbital</h3></div><span class="pill p-done">completada</span></div>
+        <div class="prog"><div class="bar"><i style="width:91%;background:var(--ok)"></i><i style="width:9%;background:var(--accent)"></i></div>10 / 11</div>
+        <div class="lbl">Entregas</div>
+        <div class="chips">
+          <span class="chip key">Propagador Kepler universal</span><span class="chip key">Maniobra RSW</span><span class="chip key">Runner de simulación</span>
+          <span class="chip">Elementos ↔ cartesianas</span><span class="chip">Tolerancias rev. 5</span><span class="chip">Referencias L2 + Orekit</span>
+          <span class="chip">4 ejecuciones de conformidad</span><span class="chip key">Informe G1</span>
+        </div>
+        <ul class="tasks">
+          <li><i class="s done"></i><span class="id">008</span>Contrato rev. 3 y ADR-008</li>
+          <li><i class="s done"></i><span class="id">010</span>Registro de tolerancias</li>
+          <li><i class="s done"></i><span class="id">011</span>Referencias independientes + VT-19</li>
+          <li><i class="s review"></i><span class="id">012</span>Orekit (hecho) · libro: espera tu decisión</li>
+          <li><i class="s done"></i><span class="id">013</span>Constantes y vectores</li>
+          <li><i class="s done"></i><span class="id">014</span>Conversión de elementos</li>
+          <li><i class="s done"></i><span class="id">015</span>Propagador</li>
+          <li><i class="s done"></i><span class="id">016</span>Base RSW y maniobra</li>
+          <li><i class="s done"></i><span class="id">017</span>Runner de simulación</li>
+          <li><i class="s done"></i><span class="id">018</span>Suite en CI e informe G1</li>
+          <li><i class="s done"></i><span class="id">019</span>Fallo explícito en caída radial</li>
+        </ul>
+        <div class="gatebox"><b>G1</b> aprobado el 16 nov · VT-17 pasa a G3</div>
+      </article>
+
+      <article class="phase current">
+        <div class="ph-top"><div><div class="tag">FASE 2 · M1</div><h3>Workspace interactivo</h3></div><span class="pill p-now">siguiente</span></div>
+        <div class="prog"><div class="bar"><i style="width:14%;background:var(--accent)"></i></div>0 / 7</div>
+        <div class="lbl">Entregas</div>
+        <div class="chips">
+          <span class="chip key">Editor de escenarios</span><span class="chip key">Escena 3D</span><span class="chip key">Timeline y reproducción</span>
+          <span class="chip">Dirección visual</span><span class="chip">Panel de modelo</span><span class="chip">Motor en un worker</span><span class="chip">Límites de rendimiento</span>
+        </div>
+        <ul class="tasks">
+          <li><i class="s review"></i><span class="id">020</span>Mock-up visual · espera tu elección</li>
+          <li><i class="s todo"></i><span class="id">021</span>Estado, resultados y worker</li>
+          <li><i class="s todo"></i><span class="id">022</span>Editor con validación</li>
+          <li><i class="s todo"></i><span class="id">023</span>Escena 3D: Tierra, órbita, cámara</li>
+          <li><i class="s todo"></i><span class="id">024</span>Timeline y reproducción</li>
+          <li><i class="s todo"></i><span class="id">025</span>Panel de modelo y supuestos</li>
+          <li><i class="s todo"></i><span class="id">026</span>Integración con el motor real</li>
+        </ul>
+        <div class="gatebox"><b>G2</b> «Workspace usable»</div>
+      </article>
+
+      <article class="phase">
+        <div class="ph-top"><div><div class="tag">FASE 3 · M1</div><h3>Análisis y comparación</h3></div><span class="pill p-next">pendiente</span></div>
+        <div class="prog"><div class="bar"></div>0 / 6</div>
+        <div class="lbl">Entregas</div>
+        <div class="chips">
+          <span class="chip key">Gráficas de parámetros</span><span class="chip key">Con vs sin maniobra</span><span class="chip key">Guardar / cargar JSON</span>
+          <span class="chip">Presets y CSV</span><span class="chip">Test de aceptación</span>
+        </div>
+        <ul class="tasks">
+          <li><i class="s todo"></i><span class="id">030</span>Elegir librería de gráficas</li>
+          <li><i class="s todo"></i><span class="id">031</span>Módulo de análisis</li>
+          <li><i class="s todo"></i><span class="id">032</span>Gráficas y comparación</li>
+          <li><i class="s todo"></i><span class="id">033</span>Persistencia (incluye VT-17)</li>
+          <li><i class="s todo"></i><span class="id">034</span>Presets y exportar CSV</li>
+          <li><i class="s todo"></i><span class="id">035</span>Escenario de aceptación e2e</li>
+        </ul>
+        <div class="gatebox"><b>G3</b> «Flujo M1 completo»</div>
+      </article>
+
+      <article class="phase">
+        <div class="ph-top"><div><div class="tag">FASE 4 · M1</div><h3>Estabilización y release</h3></div><span class="pill p-next">pendiente</span></div>
+        <div class="prog"><div class="bar"></div>0 / 4</div>
+        <div class="lbl">Entregas</div>
+        <div class="chips">
+          <span class="chip key">Release v1.0.0</span><span class="chip">Regresión y accesibilidad</span>
+          <span class="chip">Guías y trazabilidad</span><span class="chip">Hosting (lo eliges tú)</span>
+        </div>
+        <ul class="tasks">
+          <li><i class="s todo"></i><span class="id">040</span>Regresión, accesibilidad, errores</li>
+          <li><i class="s todo"></i><span class="id">041</span>Guías y notas de versión</li>
+          <li><i class="s todo"></i><span class="id">042</span>Hosting y despliegue</li>
+          <li><i class="s todo"></i><span class="id">043</span>Checklist y tag v1.0.0</li>
+        </ul>
+        <div class="gatebox"><b>G4</b> «Release M1» · recorrido contigo</div>
+      </article>
+
+    </div>
+  </section>
+
+  <section aria-label="Releases">
+    <h2 style="margin-bottom:12px">Horizonte de releases</h2>
+    <div class="rel">
+      <div class="r done"><h3>M0</h3><div class="what">Fundación técnica</div><ul><li>Repo, CI, contratos</li><li>Normas y documentación</li></ul></div>
+      <div class="r now"><h3>M1</h3><div class="what">Orbital Sandbox · en curso</div><ul><li>Órbitas terrestres</li><li>1 maniobra impulsiva</li><li>Vista 3D y timeline</li><li>Comparar y guardar</li></ul></div>
+      <div class="r"><h3>M2</h3><div class="what">Dinámica avanzada</div><ul><li>J2 e integración numérica</li><li>Varias maniobras</li><li>Empuje finito</li><li>Impacto y trazas en tierra</li></ul></div>
+      <div class="r"><h3>M3</h3><div class="what">Diseño de misiones</div><ul><li>Hohmann y bi-elíptica</li><li>Planificación de maniobras</li><li>Optimización básica</li></ul></div>
+      <div class="r"><h3>M4</h3><div class="what">Exploración</div><ul><li>Cislunar y 3 cuerpos</li><li>Interplanetario, Lambert</li><li>Lanzamiento y aterrizaje</li></ul></div>
+    </div>
+  </section>
+
+  <section aria-label="Pendiente del propietario">
+    <h2 style="margin-bottom:12px">Esperando tu decisión</h2>
+    <div class="owner">
+      <div class="oa"><b>OA-14</b><span>Elegir disposición, color y estado en el mock-up</span><small>Desbloquea el editor y la escena 3D (fase 2)</small></div>
+      <div class="oa"><b>OA-15</b><span>¿Se pueden publicar valores del libro de Wakker?</span><small>Cierra la parte del libro de texto (012)</small></div>
+      <div class="oa"><b>OA-3</b><span>Revisar el token de Mapbox del repo antiguo</span><small>No bloquea Mission Lab</small></div>
+    </div>
+  </section>
+</div>

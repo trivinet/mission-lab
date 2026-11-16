@@ -380,6 +380,11 @@
   "log": [
     {
       "date": "2026-11-16",
+      "who": "Coordinator",
+      "text": "Published a visual project roadmap (docs/status/roadmap.html, artifact claude.ai/artifact/RvGTjBWkJS7kDqBkkg7xkc). G1 follow-ups delivered in PR #43: restarted-arc procedure, verification plan amended for the VT-17 deferral, task statuses."
+    },
+    {
+      "date": "2026-11-16",
       "who": "Docs",
       "text": "G1 follow-ups started (Sonnet): restarted Orekit arc procedure, verification plan amended for the VT-17 deferral, stale status lines and task YAML statuses."
     },
