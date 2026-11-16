@@ -1,8 +1,7 @@
 # G1 Verification Report — engine
 
-**Document ID:** ML-VER-003 (as instructed; see §10 item 1: this ID is already used by
-`l2-references-report.md`) · **Date:** 2026-11-16 · **Author:** Verification Engineer
-(ML-TASK-018, final part) · **Status:** Proposed, for owner review at gate G1
+**Document ID:** ML-VER-008 (ML-VER-003 was already used by `l2-references-report.md`; §10 item 1) · **Date:** 2026-11-16 · **Author:** Verification Engineer
+(ML-TASK-018, final part) · **Status:** Approved by the owner on 2026-11-16; G1 passed on the conditions recorded in [G1-review.md](../releases/G1-review.md)
 
 Gate G1 needs, from the [verification plan](m1-verification-plan.md) §8: "VT-01…VT-19 pass;
 tolerance record approved; verification report listing which layers back each family, with L3
