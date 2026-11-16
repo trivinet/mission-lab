@@ -454,3 +454,57 @@ report_part_d3_phase2:
   recommended_next_action: >
     Owner acceptance of conformance-run-4.md; then the switch removal above; explicit timeouts for the
     three slow verification tests; CI wiring and the G1 verification report.
+
+report_g1:
+  # Final part (2026-11-16), branch docs/ml-task-018-g1-report from origin/main 77cdbaa, not pushed.
+  # No code, test, dataset, tolerance or other report changed. Engine source not read.
+  commits:
+    - "4ec8a5a G1 report: verdict per criterion and per-family evidence table"
+    - "44ac80a G1 report: L3 gaps, scope limits, CI, approvals, independence, recommendation"
+    - "this commit: this report section"
+  files_changed:
+    - docs/verification/G1-verification-report.md (new)
+    - docs/backlog/tasks/ML-TASK-018.yaml (this section)
+  summary: >
+    G1 report written (status Proposed). Verdict: criterion 2 (tolerance record approved) met;
+    criterion 3 (layers per family, L3 gaps) met by the report once accepted; criterion 1
+    (VT-01…VT-19 pass) NOT met as written: VT-17 has no test (persistence is ML-TASK-033, Phase 3),
+    VT-18 lacks the FR-011 AC3 file-level classes, VT-04 substitute angles are not compared (F-3),
+    VT-15 has no L2 element comparison, VT-14 is "VT-14: e = 0 only" (owner-accepted), VT-19 rests on
+    IERS TN36 (owner-accepted) with the WGS 84 attribution unverified. Every existing test passes
+    (1574/1574 locally and in CI); worst asserted ratio 0.81 (VT-04 convention term), otherwise
+    ≤ 0.094. Every evidence item except the tolerance record is committed but not approved.
+    Recommendation: pass G1 on conditions (defer VT-17 formally, approve datasets and reports
+    unchanged, accept the reduced scopes and L3 gaps, write a restart-arc procedure).
+  tests_executed:
+    - "pnpm install --frozen-lockfile -> exit 0"
+    - "pnpm lint -> exit 0; pnpm typecheck -> exit 0; pnpm format:check -> exit 0; pnpm check:boundaries -> exit 0 (20/20)"
+    - "pnpm test -> exit 0, Test Files 68 passed (68), Tests 1574 passed (1574), 0 skipped, 31.9 s"
+    - "npx vitest run --project conformance --silent=false -> exit 0, 26 files, 617 tests; every worst ratio quoted in the report reproduced to the printed digits"
+    - "CI: run 43847512903 on main 77cdbaa, success; checks job 68 files, 1574 passed; branch protection requires checks and e2e (strict false)"
+  reference_data_used:
+    - "conformance-run-1…4.md, l2-references-report.md, vt-19-constants.md, tolerances.md revision 5, task reports ML-TASK-011 (report_vt19), 012 (report, report_part_b), 018 (all parts); PR descriptions #19, #27, #33, #37, #40 (probes)"
+  not_verified:
+    - "Commit-order claims of the run reports (phase discipline) taken from the reports, not re-derived"
+    - "Everything listed in G1-verification-report.md §9"
+  known_limitations:
+    - "Document ID ML-VER-003 used as instructed; it collides with l2-references-report.md (report §10 item 1)"
+    - "The owner's VT-19 decision is taken from the Coordinator's instruction; on main it is not yet recorded (status.json update is on the unmerged branch chore/status-vt19)"
+  inconsistencies_reported:
+    - "ML-VER-003 ID collision"
+    - "Plan §8 requires VT-17 for G1; backlog assigns it to ML-TASK-033 (Phase 3)"
+    - "VT-19 labelled L3 in the plan, 'L1 only' in vt-19-constants.md and report_vt19"
+    - "Stale status text: conformance-run-4.md (accepted, still 'In review'); tolerances.md header lines 5–10 and §12 O-12/O-13 'subject to the owner's signature'; plan preamble and §2 L3 status"
+    - "status.json on main behind (PR #40 and VT-19 acceptance not recorded)"
+    - "Task YAML status in_review for ML-TASK-010, 011, 013–017, 019 while status.json says done"
+    - "ML-TASK-018 affected_paths omit docs/verification/G1-verification-report.md"
+    - "Superseded informative hyperbolic tests remain (vt16-r4-hyperbolic.test.ts, informative recorder in l3-vt16-escape-intersection.test.ts); ML-TASK-012 l3_gaps_for_g1 VT-16 item superseded"
+    - "L2 report F-1 and F-4 not reflected in tolerances.md"
+  risks_or_blockers:
+    - "G1 criterion 1 cannot be met before persistence exists unless the owner defers VT-17 (and the FR-011 AC3 part of VT-18)"
+    - "Restarted Orekit arcs go stale on any engine change that moves an event state; CI cannot regenerate them"
+  review_artifact: ""   # no PR opened (instructed not to push)
+  recommended_next_action: >
+    Owner review of G1-verification-report.md and the approvals of its §6.3; decision on VT-17
+    deferral; Coordinator: merge the status update, fix the ID, and record the run-4 and VT-19
+    decisions on main.
