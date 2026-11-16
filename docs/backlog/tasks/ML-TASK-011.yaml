@@ -101,3 +101,26 @@ report:
     Coordinator: decide F-2 and get the record corrections (F-1, F-3, F-4, F-5, F-8) approved;
     obtain the WGS 84 PDF for VT-19; review and approve the datasets before ML-TASK-018 runs the
     engine against them.
+
+report_vt19:
+  date: 2026-11-16
+  summary: >
+    VT-19 partly confirmed. Engine GM (3.986004418e14 m3/s2) and reference radius (6378137 m) are
+    bit equal to IERS Conventions (2010), TN36 Table 1.1 (GM, p. 18) and Table 1.2 (GRS80 aE,
+    p. 19). ERA coefficients in ADR-004 match TN36 Eq. (5.14), section 5.5.3, p. 52, and Table 1.1.
+    NGA.STND.0036 (WGS 84) was unreachable, so the WGS 84 attribution and the GM atmosphere
+    variant are not verified. No discrepancy found; nothing in the engine or architecture changed.
+  files_changed:
+    - docs/verification/vt-19-constants.md
+    - conformance/src/vt19-constants.test.ts
+    - docs/backlog/tasks/ML-TASK-011.yaml
+  reference_data_used:
+    - "IERS TN36 (2010), https://www.iers.org/fileadmin/SharedDocs/Publikationen/EN/IERS/Publications/tn/TechnNote36/tn36.pdf, 2926081 bytes, SHA-256 b0570ff245a6d76977dc56918c64130cc5bf68b679fa8fffb989137f2b833eea, retrieved 2026-11-16 (PDF not committed)"
+  evidence_layers: "L1 only (exported-value bit equality); ERA document-only"
+  not_verified:
+    - "WGS 84 GM (with and without atmosphere) and semi-major axis vs NGA.STND.0036: earth-info.nga.mil timed out, nsgreg.nga.mil reset the connection."
+    - "IAU 2000 Resolution B1.8 primary text: iau.org URLs tried returned 404."
+    - "The NGA 2012 ICG citation in constants.ts."
+  recommended_next_action: >
+    Owner or a networked environment obtains NGA.STND.0036 (2014); then compare GM and a, and
+    decide whether the attribution text in constants.ts and architecture section 3 needs rewording.
