@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "ML-TASK-021 merged: the workspace has its store, five result states and the engine in a Web Worker. The rest of Phase 2 (editor, 3D scene, timeline, model panel) waits on the mock-up choice (OA-14).",
+  "headline": "Visual direction approved (layout A, blue accent, banner + chip). ML-TASK-022 (layout and editor) and ML-TASK-023 (3D scene, VI-02) are running in parallel.",
   "gates": [
     {
       "id": "G0",
@@ -36,11 +36,6 @@
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
       "blocking": "Publishing the textbook assessment"
-    },
-    {
-      "id": "OA-14",
-      "text": "Open the workspace mock-up at claude.ai/artifact/DvtuJBRU1kxkHeTxyHqqQM and decide three things: panel arrangement, accent colour, how the result state is shown.",
-      "blocking": "ML-TASK-022, 023 (editor and 3D scene)"
     },
     {
       "id": "OA-3",
@@ -225,8 +220,8 @@
           "title": "Visual direction: layout and design tokens mock-up",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "003",
+          "status": "done",
+          "deps": "Owner approved 2026-11-16 (PR #47)",
           "approval": true
         },
         {
@@ -242,16 +237,16 @@
           "title": "Scenario editor with validation",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "020, 021"
+          "status": "in_progress",
+          "deps": "Contract in PR #47; agent running"
         },
         {
           "id": "ML-TASK-023",
           "title": "3D scene: Earth, trajectory, markers, camera",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "020, 021"
+          "status": "in_progress",
+          "deps": "Contract in PR #47; agent running"
         },
         {
           "id": "ML-TASK-024",
@@ -378,6 +373,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Frontend",
+      "text": "ML-TASK-022 (layout shell, editor, field validation, maneuver, keyboard) and ML-TASK-023 (three/R3F scene, exact Math.fround(x·s) vertices, VI-02 hook) started in parallel, Sonnet, separate worktrees."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Owner",
+      "text": "Approved the visual direction: layout A, blue accent, result state as banner plus chip. Recorded in visual-direction.md and design-tokens.md (PR #47)."
+    },
     {
       "date": "2026-11-16",
       "who": "Owner",
