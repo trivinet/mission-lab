@@ -19,10 +19,11 @@ interface FieldFrameProps {
   readonly issues: readonly ValidationIssue[];
   readonly note?: string | undefined;
   readonly testId: string;
+  readonly wide?: boolean | undefined;
   readonly children: (describedBy: string | undefined, invalid: boolean) => React.ReactNode;
 }
 
-function FieldFrame({ id, label, unit, issues, note, testId, children }: FieldFrameProps) {
+function FieldFrame({ id, label, unit, issues, note, testId, wide, children }: FieldFrameProps) {
   const msgId = `${id}-msg`;
   const noteId = `${id}-note`;
   const invalid = issues.length > 0;
@@ -30,7 +31,7 @@ function FieldFrame({ id, label, unit, issues, note, testId, children }: FieldFr
     [invalid ? msgId : null, note !== undefined ? noteId : null].filter(Boolean).join(' ') ||
     undefined;
   return (
-    <div className="f" data-testid={`field-${testId}`}>
+    <div className={wide === true ? 'f wide' : 'f'} data-testid={`field-${testId}`}>
       <label htmlFor={id}>{label}</label>
       <div className={invalid ? 'in bad' : 'in'}>
         {children(describedBy, invalid)}
@@ -129,6 +130,8 @@ export interface TextFieldProps {
   readonly issues: readonly ValidationIssue[];
   readonly note?: string;
   readonly align?: 'left' | 'right';
+  /** Label above a full-width input (for long values such as the epoch). */
+  readonly wide?: boolean;
 }
 
 export function TextField({
@@ -140,10 +143,19 @@ export function TextField({
   issues,
   note,
   align = 'right',
+  wide,
 }: TextFieldProps) {
   const id = useId();
   return (
-    <FieldFrame id={id} label={label} unit={unit} issues={issues} note={note} testId={testId}>
+    <FieldFrame
+      id={id}
+      label={label}
+      unit={unit}
+      issues={issues}
+      note={note}
+      testId={testId}
+      wide={wide}
+    >
       {(describedBy, invalid) => (
         <input
           id={id}

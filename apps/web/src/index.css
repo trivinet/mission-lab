@@ -399,3 +399,6 @@ dl.out dd {
     grid-template-columns: 1fr;
   }
 }
+.f.wide {
+  grid-template-columns: 1fr;
+}

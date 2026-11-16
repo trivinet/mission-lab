@@ -106,6 +106,7 @@ export function ScenarioPanel({ issues }: Props) {
           label="Epoch (UTC)"
           unit="UTC"
           testId="epoch"
+          wide
           value={scenario.epoch.iso}
           onChange={setEpochIso}
           issues={issuesForField(issues, FIELD.epoch)}
