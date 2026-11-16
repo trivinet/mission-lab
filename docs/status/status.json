@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Gate G1 passed on 2026-11-16: the engine is verified (1574 tests; L1, L2 and Orekit L3 evidence). VT-17 deferred to G3. Next: G1 follow-ups (restart-arc procedure, documentation clean-up), then Phase 2.",
+  "headline": "Phase 2 started: ML-TASK-021 (scenario store, five result states, engine in a Web Worker) is running. The editor and 3D scene wait on the mock-up choice (OA-14).",
   "gates": [
     {
       "id": "G0",
@@ -234,8 +234,8 @@
           "title": "Scenario store, result states, worker host",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "004"
+          "status": "in_progress",
+          "deps": "Contract written 2026-11-16; agent running"
         },
         {
           "id": "ML-TASK-022",
@@ -378,6 +378,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Frontend",
+      "text": "ML-TASK-021 started (Sonnet): zustand store, five-state result machine (ML-UX-001/002), engine in a Web Worker with transferred typed arrays, VE-02 e2e."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Coordinator",
+      "text": "Merged PR #43 (G1 follow-ups) and PR #44 (status, roadmap page). Wrote the ML-TASK-021 contract on the owner's go-ahead."
+    },
     {
       "date": "2026-11-16",
       "who": "Coordinator",
