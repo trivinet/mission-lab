@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-16",
   "phase": "Phase 1 — Astrodynamics foundation",
-  "headline": "VT-19 accepted against IERS Conventions 2010 and merged (PR #40); WGS 84 attribution listed as an open gap. The G1 verification report is being written.",
+  "headline": "G1 verification report delivered (PR #41): every test passes (1574), but G1 is not met as worded because VT-17 has no test (persistence is Phase 3). Recommendation: pass G1 on owner conditions.",
   "gates": [
     {
       "id": "G0",
@@ -31,6 +31,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-35",
+      "text": "Gate G1 decisions (report in PR #41): defer VT-17 and VT-18 FR-011 AC3 to G3; accept reduced scopes (VT-04 substitute angles, VT-15 L2 elements) and the L3 gaps; approve the 190 datasets, the 43 Orekit files and the L2/conformance/VT-19 reports; then pass G1.",
+      "blocking": "Gate G1 and Phase 2"
+    },
     {
       "id": "OA-15",
       "text": "Decide for ML-TASK-012: whether values printed in Wakker's book (all rights reserved) may be stored in the public repository; the assessment is committed locally and not pushed until then.",
@@ -201,8 +206,8 @@
           "title": "Numerical suite in CI and G1 verification report",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_progress",
-          "deps": "G1 verification report being written",
+          "status": "in_review",
+          "deps": "G1 report in PR #41; owner G1 decisions (OA-35)",
           "approval": true
         },
         {
@@ -377,6 +382,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-16",
+      "who": "Coordinator",
+      "text": "Checked the G1 report branch (only the report and task YAML changed) and confirmed the VT-17 plan/backlog conflict (plan §8 requires VT-17 at G1; backlog puts it in ML-TASK-033). PR #41 opened."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Verification",
+      "text": "G1 verification report delivered: 1574 tests pass locally and in CI; all quoted ratios reproduced. G1 not met as worded (VT-17 untested); recommends passing on owner conditions. Nine inconsistencies listed, not fixed."
+    },
     {
       "date": "2026-11-16",
       "who": "Verification",
