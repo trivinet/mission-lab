@@ -2,6 +2,7 @@ export const PACKAGE_NAME = '@mission-lab/simulation';
 export const PACKAGE_VERSION = '0.0.0';
 
 export { DEGENERACY_THRESHOLDS } from './degeneracy-thresholds';
+export { ENGINE_CONSTANTS } from './engine-constants';
 export { PROVISIONAL_MAX_SAMPLE_COUNT } from './limits';
 export { MODEL_LIMITATIONS, TIME_CONVENTION, buildResultModel } from './model';
 export { buildSimulationRequest, computeRequestId, deriveRequestId } from './request';
@@ -20,7 +21,11 @@ export type {
   TrueAnomalyMeaning,
   UndefinedElement,
 } from './scenario-view';
-export type { DegeneracyThresholds, DegenerateConvention } from '@mission-lab/astrodynamics';
+export type {
+  CentralBodyConstants,
+  DegeneracyThresholds,
+  DegenerateConvention,
+} from '@mission-lab/astrodynamics';
 export { buildSamplingGrid, gridCandidateCount, sampleCount } from './sampling-grid';
 export type { GridSegment } from './sampling-grid';
 export { validateScenarioSemantics } from './semantic-validation';
