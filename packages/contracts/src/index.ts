@@ -4,7 +4,7 @@
  * Types are inferred from the zod schemas, which are the single source of truth.
  */
 export const PACKAGE_NAME = '@mission-lab/contracts';
-export const PACKAGE_VERSION = '0.0.0';
+export const PACKAGE_VERSION = '1.0.0';
 
 export * from './codes';
 export { SCHEMA_VERSION, epochSchema, isCanonicalUtcIso, vec3Schema } from './primitives';

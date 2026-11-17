@@ -1,5 +1,5 @@
 export const PACKAGE_NAME = '@mission-lab/astrodynamics';
-export const PACKAGE_VERSION = '0.0.0';
+export const PACKAGE_VERSION = '1.0.0';
 
 export {
   EARTH_CONSTANTS,

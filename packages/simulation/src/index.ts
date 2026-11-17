@@ -1,5 +1,5 @@
 export const PACKAGE_NAME = '@mission-lab/simulation';
-export const PACKAGE_VERSION = '0.0.0';
+export const PACKAGE_VERSION = '1.0.0';
 
 export { DEGENERACY_THRESHOLDS } from './degeneracy-thresholds';
 export { ERA_AT_J2000_rev, ERA_RATE_revpday, earthRotationAngle_rad } from './earth-rotation';
