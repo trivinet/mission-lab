@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Phase 2 is 7 of 8: editor, 3D scene, timeline, model panel and the simulation API are merged. Left before gate G2: ML-TASK-026 (integration with the real engine, measured performance envelope, sample limit).",
+  "headline": "ML-TASK-026 part A is running: measured performance envelope, proposed sample limit, G2 evidence, deterministic maneuver ids and model-panel readability. The owner then decides the limit (part B) and gate G2.",
   "gates": [
     {
       "id": "G0",
@@ -272,8 +272,8 @@
           "title": "Integration with real engine; performance envelope",
           "role": "Frontend + Verification",
           "model": "sonnet / opus",
-          "status": "todo",
-          "deps": "017, 022–024",
+          "status": "in_progress",
+          "deps": "Part A running (contract on docs/ml-task-026-contract); part B after owner decision",
           "approval": true
         }
       ]
@@ -376,6 +376,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-026 part A started (Sonnet): reproducible performance harness (1e3…1e6 samples, ≥ 3 repetitions), performance-envelope.md with a Proposed limit, G2 evidence list, deterministic maneuver ids (contracts §14), model-panel readability."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #55 (status). Wrote the ML-TASK-026 contract: part A measures and proposes, part B sets the limit after the owner decides."
+    },
     {
       "date": "2026-11-17",
       "who": "Owner",
