@@ -1,9 +1,10 @@
+import { WorkspaceScene } from '../scene';
 import { ResultBanner } from './ResultStatus';
 
 /**
  * Centre column: the result banner and the stable region ML-TASK-023 mounts the 3D scene into.
- * The container `data-testid="scene-container"` is empty by design; mount `WorkspaceScene` there.
- * No scene code lives here (ML-TASK-022).
+ * `WorkspaceScene` (ML-TASK-023) is mounted inside `data-testid="scene-container"`.
+ * No scene code lives here.
  */
 export function CenterRegion() {
   return (
@@ -11,7 +12,9 @@ export function CenterRegion() {
       <ResultBanner />
       <section className="panel vp" aria-labelledby="h-vp" data-testid="scene-region">
         <h2 id="h-vp">Simulation view (3D)</h2>
-        <div className="scene-container" data-testid="scene-container" />
+        <div className="scene-container" data-testid="scene-container">
+          <WorkspaceScene />
+        </div>
       </section>
     </div>
   );
