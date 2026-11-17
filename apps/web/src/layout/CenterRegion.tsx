@@ -2,9 +2,8 @@ import { WorkspaceScene } from '../scene';
 import { ResultBanner } from './ResultStatus';
 
 /**
- * Centre column: the result banner and the stable region ML-TASK-023 mounts the 3D scene into.
- * `WorkspaceScene` (ML-TASK-023) is mounted inside `data-testid="scene-container"`.
- * No scene code lives here.
+ * Centre column: the result banner and the region that holds the 3D scene. `WorkspaceScene`
+ * (ML-TASK-023) is mounted inside `data-testid="scene-container"`; no scene code lives here.
  */
 export function CenterRegion() {
   return (
