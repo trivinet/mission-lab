@@ -53,3 +53,9 @@ export { MARGIN, U, pE, vE, vt05L2a } from './tol/tolerances';
 /** Special-number encoding and mutation lists of the VT-18 / VI-01 datasets. */
 export { applyMutations, decodeValue } from './datasets/encoding';
 export type { Mutation } from './datasets/encoding';
+
+// ML-TASK-036 (VI-03 (b), FR-010 AC3; re-exports of committed references; no behaviour change).
+
+/** Independent analysis reference of one state (200-bit polar formulation, ADR-008 convention). */
+export { analysisReferenceHp, normHp } from './ref/analysis';
+export type { AnalysisReference, ReferenceConvention } from './ref/analysis';
