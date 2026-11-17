@@ -1,0 +1,140 @@
+# Mission Lab v1.0.0 (M1 Orbital Sandbox): release notes
+
+**Status: Draft.** Remains a draft until ML-TASK-043 (release checklist and tag). Gate G4 has not
+been approved. Nothing here is released, published or deployed. Prepared by the Documentation and
+Release agent under ML-TASK-041 on 2026-11-17 from the gate reviews G0 to G3 and the documents they
+cite; no content is written from memory. Not yet in the draft: the result of ML-TASK-040
+(`docs/verification/release-readiness-review.md` does not exist yet) and the G4 evidence.
+
+**Mission Lab is not qualified for operational use.** It is an educational and exploratory tool.
+
+## 1. What is in v1.0.0
+
+Requirements are in `docs/requirements/m1-requirements.md`; the mapping to tests is in the
+[traceability matrix](../verification/traceability-matrix.md). How to use it is in the
+[user guide](../user-guide.md).
+
+- Create, edit and validate an Earth orbit from Keplerian elements; derived values and the
+  degenerate-orbit convention are shown (ML-FR-001, ML-FR-002).
+- Two-body propagation with a universal-variable solver, deterministic for identical requests
+  (ML-FR-003, ML-FR-004).
+- One impulsive maneuver in the RSW frame, with the along-track note (ML-FR-005, ML-FR-006).
+  Escape and surface-intersecting results are propagated and flagged with a warning.
+- Interactive 3D view with exact vertices, timeline and playback (ML-FR-007, ML-FR-008).
+- Plots of 13 quantities and a coast-versus-maneuver comparison table (ML-FR-009, ML-FR-010).
+- Versioned JSON save and load, with an unsaved-changes indicator and confirmation dialogs
+  (ML-FR-011).
+- Model and assumptions panel read from the result, with the not-qualified statement (ML-FR-012).
+- Three example scenarios and CSV export (ML-FR-013, ML-FR-014).
+- Result states none, computing, current, stale and error; computation in a Web Worker
+  (ML-UX-001 to ML-UX-003).
+
+Delivered by phase: G2 workspace (ML-TASK-020 to ML-TASK-027) and G3 analysis (ML-TASK-030 to
+ML-TASK-036), listed in `docs/releases/G2-review.md` and `docs/releases/G3-review.md`. The G1
+engine tasks are described in `docs/verification/G1-verification-report.md`; their numbers are
+not restated here.
+
+## 2. Verification summary
+
+| Gate | Decision | Evidence |
+|---|---|---|
+| G0 (2026-11-11) | Approved | `docs/releases/G0-review.md` |
+| G1 engine (2026-11-16) | Approved on conditions | `docs/verification/G1-verification-report.md`; tolerance record `docs/verification/tolerances.md` revision 5; conformance runs 1 to 4 |
+| G2 workspace (2026-11-17) | Approved with limits | `docs/releases/G2-review.md`: VI-01, VI-02, VE-02 |
+| G3 analysis (2026-11-17) | Approved with limits | `docs/releases/G3-review.md`: VI-03, VE-01, VT-17, VT-18 (FR-011 AC3), conformance run 5 |
+
+Test counts as the reviews state them: 1574 tests at G1; 1792 unit and integration tests and 53
+browser tests at G2; 1978 unit and integration tests and 77 browser tests (Chromium) at G3, all
+passing locally and in CI at the time. These are not re-run for this draft.
+
+Evidence layers: invariants (L1), independent implementation (L2), and Orekit as an external
+tool (L3). Worst measured ratio to tolerance in conformance run 5: 0.090 for the history
+comparison and 0.035 for the comparison table (`docs/verification/conformance-run-5.md`).
+
+Full suite on the release commit and the owner walkthrough of the 13-step acceptance scenario
+(ML-SYS-001 section 14) are G4 evidence and are not yet done. The automated acceptance flow is
+`apps/web/e2e/acceptance.spec.ts` (`docs/verification/ve-01-acceptance.md`).
+
+## 3. Known limits and accepted gaps
+
+Taken from the gate reviews. Each was accepted by the owner at the gate named.
+
+From G1 (`docs/releases/G1-review.md`):
+
+- VT-04 has no tolerance on the substitute angles; VT-15 has no L2 element comparison; VT-14 is
+  checked at e = 0 only (open item O-11 stays open).
+- VT-19 constants are checked against IERS Conventions 2010 (TN36). The WGS 84 attribution
+  (NGA.STND.0036) was not reachable and stays an open gap.
+- 13 test families have no L3 evidence; there is no textbook evidence (owner decision OA-15
+  open); Orekit is the only external tool; post-maneuver trajectories in the L3 VT-12 and VT-15
+  files are not compared.
+
+From G2 (`docs/releases/G2-review.md`):
+
+- Browsers other than Chromium, screen readers, colour contrast of the newer text and
+  colour-blind rendering were not verified.
+- The performance record used software WebGL on one loaded machine
+  (`docs/verification/performance-envelope.md`).
+- A superseded run is discarded, not cancelled; a long earlier run delays a later one.
+
+From G3 (`docs/releases/G3-review.md`):
+
+- Quantities with no approved tolerance row are informative only (e, omega and nu on hyperbolic
+  states; periapsis, apoapsis and period histories; hyperbolic periapsis; convention-assigned
+  angles on degenerate orbits). Measured differences are at most 4.4e-15.
+- Flight-path angle and mean anomaly histories are not provided. ML-SYS-001 section 2.2 lists
+  them; ML-FR-009 AC1 does not.
+- No screen-reader test; real OS file dialogs and downloads were not tested outside Playwright.
+- Analysis and plot construction run on the main thread and were not measured near the
+  1,000,000-sample limit.
+- VE-01 is a flow test, not numerical verification.
+- Readings 5 to 9 of conformance run 5 section 4 have had no separate Systems Architect review.
+
+Product limits (the model panel lists them): two-body point-mass Earth only; one maneuver;
+impulsive only; GCRF frame only; UTC labels without leap seconds; altitude above a reference
+sphere; illustrative Earth orientation; at most 1,000,000 samples per run, with a soft warning
+above 250,000; scenario files up to 64 KiB.
+
+Gaps in evidence found while writing the traceability matrix (see its section 5): no direct test
+that a state declares frame, central body and epoch (ML-FR-003 AC3); no test of plot axis titles
+and units (ML-FR-009 AC2); no end-to-end test of the error state (ML-UX-001); no review record
+for ML-NFR-002; no lint rule against clocks and randomness (ML-NFR-003); no secret scan, and the
+audit job is informational (ML-NFR-006). These are not owner-accepted. They are listed for the
+owner to accept, fix or defer.
+
+## 4. Owner decisions that shape the release
+
+- G0 (2026-11-11): greenfield repository; architecture, package layout and JSON-only persistence;
+  frame GCRF, UTC epoch plus elapsed seconds, illustrative Earth rotation, no ground tracks in
+  M1; universal-variable propagator; closed orbits only at input; Orekit as the external
+  reference (D-5); agent roles; ML-SYS-001 amendments; licence (D-9, recommendation MIT; the
+  recorded owner response is "approved as recommended").
+- 2026-11-12 and 2026-11-13: degenerate-element convention (e and i reported as computed, only
+  undefined angles assigned) and the angular accuracy target (ADR-008); energy criterion for
+  escape, and intersection limited to the simulated span (ML-FR-006 AC6); conformance workspace
+  (ADR-009).
+- 2026-11-16 (G1): VT-17 and the FR-011 AC3 part of VT-18 moved to G3; reduced scopes and L3 gaps
+  accepted as listed above.
+- 2026-11-17 (G2): sample limit kept at 1,000,000 with a soft warning above 250,000; the
+  not-qualified wording approved.
+- 2026-11-17 (G3): informative-only quantities; no flight-path or mean-anomaly histories; 64 KiB
+  file limit; presets approved; ADR-010 (uPlot 1.6.32) accepted.
+
+## 5. What comes in M2
+
+Candidate capabilities from `docs/product/ML-SYS-001.md` section 2.3, not commitments:
+numerical integration with configurable tolerances; J2; multiple sequential maneuvers; spacecraft
+mass and propulsion parameters; finite-duration thrust; alternative frames (VNC/NTW maneuver
+frame is a candidate); ground tracks and geographic visualization; enhanced plots and analysis;
+import and export of orbital data formats; parabolic and hyperbolic initial orbits as inputs;
+impact handling as a simulation event once an Earth-fixed frame exists. Each would get its own
+requirements and verification cases.
+
+## 6. Before this draft can become the release notes
+
+- ML-TASK-040 result and the owner's decisions on its findings.
+- ML-TASK-042 (hosting) and ML-TASK-043 (checklist and tag); the version number: every package
+  is still `0.0.0` in its `package.json` and nothing in the repository defines the versioning
+  process.
+- `CHANGELOG.md` does not exist; creating it is not part of ML-TASK-041.
+- The owner walkthrough of the acceptance scenario and gate G4.
