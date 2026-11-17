@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "Phase 3: plots and comparison UI (032, Sonnet) and the independent references for the analysis module (036, Opus, G3 evidence) are running in parallel. Then persistence (033).",
+  "headline": "Plots and the comparison table (032) delivered in PR #64: VI-03 (a) exact, coast and maneuvered runs side by side. The independent references (036, G3 evidence) are still running.",
   "gates": [
     {
       "id": "G0",
@@ -305,8 +305,8 @@
           "title": "Plots and comparison UI",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_progress",
-          "deps": "Contract on docs/ml-task-032-036-contracts; agent running"
+          "status": "in_review",
+          "deps": "PR #64"
         },
         {
           "id": "ML-TASK-033",
@@ -386,6 +386,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Checked ML-TASK-032: 1845 tests, 60 e2e pass; scope apps/web, lockfile, three architecture docs. Screenshot reviewed and sent; Δa ≈ 190 km for +100 m/s matches the first-order estimate. Follow-up: display precision of the comparison table. PR #64."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-032 delivered: uPlot plots (13 quantities, maneuver marker, playback cursor, wrap breaks, text alternatives), coast run in scene and plots, comparison table; VI-03 (a) Object.is 0 mismatches."
+    },
     {
       "date": "2026-11-17",
       "who": "Coordinator",
