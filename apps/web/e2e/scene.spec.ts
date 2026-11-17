@@ -90,6 +90,9 @@ test('Earth only before a run; the trajectory appears after a run; vertices are 
 
   const canvas = page.getByTestId('scene-canvas');
   const before = await canvas.screenshot();
+  // Everything below waits for the hook to show the state instead of reading it once: on a slow
+  // runner the scene can lag the DOM.
+  await expect.poll(async () => page.evaluate(() => '__missionLabScene' in window)).toBe(true);
   const empty = await hook(page);
   expect(empty.resultKind).toBe('none');
   expect(empty.segmentCount).toBe(0);
@@ -98,6 +101,7 @@ test('Earth only before a run; the trajectory appears after a run; vertices are 
   await page.getByTestId('run-button').click();
   await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'current');
   await expect(page.getByTestId('segment-summary-0')).toContainText('101 samples');
+  await expect.poll(async () => (await hook(page)).segmentCount).toBe(1);
   const run = await hook(page);
   expect(run.resultKind).toBe('current');
   expect(run.segmentCount).toBe(1);
@@ -126,8 +130,8 @@ test('camera: keyboard orbit and zoom move the camera, Reset restores it', async
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('ArrowUp');
   await page.keyboard.press('+');
+  await expect.poll(async () => (await hook(page)).camera?.position).not.toEqual(initial?.position);
   const moved = (await hook(page)).camera;
-  expect(moved?.position).not.toEqual(initial?.position);
 
   // Mouse orbit as well (OrbitControls).
   const box = await canvas.boundingBox();
@@ -138,8 +142,7 @@ test('camera: keyboard orbit and zoom move the camera, Reset restores it', async
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2 + 80, box.y + box.height / 2 + 30, { steps: 5 });
   await page.mouse.up();
-  const dragged = (await hook(page)).camera;
-  expect(dragged?.position).not.toEqual(moved?.position);
+  await expect.poll(async () => (await hook(page)).camera?.position).not.toEqual(moved?.position);
 
   await page.getByTestId('camera-reset').click();
   // OrbitControls re-derives the pose through spherical coordinates, so it returns to within
@@ -168,7 +171,7 @@ test('display options start no run (ML-FR-007 AC4)', async ({ page }) => {
   expect(workers).toBe(1);
 
   await page.getByTestId('option-axes').check();
-  expect((await hook(page)).axesVisible).toBe(true);
+  await expect.poll(async () => (await hook(page)).axesVisible).toBe(true);
   await page.getByTestId('playback-slider').fill('50');
   await expect(page.getByTestId('playback-readout')).toHaveAttribute('data-t-s', '50');
   await page.getByTestId('option-axes').uncheck();
@@ -178,7 +181,7 @@ test('display options start no run (ML-FR-007 AC4)', async ({ page }) => {
   await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'current');
   await expect(page.getByTestId('sample-count')).toHaveText('101');
   expect(workers).toBe(1);
-  expect((await hook(page)).axesVisible).toBe(false);
+  await expect.poll(async () => (await hook(page)).axesVisible).toBe(false);
 });
 
 test('a maneuvered scenario: two segments, one maneuver marker, VI-02 with 0 mismatches', async ({
@@ -197,6 +200,7 @@ test('a maneuvered scenario: two segments, one maneuver marker, VI-02 with 0 mis
   await page.getByTestId('run-button').click();
   await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'current');
 
+  await expect.poll(async () => (await hook(page)).segmentCount).toBe(2);
   const maneuvered = await hook(page);
   expect(maneuvered.resultKind).toBe('current');
   // Coast up to the maneuver and the maneuvered arc are separate segments, never joined.
@@ -205,15 +209,18 @@ test('a maneuvered scenario: two segments, one maneuver marker, VI-02 with 0 mis
   expect(maneuvered.compared).toBeGreaterThan(0);
   expect(maneuvered.mismatches).toBe(0);
 
-  const markers = await page.evaluate(
-    () =>
-      (
-        window as unknown as {
-          __missionLabScene: { get: () => { maneuverMarkers: { maneuverId: string }[] } };
-        }
-      ).__missionLabScene.get().maneuverMarkers.length,
-  );
-  expect(markers).toBe(1);
+  await expect
+    .poll(async () =>
+      page.evaluate(
+        () =>
+          (
+            window as unknown as {
+              __missionLabScene: { get: () => { maneuverMarkers: { maneuverId: string }[] } };
+            }
+          ).__missionLabScene.get().maneuverMarkers.length,
+      ),
+    )
+    .toBe(1);
   expect(errors).toEqual([]);
 });
 
@@ -223,8 +230,8 @@ test('a physical edit keeps the old trajectory, marked stale', async ({ page }) 
   await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'current');
   await page.getByTestId('input-duration').fill('3000');
   await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'stale');
+  await expect.poll(async () => (await hook(page)).stale).toBe(true);
   const state = await hook(page);
-  expect(state.stale).toBe(true);
   expect(state.segmentCount).toBe(1);
   expect(state.vertexCounts).toEqual([303]);
   await expect(page.getByTestId('scene-stale-chip')).toBeVisible();

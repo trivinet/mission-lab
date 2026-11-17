@@ -30,8 +30,9 @@ export const MODEL_LIMITATIONS: readonly string[] = Object.freeze([
   'UTC labels are epoch + elapsed seconds without leap-second handling.',
   'Any Earth orientation shown in the 3D view is illustrative only and is not used by the ' +
     'simulation (no Earth rotation model in M1).',
-  `At most ${String(PROVISIONAL_MAX_SAMPLE_COUNT)} samples per run (provisional limit, to be ` +
-    'measured in Phase 2).',
+  `At most ${String(PROVISIONAL_MAX_SAMPLE_COUNT)} samples per run (hard limit, decided by the ` +
+    'owner on 2026-11-17; playback slows well before it, see ' +
+    'docs/verification/performance-envelope.md).',
   'Not qualified for operational spacecraft navigation.',
 ]);
 

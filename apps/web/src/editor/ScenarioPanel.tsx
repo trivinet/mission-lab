@@ -6,6 +6,7 @@ import { fromDeg, fromKm, identity, toDeg, toKm } from '../format/units';
 import { getScenarioStore } from '../state/scenario-store';
 import { NumberField, TextField } from './Fields';
 import { FIELD, issuesForField } from './issue-map';
+import { SampleWarning } from './SampleWarning';
 import { isAngleKey, normaliseAngles } from './normalise-angles';
 
 interface Props {
@@ -133,6 +134,7 @@ export function ScenarioPanel({ issues }: Props) {
           onCommit={setOutputStep_s}
           issues={issuesForField(issues, FIELD.outputStep)}
         />
+        <SampleWarning testId="sample-warning" />
       </section>
 
       <section className="panel" aria-labelledby="h-orbit">

@@ -17,6 +17,7 @@ import { createStore } from 'zustand/vanilla';
 import type { StoreApi } from 'zustand/vanilla';
 import { createBrowserWorkerRunner } from '../worker/worker-runner';
 import type { SimulationRunner } from '../worker/worker-runner';
+import { nextManeuverId } from './maneuver-id';
 import { newScenario } from './default-scenario';
 import { INITIAL_RESULT_STATE, transitionResult } from './result-state';
 import type { ResultEvent, ResultState } from './result-state';
@@ -161,7 +162,12 @@ export function createScenarioStore(runner: SimulationRunner): ScenarioStore {
           ...s,
           maneuvers: [
             ...s.maneuvers,
-            { id: crypto.randomUUID(), t_s: 0, frame: 'RSW', deltaV_mps: [0, 0, 0] },
+            {
+              id: nextManeuverId(s.maneuvers.map((m) => m.id)),
+              t_s: 0,
+              frame: 'RSW',
+              deltaV_mps: [0, 0, 0],
+            },
           ],
         }));
       },
