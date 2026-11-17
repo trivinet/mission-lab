@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "Phase 3 closing: presets, CSV and table precision (034) and the 13-step acceptance test VE-01 (035) are running in parallel. Then gate G3.",
+  "headline": "All Phase 3 tasks delivered: presets, CSV and table precision (034) and the VE-01 acceptance test (035) in PR #70 (1978 tests, 77 e2e). Next: confirm the presets, merge, then the gate G3 review.",
   "gates": [
     {
       "id": "G0",
@@ -33,6 +33,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-43",
+      "text": "PR #70: confirm the three preset scenarios and the display decimals for s, dimensionless and km²/s²; merge PRs #69 and #70; then gate G3 review.",
+      "blocking": "Gate G3"
+    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -321,8 +326,8 @@
           "title": "Presets and CSV export",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_progress",
-          "deps": "Contract on docs/ml-task-034-contract; agent running"
+          "status": "in_review",
+          "deps": "PR #70"
         },
         {
           "id": "ML-TASK-036",
@@ -338,8 +343,8 @@
           "title": "Acceptance scenario end-to-end test",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_progress",
-          "deps": "Contract on docs/ml-task-034-contract; agent running",
+          "status": "in_review",
+          "deps": "PR #70",
           "approval": true
         }
       ]
@@ -386,6 +391,21 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged 034 and 035 on one branch without conflicts; all checks pass (1978 tests, 77 e2e including VE-01). A stale preview server on port 4173 from an earlier run was stopped before the rerun. PR #70."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Verification",
+      "text": "ML-TASK-035 delivered: VE-01, the 13 acceptance steps in one Playwright test, passes 3 times in a row; reload and rerun give byte-identical engine positions and the same requestIds."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-034 delivered: three presets through the user-file validation, round-trip CSV export, comparison-table display precision with exact values kept."
+    },
     {
       "date": "2026-11-17",
       "who": "Verification",
