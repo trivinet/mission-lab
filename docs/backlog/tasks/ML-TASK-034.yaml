@@ -1,0 +1,37 @@
+task_id: ML-TASK-034
+title: "Presets, CSV export, and display precision of the comparison table (apps/web)"
+status: in_progress
+requirement_ids: [ML-FR-013, ML-FR-014, ML-FR-010]
+owner_role: frontend-engineer
+reviewer_role: verification-engineer   # FR-014 AC1 is exact under VI-01
+dependencies: [ML-TASK-033, ML-TASK-032]
+affected_paths:
+  - apps/web/
+  - docs/backlog/tasks/ML-TASK-034.yaml
+objective: >
+  Finish the M1 SHOULD items and the display follow-up from ML-TASK-032: example scenarios, a CSV
+  export whose values equal the result exactly, and readable numbers in the comparison table.
+scope:
+  - "Presets (ML-FR-013 AC1): at least three example scenarios stored as scenario files (the ML-TASK-033 format) and loaded through exactly the same validation path as user files. Choose cases that show distinct behaviour, for example a near-circular LEO, an eccentric inclined orbit with a tangential burn, and an escape burn; each preset's values are a product choice, listed in the report for the owner. No reference numbers are claimed for them."
+  - "CSV export (ML-FR-014 AC1): header with units, frame and epoch; one row per sample (segment index, t_s, position and velocity components, and the history quantities if useful); every number written as the shortest round-trip decimal so `Object.is(Number(cell), value)` holds (tolerances.md §1 row 'CSV export values vs the result' and §8 VI-01). Download is user-initiated."
+  - "Comparison table display precision: numbers shown at a stated display resolution (tolerances.md §5) instead of full binary64; values at round-off level (for example Ω = 7e-16 deg when the input is 0) displayed sensibly; the underlying values and the VI-03 (a) plumbing test are unchanged; a 'copy exact values' or tooltip path keeps the full value available."
+out_of_scope:
+  - "Any change to packages/; acceptance scenario (035)."
+  - "New dependencies."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/requirements/m1-requirements.md (FR-010, FR-013, FR-014)
+  - docs/verification/tolerances.md §1 (CSV row), §5 (display resolution), §8 VI-01
+  - docs/backlog/tasks/ML-TASK-032.yaml and ML-TASK-033.yaml reports (comparison table, scenario file, load path)
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; `pnpm --filter @mission-lab/web test:e2e` passes (polling)."
+  - "FR-013 AC1: test that each preset goes through the same validation function as a user file and runs to a current result."
+  - "FR-014 AC1: test that parsing the exported CSV gives Object.is equality with every exported result value, header present with units, frame and epoch, one row per sample."
+  - "Display precision: the VI-03 (a) plumbing test still passes unchanged; a test shows a round-off-level value is displayed per the stated rule."
+test_requirements:
+  - "Vitest unit tests in apps/web/src; Playwright e2e."
+deliverables:
+  - apps/web presets, CSV export, display precision with tests; the report section of this file
+human_approval_required: false   # preset values confirmed by the owner at PR review
+
+report: {}

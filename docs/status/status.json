@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "Persistence (033) delivered in PR #67: save and load with validation, VT-17 and VT-18 (FR-011 AC3) pass; 1944 tests, 71 e2e. Owner confirms the 64 KiB file limit. Then presets and CSV (034) and the acceptance scenario (035).",
+  "headline": "All Phase 3 tasks delivered: presets, CSV and table precision (034) and the VE-01 acceptance test (035) in PR #70 (1978 tests, 77 e2e). Next: confirm the presets, merge, then the gate G3 review.",
   "gates": [
     {
       "id": "G0",
@@ -34,9 +34,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-42",
-      "text": "Confirm the scenario file size limit of 64 KiB (PR #67) so it can be merged.",
-      "blocking": "ML-TASK-034"
+      "id": "OA-43",
+      "text": "PR #70: confirm the three preset scenarios and the display decimals for s, dimensionless and km²/s²; merge PRs #69 and #70; then gate G3 review.",
+      "blocking": "Gate G3"
     },
     {
       "id": "OA-3",
@@ -318,16 +318,16 @@
           "title": "Persistence: format, validation, save/load",
           "role": "Astrodynamics + Frontend",
           "model": "opus / sonnet",
-          "status": "in_review",
-          "deps": "PR #67; owner confirms the 64 KiB limit"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PR #67)"
         },
         {
           "id": "ML-TASK-034",
           "title": "Presets and CSV export",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "033"
+          "status": "in_review",
+          "deps": "PR #70"
         },
         {
           "id": "ML-TASK-036",
@@ -343,8 +343,8 @@
           "title": "Acceptance scenario end-to-end test",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "todo",
-          "deps": "032, 033",
+          "status": "in_review",
+          "deps": "PR #70",
           "approval": true
         }
       ]
@@ -391,6 +391,36 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged 034 and 035 on one branch without conflicts; all checks pass (1978 tests, 77 e2e including VE-01). A stale preview server on port 4173 from an earlier run was stopped before the rerun. PR #70."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Verification",
+      "text": "ML-TASK-035 delivered: VE-01, the 13 acceptance steps in one Playwright test, passes 3 times in a row; reload and rerun give byte-identical engine positions and the same requestIds."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-034 delivered: three presets through the user-file validation, round-trip CSV export, comparison-table display precision with exact values kept."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Verification",
+      "text": "ML-TASK-035 started (Sonnet): the 13-step release acceptance scenario (ML-SYS-001 §14) as one Playwright test (VE-01), with a step-to-requirement map."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Owner",
+      "text": "Confirmed the 64 KiB scenario file limit; PRs #67 and #68 merged."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-034 started (Sonnet): three presets through the user-file validation path, round-trip CSV export, comparison-table display precision."
+    },
     {
       "date": "2026-11-17",
       "who": "Coordinator",
