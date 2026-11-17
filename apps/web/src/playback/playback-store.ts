@@ -7,7 +7,7 @@
  */
 import { createStore } from 'zustand/vanilla';
 import type { StoreApi } from 'zustand/vanilla';
-import { DEFAULT_RATE } from './timeline';
+import { DEFAULT_RATE } from './time-control';
 
 export interface PlaybackState {
   /** Playback time, s from the scenario epoch. */

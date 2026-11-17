@@ -35,12 +35,7 @@ export interface Advance {
 }
 
 /** Advances the playback time by a real-time step at a rate; stops exactly at the end. */
-export function advanceTime(
-  t_s: number,
-  realStep_s: number,
-  rate: number,
-  end_s: number,
-): Advance {
+export function advanceTime(t_s: number, realStep_s: number, rate: number, end_s: number): Advance {
   const step = Math.min(Math.max(realStep_s, 0), MAX_FRAME_S);
   const next = t_s + step * rate;
   return next >= end_s ? { t_s: end_s, ended: true } : { t_s: next, ended: false };

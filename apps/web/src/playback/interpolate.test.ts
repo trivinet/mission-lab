@@ -93,7 +93,10 @@ describe('displayPositionAt on synthetic segments', () => {
       velocity_mps: [0, 10, 0],
     };
     // Maneuver at the end of the span: the single-sample later segment wins.
-    expect(displayPositionAt([seg0, single], 10)).toMatchObject({ segmentIndex: 1, sampleIndex: 0 });
+    expect(displayPositionAt([seg0, single], 10)).toMatchObject({
+      segmentIndex: 1,
+      sampleIndex: 0,
+    });
     expect(displayPositionAt([], 1)).toBeNull();
     expect(resultTimeSpan_s(segments)).toEqual({ start_s: 0, end_s: 20 });
   });

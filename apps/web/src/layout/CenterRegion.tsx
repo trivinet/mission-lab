@@ -1,3 +1,4 @@
+import { Timeline } from '../playback';
 import { WorkspaceScene } from '../scene';
 import { ResultBanner } from './ResultStatus';
 
@@ -15,6 +16,7 @@ export function CenterRegion() {
           <WorkspaceScene />
         </div>
       </section>
+      <Timeline />
     </div>
   );
 }
