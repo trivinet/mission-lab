@@ -30,7 +30,13 @@ describe('handleRunMessage', () => {
       throw new Error('expected a result');
     }
     const arrays = response.result.segments.flatMap((s) => [s.t_s, s.position_m, s.velocity_mps]);
-    expect(transfer).toHaveLength(arrays.length);
+    // The worker's analysis (ML-TASK-044) is transferred too: 13 arrays per segment.
+    if (response.analysis?.ok !== true) {
+      throw new Error('expected the analysis');
+    }
+    const analysisArrays = response.analysis.segments.flatMap((s) => Object.values(s.values));
+    expect(analysisArrays).toHaveLength(13 * response.result.segments.length);
+    expect(transfer).toHaveLength(arrays.length + analysisArrays.length);
     expect(new Set(transfer).size).toBe(transfer.length);
 
     const lengths = arrays.map((a) => a.length);
@@ -39,6 +45,7 @@ describe('handleRunMessage', () => {
     });
     // The source buffers are detached: they were moved, not copied.
     expect(arrays.every((a) => a.byteLength === 0)).toBe(true);
+    expect(analysisArrays.every((a) => a.byteLength === 0)).toBe(true);
     if (received.type !== 'result') {
       throw new Error('expected a result');
     }

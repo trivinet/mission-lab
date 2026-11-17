@@ -7,7 +7,15 @@
  * test compares what the library holds against the analysis module's output (`sources`, the
  * module arrays the plot was built from).
  */
-import type { PlotSource, RunKind } from './plot-model';
+import type { RunKind } from './plot-model';
+
+/** The analysis module's output for one segment, as plain arrays (what the plot must show). */
+export interface PlotHookSource {
+  readonly run: RunKind;
+  readonly segmentIndex: number;
+  readonly t_s: readonly number[];
+  readonly values: readonly (number | null)[];
+}
 
 export interface PlotHookSeries {
   readonly id: string;
@@ -28,7 +36,7 @@ export interface PlotHookEntry {
   readonly x: number[];
   readonly series: readonly PlotHookSeries[];
   /** The analysis module's output for each segment shown. */
-  readonly sources: readonly PlotSource[];
+  readonly sources: readonly PlotHookSource[];
   readonly maneuverTimes_s: readonly number[];
   /** The playback cursor of this chart: the time it shows and whether it is inside the axis. */
   readonly cursor: { readonly t_s: number | null; readonly visible: boolean };

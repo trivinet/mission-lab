@@ -168,7 +168,12 @@ export function PlotChart({ model, describedBy, title, yLabel, stale }: PlotChar
           style: { stroke: style.stroke, dash: style.dash ?? null },
         };
       }),
-      sources: model.sources,
+      // Plain arrays for the test hook (a Float64Array time array does not serialise as one).
+      sources: model.sources.map((source) => ({
+        ...source,
+        t_s: Array.from(source.t_s),
+        values: Array.from(source.values),
+      })),
       maneuverTimes_s: model.maneuverTimes_s,
       cursor: { t_s: shownT, visible },
     }));

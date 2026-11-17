@@ -15,12 +15,28 @@
  *   are unchanged. The break is made by alternating the pieces between two series (`piece` 0 and
  *   1) of the same segment, so the number of series stays fixed however many wraps there are.
  */
-import type {
-  HistoryQuantity,
-  HistoryUnit,
-  ResultHistories,
-  SegmentHistory,
-} from '@mission-lab/simulation';
+import type { HistoryQuantity, HistoryUnit } from '@mission-lab/simulation';
+
+/**
+ * The part of the analysis module's histories the plots read. The module's `ResultHistories`
+ * satisfies it; the app also feeds it times as the engine's Float64Array (no copy) and values
+ * unpacked from the worker's typed arrays (analysis-model.ts).
+ */
+/** Sample times: the module's array, or the engine's own Float64Array (no copy). */
+export type SampleTimes = readonly number[] | Float64Array;
+
+export interface PlotSegmentHistory {
+  readonly segmentIndex: number;
+  readonly t_s: SampleTimes;
+  readonly series: readonly {
+    readonly quantity: HistoryQuantity;
+    readonly t_s: SampleTimes;
+    readonly values: readonly (number | null)[];
+  }[];
+}
+export interface PlotHistories {
+  readonly segments: readonly PlotSegmentHistory[];
+}
 
 export type RunKind = 'coast' | 'maneuvered';
 
@@ -40,7 +56,7 @@ export interface PlotSeries {
 export interface PlotSource {
   readonly run: RunKind;
   readonly segmentIndex: number;
-  readonly t_s: readonly number[];
+  readonly t_s: SampleTimes;
   readonly values: readonly (number | null)[];
 }
 
@@ -62,7 +78,7 @@ export function runOf(segmentIndex: number, hasCoastRun: boolean): RunKind {
 }
 
 /** Sorted union of ascending arrays, equal values once. */
-export function mergeTimes(arrays: readonly (readonly number[])[]): number[] {
+export function mergeTimes(arrays: readonly SampleTimes[]): number[] {
   let merged: number[] = [];
   for (const next of arrays) {
     const out: number[] = [];
@@ -90,7 +106,7 @@ export function mergeTimes(arrays: readonly (readonly number[])[]): number[] {
 
 function segmentSeries(
   run: RunKind,
-  segment: SegmentHistory,
+  segment: PlotSegmentHistory,
   quantity: HistoryQuantity,
   unit: HistoryUnit,
   x: readonly number[],
@@ -157,14 +173,14 @@ function segmentSeries(
  * run is drawn over it where they coincide (before the maneuver).
  */
 export function buildPlotModel(
-  histories: ResultHistories,
-  coast: ResultHistories | null,
+  histories: PlotHistories,
+  coast: PlotHistories | null,
   quantity: HistoryQuantity,
   unit: HistoryUnit,
   maneuverTimes_s: readonly number[],
 ): PlotModel {
   const hasCoastRun = coast !== null;
-  const parts: { run: RunKind; segment: SegmentHistory }[] = [
+  const parts: { run: RunKind; segment: PlotSegmentHistory }[] = [
     ...(coast?.segments ?? []).map((segment) => ({ run: 'coast' as const, segment })),
     ...histories.segments.map((segment) => ({
       run: runOf(segment.segmentIndex, hasCoastRun),

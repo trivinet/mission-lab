@@ -136,14 +136,16 @@ export function PlotsPanel() {
 
   const models = useMemo(() => {
     const histories = analysis?.histories;
-    if (analysis === null || !histories?.ok) {
+    if (analysis === null || histories?.ok !== true) {
       return [];
     }
     return HISTORY_QUANTITIES.filter(({ quantity }) => selected.includes(quantity)).map(
       ({ quantity, unit }) =>
         buildPlotModel(
-          histories.histories,
-          analysis.coastHistories?.ok === true ? analysis.coastHistories.histories : null,
+          histories.forQuantity(quantity),
+          analysis.coastHistories?.ok === true
+            ? analysis.coastHistories.forQuantity(quantity)
+            : null,
           quantity,
           unit,
           analysis.maneuverTimes_s,
