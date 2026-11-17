@@ -6,6 +6,7 @@ import { fromDeg, fromKm, identity, toDeg, toKm } from '../format/units';
 import { getScenarioStore } from '../state/scenario-store';
 import { NumberField, TextField } from './Fields';
 import { FIELD, issuesForField } from './issue-map';
+import { isAngleKey, normaliseAngles } from './normalise-angles';
 
 interface Props {
   readonly issues: readonly ValidationIssue[];
@@ -153,6 +154,13 @@ export function ScenarioPanel({ issues }: Props) {
             onCommit={(stored) => {
               setElement(row.key, stored);
             }}
+            {...(isAngleKey(row.key)
+              ? {
+                  onBlur: () => {
+                    normaliseAngles(store);
+                  },
+                }
+              : {})}
             issues={issuesForField(issues, row.field)}
           />
         ))}

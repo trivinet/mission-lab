@@ -72,6 +72,8 @@ export interface NumberFieldProps {
   /** Display unit -> stored; applied once to what the user types. */
   readonly fromDisplay: (display: number) => number;
   readonly onCommit: (stored: number) => void;
+  /** Called when the input loses focus (used to normalise angles, ML-FR-002 AC2). */
+  readonly onBlur?: () => void;
   readonly issues: readonly ValidationIssue[];
   readonly note?: string;
 }
@@ -84,6 +86,7 @@ export function NumberField({
   toDisplay,
   fromDisplay,
   onCommit,
+  onBlur,
   issues,
   note,
 }: NumberFieldProps) {
@@ -115,6 +118,7 @@ export function NumberField({
             setText(e.target.value);
             onCommit(fromDisplay(parseNumber(e.target.value)));
           }}
+          onBlur={onBlur}
         />
       )}
     </FieldFrame>
