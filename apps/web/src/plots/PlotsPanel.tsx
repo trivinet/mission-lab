@@ -33,7 +33,9 @@ const DEFAULT_SELECTION: readonly HistoryQuantity[] = [
 
 function axisLabel(quantity: HistoryQuantity, unit: string): string {
   const { symbol } = displayUnit(unit);
-  return `${HISTORY_LABELS[quantity]} (${symbol === '' ? 'dimensionless' : symbol})`;
+  // The long name of altitude does not fit beside the axis; the caption keeps the full name.
+  const name = quantity === 'altitude_m' ? 'Altitude' : HISTORY_LABELS[quantity];
+  return `${name} (${symbol === '' ? 'dimensionless' : symbol})`;
 }
 
 /** The values at the playback time as text: the text alternative of one plot. */

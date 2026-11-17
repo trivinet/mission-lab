@@ -45,4 +45,41 @@ deliverables:
   - apps/web plots and comparison UI with tests; doc updates listed in affected_paths; the report section of this file
 human_approval_required: false
 
-report: {}
+report:
+  files_changed:
+    - apps/web/package.json, pnpm-lock.yaml                      # uplot 1.6.32 exact
+    - docs/architecture/tech-baseline.md, adr/ADR-006-frontend-stack.md, proposed-architecture.md
+    - apps/web/src/state/result-state.ts, scenario-store.ts     # coast pair; run both requests
+    - apps/web/src/scene/*                                       # coast run next to maneuvered; hook coastSegments
+    - apps/web/src/plots/*                                       # analysis-model, plot-model, PlotChart, PlotsPanel, ComparisonTable, plot-hook, styles, labels, tests
+    - apps/web/src/format/units.ts                               # display units for analysis values
+    - apps/web/src/layout/CenterRegion.tsx, index.css
+    - apps/web/e2e/plots.spec.ts
+  summary: >
+    uPlot plots of computeHistories (13 selectable quantities, default altitude, speed, true anomaly),
+    segments as separate series, angle breaks by alternating two series per segment (values unchanged),
+    maneuver marker, playback cursor driven from the playback store, per-plot text alternative (cursor-time
+    values, sample-and-hold) and the comparison table with applied delta-v and absent values with reasons.
+    Run with a maneuver also runs buildCoastRequest through the worker (coast message id = -runId); the pair
+    is carried inside current/stale result states, so latest-run-wins and stale apply to both; a failed coast
+    run makes the run an error. The scene draws the coast run dashed grey and the whole maneuvered run solid
+    teal. Analysis is computed once per result (WeakMap cache). Hook: window.__missionLabPlots (with
+    ?sceneHook=1), values read from u.data.
+  tests_executed:
+    - pnpm install --frozen-lockfile, lint, typecheck, build, format:check, check:boundaries -> exit 0
+    - pnpm test -> 95 files, 1845 tests passed
+    - pnpm --filter @mission-lab/web test:e2e -> 60 passed (7 new in plots.spec.ts)
+  reference_data_used: []
+  not_verified:
+    - VI-03 (b) correctness and FR-010 AC3 (ML-TASK-036).
+    - Time and memory of computeHistories and plot build near 1e6 samples (not measured; main thread, once per result; nothing optimised).
+    - Only Chromium; no screen reader test of the text alternatives.
+    - Angle break rule is |delta| > pi between consecutive samples; a legitimate advance above pi per sample (very coarse output step) would show as a break.
+    - Series share one x union; runs with different sample grids would show breaks (same grid in M1).
+  known_limitations:
+    - Plot data is SI with km/deg tick labels; tick labels of near-constant series show many digits.
+    - Flight-path angle and mean anomaly absent (module does not provide them).
+  documentation_changes: [tech-baseline.md, ADR-006, proposed-architecture.md]
+  risks_or_blockers: []
+  review_artifact: artifacts-local/ml-task-032-plots.png (not committed)
+  recommended_next_action: Verification Engineer review of VI-03 (a) plumbing; owner review of layout.
