@@ -79,6 +79,35 @@ const nonWebFiles = [
   'tools/boundary-fixtures/{astrodynamics,contracts,simulation,verification,conformance}/**/*.{ts,tsx}',
 ];
 
+// ML-NFR-003 (determinism): the engine packages read no clock and no randomness. A run is a pure
+// function of its request, so `Date.now()`, `new Date()` / `Date()` (no argument: the current
+// time), `performance`, `Math.random` and the Web Crypto random functions are forbidden there.
+// `Date.parse(text)` and `new Date(value)` stay allowed: they are calendar arithmetic on an
+// argument, not a clock read (packages/simulation/src/utc-label.ts uses them, ADR-004).
+const determinismFiles = [
+  'packages/astrodynamics/**/*.{ts,tsx}',
+  'packages/simulation/**/*.{ts,tsx}',
+  'tools/boundary-fixtures/{astrodynamics,simulation}/**/*.{ts,tsx}',
+];
+const NFR_003 = 'ML-NFR-003: the engine reads no clock and no randomness.';
+const determinismProperties = [
+  { object: 'Date', property: 'now', message: NFR_003 },
+  { object: 'performance', property: 'now', message: NFR_003 },
+  { object: 'Math', property: 'random', message: NFR_003 },
+  { property: 'getRandomValues', message: NFR_003 },
+  { property: 'randomUUID', message: NFR_003 },
+];
+const determinismSyntax = [
+  {
+    selector: "NewExpression[callee.name='Date'][arguments.length=0]",
+    message: `${NFR_003} \`new Date()\` is the current time.`,
+  },
+  {
+    selector: "CallExpression[callee.name='Date']",
+    message: `${NFR_003} \`Date()\` is the current time.`,
+  },
+];
+
 export default tseslint.config(
   {
     ignores: [
@@ -130,6 +159,20 @@ export default tseslint.config(
     rules: {
       'no-restricted-imports': ['error', { patterns: uiLibraryImports }],
       'no-restricted-globals': ['error', ...browserGlobals],
+    },
+  },
+  {
+    files: determinismFiles,
+    rules: {
+      // Replaces the list above for these files, so the browser globals are repeated.
+      'no-restricted-globals': [
+        'error',
+        ...browserGlobals,
+        { name: 'performance', message: NFR_003 },
+        { name: 'crypto', message: NFR_003 },
+      ],
+      'no-restricted-properties': ['error', ...determinismProperties],
+      'no-restricted-syntax': ['error', ...determinismSyntax],
     },
   },
 );
