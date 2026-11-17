@@ -1,6 +1,6 @@
 # ADR-010 — Charting library for the time-history and comparison plots
 
-**Status:** Proposed — awaiting owner approval · **Resolves:** OD-006 (ADR-006; ML-SYS-001 §9;
+**Status:** Accepted by the owner on 2026-11-17 (uPlot 1.6.32, exact pin) · **Resolves:** OD-006 (ADR-006; ML-SYS-001 §9;
 proposed-architecture §5) · **Task:** ML-TASK-030 · **Affects (if approved):** ML-TASK-032,
 `apps/web/package.json`, `docs/architecture/tech-baseline.md` ·
 **Evidence:** `spikes/charting/` (code, raw data, `results/`)
@@ -184,7 +184,7 @@ change what is drawn, and FR-009 AC3 is about the numbers shown.
   library choice matters at the large sizes, which is the only place the soft-warning size
   (250 000) is reached.
 
-## Decision (recommended; the owner decides)
+## Decision (accepted by the owner, 2026-11-17)
 
 **Adopt uPlot 1.6.32 (exact pin) for the M1 time-history and comparison plots.**
 
@@ -220,7 +220,14 @@ note. Recharts and Plotly basic are not recommended: Recharts needs 163 ms per c
 10 000 points and 4 s at 250 000; Plotly basic is the largest bundle (405.6 kB gzip) with a
 168 ms cursor update at 250 000 points.
 
-## Consequences if approved
+## Angle plotting policy (owner decision, 2026-11-17)
+
+Angles reported in [0, 2π) (true anomaly, Ω, ω) are plotted with a **break in the line at each wrap**:
+the series is split where consecutive values jump across the 0/2π boundary, and no plotted value is
+changed (no unwrapping). This keeps the plotted values identical to the analysis module output
+(ML-FR-009 AC3; VI-03 plumbing). Implemented in ML-TASK-032.
+
+## Consequences
 
 - **Dependency:** `uplot` is added to `apps/web` (exact version, `1.6.32`) by ML-TASK-032, with its
   justification in that PR (ML-NFR-007). `pnpm-lock.yaml` changes then, not before. The spike
