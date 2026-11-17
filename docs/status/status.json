@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "The workspace runs end to end: editor, derived values, degenerate convention, maneuver and the 3D scene with exact vertices (022 + 023 integrated on 027; 1738 tests, 42 e2e). Waiting for github.com to resolve again to push and open the PRs.",
+  "headline": "The workspace is merged: editor, derived values, maneuver and the exact 3D scene (022, 023, 027). Phase 2 left: timeline and playback (024), model panel (025), integration and performance envelope (026), then gate G2.",
   "gates": [
     {
       "id": "G0",
@@ -232,16 +232,16 @@
           "title": "Scenario editor with validation",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "Integrated on branch feat/phase2-workspace-integration; PR pending (network)"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PRs #49, #50)"
         },
         {
           "id": "ML-TASK-023",
           "title": "3D scene: Earth, trajectory, markers, camera",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "Integrated on branch feat/phase2-workspace-integration; PR pending (network)"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PRs #49, #50)"
         },
         {
           "id": "ML-TASK-024",
@@ -264,8 +264,8 @@
           "title": "Scenario-view API in simulation (derived values, degenerate convention, angles, UTC label, Earth radius, ERA)",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_review",
-          "deps": "Done; PR pending (network)"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PRs #49, #50)"
         },
         {
           "id": "ML-TASK-026",
@@ -376,6 +376,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #49 (ML-TASK-027), PR #50 (ML-TASK-022 + 023 workspace) and PR #51 (status) on the owner's go-ahead; CI green. PR #50 first failed CI on a camera e2e race (camera not yet registered); fixed by polling, assertions unchanged."
+    },
     {
       "date": "2026-11-17",
       "who": "Coordinator",
