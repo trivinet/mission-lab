@@ -1,0 +1,37 @@
+task_id: ML-TASK-041
+title: "User guide, developer guide, requirements traceability matrix, release notes"
+status: in_progress
+requirement_ids: [ML-NFR-002, ML-NFR-005]
+owner_role: docs-release
+reviewer_role: verification-engineer
+dependencies: [ML-TASK-035]
+affected_paths:
+  - README.md
+  - docs/user-guide.md
+  - docs/developer-guide.md
+  - docs/verification/traceability-matrix.md
+  - docs/releases/release-notes-v1.0.0.md
+  - docs/backlog/tasks/ML-TASK-041.yaml
+objective: >
+  Make M1 usable and maintainable by someone who was not in this conversation: how to use it, how
+  to build and verify it, which test proves which requirement, and what v1.0.0 contains.
+scope:
+  - "User guide: what Mission Lab is and is not (not qualified for operational use), the workspace, editing an orbit, a maneuver in RSW (with the along-track note), running, playback, plots and comparison, save/load, presets, CSV, the model panel, limits (sample limit and warning, two-body only). Plain language; screenshots are optional and may be referenced but not committed if large."
+  - "Developer guide: repository layout and boundaries (ADR-002), toolchain and commands, how CI works, how verification is organised (layers, tolerance record, conformance runs, phase discipline §4.1, restarted Orekit arcs procedure), how to add a feature without breaking the rules (AGENTS.md)."
+  - "Traceability matrix: every ML-FR, ML-UX and ML-NFR in docs/requirements/m1-requirements.md → acceptance criteria → test files and evidence documents (conformance runs, G1/G2/G3 reviews). Mark anything without evidence as a gap; do not claim evidence that does not exist (check each file exists)."
+  - "Release notes v1.0.0 (draft): features, verification summary with links, known limits and accepted gaps (from G1-, G2-, G3-review.md), owner decisions, what comes in M2 (ML-SYS-001 §2.3). Status: Draft until ML-TASK-043."
+  - "README: short entry point linking to the guides."
+out_of_scope:
+  - "Any code or test change; changing approved documents (tolerances, ADRs, reviews)."
+inputs:
+  - AGENTS.md; docs/product/ML-SYS-001.md; docs/requirements/m1-requirements.md; docs/verification/*; docs/releases/G0…G3; docs/architecture/*; task reports ML-TASK-001…036
+acceptance_criteria:
+  - "Every requirement in m1-requirements.md appears in the matrix with evidence or an explicit gap; every linked file exists (checked by a script or listed check)."
+  - "`pnpm format:check` exits 0."
+test_requirements:
+  - "A link/path existence check over the matrix (script output in the report)."
+deliverables:
+  - the five documents, the report section of this file
+human_approval_required: false
+
+report: {}

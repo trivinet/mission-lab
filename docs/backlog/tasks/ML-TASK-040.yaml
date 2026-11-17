@@ -1,0 +1,39 @@
+task_id: ML-TASK-040
+title: "Full regression, accessibility and keyboard review, error-path review (release readiness)"
+status: in_progress
+requirement_ids: [ML-UX-001, ML-UX-002, ML-UX-003, ML-UX-004, ML-NFR-005, ML-NFR-006]
+owner_role: verification-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-035]
+affected_paths:
+  - apps/web/e2e/
+  - docs/verification/release-readiness-review.md
+  - docs/backlog/tasks/ML-TASK-040.yaml
+objective: >
+  Before release, review the whole app as a user and as a tester: run the full suite on the release
+  candidate, review accessibility and keyboard operation, walk every error path, and file what is
+  found. Fix nothing in product code here; defects are reported for the owner to accept or for a
+  fix task.
+scope:
+  - "Full regression: install, lint, typecheck, test, build, format, boundaries, web e2e, plus the conformance project and `pnpm perf:envelope` once; record counts and any flake (run e2e 3 times)."
+  - "Accessibility: run an automated check (axe via Playwright only if it can be loaded without adding a dependency to the app; otherwise a documented manual checklist) on the main states: none, current, stale, error, with a maneuver, dialogs open. Check names and roles of controls, focus order, visible focus, text alternatives for the 3D view and plots, colour contrast of text against the design tokens (compute ratios), no information by colour only."
+  - "Keyboard: complete the VE-01 flow by keyboard only (a new e2e if feasible)."
+  - "Error paths: every validation class in the editor, every rejected file class, a failed run (e.g. a rectilinear collision scenario), sample-limit exceeded, worker crash path, stale/new/load confirmations; each shows a readable message and leaves the app usable."
+  - "docs/verification/release-readiness-review.md: findings numbered D-1… with severity (blocker / major / minor), steps to reproduce, and a recommendation (fix before release, accept, defer to M2)."
+out_of_scope:
+  - "Changing apps/web/src or packages/ (findings only; the owner decides fixes)."
+  - "New dependencies in the app. A dev-only tool used from a throwaway script outside the workspace is allowed if documented."
+inputs:
+  - AGENTS.md; docs/requirements/m1-requirements.md (§3 UX, §4 NFR); docs/product/ML-SYS-001.md §9, §14
+  - docs/design/design-tokens.md (contrast table); docs/verification/ve-01-acceptance.md
+  - reports of ML-TASK-021…036
+acceptance_criteria:
+  - "release-readiness-review.md exists with the regression counts, the accessibility and keyboard results, the error-path walk and the numbered findings with severities."
+  - "Any new e2e added passes 3 times in a row; `pnpm lint`, `pnpm typecheck`, `pnpm format:check` exit 0."
+test_requirements:
+  - "Playwright e2e for the keyboard-only flow if feasible; otherwise documented manual steps."
+deliverables:
+  - docs/verification/release-readiness-review.md, any new e2e, the report section of this file
+human_approval_required: true   # the owner accepts or rejects each finding before G4
+
+report: {}

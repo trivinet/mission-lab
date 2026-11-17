@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 4 — Stabilisation and release (gate G4)",
-  "headline": "Gate G3 passed on 2026-11-17: the full M1 flow works and is verified. Phase 4 started: regression and accessibility review (040) and guides and traceability (041); then hosting (042) and release v1.0.0 (043).",
+  "headline": "Release review (040, PR #74) and documentation (041, PR #73) delivered: no blocker; one major finding (main thread blocks ~3 s after a 1M-sample result since the plots landed). Owner decides the pre-release fix package; then hosting (042) and release (043).",
   "gates": [
     {
       "id": "G0",
@@ -34,6 +34,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-45",
+      "text": "Decide the pre-release fix package: D-1 (move analysis off the main thread, re-measure the envelope), D-2/D-3 text, D-6 unsaved-tab warning, D-7/D-9 a11y details, FR-009 AC2 axis-title test, NFR-003 lint rule; accept D-4, D-5, D-8, D-10 for M1. Merge PRs #72, #73, #74.",
+      "blocking": "ML-TASK-042, 043"
+    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -354,16 +359,16 @@
           "title": "Full regression, accessibility and error-path review",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "todo",
-          "deps": "035"
+          "status": "in_review",
+          "deps": "PR #74"
         },
         {
           "id": "ML-TASK-041",
           "title": "User guide, developer guide, traceability, release notes",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "todo",
-          "deps": "035"
+          "status": "in_review",
+          "deps": "PR #73"
         },
         {
           "id": "ML-TASK-042",
@@ -387,6 +392,21 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Verification",
+      "text": "ML-TASK-040 delivered (after resuming from the usage limit): 1978 tests; e2e 91/91 ×3; axe 0 violations in 11 states; contrast ≥ 5.40:1; keyboard-only VE-01 passes; 10 findings (D-1 major: post-result main-thread block 3.2 s at 1M vs 0.5 s recorded)."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Docs",
+      "text": "ML-TASK-041 delivered: user guide, developer guide, traceability matrix (FR 9 covered / 5 partial; UX 2/2; NFR 2/4/1 gap), v1.0.0 release notes draft; 230 paths checked."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #71 (G3 approved). Phase 4 started: ML-TASK-040 (release-readiness review, Sonnet) and ML-TASK-041 (guides, traceability, release notes, Sonnet) running in parallel."
+    },
     {
       "date": "2026-11-17",
       "who": "Owner",
