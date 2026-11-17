@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Timeline and playback (024) and the model panel (025) are delivered together in PR #54: 1779 tests, 52 e2e. Phase 2 has only ML-TASK-026 (integration and performance envelope) left before gate G2.",
+  "headline": "Phase 2 is 7 of 8: editor, 3D scene, timeline, model panel and the simulation API are merged. Left before gate G2: ML-TASK-026 (integration with the real engine, measured performance envelope, sample limit).",
   "gates": [
     {
       "id": "G0",
@@ -32,11 +32,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-37",
-      "text": "PR #54: approve the not-qualified statement wording (\"Not qualified for operational use. Mission Lab is an educational and exploratory tool: do not use its results for real spacecraft navigation, mission planning or operations.\") and merge PR #53 then #54.",
-      "blocking": "ML-TASK-026"
-    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -253,16 +248,16 @@
           "title": "Timeline and playback",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "PR #54"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PR #54)"
         },
         {
           "id": "ML-TASK-025",
           "title": "Model & assumptions panel",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "PR #54"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PR #54)"
         },
         {
           "id": "ML-TASK-027",
@@ -381,6 +376,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Owner",
+      "text": "Approved the not-qualified statement wording; PR #53 and PR #54 merged (merge commits), CI green."
+    },
     {
       "date": "2026-11-17",
       "who": "Coordinator",
