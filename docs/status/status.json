@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Owner decided the sample limit: keep 1,000,000 as a hard ceiling, with a soft UI warning above 250,000 samples; maneuver ids derived in the UI. ML-TASK-026 part B is implementing that; then gate G2.",
+  "headline": "Phase 2 complete: all 8 tasks merged; VI-01, VI-02 and VE-02 pass (1792 tests, 53 e2e). Gate G2 package is ready for the owner (docs/releases/G2-review.md).",
   "gates": [
     {
       "id": "G0",
@@ -32,6 +32,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-39",
+      "text": "Gate G2: read docs/releases/G2-review.md (PR #58), ideally try the workspace (pnpm --filter @mission-lab/web dev), then approve or ask for changes.",
+      "blocking": "Phase 3"
+    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -272,8 +277,8 @@
           "title": "Integration with real engine; performance envelope",
           "role": "Frontend + Verification",
           "model": "sonnet / opus",
-          "status": "in_review",
-          "deps": "Part A in PR #57; verification review running; owner decisions OA-38",
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PR #57)",
           "approval": true
         }
       ]
@@ -376,6 +381,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #56 and PR #57 (ML-TASK-026 parts A and B; 1792 tests, 53 e2e, CI green). Phase 2 complete. Wrote the G2 review package (PR #58)."
+    },
     {
       "date": "2026-11-17",
       "who": "Owner",
