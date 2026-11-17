@@ -1,7 +1,7 @@
 {
-  "updated": "2026-11-16",
+  "updated": "2026-11-17",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Visual direction approved (layout A, blue accent, banner + chip). ML-TASK-022 (layout and editor) and ML-TASK-023 (3D scene, VI-02) are running in parallel.",
+  "headline": "The workspace runs end to end: editor, derived values, degenerate convention, maneuver and the 3D scene with exact vertices (022 + 023 integrated on 027; 1738 tests, 42 e2e). Waiting for github.com to resolve again to push and open the PRs.",
   "gates": [
     {
       "id": "G0",
@@ -232,16 +232,16 @@
           "title": "Scenario editor with validation",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_progress",
-          "deps": "Contract in PR #47; agent running"
+          "status": "in_review",
+          "deps": "Integrated on branch feat/phase2-workspace-integration; PR pending (network)"
         },
         {
           "id": "ML-TASK-023",
           "title": "3D scene: Earth, trajectory, markers, camera",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_progress",
-          "deps": "Contract in PR #47; agent running"
+          "status": "in_review",
+          "deps": "Integrated on branch feat/phase2-workspace-integration; PR pending (network)"
         },
         {
           "id": "ML-TASK-024",
@@ -258,6 +258,14 @@
           "model": "sonnet",
           "status": "todo",
           "deps": "017, 021"
+        },
+        {
+          "id": "ML-TASK-027",
+          "title": "Scenario-view API in simulation (derived values, degenerate convention, angles, UTC label, Earth radius, ERA)",
+          "role": "Astrodynamics Engineer",
+          "model": "opus",
+          "status": "in_review",
+          "deps": "Done; PR pending (network)"
         },
         {
           "id": "ML-TASK-026",
@@ -368,6 +376,41 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Checked the integration branch: all checks pass, 1738 tests, 42 e2e; only apps/web, the lockfile, simulation (027) and task YAMLs changed; no Date arithmetic left in apps/web. Derived values in the screenshot match hand values (period 5828.5 s, energy −28.47 km²/s² for a = 7000 km). Screenshots sent to the owner."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "Integrated 022 + 023 on the 027 API: scene in the centre region, derived panel and degeneracy from describeScenarioOrbit, angle normalisation, UTC label and ERA from the engine, browser VI-02 on a maneuvered scenario (0 mismatches)."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Checked ML-TASK-027 (1677 tests, scope packages/simulation only). Recomputed the ERA test values in 40-digit decimal; the hand values were 1e-11 rad off under a 1e-8 tolerance, so the test now asserts 5e-13 (5e-11 for the daily advance). Push failed: github.com does not resolve from this network. Integration of 022 + 023 on 027 started (Sonnet)."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-027 delivered after resuming from the usage limit: DEGENERACY_THRESHOLDS (ADR-008), ENGINE_CONSTANTS, describeScenarioOrbit, utcIsoAtElapsed, earthRotationAngle_rad; 47 new tests."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Frontend",
+      "text": "ML-TASK-023 delivered: three/R3F scene, scale 1e-6 per metre, VI-02 exact (Object.is on 918 components across 3 scenarios, 0 mismatches; a 1.0000001 scale mutation fails 4 tests), display options never run, 9 e2e pass. Reference radius and ERA arithmetic moved to ML-TASK-027."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-027 started (Opus): expose through packages/simulation the approved degeneracy thresholds, a scenario-orbit description (normalised angles, derived quantities, degenerate class and convention) and a UTC label of epoch + t_s, so apps/web computes no physics and the boundary stays as approved."
+    },
+    {
+      "date": "2026-11-16",
+      "who": "Frontend",
+      "text": "ML-TASK-022 delivered partly: layout A, editor, maneuver, banner + chip, keyboard; 26 e2e pass. Blocked on FR-002 AC2–AC4 because the needed functions are only in packages/astrodynamics, which apps/web may not import (ADR-002); nothing was reimplemented."
+    },
     {
       "date": "2026-11-16",
       "who": "Owner",
