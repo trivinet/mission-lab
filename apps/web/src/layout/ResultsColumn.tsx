@@ -19,7 +19,12 @@ export function ResultsColumn() {
     shown === null ? null : shown.segments.reduce((n, segment) => n + segment.t_s.length, 0);
 
   return (
-    <div className="col" aria-label="Results and assumptions" data-state={resultState.kind}>
+    <div
+      className="col"
+      role="group"
+      aria-label="Results and assumptions"
+      data-state={resultState.kind}
+    >
       <section className="panel" aria-labelledby="h-diag" data-testid="diagnostics-panel">
         <h2 id="h-diag">Diagnostics</h2>
         {resultState.kind === 'error' && diagnostics.length === 0 && (
