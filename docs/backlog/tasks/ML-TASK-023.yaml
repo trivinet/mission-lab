@@ -52,16 +52,17 @@ report:
   files_changed:
     - "apps/web/package.json, pnpm-lock.yaml: three 0.186.1, @react-three/fiber 9.8.2, @types/three 0.186.0 (exact; the only additions, no drei)"
     - "apps/web/src/scene/ (new): scene-scale.ts, scene-geometry.ts, earth-orientation.ts, scene-source.ts, scene-options.ts, scene-hook.ts, scene-style.ts, SceneCanvas.tsx, SceneErrorBoundary.tsx, WorkspaceScene.tsx, index.ts, scene-geometry.test.ts, scene-options.test.ts"
-    - "apps/web/src/App.tsx: one mount of WorkspaceScene under the debug surface (Coordinator reconciles with ML-TASK-022)"
-    - "apps/web/e2e/scene.spec.ts (new)"
+    - "apps/web/src/App.tsx: one mount of WorkspaceScene under the debug surface; reconciled by the integration (feat/phase2-workspace-integration): the debug surface is gone and layout/CenterRegion.tsx mounts WorkspaceScene inside scene-container"
+    - "apps/web/e2e/scene.spec.ts (new); integration adapted its test ids to the editor (input-duration, result-state data-state) and added the maneuvered-scenario test"
+    - "Integration on ML-TASK-027: scene-source.ts reads ENGINE_CONSTANTS.referenceRadius_m; earth-orientation.ts calls the engine's earthRotationAngle_rad (returns null if the engine declines, the Earth is then unrotated; scene-hook rotationZ_rad is number or null); scene-geometry.test.ts ERA test adapted (angle now in [0, 2 pi), advance compared modulo 2 pi using ERA_RATE_revpday) plus a null-epoch case"
   summary: >
     The scene scale is s = 1e-6 scene units per metre (1 unit = 1000 km), the single constant
     applied to samples. A vertex component is exactly Math.fround(x * s) (toSceneCoordinate in
     scene-scale.ts). buildSceneGeometry turns each result segment into its own Float32Array, so
     segments are never joined; the array is handed to the three BufferAttribute by reference. The
-    Earth sphere radius is result.model.constants.referenceRadius_m times s (Earth only: the radius
-    from the request the engine builds, because web may not import astrodynamics). Earth
-    orientation is rotation about +Z by the ADR-004 ERA, labelled illustrative. Coast (segment 0)
+    Earth sphere radius is result.model.constants.referenceRadius_m times s (with no result:
+    ENGINE_CONSTANTS.referenceRadius_m). Earth orientation is rotation about +Z by the engine's
+    earthRotationAngle_rad (ADR-004), labelled illustrative. Coast (segment 0)
     is dashed grey, maneuvered segments solid teal, the maneuver point a large amber marker, the
     spacecraft marker sits at a flat sample index (slider, until ML-TASK-024). Stale shows the old
     trajectory at 50 percent opacity with a chip; none, computing and error show Earth only.
@@ -74,18 +75,19 @@ report:
     - "pnpm --filter @mission-lab/web test:e2e (Chromium, built app): 9 passed (5 new in scene.spec.ts)"
     - "VI-02 (Vitest, real engine, Object.is on every component vs Math.fround(sample * s)): default scenario 303 components; maneuver on the grid at 3000 s 306; maneuver off the grid at 2500.25 s 309; 0 mismatches; also segment separation, event markers, hook arrays identical to the rendered arrays"
     - "VI-02 in the browser (e2e): hook sourcePosition_m vs vertices, 303 components, 0 mismatches"
+    - "Integration: VI-02 in the browser for a maneuvered scenario (maneuver at 3000 s, dv along-track 100 m/s, entered in the editor): 2 segments, compared equals the vertex total, 0 mismatches, 1 maneuver marker, no console errors"
+    - "Integration: pnpm test 84 files, 1738 tests; web e2e 42 passed; install, lint, typecheck, build, format:check, check:boundaries exit 0"
+    - "Integration: screenshots of the built app (default state; maneuvered current state) viewed; Earth, dashed coast, solid maneuvered arc and the maneuver marker visible"
     - "Mutation check: scaling by 1.0000001 made 4 VI-02 tests fail; reverted, not committed"
     - "AC4: unit test (display option store never calls the runner, result state identical) and e2e (single worker, state stays current)"
     - "Visual check of a Playwright screenshot of the real WebGL canvas: Earth with graticule, dashed trajectory, axes"
   e2e_webgl_flags: "None needed: headless Chromium via Playwright rendered WebGL with default flags."
   not_verified:
-    - "Earth ERA constants are pinned to ADR-004 as written; the unit test restates the formula and is not an independent check (ADR-004 asks the Verification Engineer to confirm them)."
+    - "The ERA now comes from the engine (earthRotationAngle_rad); the scene tests check only that the scene passes it through (J2000 value, one-day advance modulo 2 pi, null on a bad epoch). The ERA's own verification belongs to the simulation package tests."
     - "The e2e render check compares canvas screenshots before and after a run and checks no console errors; it does not prove the pixels show the right geometry. Exactness rests on the VI-02 hook arrays."
-    - "A maneuvered scenario in the browser is not tested (the editor has no maneuver input yet; maneuvered cases are Vitest only). The spacecraft marker is hidden behind the Earth in the default view. GPU upload of the arrays is not observed (the hook shows the CPU arrays given to three)."
+    - "The spacecraft marker is hidden behind the Earth in the default view. GPU upload of the arrays is not observed (the hook shows the CPU arrays given to three)."
     - "Keyboard orbit is checked by e2e (camera moves); no screen-reader test. Stale 50 percent opacity and graticule colours are not contrast-measured (design-tokens.md caveat)."
     - "computeLineDistances (three) fills a dash attribute for the coast line; positions are untouched."
   conflicts_or_gaps:
-    - "The web app cannot import astrodynamics and the engine exports no standalone reference radius, so with no result the radius is read from buildSimulationRequest(newScenario()).constants. A small simulation export would be cleaner (contract gap; packages not changed)."
-    - "ADR-004 needs a date-to-days computation (Date.parse) in the UI for ERA; no engine time-conversion module is exported yet."
-    - "The lint rule no-loss-of-precision flags the ADR-004 literal 1.00273781191135448; one eslint-disable line with a comment keeps it as written."
+    - "Resolved by ML-TASK-027 and this integration: the Earth radius uses ENGINE_CONSTANTS.referenceRadius_m (no dummy request); the ERA and its Date arithmetic and the ADR-004 literal with its eslint-disable are gone from apps/web."
     - "AxesHelper colours (X red, Y green, Z blue) are the three convention, not design tokens."
