@@ -1,0 +1,44 @@
+task_id: ML-TASK-033
+title: "Persistence: versioned scenario file, validated load, save/load UI, unsaved-changes indicator (VT-17, VT-18 FR-011 AC3, FR-001 AC3)"
+status: in_progress
+requirement_ids: [ML-FR-011, ML-FR-001, ML-UX-004]
+owner_role: frontend-engineer
+reviewer_role: verification-engineer   # VT-17 and VT-18 (FR-011 AC3) are G3 evidence
+dependencies: [ML-TASK-004, ML-TASK-022]
+affected_paths:
+  - apps/web/
+  - docs/backlog/tasks/ML-TASK-033.yaml
+objective: >
+  Let the user save a scenario to a versioned JSON file and load it back safely, and close the
+  items deferred to persistence: VT-17 and the FR-011 AC3 part of VT-18 (moved from G1 to G3,
+  G1-review.md decision 1) and ML-FR-001 AC3 (confirm before replacing unsaved work).
+scope:
+  - "File format: the contract's Scenario plus `schemaVersion` (packages/contracts SCHEMA_VERSION and scenarioSchema), everything needed to reproduce the run (ML-FR-011 AC1). Serialisation is deterministic (stable key order, numbers as shortest round-trip decimals, a documented newline/indent), so save → load → save gives byte-identical files (AC2). Use only what packages/contracts exports; if the contract lacks something the format needs, stop and report (no contract change here)."
+  - "Load: read a user-chosen file (file input, no network); reject with a readable message and without changing the current scenario: invalid JSON, unknown or missing schemaVersion, schema violations, out-of-range values (the engine's validation), and files over a size limit (AC3). The size limit is one named UI constant; propose a value and list it in the report for the owner."
+  - "Save: the browser download of the JSON file is allowed inside the app (a user-initiated save of the user's own scenario)."
+  - "Unsaved-changes indicator (AC4) next to the scenario name; New scenario and Load ask for confirmation when there are unsaved changes (ML-FR-001 AC3), with an in-page dialog (no window.confirm)."
+  - "VT-17 (FR-011 AC2): save → load → save byte identity, and load → run reproduces the original result (same requestId and bit-identical samples)."
+  - "VT-18 FR-011 AC3: one test per invalid class with its message, and the current scenario unchanged after each rejection."
+  - "Keyboard operation of save, load and the dialog (ML-UX-004)."
+out_of_scope:
+  - "Presets and CSV export (034); any change to packages/; cloud storage or any network."
+  - "New dependencies."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/requirements/m1-requirements.md (FR-001 AC3, FR-011, UX-004)
+  - docs/verification/m1-verification-plan.md (VT-17, VT-18) and tolerances.md §1 (exact items)
+  - docs/architecture/contracts-v1.md (Scenario, schemaVersion, validation, §14 maneuver ids)
+  - docs/releases/G1-review.md (decision 1)
+  - docs/backlog/tasks/ML-TASK-021.yaml, ML-TASK-022.yaml, ML-TASK-026.yaml reports (store, editor, deterministic maneuver ids)
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; `pnpm --filter @mission-lab/web test:e2e` passes (polling, never single reads)."
+  - "VT-17: byte-identical save → load → save on the default, a maneuvered and a degenerate scenario; load → run gives the same requestId and bit-identical samples."
+  - "VT-18 (FR-011 AC3): each invalid class rejected with its message; the current scenario is unchanged (deep equality) after each."
+  - "e2e: save, load, unsaved indicator, confirmation dialog on New and on Load, keyboard operation."
+test_requirements:
+  - "Vitest unit tests in apps/web/src; Playwright e2e."
+deliverables:
+  - apps/web persistence code and tests; the report section of this file
+human_approval_required: false   # the size-limit value is confirmed by the owner at PR review
+
+report: {}
