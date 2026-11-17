@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 4 — Stabilisation and release (gate G4)",
-  "headline": "Mission Lab is live at https://trivinet.github.io/mission-lab/. Release v1.0.0 preparation (043) is running: version, final release notes, changelog, doc clean-up and the G4 package. The owner can do the 13-step walkthrough on the live site meanwhile.",
+  "headline": "Release candidate v1.0.0 is live at https://trivinet.github.io/mission-lab/ (engine version 1.0.0). Waiting for the owner walkthrough of the 13 steps and the G4 decision; then the v1.0.0 tag and GitHub release.",
   "gates": [
     {
       "id": "G0",
@@ -35,9 +35,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-47",
-      "text": "Try the live site https://trivinet.github.io/mission-lab/ (ideally the 13-step walkthrough of ML-SYS-001 §14) and give the go-ahead for release v1.0.0 (ML-TASK-043).",
-      "blocking": "Gate G4"
+      "id": "OA-48",
+      "text": "Walk through the 13 steps of ML-SYS-001 §14 on https://trivinet.github.io/mission-lab/ (checklist in docs/releases/G4-review.md) and approve or reject gate G4.",
+      "blocking": "Tag v1.0.0 and GitHub release"
     },
     {
       "id": "OA-3",
@@ -393,14 +393,19 @@
           "title": "Release v1.0.0 checklist and tag",
           "role": "Coordinator",
           "model": "session",
-          "status": "in_progress",
-          "deps": "Contract on docs/ml-task-043-contract; agent running",
+          "status": "in_review",
+          "deps": "RC merged (PR #80) and deployed; tag after G4",
           "approval": true
         }
       ]
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #79 and, with the owner's explicit OK, PR #80 (release candidate v1.0.0). Pages deployment of 08be60d succeeded; live site checked: default run current, model panel shows engine version 1.0.0."
+    },
     {
       "date": "2026-11-17",
       "who": "Docs",
