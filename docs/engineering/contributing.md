@@ -50,8 +50,8 @@ the repository does not establish are listed in section 8, *Not yet decided*. Co
 - Claims are separated as *done and verified*, *done but not verified* or *proposed*
   (AGENTS.md, Non-negotiable rules).
 - No deployment, publication or other external action without owner authorisation (AGENTS.md).
-- PR and issue templates, and CI checks, are planned in ML-TASK-005. None exist yet
-  (backlog.md, Phase 0b).
+- A PR template (`.github/pull_request_template.md`), issue templates (`.github/ISSUE_TEMPLATE/`)
+  and CI workflows (`.github/workflows/ci.yml`, `pages.yml`) exist in the repository.
 
 ## 5. Provisioning a Windows 11 development machine
 
@@ -82,7 +82,7 @@ All commands run from the repository root. Script names and their bodies are fro
 | `pnpm install --frozen-lockfile` | pnpm install | Uses the committed lockfile |
 | `pnpm lint` | `eslint .` | Typed lint; includes import-boundary rules |
 | `pnpm typecheck` | `tsc --noEmit -p tsconfig.json && pnpm -r run typecheck` | Root tooling, then each workspace |
-| `pnpm test` | `vitest run` | Runs the five Vitest projects |
+| `pnpm test` | `vitest run` | Runs the six Vitest projects |
 | `pnpm build` | `pnpm -r --if-present run build` | `apps/web` runs `tsc` then `vite build` |
 | `pnpm format` | `prettier --write .` | Writes files |
 | `pnpm format:check` | `prettier --check .` | Does not check `*.md` or `docs/` |
@@ -132,7 +132,8 @@ Evidence limits:
 - Dependency audit command and licence check. `pnpm audit` is named for CI in ML-NFR-006 and
   tech-baseline §7; no script exists.
 - Dependency update policy. The release-age rule is not enabled (tech-baseline §6, D-4 default).
-- Release and versioning process. All packages are at `0.0.0`. `CHANGELOG.md` does not exist yet.
+- Release and versioning process beyond what the v1.0.0 release shows: all packages are at
+  `1.0.0` and [CHANGELOG.md](../../CHANGELOG.md) exists. No written process is established.
 - Whether a Windows-specific setup (shell, line endings beyond `.editorconfig`) is supported
   beyond the provisioning steps above.
 - Dev server port and host. `server.host` must not be set without owner approval
