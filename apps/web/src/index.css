@@ -451,3 +451,119 @@ dl.out dd {
 .limits li {
   margin-bottom: var(--s1);
 }
+
+/* Plots and comparison table (ML-TASK-032). Colours are the design tokens. */
+.plot-select {
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  margin: 0 0 var(--s2);
+  padding: var(--s1) var(--s3) var(--s2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s4);
+}
+.plot-select legend {
+  color: var(--text-2);
+  padding: 0 var(--s1);
+}
+.plot-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  min-height: 24px;
+}
+.plot-legend {
+  list-style: none;
+  margin: 0 0 var(--s2);
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s4);
+  color: var(--text-2);
+}
+.plot-legend svg {
+  vertical-align: middle;
+}
+.plot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: var(--s3);
+}
+.plot-fig {
+  margin: 0;
+  min-width: 0;
+}
+.plot-fig figcaption {
+  color: var(--text-2);
+  font-weight: 600;
+  margin-bottom: var(--s1);
+}
+.plot-host {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  min-height: 222px;
+  overflow: hidden;
+}
+.plot-host.stale {
+  opacity: 0.55;
+}
+.plot-host .uplot,
+.plot-host .u-over {
+  font-family: var(--font-ui);
+}
+.plot-cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 2px solid var(--accent);
+  pointer-events: none;
+}
+.plot-readout {
+  margin: var(--s1) 0 0;
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.cmp-h {
+  font-size: 13px;
+  color: var(--text);
+  margin: var(--s2) 0;
+}
+table.cmp {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--s2);
+}
+table.cmp th,
+table.cmp td {
+  border-bottom: 1px solid var(--border);
+  padding: var(--s1) var(--s2);
+  text-align: right;
+  font-family: var(--font-mono);
+  vertical-align: top;
+}
+table.cmp thead th {
+  background: var(--bg-raised);
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+table.cmp th[scope='row'],
+table.cmp thead th:first-child {
+  text-align: left;
+  font-family: var(--font-ui);
+  color: var(--text-2);
+  font-weight: 400;
+}
+table.cmp td.unit-cell {
+  text-align: left;
+  color: var(--text-3);
+}
+.absent-reason {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--text-3);
+}

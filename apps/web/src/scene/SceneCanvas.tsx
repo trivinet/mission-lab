@@ -40,7 +40,15 @@ function positionGeometry(vertices: Float32Array): BufferGeometry {
   return geometry;
 }
 
-function TrajectoryLine({ segment, stale }: { segment: SceneSegment; stale: boolean }) {
+function TrajectoryLine({
+  segment,
+  stale,
+  name,
+}: {
+  segment: SceneSegment;
+  stale: boolean;
+  name: string;
+}) {
   const line = useMemo(() => {
     const geometry = positionGeometry(segment.vertices);
     const opacity = stale ? STALE_OPACITY : 1;
@@ -68,7 +76,7 @@ function TrajectoryLine({ segment, stale }: { segment: SceneSegment; stale: bool
     },
     [line],
   );
-  return <primitive object={line} name={`segment-${String(segment.index)}`} />;
+  return <primitive object={line} name={name} />;
 }
 
 function PointMarker({
@@ -321,8 +329,21 @@ export function SceneCanvas(props: SceneCanvasProps) {
       <color attach="background" args={[SCENE_COLORS.background]} />
       <Earth radius={props.earthRadius_scene} rotationZ_rad={props.earthRotationZ_rad} />
       {props.axesVisible && <primitive object={axes} name="inertial-axes" />}
+      {props.geometry?.coastSegments.map((segment) => (
+        <TrajectoryLine
+          key={`coast-${String(segment.index)}`}
+          segment={segment}
+          stale={props.stale}
+          name={`coast-segment-${String(segment.index)}`}
+        />
+      ))}
       {props.geometry?.segments.map((segment) => (
-        <TrajectoryLine key={segment.index} segment={segment} stale={props.stale} />
+        <TrajectoryLine
+          key={segment.index}
+          segment={segment}
+          stale={props.stale}
+          name={`segment-${String(segment.index)}`}
+        />
       ))}
       {props.geometry?.maneuverMarkers.map((marker) => (
         <PointMarker

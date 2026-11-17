@@ -34,10 +34,18 @@ export interface SceneGeometry {
   /** The engine's reference radius, m (result.model.constants.referenceRadius_m). */
   readonly referenceRadius_m: number;
   readonly epochIso: string;
+  /** Segments of the shown result. With a coast pair they are all 'maneuvered'. */
   readonly segments: readonly SceneSegment[];
+  /**
+   * The coast run drawn next to a maneuvered result (ML-FR-010 AC1): same scenario without the
+   * maneuver, kind 'coast'. Empty when there is no coast pair.
+   */
+  readonly coastSegments: readonly SceneSegment[];
   readonly maneuverMarkers: readonly SceneManeuverMarker[];
   /** The result the geometry was built from (kept for the test hook's source arrays). */
   readonly source: SimulationResult;
+  /** The coast result the coast segments were built from, or null. */
+  readonly coastSource: SimulationResult | null;
 }
 
 /** Earth sphere radius in scene units: the engine's reference radius times the scene scale. */
@@ -48,10 +56,19 @@ export function earthRadiusScene(referenceRadius_m: number, s: number = SCENE_SC
 export function buildSceneGeometry(
   result: SimulationResult,
   s: number = SCENE_SCALE,
+  coast?: SimulationResult,
 ): SceneGeometry {
+  // Without a coast run, segment 0 (before any maneuver) is the coast part. With one, the whole
+  // shown result is the maneuvered run and the coast run is drawn separately.
   const segments = result.segments.map((segment): SceneSegment => ({
     index: segment.index,
-    kind: segment.index === 0 ? 'coast' : 'maneuvered',
+    kind: coast === undefined && segment.index === 0 ? 'coast' : 'maneuvered',
+    vertices: toSceneVertices(segment.position_m, s),
+    t_s: segment.t_s,
+  }));
+  const coastSegments = (coast?.segments ?? []).map((segment): SceneSegment => ({
+    index: segment.index,
+    kind: 'coast',
     vertices: toSceneVertices(segment.position_m, s),
     t_s: segment.t_s,
   }));
@@ -69,8 +86,10 @@ export function buildSceneGeometry(
     referenceRadius_m: result.model.constants.referenceRadius_m,
     epochIso: result.model.epoch.iso,
     segments,
+    coastSegments,
     maneuverMarkers,
     source: result,
+    coastSource: coast ?? null,
   };
 }
 

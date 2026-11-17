@@ -34,7 +34,10 @@ export interface SceneHookState {
     readonly label: string;
     readonly rotationZ_rad: number | null;
   };
+  /** Segments of the shown (maneuvered) result. */
   readonly segments: readonly SceneHookSegment[];
+  /** The coast run drawn next to it (empty without a maneuver), kind 'coast'. */
+  readonly coastSegments: readonly SceneHookSegment[];
   readonly maneuverMarkers: readonly {
     readonly maneuverId: string;
     readonly position: Float32Array;
@@ -52,6 +55,8 @@ export interface SceneHookState {
   } | null;
   /** Engine position arrays (m), one per segment, by reference; null without a trajectory. */
   readonly sourcePosition_m: readonly Float64Array[] | null;
+  /** Engine position arrays of the coast run, by reference; null without a coast run. */
+  readonly coastSourcePosition_m: readonly Float64Array[] | null;
 }
 
 export interface SceneHookInput {
@@ -87,6 +92,12 @@ export function buildSceneHookState(input: SceneHookInput): SceneHookState {
     },
     segments:
       geometry?.segments.map((s) => ({ index: s.index, kind: s.kind, vertices: s.vertices })) ?? [],
+    coastSegments:
+      geometry?.coastSegments.map((s) => ({
+        index: s.index,
+        kind: s.kind,
+        vertices: s.vertices,
+      })) ?? [],
     maneuverMarkers:
       geometry?.maneuverMarkers.map((m) => ({
         maneuverId: m.maneuverId,
@@ -96,6 +107,7 @@ export function buildSceneHookState(input: SceneHookInput): SceneHookState {
     axesVisible: input.axesVisible,
     camera: input.camera,
     sourcePosition_m: geometry?.source.segments.map((s) => s.position_m) ?? null,
+    coastSourcePosition_m: geometry?.coastSource?.segments.map((s) => s.position_m) ?? null,
   };
 }
 

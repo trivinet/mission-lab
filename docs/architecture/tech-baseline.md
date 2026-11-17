@@ -16,7 +16,7 @@ exists yet.
    2026-10-28). The only deliberate exception is Vite (security fix, §3.2).
 3. Peer-dependency ranges were read from the npm registry metadata of the exact version chosen.
 4. Permissive licences only (MIT, Apache-2.0, BSD, ISC).
-5. Smallest set that satisfies ADR-006 and proposed-architecture §6. Charting is out of scope (OD-006).
+5. Smallest set that satisfies ADR-006 and proposed-architecture §6. Charting: uPlot only (ADR-010, see the table); no other chart dependency.
 
 All registry data was read from `https://registry.npmjs.org/<package>` (fields `dist-tags`, `time`,
 `versions[v].license`, `peerDependencies`, `engines`). In the table the "Source" column gives the
@@ -41,6 +41,7 @@ human-readable npm page; the registry document behind it is the same package nam
 | @react-three/drei | *not in scaffold*; if later justified: **10.7.9** | 2026-09-25 | Stable (`latest`) | MIT | https://www.npmjs.com/package/@react-three/drei |
 | tailwindcss | **4.3.3** | 2026-07-16 | Stable | MIT | https://www.npmjs.com/package/tailwindcss |
 | @tailwindcss/vite | **4.3.3** | 2026-07-16 | Stable (must equal tailwindcss) | MIT | https://www.npmjs.com/package/@tailwindcss/vite |
+| uplot (time-history and comparison plots) | **1.6.32** | 2025-03-14 | Stable (`latest`); added by ML-TASK-032 per ADR-010 (accepted 2026-11-17); rule 2: older than 14 days; rule 4: MIT; no runtime dependencies | MIT | https://www.npmjs.com/package/uplot, https://github.com/leeoniya/uPlot (registry read 2026-11-17, `spikes/charting/metadata.json`) |
 | zustand (state store) | **5.0.16** | 2026-10-22 | Stable | MIT | https://www.npmjs.com/package/zustand |
 | zod (runtime schemas) | **4.6.7** | 2026-10-12 | Stable (`latest`) | MIT | https://www.npmjs.com/package/zod |
 | vitest | **5.0.5** | 2026-10-15 | Stable | MIT | https://www.npmjs.com/package/vitest |

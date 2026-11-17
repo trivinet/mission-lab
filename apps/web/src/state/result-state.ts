@@ -19,7 +19,18 @@
  *
  * An ignored event returns the same state object it received.
  */
-import type { Diagnostic, SimulationResult } from '@mission-lab/contracts';
+import type { Diagnostic, SimulationRequest, SimulationResult } from '@mission-lab/contracts';
+
+/**
+ * The coast run that accompanies a maneuvered result (ML-FR-010 AC1) and the request that produced
+ * the maneuvered result (the analysis needs its RSW components). It is present only when the
+ * scenario has a maneuver. It travels with the result through every state, so the pair is always
+ * current, stale or discarded together (latest run wins for the pair).
+ */
+export interface CoastPair {
+  readonly coast: SimulationResult;
+  readonly request: SimulationRequest;
+}
 
 export type ResultState =
   | { readonly kind: 'none' }
@@ -27,6 +38,7 @@ export type ResultState =
   | {
       readonly kind: 'current';
       readonly result: SimulationResult;
+      readonly pair?: CoastPair;
       /** Diagnostics of severity "warning" of the successful result (ML-UX-001). */
       readonly warnings: readonly Diagnostic[];
     }
@@ -34,6 +46,7 @@ export type ResultState =
       readonly kind: 'stale';
       /** The result of the previous scenario, shown only as stale; null if none was available. */
       readonly result: SimulationResult | null;
+      readonly pair?: CoastPair;
     }
   | {
       readonly kind: 'error';
@@ -44,7 +57,12 @@ export type ResultState =
 
 export type ResultEvent =
   | { readonly type: 'RUN_STARTED'; readonly runId: number }
-  | { readonly type: 'RUN_FINISHED'; readonly runId: number; readonly result: SimulationResult }
+  | {
+      readonly type: 'RUN_FINISHED';
+      readonly runId: number;
+      readonly result: SimulationResult;
+      readonly pair?: CoastPair;
+    }
   | { readonly type: 'RUN_CRASHED'; readonly runId: number; readonly message: string }
   | { readonly type: 'PHYSICAL_EDIT' };
 
@@ -58,7 +76,7 @@ export function transitionResult(state: ResultState, event: ResultEvent): Result
       if (state.kind !== 'computing' || state.runId !== event.runId) {
         return state;
       }
-      const { result } = event;
+      const { result, pair } = event;
       if (result.status === 'failed') {
         const first = result.diagnostics.find((d) => d.severity === 'error');
         return {
@@ -70,6 +88,7 @@ export function transitionResult(state: ResultState, event: ResultEvent): Result
       return {
         kind: 'current',
         result,
+        ...(pair === undefined ? {} : { pair }),
         warnings: result.diagnostics.filter((d) => d.severity === 'warning'),
       };
     }
@@ -80,7 +99,9 @@ export function transitionResult(state: ResultState, event: ResultEvent): Result
       return { kind: 'error', diagnostics: [], message: event.message };
     case 'PHYSICAL_EDIT':
       if (state.kind === 'current') {
-        return { kind: 'stale', result: state.result };
+        return state.pair === undefined
+          ? { kind: 'stale', result: state.result }
+          : { kind: 'stale', result: state.result, pair: state.pair };
       }
       if (state.kind === 'computing') {
         return { kind: 'stale', result: null };

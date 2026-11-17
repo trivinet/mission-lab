@@ -17,7 +17,7 @@ import { buildSceneHookState, sceneHookRequested } from './scene-hook';
 import { markerAt } from './scene-marker';
 import { getSceneOptionsStore } from './scene-options';
 import { SCENE_SCALE } from './scene-scale';
-import { engineReferenceRadius_m, resultToShow } from './scene-source';
+import { coastToShow, engineReferenceRadius_m, resultToShow } from './scene-source';
 import { SCENE_COLORS } from './scene-style';
 
 function webglAvailable(): boolean {
@@ -53,7 +53,11 @@ export function WorkspaceScene() {
   const cameraRef = useRef<(() => CameraSnapshot) | null>(null);
 
   const result = resultToShow(resultState);
-  const geometry = useMemo(() => (result === null ? null : buildSceneGeometry(result)), [result]);
+  const coast = coastToShow(resultState);
+  const geometry = useMemo(
+    () => (result === null ? null : buildSceneGeometry(result, SCENE_SCALE, coast)),
+    [result, coast],
+  );
   const stale = resultState.kind === 'stale' && geometry !== null;
   const markerState = useMemo(
     () => (result === null ? null : markerAt(result, playbackT_s)),
@@ -173,13 +177,17 @@ export function WorkspaceScene() {
             <span aria-hidden="true" style={{ color: SCENE_COLORS.coast }}>
               {'- - -'}
             </span>{' '}
-            Coast (dashed grey): before any maneuver
+            {geometry !== null && geometry.coastSegments.length > 0
+              ? 'Coast run (dashed grey): the same scenario without the maneuver'
+              : 'Coast (dashed grey): before any maneuver'}
           </li>
           <li>
             <span aria-hidden="true" style={{ color: SCENE_COLORS.maneuver }}>
               {'——'}
             </span>{' '}
-            Maneuvered (solid teal): after a maneuver
+            {geometry !== null && geometry.coastSegments.length > 0
+              ? 'Maneuvered run (solid teal): the scenario with its maneuver'
+              : 'Maneuvered (solid teal): after a maneuver'}
           </li>
           <li>
             <span aria-hidden="true" style={{ color: SCENE_COLORS.maneuverMarker }}>
@@ -187,6 +195,12 @@ export function WorkspaceScene() {
             </span>{' '}
             Maneuver point (large amber square); spacecraft marker (small white square)
           </li>
+          {geometry?.coastSegments.map((segment) => (
+            <li key={`coast-${String(segment.index)}`} data-testid="coast-run-summary">
+              Coast run: {segment.t_s.length} samples, t = {String(segment.t_s[0])} to{' '}
+              {String(segment.t_s[segment.t_s.length - 1])} s
+            </li>
+          ))}
           {geometry?.segments.map((segment) => (
             <li key={segment.index} data-testid={`segment-summary-${String(segment.index)}`}>
               Segment {segment.index} ({segment.kind}): {segment.t_s.length} samples, t ={' '}

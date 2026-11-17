@@ -172,7 +172,7 @@ maneuver.
 | Computation | `packages/simulation` invoked inside a Web Worker; typed arrays transferred, not copied | Keeps the render loop free |
 | Scene units | 1 scene unit = 1 000 km, applied in one function in `features/scene` | Float32 GPU precision; single conversion point (ARCH-002) |
 | Playback | Display interpolation between engine samples (cubic Hermite from position + velocity). Never crosses a segment boundary | Smooth motion without the renderer computing physics |
-| Charts | Decided by a spike at the start of Phase 3 (OD-006) | |
+| Charts | uPlot 1.6.32, decided by ADR-010 (accepted 2026-11-17; resolves OD-006) | Canvas 2D; no other chart dependency |
 | Persistence | Versioned JSON file export/import. Optional local-storage autosave of the working scenario. No IndexedDB (OD-007) | |
 | Deployment | Static hosting; provider and any publication decided by the owner before Phase 4 | No external action without authorisation |
 
@@ -194,4 +194,4 @@ lint, type-check, tests and build on every PR · Node LTS pinned via `.nvmrc`/`e
 | [ADR-006](adr/ADR-006-frontend-stack.md) | Vite + React + R3F + Tailwind; JSON-only persistence | OD-002, OD-007 |
 | [ADR-007](adr/ADR-007-agent-organisation.md) | Claude Code subagents, roles and model allocation | OD-008 |
 
-OD-006 (charting library) stays open by design until the Phase 3 spike.
+OD-006 (charting library) is resolved by ADR-010 (uPlot 1.6.32, accepted 2026-11-17).

@@ -69,3 +69,41 @@ export function utcLabel(epochIso: string, elapsed_s: number): string | null {
 export function toKm2ps2(value_m2ps2: number): number {
   return value_m2ps2 / 1e6;
 }
+
+/** How a quantity of an SI unit (as the analysis module reports it) is shown. */
+export interface DisplayUnit {
+  /** Symbol shown after the number; '' for a dimensionless quantity. */
+  readonly symbol: string;
+  /** SI -> display scaling (unit scaling only). */
+  readonly fromSi: (value: number) => number;
+}
+
+/** Display unit of an analysis-module unit string (km, km/s, deg, km^2/s^2, s, none). */
+export function displayUnit(unit: string): DisplayUnit {
+  switch (unit) {
+    case 'm':
+      return { symbol: 'km', fromSi: toKm };
+    case 'm/s':
+      return { symbol: 'km/s', fromSi: toKm };
+    case 'rad':
+      return { symbol: 'deg', fromSi: toDeg };
+    case 'm^2/s^2':
+      return { symbol: 'km²/s²', fromSi: toKm2ps2 };
+    case 's':
+      return { symbol: 's', fromSi: identity };
+    default:
+      return { symbol: '', fromSi: identity };
+  }
+}
+
+/** A number of an analysis-module unit, converted for display, without its unit. */
+export function formatDisplayValue(value_si: number, unit: string): string {
+  return formatInputNumber(displayUnit(unit).fromSi(value_si));
+}
+
+/** The same with its unit symbol; dimensionless quantities have none. */
+export function formatWithUnit(value_si: number, unit: string): string {
+  const { symbol } = displayUnit(unit);
+  const text = formatDisplayValue(value_si, unit);
+  return symbol === '' ? text : `${text} ${symbol}`;
+}
