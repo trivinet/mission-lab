@@ -1,7 +1,7 @@
 {
-  "updated": "2026-11-16",
+  "updated": "2026-11-17",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Phase 2: 3D scene (023) done with exact VI-02 (918 components, 0 mismatches); editor (022) built. Both wait on ML-TASK-027 (simulation API for derived values, degenerate convention, angles, UTC, Earth radius and ERA); then one integration step joins them.",
+  "headline": "ML-TASK-027 done (simulation API: derived values, degenerate convention, angles, UTC label, Earth radius, ERA). The integration of the editor (022) and the 3D scene (023) on that API is running. GitHub unreachable from this network for now; branches stay local until it returns.",
   "gates": [
     {
       "id": "G0",
@@ -264,8 +264,8 @@
           "title": "Scenario-view API in simulation (derived values, degenerate convention, angles, UTC label, Earth radius, ERA)",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_progress",
-          "deps": "Unblocks 022"
+          "status": "in_review",
+          "deps": "Done; PR pending (network)"
         },
         {
           "id": "ML-TASK-026",
@@ -376,6 +376,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Checked ML-TASK-027 (1677 tests, scope packages/simulation only). Recomputed the ERA test values in 40-digit decimal; the hand values were 1e-11 rad off under a 1e-8 tolerance, so the test now asserts 5e-13 (5e-11 for the daily advance). Push failed: github.com does not resolve from this network. Integration of 022 + 023 on 027 started (Sonnet)."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Astrodynamics",
+      "text": "ML-TASK-027 delivered after resuming from the usage limit: DEGENERACY_THRESHOLDS (ADR-008), ENGINE_CONSTANTS, describeScenarioOrbit, utcIsoAtElapsed, earthRotationAngle_rad; 47 new tests."
+    },
     {
       "date": "2026-11-16",
       "who": "Frontend",
