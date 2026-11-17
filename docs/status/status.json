@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "ML-TASK-026 part A is running: measured performance envelope, proposed sample limit, G2 evidence, deterministic maneuver ids and model-panel readability. The owner then decides the limit (part B) and gate G2.",
+  "headline": "ML-TASK-026 part A delivered (PR #57): performance envelope measured up to 1e6 samples; engine 1.4 s at 1e6, page stays responsive; playback is the bottleneck. Verification review of the record running; then the owner decides the sample limit and maneuver ids, and gate G2.",
   "gates": [
     {
       "id": "G0",
@@ -32,6 +32,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-38",
+      "text": "Decide two things for ML-TASK-026: (1) the sample limit (proposal: keep 1,000,000; alternatives in docs/verification/performance-envelope.md); (2) deterministic maneuver ids: derive the next free id from the scenario in apps/web (recommended, no contract change) or add a counter field to the Scenario schema (contract change).",
+      "blocking": "ML-TASK-026 part B, gate G2"
+    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -272,8 +277,8 @@
           "title": "Integration with real engine; performance envelope",
           "role": "Frontend + Verification",
           "model": "sonnet / opus",
-          "status": "in_progress",
-          "deps": "Part A running (contract on docs/ml-task-026-contract); part B after owner decision",
+          "status": "in_review",
+          "deps": "Part A in PR #57; verification review running; owner decisions OA-38",
           "approval": true
         }
       ]
@@ -376,6 +381,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Verification",
+      "text": "Bounded review of the ML-TASK-026 performance record started (Sonnet): method, medians recomputed from raw data, honesty of the envelope, the limit recommendation, the worker timing hook."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-026 part A: 18/18 measured runs 1e3…1e6 samples (engine ~1.4 µs/sample, transfer ≤ 3.2 ms, responsive during runs, ~0.5 s geometry pause and <3 fps software-WebGL playback at 1e6); proposed limit: keep 1,000,000; VI-01 integration test added; model panel readability fixed. Deterministic maneuver ids blocked: no counter field in the Scenario schema."
+    },
     {
       "date": "2026-11-17",
       "who": "Frontend",
