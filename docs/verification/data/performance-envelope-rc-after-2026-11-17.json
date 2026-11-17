@@ -1,0 +1,999 @@
+{
+  "environment": {
+    "startedAt": "2026-11-17T18:59:39.651Z",
+    "os": "Windows_NT 10.0.26200 (win32 x64)",
+    "cpu": "Intel(R) Core(TM) i7-10875H CPU @ 2.30GHz",
+    "logicalCpus": 16,
+    "ramTotal_GB": 31.8,
+    "ramFreeAtStart_GB": 20.3,
+    "node": "v24.22.2",
+    "playwright": "1.64.1",
+    "browser": "chromium 156.0.8078.4",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+    "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "sizes": [
+      1000,
+      10000,
+      100000,
+      250000,
+      500000,
+      1000000
+    ],
+    "repetitions": 3,
+    "note": "Single developer PC, not idle, headless Chromium. See docs/verification/performance-envelope.md."
+  },
+  "results": [
+    {
+      "n": 1000,
+      "reps": [
+        {
+          "ok": true,
+          "n": 1000,
+          "engine_ms": 21.100000008940697,
+          "analysis_ms": 11.5,
+          "transfer_ms": 0.39990234375,
+          "clickToWorkerPost_ms": 90.800048828125,
+          "clickToCurrent_ms": 133.099853515625,
+          "currentToFirstFrame_ms": 138.300048828125,
+          "clickToFirstFrame_ms": 271.39990234375,
+          "maxFrameGapDuringRun_ms": 16.89990234375,
+          "maxLongTaskDuringRun_ms": 92,
+          "totalLongTaskDuringRun_ms": 146,
+          "probeCount": 3,
+          "probeMedian_ms": 23.285499999999956,
+          "probeMax_ms": 173.06060000000025,
+          "playbackFrames": 182,
+          "playbackFrameMedian_ms": 16.699951171875,
+          "playbackFrameP95_ms": 17.5,
+          "playbackFrameMax_ms": 37.400146484375,
+          "heapBefore_MB": 4.70768,
+          "heapAfter_MB": 7.178712,
+          "sceneVertices": 1000,
+          "sourceSamples": 1000
+        },
+        {
+          "ok": true,
+          "n": 1000,
+          "engine_ms": 19.600000008940697,
+          "analysis_ms": 10.699999988079071,
+          "transfer_ms": 0.300048828125,
+          "clickToWorkerPost_ms": 85,
+          "clickToCurrent_ms": 123,
+          "currentToFirstFrame_ms": 118.10009765625,
+          "clickToFirstFrame_ms": 241.10009765625,
+          "maxFrameGapDuringRun_ms": 17.400146484375,
+          "maxLongTaskDuringRun_ms": 78,
+          "totalLongTaskDuringRun_ms": 78,
+          "probeCount": 3,
+          "probeMedian_ms": 18.239599999999882,
+          "probeMax_ms": 150.0623000000005,
+          "playbackFrames": 182,
+          "playbackFrameMedian_ms": 16.699951171875,
+          "playbackFrameP95_ms": 17.900146484375,
+          "playbackFrameMax_ms": 35.599853515625,
+          "heapBefore_MB": 4.699132,
+          "heapAfter_MB": 7.167132,
+          "sceneVertices": 1000,
+          "sourceSamples": 1000
+        },
+        {
+          "ok": true,
+          "n": 1000,
+          "engine_ms": 20.099999994039536,
+          "analysis_ms": 10.100000008940697,
+          "transfer_ms": 4.599853515625,
+          "clickToWorkerPost_ms": 112.400146484375,
+          "clickToCurrent_ms": 154.89990234375,
+          "currentToFirstFrame_ms": 109,
+          "clickToFirstFrame_ms": 263.89990234375,
+          "maxFrameGapDuringRun_ms": 18.60009765625,
+          "maxLongTaskDuringRun_ms": 81,
+          "totalLongTaskDuringRun_ms": 81,
+          "probeCount": 3,
+          "probeMedian_ms": 19.419599999999264,
+          "probeMax_ms": 70.44790000000103,
+          "playbackFrames": 184,
+          "playbackFrameMedian_ms": 16.60009765625,
+          "playbackFrameP95_ms": 18.10009765625,
+          "playbackFrameMax_ms": 24.099853515625,
+          "heapBefore_MB": 4.706708,
+          "heapAfter_MB": 7.104736,
+          "sceneVertices": 1000,
+          "sourceSamples": 1000
+        }
+      ],
+      "summary": {
+        "engine_ms": {
+          "median": 20.099999994039536,
+          "min": 19.600000008940697,
+          "max": 21.100000008940697
+        },
+        "analysis_ms": {
+          "median": 10.699999988079071,
+          "min": 10.100000008940697,
+          "max": 11.5
+        },
+        "transfer_ms": {
+          "median": 0.39990234375,
+          "min": 0.300048828125,
+          "max": 4.599853515625
+        },
+        "clickToCurrent_ms": {
+          "median": 133.099853515625,
+          "min": 123,
+          "max": 154.89990234375
+        },
+        "currentToFirstFrame_ms": {
+          "median": 118.10009765625,
+          "min": 109,
+          "max": 138.300048828125
+        },
+        "clickToFirstFrame_ms": {
+          "median": 263.89990234375,
+          "min": 241.10009765625,
+          "max": 271.39990234375
+        },
+        "maxFrameGapDuringRun_ms": {
+          "median": 17.400146484375,
+          "min": 16.89990234375,
+          "max": 18.60009765625
+        },
+        "maxLongTaskDuringRun_ms": {
+          "median": 81,
+          "min": 78,
+          "max": 92
+        },
+        "totalLongTaskDuringRun_ms": {
+          "median": 81,
+          "min": 78,
+          "max": 146
+        },
+        "probeMedian_ms": {
+          "median": 19.419599999999264,
+          "min": 18.239599999999882,
+          "max": 23.285499999999956
+        },
+        "probeMax_ms": {
+          "median": 150.0623000000005,
+          "min": 70.44790000000103,
+          "max": 173.06060000000025
+        },
+        "playbackFrameMedian_ms": {
+          "median": 16.699951171875,
+          "min": 16.60009765625,
+          "max": 16.699951171875
+        },
+        "playbackFrameP95_ms": {
+          "median": 17.900146484375,
+          "min": 17.5,
+          "max": 18.10009765625
+        },
+        "playbackFrameMax_ms": {
+          "median": 35.599853515625,
+          "min": 24.099853515625,
+          "max": 37.400146484375
+        },
+        "heapBefore_MB": {
+          "median": 4.706708,
+          "min": 4.699132,
+          "max": 4.70768
+        },
+        "heapAfter_MB": {
+          "median": 7.167132,
+          "min": 7.104736,
+          "max": 7.178712
+        }
+      }
+    },
+    {
+      "n": 10000,
+      "reps": [
+        {
+          "ok": true,
+          "n": 10000,
+          "engine_ms": 44.49999998509884,
+          "analysis_ms": 56.20000000298023,
+          "transfer_ms": 0.39990234375,
+          "clickToWorkerPost_ms": 155.89990234375,
+          "clickToCurrent_ms": 207.39990234375,
+          "currentToFirstFrame_ms": 152.300048828125,
+          "clickToFirstFrame_ms": 359.699951171875,
+          "maxFrameGapDuringRun_ms": 18.10009765625,
+          "maxLongTaskDuringRun_ms": 85,
+          "totalLongTaskDuringRun_ms": 151,
+          "probeCount": 6,
+          "probeMedian_ms": 19.045799999999872,
+          "probeMax_ms": 184.6153000000013,
+          "playbackFrames": 149,
+          "playbackFrameMedian_ms": 17.400146484375,
+          "playbackFrameP95_ms": 34.400146484375,
+          "playbackFrameMax_ms": 37.5,
+          "heapBefore_MB": 4.706904,
+          "heapAfter_MB": 8.502484,
+          "sceneVertices": 10000,
+          "sourceSamples": 10000
+        },
+        {
+          "ok": true,
+          "n": 10000,
+          "engine_ms": 43.70000000298023,
+          "analysis_ms": 50.900000005960464,
+          "transfer_ms": 0.600341796875,
+          "clickToWorkerPost_ms": 172.19970703125,
+          "clickToCurrent_ms": 218.89990234375,
+          "currentToFirstFrame_ms": 142.60009765625,
+          "clickToFirstFrame_ms": 361.5,
+          "maxFrameGapDuringRun_ms": 18.199951171875,
+          "maxLongTaskDuringRun_ms": 86,
+          "totalLongTaskDuringRun_ms": 146,
+          "probeCount": 6,
+          "probeMedian_ms": 19.12764999999854,
+          "probeMax_ms": 175.10399999999936,
+          "playbackFrames": 155,
+          "playbackFrameMedian_ms": 16.89990234375,
+          "playbackFrameP95_ms": 35.300048828125,
+          "playbackFrameMax_ms": 37,
+          "heapBefore_MB": 4.699072,
+          "heapAfter_MB": 8.488272,
+          "sceneVertices": 10000,
+          "sourceSamples": 10000
+        },
+        {
+          "ok": true,
+          "n": 10000,
+          "engine_ms": 40.30000001192093,
+          "analysis_ms": 51.099999994039536,
+          "transfer_ms": 0.400146484375,
+          "clickToWorkerPost_ms": 144.499755859375,
+          "clickToCurrent_ms": 195.5,
+          "currentToFirstFrame_ms": 147.599853515625,
+          "clickToFirstFrame_ms": 343.099853515625,
+          "maxFrameGapDuringRun_ms": 18.60009765625,
+          "maxLongTaskDuringRun_ms": 84,
+          "totalLongTaskDuringRun_ms": 149,
+          "probeCount": 6,
+          "probeMedian_ms": 16.39284999999836,
+          "probeMax_ms": 182.51200000000244,
+          "playbackFrames": 134,
+          "playbackFrameMedian_ms": 18.2001953125,
+          "playbackFrameP95_ms": 35.2001953125,
+          "playbackFrameMax_ms": 36.60009765625,
+          "heapBefore_MB": 4.699208,
+          "heapAfter_MB": 8.4941,
+          "sceneVertices": 10000,
+          "sourceSamples": 10000
+        }
+      ],
+      "summary": {
+        "engine_ms": {
+          "median": 43.70000000298023,
+          "min": 40.30000001192093,
+          "max": 44.49999998509884
+        },
+        "analysis_ms": {
+          "median": 51.099999994039536,
+          "min": 50.900000005960464,
+          "max": 56.20000000298023
+        },
+        "transfer_ms": {
+          "median": 0.400146484375,
+          "min": 0.39990234375,
+          "max": 0.600341796875
+        },
+        "clickToCurrent_ms": {
+          "median": 207.39990234375,
+          "min": 195.5,
+          "max": 218.89990234375
+        },
+        "currentToFirstFrame_ms": {
+          "median": 147.599853515625,
+          "min": 142.60009765625,
+          "max": 152.300048828125
+        },
+        "clickToFirstFrame_ms": {
+          "median": 359.699951171875,
+          "min": 343.099853515625,
+          "max": 361.5
+        },
+        "maxFrameGapDuringRun_ms": {
+          "median": 18.199951171875,
+          "min": 18.10009765625,
+          "max": 18.60009765625
+        },
+        "maxLongTaskDuringRun_ms": {
+          "median": 85,
+          "min": 84,
+          "max": 86
+        },
+        "totalLongTaskDuringRun_ms": {
+          "median": 149,
+          "min": 146,
+          "max": 151
+        },
+        "probeMedian_ms": {
+          "median": 19.045799999999872,
+          "min": 16.39284999999836,
+          "max": 19.12764999999854
+        },
+        "probeMax_ms": {
+          "median": 182.51200000000244,
+          "min": 175.10399999999936,
+          "max": 184.6153000000013
+        },
+        "playbackFrameMedian_ms": {
+          "median": 17.400146484375,
+          "min": 16.89990234375,
+          "max": 18.2001953125
+        },
+        "playbackFrameP95_ms": {
+          "median": 35.2001953125,
+          "min": 34.400146484375,
+          "max": 35.300048828125
+        },
+        "playbackFrameMax_ms": {
+          "median": 37,
+          "min": 36.60009765625,
+          "max": 37.5
+        },
+        "heapBefore_MB": {
+          "median": 4.699208,
+          "min": 4.699072,
+          "max": 4.706904
+        },
+        "heapAfter_MB": {
+          "median": 8.4941,
+          "min": 8.488272,
+          "max": 8.502484
+        }
+      }
+    },
+    {
+      "n": 100000,
+      "reps": [
+        {
+          "ok": true,
+          "n": 100000,
+          "engine_ms": 182.90000000596046,
+          "analysis_ms": 270.79999999701977,
+          "transfer_ms": 0.60009765625,
+          "clickToWorkerPost_ms": 508.300048828125,
+          "clickToCurrent_ms": 614.7001953125,
+          "currentToFirstFrame_ms": 194,
+          "clickToFirstFrame_ms": 808.7001953125,
+          "maxFrameGapDuringRun_ms": 19.5,
+          "maxLongTaskDuringRun_ms": 139,
+          "totalLongTaskDuringRun_ms": 260,
+          "probeCount": 25,
+          "probeMedian_ms": 15.249299999999494,
+          "probeMax_ms": 20.853399999999965,
+          "playbackFrames": 69,
+          "playbackFrameMedian_ms": 45.800048828125,
+          "playbackFrameP95_ms": 50,
+          "playbackFrameMax_ms": 57.60009765625,
+          "heapBefore_MB": 4.706824,
+          "heapAfter_MB": 17.924028,
+          "sceneVertices": 100000,
+          "sourceSamples": 100000
+        },
+        {
+          "ok": true,
+          "n": 100000,
+          "engine_ms": 190.29999999701977,
+          "analysis_ms": 277.20000000298023,
+          "transfer_ms": 0.400146484375,
+          "clickToWorkerPost_ms": 521.5,
+          "clickToCurrent_ms": 626.400146484375,
+          "currentToFirstFrame_ms": 198.5,
+          "clickToFirstFrame_ms": 824.900146484375,
+          "maxFrameGapDuringRun_ms": 20.199951171875,
+          "maxLongTaskDuringRun_ms": 138,
+          "totalLongTaskDuringRun_ms": 259,
+          "probeCount": 25,
+          "probeMedian_ms": 16.924800000000687,
+          "probeMax_ms": 297.7155999999959,
+          "playbackFrames": 68,
+          "playbackFrameMedian_ms": 46,
+          "playbackFrameP95_ms": 49.7001953125,
+          "playbackFrameMax_ms": 66.39990234375,
+          "heapBefore_MB": 4.706748,
+          "heapAfter_MB": 17.990396,
+          "sceneVertices": 100000,
+          "sourceSamples": 100000
+        },
+        {
+          "ok": true,
+          "n": 100000,
+          "engine_ms": 185.6000000089407,
+          "analysis_ms": 269,
+          "transfer_ms": 1.199951171875,
+          "clickToWorkerPost_ms": 514.199951171875,
+          "clickToCurrent_ms": 620.300048828125,
+          "currentToFirstFrame_ms": 206.199951171875,
+          "clickToFirstFrame_ms": 826.5,
+          "maxFrameGapDuringRun_ms": 21.10009765625,
+          "maxLongTaskDuringRun_ms": 138,
+          "totalLongTaskDuringRun_ms": 257,
+          "probeCount": 26,
+          "probeMedian_ms": 15.703649999995832,
+          "probeMax_ms": 297.8674000000028,
+          "playbackFrames": 67,
+          "playbackFrameMedian_ms": 46.199951171875,
+          "playbackFrameP95_ms": 49.89990234375,
+          "playbackFrameMax_ms": 86.800048828125,
+          "heapBefore_MB": 4.706788,
+          "heapAfter_MB": 17.995604,
+          "sceneVertices": 100000,
+          "sourceSamples": 100000
+        }
+      ],
+      "summary": {
+        "engine_ms": {
+          "median": 185.6000000089407,
+          "min": 182.90000000596046,
+          "max": 190.29999999701977
+        },
+        "analysis_ms": {
+          "median": 270.79999999701977,
+          "min": 269,
+          "max": 277.20000000298023
+        },
+        "transfer_ms": {
+          "median": 0.60009765625,
+          "min": 0.400146484375,
+          "max": 1.199951171875
+        },
+        "clickToCurrent_ms": {
+          "median": 620.300048828125,
+          "min": 614.7001953125,
+          "max": 626.400146484375
+        },
+        "currentToFirstFrame_ms": {
+          "median": 198.5,
+          "min": 194,
+          "max": 206.199951171875
+        },
+        "clickToFirstFrame_ms": {
+          "median": 824.900146484375,
+          "min": 808.7001953125,
+          "max": 826.5
+        },
+        "maxFrameGapDuringRun_ms": {
+          "median": 20.199951171875,
+          "min": 19.5,
+          "max": 21.10009765625
+        },
+        "maxLongTaskDuringRun_ms": {
+          "median": 138,
+          "min": 138,
+          "max": 139
+        },
+        "totalLongTaskDuringRun_ms": {
+          "median": 259,
+          "min": 257,
+          "max": 260
+        },
+        "probeMedian_ms": {
+          "median": 15.703649999995832,
+          "min": 15.249299999999494,
+          "max": 16.924800000000687
+        },
+        "probeMax_ms": {
+          "median": 297.7155999999959,
+          "min": 20.853399999999965,
+          "max": 297.8674000000028
+        },
+        "playbackFrameMedian_ms": {
+          "median": 46,
+          "min": 45.800048828125,
+          "max": 46.199951171875
+        },
+        "playbackFrameP95_ms": {
+          "median": 49.89990234375,
+          "min": 49.7001953125,
+          "max": 50
+        },
+        "playbackFrameMax_ms": {
+          "median": 66.39990234375,
+          "min": 57.60009765625,
+          "max": 86.800048828125
+        },
+        "heapBefore_MB": {
+          "median": 4.706788,
+          "min": 4.706748,
+          "max": 4.706824
+        },
+        "heapAfter_MB": {
+          "median": 17.990396,
+          "min": 17.924028,
+          "max": 17.995604
+        }
+      }
+    },
+    {
+      "n": 250000,
+      "reps": [
+        {
+          "ok": true,
+          "n": 250000,
+          "engine_ms": 392.5,
+          "analysis_ms": 649.7999999970198,
+          "transfer_ms": 1.699951171875,
+          "clickToWorkerPost_ms": 1096.699951171875,
+          "clickToCurrent_ms": 1265.5,
+          "currentToFirstFrame_ms": 294.300048828125,
+          "clickToFirstFrame_ms": 1559.800048828125,
+          "maxFrameGapDuringRun_ms": 19.800048828125,
+          "maxLongTaskDuringRun_ms": 222,
+          "totalLongTaskDuringRun_ms": 403,
+          "probeCount": 64,
+          "probeMedian_ms": 14.16700000000128,
+          "probeMax_ms": 267.875,
+          "playbackFrames": 33,
+          "playbackFrameMedian_ms": 102.699951171875,
+          "playbackFrameP95_ms": 114.300048828125,
+          "playbackFrameMax_ms": 115.300048828125,
+          "heapBefore_MB": 4.700064,
+          "heapAfter_MB": 32.866864,
+          "sceneVertices": 250000,
+          "sourceSamples": 250000
+        },
+        {
+          "ok": true,
+          "n": 250000,
+          "engine_ms": 384.70000000298023,
+          "analysis_ms": 653.5,
+          "transfer_ms": 2.2001953125,
+          "clickToWorkerPost_ms": 1114.599853515625,
+          "clickToCurrent_ms": 1287.199951171875,
+          "currentToFirstFrame_ms": 277.400146484375,
+          "clickToFirstFrame_ms": 1564.60009765625,
+          "maxFrameGapDuringRun_ms": 19.5,
+          "maxLongTaskDuringRun_ms": 223,
+          "totalLongTaskDuringRun_ms": 405,
+          "probeCount": 64,
+          "probeMedian_ms": 14.04175000000032,
+          "probeMax_ms": 17.48990000000049,
+          "playbackFrames": 34,
+          "playbackFrameMedian_ms": 101.1500244140625,
+          "playbackFrameP95_ms": 109.199951171875,
+          "playbackFrameMax_ms": 120.800048828125,
+          "heapBefore_MB": 4.706824,
+          "heapAfter_MB": 32.878596,
+          "sceneVertices": 250000,
+          "sourceSamples": 250000
+        },
+        {
+          "ok": true,
+          "n": 250000,
+          "engine_ms": 384.09999999403954,
+          "analysis_ms": 617.7000000029802,
+          "transfer_ms": 1.099853515625,
+          "clickToWorkerPost_ms": 1079.5,
+          "clickToCurrent_ms": 1255.300048828125,
+          "currentToFirstFrame_ms": 307.89990234375,
+          "clickToFirstFrame_ms": 1563.199951171875,
+          "maxFrameGapDuringRun_ms": 19.89990234375,
+          "maxLongTaskDuringRun_ms": 229,
+          "totalLongTaskDuringRun_ms": 411,
+          "probeCount": 63,
+          "probeMedian_ms": 13.609000000004016,
+          "probeMax_ms": 467.34820000000036,
+          "playbackFrames": 33,
+          "playbackFrameMedian_ms": 101.10009765625,
+          "playbackFrameP95_ms": 111.800048828125,
+          "playbackFrameMax_ms": 120.7001953125,
+          "heapBefore_MB": 4.707652,
+          "heapAfter_MB": 32.930456,
+          "sceneVertices": 250000,
+          "sourceSamples": 250000
+        }
+      ],
+      "summary": {
+        "engine_ms": {
+          "median": 384.70000000298023,
+          "min": 384.09999999403954,
+          "max": 392.5
+        },
+        "analysis_ms": {
+          "median": 649.7999999970198,
+          "min": 617.7000000029802,
+          "max": 653.5
+        },
+        "transfer_ms": {
+          "median": 1.699951171875,
+          "min": 1.099853515625,
+          "max": 2.2001953125
+        },
+        "clickToCurrent_ms": {
+          "median": 1265.5,
+          "min": 1255.300048828125,
+          "max": 1287.199951171875
+        },
+        "currentToFirstFrame_ms": {
+          "median": 294.300048828125,
+          "min": 277.400146484375,
+          "max": 307.89990234375
+        },
+        "clickToFirstFrame_ms": {
+          "median": 1563.199951171875,
+          "min": 1559.800048828125,
+          "max": 1564.60009765625
+        },
+        "maxFrameGapDuringRun_ms": {
+          "median": 19.800048828125,
+          "min": 19.5,
+          "max": 19.89990234375
+        },
+        "maxLongTaskDuringRun_ms": {
+          "median": 223,
+          "min": 222,
+          "max": 229
+        },
+        "totalLongTaskDuringRun_ms": {
+          "median": 405,
+          "min": 403,
+          "max": 411
+        },
+        "probeMedian_ms": {
+          "median": 14.04175000000032,
+          "min": 13.609000000004016,
+          "max": 14.16700000000128
+        },
+        "probeMax_ms": {
+          "median": 267.875,
+          "min": 17.48990000000049,
+          "max": 467.34820000000036
+        },
+        "playbackFrameMedian_ms": {
+          "median": 101.1500244140625,
+          "min": 101.10009765625,
+          "max": 102.699951171875
+        },
+        "playbackFrameP95_ms": {
+          "median": 111.800048828125,
+          "min": 109.199951171875,
+          "max": 114.300048828125
+        },
+        "playbackFrameMax_ms": {
+          "median": 120.7001953125,
+          "min": 115.300048828125,
+          "max": 120.800048828125
+        },
+        "heapBefore_MB": {
+          "median": 4.706824,
+          "min": 4.700064,
+          "max": 4.707652
+        },
+        "heapAfter_MB": {
+          "median": 32.878596,
+          "min": 32.866864,
+          "max": 32.930456
+        }
+      }
+    },
+    {
+      "n": 500000,
+      "reps": [
+        {
+          "ok": true,
+          "n": 500000,
+          "engine_ms": 743.5000000149012,
+          "analysis_ms": 1320.2999999970198,
+          "transfer_ms": 0.7998046875,
+          "clickToWorkerPost_ms": 2116.400146484375,
+          "clickToCurrent_ms": 2382.10009765625,
+          "currentToFirstFrame_ms": 455.39990234375,
+          "clickToFirstFrame_ms": 2837.5,
+          "maxFrameGapDuringRun_ms": 20.2998046875,
+          "maxLongTaskDuringRun_ms": 348,
+          "totalLongTaskDuringRun_ms": 641,
+          "probeCount": 100,
+          "probeMedian_ms": 13.772299999996903,
+          "probeMax_ms": 19.39890000000014,
+          "playbackFrames": 20,
+          "playbackFrameMedian_ms": 194.550048828125,
+          "playbackFrameP95_ms": 199.199951171875,
+          "playbackFrameMax_ms": 207.39990234375,
+          "heapBefore_MB": 4.699496,
+          "heapAfter_MB": 59.716732,
+          "sceneVertices": 500000,
+          "sourceSamples": 500000
+        },
+        {
+          "ok": true,
+          "n": 500000,
+          "engine_ms": 723.0999999940395,
+          "analysis_ms": 1339.7000000029802,
+          "transfer_ms": 0.7001953125,
+          "clickToWorkerPost_ms": 2143.39990234375,
+          "clickToCurrent_ms": 2407.39990234375,
+          "currentToFirstFrame_ms": 450.7001953125,
+          "clickToFirstFrame_ms": 2858.10009765625,
+          "maxFrameGapDuringRun_ms": 19.5,
+          "maxLongTaskDuringRun_ms": 346,
+          "totalLongTaskDuringRun_ms": 635,
+          "probeCount": 100,
+          "probeMedian_ms": 13.681150000003981,
+          "probeMax_ms": 17.131300000008196,
+          "playbackFrames": 19,
+          "playbackFrameMedian_ms": 194.5,
+          "playbackFrameP95_ms": 252.10009765625,
+          "playbackFrameMax_ms": 252.10009765625,
+          "heapBefore_MB": 4.706552,
+          "heapAfter_MB": 59.728368,
+          "sceneVertices": 500000,
+          "sourceSamples": 500000
+        },
+        {
+          "ok": true,
+          "n": 500000,
+          "engine_ms": 739.0000000149012,
+          "analysis_ms": 1333.8999999910593,
+          "transfer_ms": 0.7998046875,
+          "clickToWorkerPost_ms": 2125.300048828125,
+          "clickToCurrent_ms": 2391.099853515625,
+          "currentToFirstFrame_ms": 450.2001953125,
+          "clickToFirstFrame_ms": 2841.300048828125,
+          "maxFrameGapDuringRun_ms": 20.199951171875,
+          "maxLongTaskDuringRun_ms": 350,
+          "totalLongTaskDuringRun_ms": 637,
+          "probeCount": 100,
+          "probeMedian_ms": 13.541000000004715,
+          "probeMax_ms": 17.472200000003795,
+          "playbackFrames": 20,
+          "playbackFrameMedian_ms": 194.150146484375,
+          "playbackFrameP95_ms": 207.10009765625,
+          "playbackFrameMax_ms": 255.699951171875,
+          "heapBefore_MB": 4.706724,
+          "heapAfter_MB": 59.72664,
+          "sceneVertices": 500000,
+          "sourceSamples": 500000
+        }
+      ],
+      "summary": {
+        "engine_ms": {
+          "median": 739.0000000149012,
+          "min": 723.0999999940395,
+          "max": 743.5000000149012
+        },
+        "analysis_ms": {
+          "median": 1333.8999999910593,
+          "min": 1320.2999999970198,
+          "max": 1339.7000000029802
+        },
+        "transfer_ms": {
+          "median": 0.7998046875,
+          "min": 0.7001953125,
+          "max": 0.7998046875
+        },
+        "clickToCurrent_ms": {
+          "median": 2391.099853515625,
+          "min": 2382.10009765625,
+          "max": 2407.39990234375
+        },
+        "currentToFirstFrame_ms": {
+          "median": 450.7001953125,
+          "min": 450.2001953125,
+          "max": 455.39990234375
+        },
+        "clickToFirstFrame_ms": {
+          "median": 2841.300048828125,
+          "min": 2837.5,
+          "max": 2858.10009765625
+        },
+        "maxFrameGapDuringRun_ms": {
+          "median": 20.199951171875,
+          "min": 19.5,
+          "max": 20.2998046875
+        },
+        "maxLongTaskDuringRun_ms": {
+          "median": 348,
+          "min": 346,
+          "max": 350
+        },
+        "totalLongTaskDuringRun_ms": {
+          "median": 637,
+          "min": 635,
+          "max": 641
+        },
+        "probeMedian_ms": {
+          "median": 13.681150000003981,
+          "min": 13.541000000004715,
+          "max": 13.772299999996903
+        },
+        "probeMax_ms": {
+          "median": 17.472200000003795,
+          "min": 17.131300000008196,
+          "max": 19.39890000000014
+        },
+        "playbackFrameMedian_ms": {
+          "median": 194.5,
+          "min": 194.150146484375,
+          "max": 194.550048828125
+        },
+        "playbackFrameP95_ms": {
+          "median": 207.10009765625,
+          "min": 199.199951171875,
+          "max": 252.10009765625
+        },
+        "playbackFrameMax_ms": {
+          "median": 252.10009765625,
+          "min": 207.39990234375,
+          "max": 255.699951171875
+        },
+        "heapBefore_MB": {
+          "median": 4.706552,
+          "min": 4.699496,
+          "max": 4.706724
+        },
+        "heapAfter_MB": {
+          "median": 59.72664,
+          "min": 59.716732,
+          "max": 59.728368
+        }
+      }
+    },
+    {
+      "n": 1000000,
+      "reps": [
+        {
+          "ok": true,
+          "n": 1000000,
+          "engine_ms": 1423.800000011921,
+          "analysis_ms": 2522.7999999970198,
+          "transfer_ms": 0.89990234375,
+          "clickToWorkerPost_ms": 4028.7001953125,
+          "clickToCurrent_ms": 4521.300048828125,
+          "currentToFirstFrame_ms": 765.5,
+          "clickToFirstFrame_ms": 5286.800048828125,
+          "maxFrameGapDuringRun_ms": 19.5,
+          "maxLongTaskDuringRun_ms": 624,
+          "totalLongTaskDuringRun_ms": 1208,
+          "probeCount": 100,
+          "probeMedian_ms": 13.127800000002026,
+          "probeMax_ms": 18.431700000001,
+          "playbackFrames": 12,
+          "playbackFrameMedian_ms": 376.199951171875,
+          "playbackFrameP95_ms": 471.10009765625,
+          "playbackFrameMax_ms": 471.10009765625,
+          "heapBefore_MB": 4.707656,
+          "heapAfter_MB": 115.129536,
+          "sceneVertices": 1000000,
+          "sourceSamples": 1000000
+        },
+        {
+          "ok": true,
+          "n": 1000000,
+          "engine_ms": 1457.5000000149012,
+          "analysis_ms": 2602.3999999910593,
+          "transfer_ms": 0.699951171875,
+          "clickToWorkerPost_ms": 4115.699951171875,
+          "clickToCurrent_ms": 4604.800048828125,
+          "currentToFirstFrame_ms": 756.199951171875,
+          "clickToFirstFrame_ms": 5361,
+          "maxFrameGapDuringRun_ms": 20.39990234375,
+          "maxLongTaskDuringRun_ms": 613,
+          "totalLongTaskDuringRun_ms": 1194,
+          "probeCount": 100,
+          "probeMedian_ms": 13.05449999999837,
+          "probeMax_ms": 19.41929999999411,
+          "playbackFrames": 12,
+          "playbackFrameMedian_ms": 377.449951171875,
+          "playbackFrameP95_ms": 460.199951171875,
+          "playbackFrameMax_ms": 460.199951171875,
+          "heapBefore_MB": 4.707656,
+          "heapAfter_MB": 115.127224,
+          "sceneVertices": 1000000,
+          "sourceSamples": 1000000
+        },
+        {
+          "ok": true,
+          "n": 1000000,
+          "engine_ms": 1459.4000000059605,
+          "analysis_ms": 2538.0999999940395,
+          "transfer_ms": 0.699951171875,
+          "clickToWorkerPost_ms": 4051.300048828125,
+          "clickToCurrent_ms": 4535.60009765625,
+          "currentToFirstFrame_ms": 773,
+          "clickToFirstFrame_ms": 5308.60009765625,
+          "maxFrameGapDuringRun_ms": 20.099853515625,
+          "maxLongTaskDuringRun_ms": 609,
+          "totalLongTaskDuringRun_ms": 1197,
+          "probeCount": 100,
+          "probeMedian_ms": 13.314349999993283,
+          "probeMax_ms": 19.356599999999162,
+          "playbackFrames": 12,
+          "playbackFrameMedian_ms": 379.75,
+          "playbackFrameP95_ms": 458.400146484375,
+          "playbackFrameMax_ms": 458.400146484375,
+          "heapBefore_MB": 4.6989,
+          "heapAfter_MB": 115.115444,
+          "sceneVertices": 1000000,
+          "sourceSamples": 1000000
+        }
+      ],
+      "summary": {
+        "engine_ms": {
+          "median": 1457.5000000149012,
+          "min": 1423.800000011921,
+          "max": 1459.4000000059605
+        },
+        "analysis_ms": {
+          "median": 2538.0999999940395,
+          "min": 2522.7999999970198,
+          "max": 2602.3999999910593
+        },
+        "transfer_ms": {
+          "median": 0.699951171875,
+          "min": 0.699951171875,
+          "max": 0.89990234375
+        },
+        "clickToCurrent_ms": {
+          "median": 4535.60009765625,
+          "min": 4521.300048828125,
+          "max": 4604.800048828125
+        },
+        "currentToFirstFrame_ms": {
+          "median": 765.5,
+          "min": 756.199951171875,
+          "max": 773
+        },
+        "clickToFirstFrame_ms": {
+          "median": 5308.60009765625,
+          "min": 5286.800048828125,
+          "max": 5361
+        },
+        "maxFrameGapDuringRun_ms": {
+          "median": 20.099853515625,
+          "min": 19.5,
+          "max": 20.39990234375
+        },
+        "maxLongTaskDuringRun_ms": {
+          "median": 613,
+          "min": 609,
+          "max": 624
+        },
+        "totalLongTaskDuringRun_ms": {
+          "median": 1197,
+          "min": 1194,
+          "max": 1208
+        },
+        "probeMedian_ms": {
+          "median": 13.127800000002026,
+          "min": 13.05449999999837,
+          "max": 13.314349999993283
+        },
+        "probeMax_ms": {
+          "median": 19.356599999999162,
+          "min": 18.431700000001,
+          "max": 19.41929999999411
+        },
+        "playbackFrameMedian_ms": {
+          "median": 377.449951171875,
+          "min": 376.199951171875,
+          "max": 379.75
+        },
+        "playbackFrameP95_ms": {
+          "median": 460.199951171875,
+          "min": 458.400146484375,
+          "max": 471.10009765625
+        },
+        "playbackFrameMax_ms": {
+          "median": 460.199951171875,
+          "min": 458.400146484375,
+          "max": 471.10009765625
+        },
+        "heapBefore_MB": {
+          "median": 4.707656,
+          "min": 4.6989,
+          "max": 4.707656
+        },
+        "heapAfter_MB": {
+          "median": 115.127224,
+          "min": 115.115444,
+          "max": 115.129536
+        }
+      }
+    }
+  ]
+}
