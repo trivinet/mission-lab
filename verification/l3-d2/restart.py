@@ -6,7 +6,7 @@ call as the datasets of test-data/l3-orekit (KeplerianPropagator on a CartesianO
 GCRF; verification/l3/generate.py `propagate`), at the segment-1 sample times (§9.3.2 item 2).
 
 This script does not run the engine. It reads the engine event states that the conformance test
-conformance/src/l3-vt16.test.ts writes in writer mode (ML_WRITE_L3_EVENT_STATES=1) into
+conformance/src/l3-vt16-escape-intersection.test.ts writes in writer mode (ML_WRITE_L3_EVENT_STATES=1) into
 conformance/l3-restart/engine-event-states.json, and writes one Orekit arc per case next to it.
 The comparison code and the tolerances (test-data/reference-cases/l3-r4-vt-16, evaluated from
 Orekit's own event state, §9.3.2 item 3) are committed before this script is run (§4.1).
