@@ -96,7 +96,7 @@ test('Earth only before a run; the trajectory appears after a run; vertices are 
   expect(empty.earthRadius_scene).toBe(empty.referenceRadius_m * empty.scale);
 
   await page.getByTestId('run-button').click();
-  await expect(page.getByTestId('result-state')).toHaveText('current');
+  await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'current');
   await expect(page.getByTestId('segment-summary-0')).toContainText('101 samples');
   const run = await hook(page);
   expect(run.resultKind).toBe('current');
@@ -161,7 +161,7 @@ test('display options start no run (ML-FR-007 AC4)', async ({ page }) => {
   });
   await page.goto('/?sceneHook=1');
   await page.getByTestId('run-button').click();
-  await expect(page.getByTestId('result-state')).toHaveText('current');
+  await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'current');
   expect(workers).toBe(1);
 
   await page.getByTestId('option-axes').check();
@@ -172,18 +172,54 @@ test('display options start no run (ML-FR-007 AC4)', async ({ page }) => {
   await page.getByTestId('camera-reset').click();
 
   // Still current (never stale, never computing), the same single worker, same sample count.
-  await expect(page.getByTestId('result-state')).toHaveText('current');
+  await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'current');
   await expect(page.getByTestId('sample-count')).toHaveText('101');
   expect(workers).toBe(1);
   expect((await hook(page)).axesVisible).toBe(false);
 });
 
+test('a maneuvered scenario: two segments, one maneuver marker, VI-02 with 0 mismatches', async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on('console', (m) => {
+    if (m.type() === 'error') {
+      errors.push(m.text());
+    }
+  });
+  await page.goto('/?sceneHook=1');
+  await page.getByTestId('add-maneuver').click();
+  await page.getByTestId('input-m0-time').fill('3000');
+  await page.getByTestId('input-m0-dv-s').fill('100');
+  await page.getByTestId('run-button').click();
+  await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'current');
+
+  const maneuvered = await hook(page);
+  expect(maneuvered.resultKind).toBe('current');
+  // Coast up to the maneuver and the maneuvered arc are separate segments, never joined.
+  expect(maneuvered.segmentCount).toBe(2);
+  expect(maneuvered.compared).toBe(maneuvered.vertexCounts.reduce((sum, n) => sum + n, 0));
+  expect(maneuvered.compared).toBeGreaterThan(0);
+  expect(maneuvered.mismatches).toBe(0);
+
+  const markers = await page.evaluate(
+    () =>
+      (
+        window as unknown as {
+          __missionLabScene: { get: () => { maneuverMarkers: { maneuverId: string }[] } };
+        }
+      ).__missionLabScene.get().maneuverMarkers.length,
+  );
+  expect(markers).toBe(1);
+  expect(errors).toEqual([]);
+});
+
 test('a physical edit keeps the old trajectory, marked stale', async ({ page }) => {
   await page.goto('/?sceneHook=1');
   await page.getByTestId('run-button').click();
-  await expect(page.getByTestId('result-state')).toHaveText('current');
-  await page.getByTestId('input-duration-s').fill('3000');
-  await expect(page.getByTestId('result-state')).toHaveText('stale');
+  await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'current');
+  await page.getByTestId('input-duration').fill('3000');
+  await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'stale');
   const state = await hook(page);
   expect(state.stale).toBe(true);
   expect(state.segmentCount).toBe(1);

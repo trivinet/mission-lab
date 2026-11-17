@@ -11,14 +11,14 @@ async function fill(page: Page, id: string, value: string): Promise<void> {
   await page.getByTestId(`input-${id}`).fill(value);
 }
 
-test('layout shell: three columns, toolbar, and an empty labelled scene region', async ({
+test('layout shell: three columns, toolbar, and the labelled scene region holding the 3D view', async ({
   page,
 }) => {
   await page.goto('/');
   await expect(page.getByRole('region', { name: 'Simulation view (3D)' })).toBeVisible();
   const region = page.getByTestId('scene-region');
   await expect(region).toBeVisible();
-  await expect(page.getByTestId('scene-container')).toBeEmpty();
+  await expect(page.getByTestId('scene-container').getByTestId('workspace-scene')).toBeVisible();
   await expect(page.getByTestId('editor-column')).toBeVisible();
   await expect(page.getByTestId('diagnostics-panel')).toBeVisible();
   // Initially: chip "No result" and the "none" banner, both text, not colour alone.
@@ -126,7 +126,9 @@ test.describe('field-level validation prevents the run (ML-FR-002 AC2)', () => {
       await expect(message).toContainText(code);
       await expect(page.getByTestId(`input-${id}`)).toHaveAttribute('aria-invalid', 'true');
       await expect(page.getByTestId('run-blocked')).toBeVisible();
-      await run(page);
+      // A click that does not move focus: an angle field keeps its out-of-range text (a normal
+      // click would first blur it, which normalises it; see the normalisation tests below).
+      await page.getByTestId('run-button').dispatchEvent('click');
       // The run is prevented: the result state is unchanged (none), never computing.
       await expect(state(page)).toHaveAttribute('data-state', 'none');
     });
@@ -217,11 +219,118 @@ test('maneuver validation: time out of range, non-finite dv, and the second mane
   await expect(page.getByTestId('error-maneuvers')).toHaveCount(0);
 });
 
-test('derived values are not available and are stated as such (blocked on an engine export)', async ({
-  page,
-}) => {
-  await page.goto('/');
-  await expect(page.getByTestId('derived-blocked')).toContainText('The UI does not compute them');
+test.describe('angle normalisation (ML-FR-002 AC2)', () => {
+  const cases: [string, string, string, string][] = [
+    ['raan 360 deg', 'raan', '360', '0'],
+    ['raan 370 deg', 'raan', '370', '10'],
+    ['argp -10 deg', 'argp', '-10', '350'],
+    ['nu 400 deg', 'nu', '400', '40'],
+  ];
+  for (const [name, id, typed, normalised] of cases) {
+    test(name + ' is normalised into [0, 360) when the field loses focus', async ({ page }) => {
+      await page.goto('/');
+      await fill(page, id, typed);
+      // While typing, the engine message is shown and the run is blocked.
+      await expect(page.getByTestId(`error-${id}`)).toContainText('ANGLE_OUT_OF_RANGE');
+      await page.getByTestId(`input-${id}`).blur();
+      await expect(page.getByTestId(`input-${id}`)).toHaveValue(normalised);
+      await expect(page.getByTestId(`error-${id}`)).toHaveCount(0);
+      await expect(page.getByTestId('run-blocked')).toHaveCount(0);
+      await run(page);
+      await expect(state(page)).toHaveAttribute('data-state', 'current');
+    });
+  }
+});
+
+test.describe('derived values (ML-FR-002 AC4) come from the engine and are visibly outputs', () => {
+  test('default orbit: perigee/apogee radius and altitude, period, specific energy', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const panel = page.getByTestId('derived-panel');
+    // Default a = 7000 km, e = 0.01: r_p = 6930 km, r_a = 7070 km (hand calculation).
+    await expect(panel.getByTestId('derived-perigee-radius')).toContainText('6930 km');
+    await expect(panel.getByTestId('derived-apogee-radius')).toContainText('7070 km');
+    await expect(panel.getByTestId('derived-perigee-altitude')).toContainText('km');
+    await expect(panel.getByTestId('derived-apogee-altitude')).toContainText('km');
+    await expect(panel.getByTestId('derived-period')).toContainText(' s');
+    await expect(panel.getByTestId('derived-specific-energy')).toContainText('km²/s²');
+    // Distinct from inputs: no input element, tagged computed, not editable.
+    await expect(panel.locator('input')).toHaveCount(0);
+    await expect(panel.getByText('computed', { exact: true })).toBeVisible();
+  });
+
+  test('derived values follow the inputs and every one carries a unit', async ({ page }) => {
+    await page.goto('/');
+    await fill(page, 'a', '9000');
+    await fill(page, 'e', '0.2');
+    const panel = page.getByTestId('derived-panel');
+    // r_p = a(1 - e) = 7200 km, r_a = a(1 + e) = 10800 km (hand calculation).
+    await expect(panel.getByTestId('derived-perigee-radius')).toContainText('7200 km');
+    await expect(panel.getByTestId('derived-apogee-radius')).toContainText('10800 km');
+    for (const id of [
+      'perigee-radius',
+      'apogee-radius',
+      'perigee-altitude',
+      'apogee-altitude',
+      'period',
+      'specific-energy',
+    ]) {
+      await expect(panel.getByTestId(`derived-${id}`)).toContainText(/(km|s|km²\/s²)$/);
+    }
+  });
+
+  test('invalid orbit inputs: derived values are withheld with a reason', async ({ page }) => {
+    await page.goto('/');
+    await fill(page, 'e', '1.5');
+    await expect(page.getByTestId('derived-unavailable')).toBeVisible();
+    await expect(page.getByTestId('derived-perigee-radius')).toHaveCount(0);
+  });
+});
+
+test.describe('degenerate orbit classification (ML-FR-002 AC3)', () => {
+  test('non-degenerate orbit: nothing undefined', async ({ page }) => {
+    await page.goto('/');
+    await fill(page, 'e', '0.1');
+    await expect(page.getByTestId('degeneracy')).toHaveAttribute('data-convention', 'NONE');
+    await expect(page.getByTestId('degeneracy-undefined')).toHaveText('none');
+  });
+
+  test('circular orbit: argument of perigee undefined, nu is the argument of latitude', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await fill(page, 'e', '0');
+    await fill(page, 'i', '45');
+    await expect(page.getByTestId('degeneracy')).toHaveAttribute('data-convention', 'CIRCULAR');
+    await expect(page.getByTestId('degeneracy-convention')).toHaveText('CIRCULAR');
+    await expect(page.getByTestId('degeneracy-undefined')).toContainText('ω');
+    await expect(page.getByTestId('degeneracy-undefined')).not.toContainText('Ω');
+    await expect(page.getByTestId('degeneracy-note')).toContainText('argument of latitude');
+  });
+
+  test('equatorial orbit: RAAN undefined, omega is the longitude of perigee', async ({ page }) => {
+    await page.goto('/');
+    await fill(page, 'e', '0.1');
+    await fill(page, 'i', '0');
+    await expect(page.getByTestId('degeneracy')).toHaveAttribute('data-convention', 'EQUATORIAL');
+    await expect(page.getByTestId('degeneracy-undefined')).toContainText('Ω');
+    await expect(page.getByTestId('degeneracy-note')).toContainText('longitude of perigee');
+  });
+
+  test('circular and equatorial: both undefined, nu is the true longitude', async ({ page }) => {
+    await page.goto('/');
+    await fill(page, 'e', '0');
+    await fill(page, 'i', '0');
+    await expect(page.getByTestId('degeneracy')).toHaveAttribute(
+      'data-convention',
+      'CIRCULAR_EQUATORIAL',
+    );
+    await expect(page.getByTestId('degeneracy-undefined')).toContainText('Ω');
+    await expect(page.getByTestId('degeneracy-undefined')).toContainText('ω');
+    await expect(page.getByTestId('degeneracy-note')).toContainText('true longitude');
+    await expect(page.getByTestId('degeneracy-reported')).toContainText('0°, 0°');
+  });
 });
 
 test('keyboard only: edit a field, add a maneuver and run the default scenario with focus visible', async ({
