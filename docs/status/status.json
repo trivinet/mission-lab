@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 4 — Stabilisation and release (gate G4)",
-  "headline": "Release review (040, PR #74) and documentation (041, PR #73) delivered: no blocker; one major finding (main thread blocks ~3 s after a 1M-sample result since the plots landed). Owner decides the pre-release fix package; then hosting (042) and release (043).",
+  "headline": "Pre-release fixes (044) delivered in PR #76: post-result main-thread time at 1M samples 4.0 s → 1.2 s; 1989 tests, 98 e2e. Owner: re-confirm the sample limits, merge, and choose the hosting provider (042); then release v1.0.0 (043) and G4.",
   "gates": [
     {
       "id": "G0",
@@ -35,8 +35,8 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-45",
-      "text": "Decide the pre-release fix package: D-1 (move analysis off the main thread, re-measure the envelope), D-2/D-3 text, D-6 unsaved-tab warning, D-7/D-9 a11y details, FR-009 AC2 axis-title test, NFR-003 lint rule; accept D-4, D-5, D-8, D-10 for M1. Merge PRs #72, #73, #74.",
+      "id": "OA-46",
+      "text": "Re-confirm the 250 000 soft warning and 1 000 000 hard limit on the re-measured envelope (performance-envelope.md §8); merge PRs #75 and #76; choose the hosting provider for ML-TASK-042 (GitHub Pages, Cloudflare Pages or Vercel Hobby) and authorise publishing.",
       "blocking": "ML-TASK-042, 043"
     },
     {
@@ -359,16 +359,25 @@
           "title": "Full regression, accessibility and error-path review",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_review",
-          "deps": "PR #74"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PRs #73, #74)"
         },
         {
           "id": "ML-TASK-041",
           "title": "User guide, developer guide, traceability, release notes",
           "role": "Docs & Release",
           "model": "haiku",
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PRs #73, #74)"
+        },
+        {
+          "id": "ML-TASK-044",
+          "title": "Pre-release fixes: analysis off the main thread (D-1), readiness findings, traceability gaps",
+          "role": "Frontend Engineer",
+          "model": "sonnet",
           "status": "in_review",
-          "deps": "PR #73"
+          "deps": "PR #76",
+          "approval": true
         },
         {
           "id": "ML-TASK-042",
@@ -392,6 +401,26 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Checked ML-TASK-044: 1989 tests, 98 e2e, no packages/ change. PR #76."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-044 delivered: computeHistories moved to the worker (1M: post-result main thread 3992 → 1197 ms, largest block 3483 → 613 ms); D-2, D-3, D-6, D-7, D-9; FR-009 AC2 e2e; NFR-003 lint rule (28/28 fixtures); release-note known limits."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Owner",
+      "text": "Approved the pre-release fix package: fix D-1, D-2, D-3, D-6, D-7, D-9, FR-009 AC2 test, NFR-003 lint rule; accept D-4, D-5, D-8, D-10 for M1. PRs #72, #73, #74 merged (the non-required audit job now fails on the dev-tooling advisory D-10)."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-044 started (Sonnet)."
+    },
     {
       "date": "2026-11-17",
       "who": "Verification",
