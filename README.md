@@ -4,9 +4,9 @@ An interactive, browser-based laboratory for exploring orbital mechanics and pre
 spacecraft mission design: configure an orbit, simulate it, apply a maneuver, and analyse the
 result.
 
-**Status:** release M1 "Orbital Sandbox" (v1.0.0) is in preparation; gates G0 to G3 are approved
-and Phase 4 (stabilisation and release) is in progress. The release notes are a draft. Live task
-status: `docs/status/status.json`.
+**Status:** release M1 "Orbital Sandbox" (v1.0.0) is a release candidate, awaiting the owner's
+gate G4 walkthrough; gates G0 to G3 are approved. Live site: https://trivinet.github.io/mission-lab/.
+Task status: `docs/status/status.json`.
 
 Mission Lab is a personal R&D project. It is **not qualified for operational use** and must not be
 used for real spacecraft navigation or mission planning.
@@ -18,7 +18,7 @@ used for real spacecraft navigation or mission planning.
 | Use the application | [User guide](docs/user-guide.md) |
 | Build, test and change it | [Developer guide](docs/developer-guide.md) |
 | See which test backs which requirement | [Traceability matrix](docs/verification/traceability-matrix.md) |
-| See what v1.0.0 contains (draft) | [Release notes](docs/releases/release-notes-v1.0.0.md) |
+| See what v1.0.0 contains | [Release notes](docs/releases/release-notes-v1.0.0.md) |
 
 Quick start (Node 24.22.2 and pnpm 12.16.1, see the developer guide):
 

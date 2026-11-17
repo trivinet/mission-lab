@@ -120,7 +120,7 @@ Evidence limits:
 - Allowed `<type>` values for branch names. `docs` is used by the branch of ML-TASK-006 but is not
   listed in any document.
 - Commit message format, and whether a commit trailer policy applies.
-- Pull request template and required PR sections beyond "summary and verification evidence"
+- Required PR sections beyond the existing template (`.github/pull_request_template.md`)
   (ML-TASK-005).
 - Branch protection rules and required CI checks (ML-TASK-005).
 - Merge method (merge commit, squash or rebase). Only the owner merges.
