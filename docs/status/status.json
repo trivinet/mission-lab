@@ -354,16 +354,16 @@
           "title": "Full regression, accessibility and error-path review",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "todo",
-          "deps": "035"
+          "status": "in_progress",
+          "deps": "Contract on docs/ml-task-040-041-contracts; agent running"
         },
         {
           "id": "ML-TASK-041",
           "title": "User guide, developer guide, traceability, release notes",
           "role": "Docs & Release",
           "model": "haiku",
-          "status": "todo",
-          "deps": "035"
+          "status": "in_progress",
+          "deps": "Contract on docs/ml-task-040-041-contracts; agent running"
         },
         {
           "id": "ML-TASK-042",
@@ -387,6 +387,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #71 (G3 approved). Phase 4 started: ML-TASK-040 (release-readiness review, Sonnet) and ML-TASK-041 (guides, traceability, release notes, Sonnet) running in parallel."
+    },
     {
       "date": "2026-11-17",
       "who": "Owner",
