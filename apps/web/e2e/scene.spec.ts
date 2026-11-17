@@ -115,6 +115,9 @@ test('camera: keyboard orbit and zoom move the camera, Reset restores it', async
   await page.goto('/?sceneHook=1');
   const canvas = page.getByTestId('scene-canvas').locator('canvas');
   await expect(canvas).toBeVisible();
+  // The camera registers in the hook after the first rendered frame; on a slow runner that can
+  // come after the canvas is visible, so wait for it instead of reading it once.
+  await expect.poll(async () => (await hook(page)).camera).not.toBeNull();
   const initial = (await hook(page)).camera;
   expect(initial).not.toBeNull();
 
