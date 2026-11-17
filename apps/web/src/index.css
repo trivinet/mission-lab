@@ -451,3 +451,38 @@ dl.out dd {
 .limits li {
   margin-bottom: var(--s1);
 }
+
+/* Persistence (ML-TASK-033): unsaved indicator and the in-page dialog. */
+.unsaved {
+  font-size: 12px;
+  color: var(--text-2);
+}
+.unsaved.dirty {
+  color: var(--stale);
+  font-weight: 600;
+}
+dialog.notice {
+  max-width: min(520px, 92vw);
+  background: var(--bg-panel);
+  color: var(--text);
+  border: 1px solid var(--border-input);
+  border-radius: var(--r2);
+  padding: var(--s4);
+}
+dialog.notice::backdrop {
+  background: rgb(0 0 0 / 0.6);
+}
+.notice-details {
+  max-height: 40vh;
+  overflow: auto;
+  padding-left: var(--s4);
+  font-size: 12px;
+  font-family: ui-monospace, monospace;
+  color: var(--text-2);
+}
+.notice-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--s3);
+  margin-top: var(--s4);
+}
