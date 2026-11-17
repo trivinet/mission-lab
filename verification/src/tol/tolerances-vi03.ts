@@ -149,7 +149,10 @@ export function fr010ClosedTolerances(
     return { periapsisRadius_m: x, apoapsisRadius_m: x, period_s: x };
   }
   if (da === null || de === null) {
-    const x: Tol = { value: null, reason: t.semiMajorAxis_m.reason ?? t.eccentricity.reason };
+    const x: Tol = {
+      value: null,
+      reason: t.semiMajorAxis_m.reason ?? t.eccentricity.reason ?? REASON.operand,
+    };
     return { periapsisRadius_m: x, apoapsisRadius_m: x, period_s: x };
   }
   const a = s.semiMajorAxis_m;

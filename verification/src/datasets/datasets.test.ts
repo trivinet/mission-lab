@@ -27,6 +27,7 @@ import { buildAllDatasets, type DatasetFile } from './build';
 import { buildPartCDatasets } from './build-c';
 import { buildPartD2Datasets } from './build-d2';
 import { buildPartD3Datasets } from './build-d3';
+import { buildVi03Datasets } from './build-vi03';
 
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const DATA_DIR = join(ROOT, 'test-data', 'reference-cases');
@@ -39,6 +40,7 @@ const PROVENANCE_KEYS = ['codeRevision', 'date', 'runtime'];
 
 // ML_WRITE_DATASETS=1 writes the ML-TASK-011 files, ML_WRITE_DATASETS=C the ML-TASK-018 part C
 // files only, ML_WRITE_DATASETS=D the part D2 files only, ML_WRITE_DATASETS=D3 the part D3 files
+// (ML_WRITE_DATASETS=VI03: the ML-TASK-036 files)
 // only (so that the provenance of earlier, committed datasets is never rewritten).
 const writeMode = process.env.ML_WRITE_DATASETS;
 
@@ -76,9 +78,22 @@ const builtD3: DatasetFile[] = buildPartD3Datasets({
   runtime: `Node.js ${process.version}`,
 });
 
-const built: DatasetFile[] = [...builtA, ...builtC, ...builtD, ...builtD3];
+// ML-TASK-036 phase 1 (VI-03 (b), FR-010 AC3): vi-03-b/ only; ML_WRITE_DATASETS=VI03 writes these.
+const builtVI03: DatasetFile[] = buildVi03Datasets({
+  codeRevision: process.env.ML_CODE_REVISION ?? 'unset',
+  date: '2026-11-17',
+  runtime: `Node.js ${process.version}`,
+});
 
-const writeSets: Record<string, DatasetFile[]> = { '1': builtA, C: builtC, D: builtD, D3: builtD3 };
+const built: DatasetFile[] = [...builtA, ...builtC, ...builtD, ...builtD3, ...builtVI03];
+
+const writeSets: Record<string, DatasetFile[]> = {
+  '1': builtA,
+  C: builtC,
+  D: builtD,
+  D3: builtD3,
+  VI03: builtVI03,
+};
 const toWrite = writeMode === undefined ? undefined : writeSets[writeMode];
 if (toWrite !== undefined) {
   if (process.env.ML_CODE_REVISION === undefined) throw new Error('set ML_CODE_REVISION');
