@@ -7,8 +7,7 @@
  * - none, computing, error: no trajectory, Earth only.
  */
 import type { SimulationResult } from '@mission-lab/contracts';
-import { buildSimulationRequest } from '@mission-lab/simulation';
-import { newScenario } from '../state/default-scenario';
+import { ENGINE_CONSTANTS } from '@mission-lab/simulation';
 import type { ResultState } from '../state/result-state';
 
 export function resultToShow(state: ResultState): SimulationResult | null {
@@ -23,22 +22,11 @@ export function resultToShow(state: ResultState): SimulationResult | null {
   }
 }
 
-let cachedRadius_m: number | undefined;
-
 /**
- * The engine's reference radius [m], read from the request the engine itself builds
- * (`constants.referenceRadius_m`, contracts-v1 section 4). The web app may not import
- * packages/astrodynamics, and the engine has no standalone export of the radius; the constants
- * do not depend on the scenario, so the request of the default scenario carries them. With a
- * result, the scene uses `result.model.constants.referenceRadius_m` instead.
+ * The engine's reference radius [m]: `ENGINE_CONSTANTS.referenceRadius_m` of
+ * `@mission-lab/simulation`, the same value `buildSimulationRequest` puts in every request. With
+ * a result, the scene uses `result.model.constants.referenceRadius_m` instead.
  */
 export function engineReferenceRadius_m(): number {
-  if (cachedRadius_m === undefined) {
-    const built = buildSimulationRequest(newScenario());
-    if (!built.ok) {
-      throw new Error('The engine rejected the default scenario; cannot read its constants.');
-    }
-    cachedRadius_m = built.value.constants.referenceRadius_m;
-  }
-  return cachedRadius_m;
+  return ENGINE_CONSTANTS.referenceRadius_m;
 }

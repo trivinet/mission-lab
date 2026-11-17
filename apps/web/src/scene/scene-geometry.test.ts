@@ -10,7 +10,8 @@ import type { Scenario, SimulationResult } from '@mission-lab/contracts';
 import { buildSimulationRequest, runSimulation } from '@mission-lab/simulation';
 import { describe, expect, it } from 'vitest';
 import { newScenario } from '../state/default-scenario';
-import { ERA_REVOLUTIONS_PER_UT1_DAY, earthRotationAngle_rad } from './earth-orientation';
+import { ERA_RATE_revpday } from '@mission-lab/simulation';
+import { earthRotationAngle_rad } from './earth-orientation';
 import {
   buildSceneGeometry,
   earthRadiusScene,
@@ -177,9 +178,15 @@ describe('Earth orientation (illustrative, ADR-004)', () => {
   });
 
   it('one day later the angle advances by 2 pi times the ADR-004 rate', () => {
-    const a = earthRotationAngle_rad('2000-01-01T12:00:00.000Z', 0);
-    const b = earthRotationAngle_rad('2000-01-01T12:00:00.000Z', 86_400);
-    expect(b - a).toBeCloseTo(2 * Math.PI * ERA_REVOLUTIONS_PER_UT1_DAY, 12);
-    expect(earthRotationAngle_rad('2000-01-02T12:00:00.000Z', 0)).toBeCloseTo(b, 12);
+    // The engine returns the angle in [0, 2 pi), so the advance is compared modulo 2 pi.
+    const a = earthRotationAngle_rad('2000-01-01T12:00:00.000Z', 0) ?? Number.NaN;
+    const b = earthRotationAngle_rad('2000-01-01T12:00:00.000Z', 86_400) ?? Number.NaN;
+    const advance = 2 * Math.PI * (ERA_RATE_revpday - 1);
+    expect(b - a).toBeCloseTo(advance, 12);
+    expect(earthRotationAngle_rad('2000-01-02T12:00:00.000Z', 0) ?? Number.NaN).toBeCloseTo(b, 12);
+  });
+
+  it('is null when the engine declines the epoch (the Earth is then drawn unrotated)', () => {
+    expect(earthRotationAngle_rad('not a date', 0)).toBeNull();
   });
 });

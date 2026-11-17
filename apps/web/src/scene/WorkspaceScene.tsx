@@ -102,7 +102,7 @@ export function WorkspaceScene() {
               geometry={geometry}
               stale={stale}
               earthRadius_scene={hookState.earthRadius_scene}
-              earthRotationZ_rad={hookState.earth.rotationZ_rad}
+              earthRotationZ_rad={hookState.earth.rotationZ_rad ?? 0}
               axesVisible={axesVisible}
               spacecraftPosition={marker?.position ?? null}
               resetNonce={resetNonce}

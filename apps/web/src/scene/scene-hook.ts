@@ -31,7 +31,7 @@ export interface SceneHookState {
   readonly earth: {
     readonly orientation: 'illustrative';
     readonly label: string;
-    readonly rotationZ_rad: number;
+    readonly rotationZ_rad: number | null;
   };
   readonly segments: readonly SceneHookSegment[];
   readonly maneuverMarkers: readonly {
