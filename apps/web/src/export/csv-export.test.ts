@@ -85,7 +85,8 @@ describe('CSV export of a real result', () => {
         expect(csv.rowCount).toBe(samples);
         let at = 0;
         for (const segment of result.segments) {
-          for (let k = 0; k < segment.t_s.length; k += 1) {
+          for (const time of segment.t_s) {
+            expect(Object.is(Number(rows[at]?.[1]), time)).toBe(true);
             expect(rows[at]?.[0]).toBe(String(segment.index));
             at += 1;
           }

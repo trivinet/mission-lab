@@ -173,9 +173,7 @@ test('comparison table: display resolution, round-off shown as zero, exact value
     .toContain(`semiMajorAxis_m\tm\t${si ?? ''}\t`);
 });
 
-test('comparison table: a round-off-level difference reads as zero', async ({
-  page,
-}) => {
+test('comparison table: a round-off-level difference reads as zero', async ({ page }) => {
   await page.goto('/');
   // Escape preset: inclination and node do not change by an along-track burn, so these
   // differences are zero or at round-off level; either way the cell must read 0.000.
