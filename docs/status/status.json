@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "The workspace is merged: editor, derived values, maneuver and the exact 3D scene (022, 023, 027). Phase 2 left: timeline and playback (024), model panel (025), integration and performance envelope (026), then gate G2.",
+  "headline": "Phase 2: timeline and playback (024) and the model panel (025) are running in parallel. Then 026 (integration and performance envelope) and gate G2.",
   "gates": [
     {
       "id": "G0",
@@ -248,16 +248,16 @@
           "title": "Timeline and playback",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "023"
+          "status": "in_progress",
+          "deps": "Contract on branch docs/ml-task-024-025-contracts; agent running"
         },
         {
           "id": "ML-TASK-025",
           "title": "Model & assumptions panel",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "017, 021"
+          "status": "in_progress",
+          "deps": "Contract on branch docs/ml-task-024-025-contracts; agent running"
         },
         {
           "id": "ML-TASK-027",
@@ -376,6 +376,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-024 (timeline, playback, Hermite display interpolation within a segment, exact at samples) and ML-TASK-025 (model panel rendered from SimulationResult.model, sentinel test, not-qualified statement) started in parallel, Sonnet."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #52 (status). Wrote the ML-TASK-024 and 025 contracts."
+    },
     {
       "date": "2026-11-17",
       "who": "Coordinator",
