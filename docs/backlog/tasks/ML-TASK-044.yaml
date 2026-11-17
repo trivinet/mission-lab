@@ -1,0 +1,45 @@
+task_id: ML-TASK-044
+title: "Pre-release fix package: analysis off the main thread (D-1) with a re-measured envelope, readiness findings D-2/D-3/D-6/D-7/D-9, FR-009 AC2 test, NFR-003 lint rule"
+status: in_progress
+requirement_ids: [ML-NFR-004, ML-UX-003, ML-UX-004, ML-FR-009, ML-NFR-003, ML-FR-011]
+owner_role: frontend-engineer
+reviewer_role: verification-engineer
+dependencies: [ML-TASK-040, ML-TASK-041]
+affected_paths:
+  - apps/web/
+  - eslint.config.js                          # NFR-003 rule only
+  - tools/boundary-fixtures/                  # a fixture proving the NFR-003 rule, if the rule is added there
+  - docs/verification/performance-envelope.md # re-measured section
+  - docs/verification/data/                   # new raw data file only
+  - docs/releases/release-notes-v1.0.0.md     # accepted findings listed as known limits
+  - docs/design/design-tokens.md              # D-9 only if the document is corrected instead of the CSS
+  - docs/backlog/tasks/ML-TASK-044.yaml
+objective: >
+  Close the owner-approved pre-release fix package from the release-readiness review
+  (docs/verification/release-readiness-review.md) and the traceability matrix gaps, so G4 can be
+  prepared on a release candidate whose performance record is current.
+scope:
+  - "D-1: move computeHistories and compareCoastAndManeuver (and anything else that is O(N) per result) into the simulation worker, so the main thread receives ready data (typed arrays transferred). The VI-03 (a) plumbing test must still pass unchanged in its assertions (plotted values equal the module output). Then re-run `pnpm perf:envelope` (3 repetitions) and add a dated 'Release candidate' section to performance-envelope.md with the new table and raw data; state plainly whether the 250 000 soft threshold and the 1 000 000 hard limit still read as decided, without changing either (the owner re-confirms)."
+  - "D-2: do not show the large-run note when the sample-limit error is present. D-3: fix '1 problem prevent' agreement."
+  - "D-6: warn on closing or reloading the tab with unsaved changes (`beforeunload`), with an e2e where Playwright can observe it."
+  - "D-7: make the three column wrappers labelled landmarks or groups (section with aria-labelledby or role=group); give the interactive 3D canvas a role that signals interaction, with its text alternative kept."
+  - "D-9: either set the 2 px focus offset on text inputs or correct design-tokens.md; state which."
+  - "FR-009 AC2: e2e asserting each plot has axis titles with units, a legend and the maneuver marker."
+  - "NFR-003: a lint rule forbidding clock and randomness (Date, performance.now, Math.random, crypto.getRandomValues/randomUUID) in packages/astrodynamics and packages/simulation, with a fixture proving it fires; existing code must pass (if the engine uses any of these, stop and report)."
+  - "Release notes: list D-4, D-5, D-8, D-10 as accepted known limits for M1 (owner decision 2026-11-17)."
+out_of_scope:
+  - "Physics or verification changes; new dependencies; any change to tolerances."
+inputs:
+  - AGENTS.md; docs/verification/release-readiness-review.md; docs/verification/traceability-matrix.md §5
+  - docs/verification/performance-envelope.md; reports of ML-TASK-026, 031, 032, 040, 041
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; web e2e passes 3 times in a row."
+  - "Re-measured envelope committed with raw data; the 1M-sample post-result main-thread block is reported before and after."
+  - "VI-03 (a) and VI-02 tests pass with assertions unchanged."
+test_requirements:
+  - "Vitest and Playwright as listed."
+deliverables:
+  - code, tests, the re-measured envelope section, release-notes update, the report section of this file
+human_approval_required: true   # the owner re-confirms the sample-limit decisions on the new numbers
+
+report: {}
