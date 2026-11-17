@@ -41,4 +41,53 @@ deliverables:
   - apps/web persistence code and tests; the report section of this file
 human_approval_required: false   # the size-limit value is confirmed by the owner at PR review
 
-report: {}
+
+report:
+  files_changed:
+    - apps/web/src/persistence/scenario-file.ts
+    - apps/web/src/persistence/scenario-file.test.ts
+    - apps/web/src/persistence/NoticeDialog.tsx
+    - apps/web/src/persistence/FileControls.tsx
+    - apps/web/src/state/scenario-store.ts
+    - apps/web/src/layout/Toolbar.tsx
+    - apps/web/src/index.css
+    - apps/web/e2e/persistence.spec.ts
+    - docs/backlog/tasks/ML-TASK-033.yaml
+  summary: >
+    Save, load, unsaved indicator and confirmation dialog. The file is one contracts Scenario
+    (schemaVersion "1.0") in a fixed key order, 2-space indent, LF, one final newline, numbers as
+    JSON.stringify shortest round-trip decimals (so -0 is written as 0). Load checks size, UTF-8,
+    JSON, then validateScenario and validateScenarioSemantics; each failure class has its own
+    message and the store is untouched. Unsaved means the scenario's file text differs from the
+    text last saved, loaded or created (store field savedText), so name edits count and reverting
+    an edit clears the indicator. New scenario and Load confirm through a native modal dialog when
+    there are unsaved changes; Load confirms after the file has been validated, so an invalid file
+    never asks. Save refuses a scenario the engine rejects (it would not load). No change to
+    packages/.
+  tests_executed:
+    - "pnpm install --frozen-lockfile: exit 0"
+    - "pnpm lint: exit 0"
+    - "pnpm typecheck: exit 0"
+    - "pnpm test: 94 files, 1866 tests passed (44 new in apps/web/src/persistence)"
+    - "pnpm build: exit 0"
+    - "pnpm format:check: exit 0"
+    - "pnpm check:boundaries: 20/20 fixtures ok"
+    - "pnpm --filter @mission-lab/web test:e2e: 64 passed (12 new in persistence.spec.ts)"
+  reference_data_used: []
+  not_verified:
+    - "Real OS file dialogs and real downloads outside Playwright; Chromium only."
+    - "Visual review of the toolbar and dialog (no screenshot taken), including narrow widths."
+    - "Whether a download reached disk: the browser does not say, so Save marks the scenario saved when the download starts."
+  known_limitations:
+    - "Proposed size limit MAX_SCENARIO_FILE_BYTES = 64 KiB (65 536 bytes); owner to confirm. A one-maneuver file is about 1 KiB; 64 KiB leaves room for a very long name (the only unbounded field) and rejects a wrong file before it is read."
+    - "contracts-v1 11.4 P3: this module does not normalise -0 itself. Save writes -0 as 0; a hand-edited file with -0 loads (the contract accepts it), is kept in memory, and gets the same requestId as +0 because the engine's request builder normalises. normalizeNegativeZero is not exported from packages/simulation, so it was not reused."
+    - "A leading UTF-8 BOM is accepted on load (never written). Invalid UTF-8 is its own rejection class (NOT_UTF8)."
+    - "The native dialog keeps the page behind inert, but Tab can leave the dialog to the browser chrome; Escape and Shift+Tab work."
+    - "No beforeunload warning when closing the tab with unsaved changes (not in scope)."
+    - "Issue lines in the dialog show the engine's message, path and code (the editor does the same today)."
+    - "Loading resets the result to none."
+  documentation_changes: []
+  risks_or_blockers:
+    - "ML-TASK-032 (plots/comparison, open PR) also edits the toolbar/layout region; expect a small conflict in apps/web/src/layout/Toolbar.tsx and apps/web/src/index.css."
+  review_artifact: ""
+  recommended_next_action: "Verification Engineer reviews VT-17 and VT-18 (FR-011 AC3); owner confirms the size limit."

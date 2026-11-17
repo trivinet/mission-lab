@@ -33,6 +33,8 @@ export function NoticeDialog({ model, onDismiss }: Props) {
     }
     if (open && !dialog.open) {
       dialog.showModal();
+      // The safe action takes initial focus (React's autoFocus runs before the dialog is open).
+      dialog.querySelector<HTMLElement>('[data-autofocus]')?.focus();
     } else if (!open && dialog.open) {
       dialog.close();
     }
@@ -78,7 +80,7 @@ export function NoticeDialog({ model, onDismiss }: Props) {
             <button
               type="button"
               className="primary"
-              autoFocus
+              data-autofocus
               data-testid="notice-dismiss"
               onClick={onDismiss}
             >
