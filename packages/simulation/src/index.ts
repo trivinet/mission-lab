@@ -41,3 +41,43 @@ export {
   toLowerHex,
   utf8Encode,
 } from './sha256';
+export {
+  COMPARISON_QUANTITIES,
+  HISTORY_QUANTITIES,
+  buildCoastRequest,
+  compareCoastAndManeuver,
+  computeHistories,
+  historySeries,
+  stateQuantities,
+} from './analysis';
+export type {
+  AnalysisConstants,
+  AppliedDeltaV,
+  CoastManeuverComparison,
+  CompareFailure,
+  CompareResult,
+  ComparisonQuantity,
+  ComparisonRow,
+  ComparisonUnit,
+  ComparisonValueAbsence,
+  ComputeHistoriesFailure,
+  ComputeHistoriesResult,
+  HistoryQuantity,
+  HistorySeries,
+  HistoryUnit,
+  ManeuverComparison,
+  ReportedClosedOrbit,
+  ReportedElements,
+  ResultHistories,
+  SegmentHistory,
+  StateClassification,
+  StateQuantities,
+  StateQuantitiesFailure,
+  StateQuantitiesResult,
+} from './analysis';
+export type {
+  ClosedOrbitQuantitiesFailure,
+  ConicType,
+  StateIntegralsFailure,
+  StateToElementsFailure,
+} from '@mission-lab/astrodynamics';
