@@ -1,6 +1,6 @@
 task_id: ML-TASK-025
 title: "Model and assumptions panel rendered from SimulationResult.model (apps/web)"
-status: in_progress
+status: review
 requirement_ids: [ML-FR-012, ML-UX-004]
 owner_role: frontend-engineer
 reviewer_role: systems-architect
@@ -40,4 +40,39 @@ deliverables:
   - apps/web/src/model-panel/ with tests; mount; e2e; the report section of this file
 human_approval_required: false
 
-report: {}
+report:
+  files_changed:
+    - "apps/web/src/model-panel/ModelPanel.tsx (new): panel, NOT_QUALIFIED_STATEMENT"
+    - "apps/web/src/model-panel/model-rows.ts (new): rows read from SimulationResult.model"
+    - "apps/web/src/model-panel/index.ts (new)"
+    - "apps/web/src/model-panel/ModelPanel.test.ts (new): sentinel (AC2), no-model and not-qualified tests"
+    - "apps/web/src/layout/ResultsColumn.tsx: mounts the panel"
+    - "apps/web/src/index.css: panel styles only (appended)"
+    - "apps/web/e2e/model-panel.spec.ts (new)"
+  summary: >
+    The panel shows dynamics model, central body, mu and reference radius with source, propagator,
+    maneuver model, frame, epoch, time convention, engine version, duration, output step and every
+    limitation, all read from SimulationResult.model. Numbers are shown in SI with their unit as
+    String(value) (no conversion). Stale shows the old model marked stale. none, computing, stale
+    without a result, and error show that there is no model. Details are a native details element
+    (keyboard operable, global focus-visible). The not-qualified statement sits outside it, always
+    visible.
+  tests_executed:
+    - "pnpm install --frozen-lockfile: exit 0"
+    - "pnpm lint: exit 0"
+    - "pnpm typecheck: exit 0"
+    - "pnpm test: exit 0; 85 files, 1753 tests passed"
+    - "pnpm build: exit 0"
+    - "pnpm format:check: exit 0"
+    - "pnpm check:boundaries: exit 0; 20/20 fixtures reported"
+    - "pnpm --filter @mission-lab/web test:e2e: 45 passed (3 new in model-panel.spec.ts)"
+  reference_data_used: []
+  not_verified:
+    - "No human visual review of layout or contrast; only DOM-level e2e assertions."
+    - "Narrow-viewport wrapping of long limitation texts not checked."
+  known_limitations:
+    - "Unit tests render with react-dom/server (node environment, no new dependency), so collapse behaviour is covered by e2e only."
+  documentation_changes: []
+  risks_or_blockers: []
+  review_artifact: ""
+  recommended_next_action: "Owner reviews the not-qualified wording and the limitation wording (contracts P10)."

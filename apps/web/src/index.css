@@ -402,3 +402,37 @@ dl.out dd {
 .f.wide {
   grid-template-columns: 1fr;
 }
+
+/* Model and assumptions panel (ML-TASK-025) */
+.notqual {
+  margin: 0 0 var(--s2);
+  padding: var(--s2);
+  border: 1px solid var(--stale);
+  border-radius: var(--r1);
+  color: var(--text);
+}
+.model-list .model-row {
+  display: contents;
+}
+.model-list dd {
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.model-details > summary {
+  cursor: pointer;
+  color: var(--text-2);
+  margin-bottom: var(--s2);
+}
+.model-sub {
+  font-size: 11px;
+  margin: var(--s2) 0 var(--s1);
+  color: var(--text-2);
+}
+.limits {
+  margin: 0;
+  padding-left: var(--s3);
+  color: var(--text);
+}
+.limits li {
+  margin-bottom: var(--s1);
+}
