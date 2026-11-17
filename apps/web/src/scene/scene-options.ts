@@ -8,10 +8,7 @@ import type { StoreApi } from 'zustand/vanilla';
 export interface SceneOptionsState {
   /** Inertial GCRF axes (ML-FR-007 AC3). */
   readonly axesVisible: boolean;
-  /** Flat sample index of the spacecraft marker (ML-TASK-024 replaces this by playback time). */
-  readonly markerFlatIndex: number;
   setAxesVisible: (visible: boolean) => void;
-  setMarkerFlatIndex: (index: number) => void;
 }
 
 export type SceneOptionsStore = StoreApi<SceneOptionsState>;
@@ -19,12 +16,8 @@ export type SceneOptionsStore = StoreApi<SceneOptionsState>;
 export function createSceneOptionsStore(): SceneOptionsStore {
   return createStore<SceneOptionsState>()((set) => ({
     axesVisible: false,
-    markerFlatIndex: 0,
     setAxesVisible: (axesVisible) => {
       set({ axesVisible });
-    },
-    setMarkerFlatIndex: (markerFlatIndex) => {
-      set({ markerFlatIndex });
     },
   }));
 }

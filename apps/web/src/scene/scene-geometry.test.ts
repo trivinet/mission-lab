@@ -20,6 +20,7 @@ import {
   totalSampleCount,
 } from './scene-geometry';
 import { buildSceneHookState } from './scene-hook';
+import { markerAt } from './scene-marker';
 import { SCENE_SCALE } from './scene-scale';
 
 function runEngine(scenario: Scenario): SimulationResult {
@@ -92,7 +93,7 @@ describe.each(CASES)('VI-02: $name', ({ scenario }) => {
       fallbackEpochIso: '',
       scale: geometry.scale,
       axesVisible: false,
-      markerFlatIndex: 0,
+      marker: markerAt(result, 0),
       camera: null,
     });
     expect(state.scale).toBe(SCENE_SCALE);

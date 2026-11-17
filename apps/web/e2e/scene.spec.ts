@@ -169,8 +169,8 @@ test('display options start no run (ML-FR-007 AC4)', async ({ page }) => {
 
   await page.getByTestId('option-axes').check();
   expect((await hook(page)).axesVisible).toBe(true);
-  await page.getByTestId('option-marker-sample').fill('50');
-  await expect(page.getByTestId('marker-readout')).toContainText('#50');
+  await page.getByTestId('playback-slider').fill('50');
+  await expect(page.getByTestId('playback-readout')).toHaveAttribute('data-t-s', '50');
   await page.getByTestId('option-axes').uncheck();
   await page.getByTestId('camera-reset').click();
 

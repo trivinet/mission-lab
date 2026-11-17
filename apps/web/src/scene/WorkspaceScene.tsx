@@ -11,8 +11,10 @@ import { SceneCanvas } from './SceneCanvas';
 import { SceneErrorBoundary } from './SceneErrorBoundary';
 import type { CameraSnapshot } from './SceneCanvas';
 import { EARTH_ORIENTATION_LABEL } from './earth-orientation';
-import { buildSceneGeometry, totalSampleCount } from './scene-geometry';
+import { getPlaybackStore } from '../playback/playback-store';
+import { buildSceneGeometry } from './scene-geometry';
 import { buildSceneHookState, sceneHookRequested } from './scene-hook';
+import { markerAt } from './scene-marker';
 import { getSceneOptionsStore } from './scene-options';
 import { SCENE_SCALE } from './scene-scale';
 import { engineReferenceRadius_m, resultToShow } from './scene-source';
@@ -44,7 +46,8 @@ export function WorkspaceScene() {
   const resultState = useStore(scenarioStore, (s) => s.resultState);
   const epochIso = useStore(scenarioStore, (s) => s.scenario.epoch.iso);
   const axesVisible = useStore(optionsStore, (s) => s.axesVisible);
-  const markerFlatIndex = useStore(optionsStore, (s) => s.markerFlatIndex);
+  // The one playback time (ML-FR-008 AC2): the marker is computed from it, nothing else.
+  const playbackT_s = useStore(getPlaybackStore(), (s) => s.t_s);
   const [resetNonce, setResetNonce] = useState(0);
   const [webgl] = useState(webglAvailable);
   const cameraRef = useRef<(() => CameraSnapshot) | null>(null);
@@ -52,8 +55,10 @@ export function WorkspaceScene() {
   const result = resultToShow(resultState);
   const geometry = useMemo(() => (result === null ? null : buildSceneGeometry(result)), [result]);
   const stale = resultState.kind === 'stale' && geometry !== null;
-  const sampleCount = geometry === null ? 0 : totalSampleCount(geometry);
-  const clampedIndex = Math.min(markerFlatIndex, Math.max(sampleCount - 1, 0));
+  const markerState = useMemo(
+    () => (result === null ? null : markerAt(result, playbackT_s)),
+    [result, playbackT_s],
+  );
 
   const hookState = buildSceneHookState({
     resultKind: resultState.kind,
@@ -62,7 +67,7 @@ export function WorkspaceScene() {
     fallbackEpochIso: epochIso,
     scale: SCENE_SCALE,
     axesVisible,
-    markerFlatIndex: clampedIndex,
+    marker: markerState,
     camera: null,
   });
 
@@ -156,27 +161,9 @@ export function WorkspaceScene() {
           />
           Inertial axes (GCRF: X red, Y green, Z blue)
         </label>
-        <label className="flex items-center gap-2">
-          Marker sample
-          <input
-            type="range"
-            data-testid="option-marker-sample"
-            min={0}
-            max={Math.max(sampleCount - 1, 0)}
-            step={1}
-            value={clampedIndex}
-            disabled={sampleCount === 0}
-            onChange={(e) => {
-              optionsStore.getState().setMarkerFlatIndex(Number(e.target.value));
-            }}
-          />
-          <output data-testid="marker-readout" className="font-mono">
-            {marker === null
-              ? 'no trajectory'
-              : `#${String(clampedIndex)}, t = ${String(marker.t_s)} s`}
-          </output>
-        </label>
-        <p className="text-[11px] text-[#8c99a8]">Display options never start a simulation.</p>
+        <p className="text-[11px] text-[#8c99a8]">
+          Display options and playback never start a simulation.
+        </p>
       </div>
 
       <div data-testid="scene-summary" className="text-[#a8b3c0]">

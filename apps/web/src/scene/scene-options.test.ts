@@ -20,14 +20,13 @@ describe('display options (AC4)', () => {
     const before = scenarioStore.getState();
 
     options.getState().setAxesVisible(true);
-    options.getState().setMarkerFlatIndex(7);
     options.getState().setAxesVisible(false);
     await Promise.resolve();
 
     expect(requests).toHaveLength(0);
     expect(scenarioStore.getState().resultState).toBe(before.resultState);
     expect(scenarioStore.getState().scenario).toBe(before.scenario);
-    expect(options.getState().markerFlatIndex).toBe(7);
+    expect(options.getState().axesVisible).toBe(false);
   });
 
   it('the scene draws no trajectory for none, computing and error', () => {
