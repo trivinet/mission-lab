@@ -48,4 +48,43 @@ deliverables:
   - apps/web layout shell, editor, tests; the report section of this file
 human_approval_required: false
 
-report: {}
+report:
+  files_changed:
+    - "apps/web/src/App.tsx, index.css (tokens as CSS custom properties, dark only), layout/ (Toolbar, ResultStatus chip and banner, CenterRegion, ResultsColumn)"
+    - "apps/web/src/editor/ (Fields, ScenarioPanel, ManeuverPanel, DerivedPanel, issue-map, useIssues) and format/units.ts (m<->km, rad<->deg, UTC label)"
+    - "apps/web/src/state/scenario-store.ts: additions only (setElement, addManeuver, setManeuverTime_s, setManeuverDeltaV_mps, removeManeuver); five-state rules untouched"
+    - "apps/web/src/debug/DebugSurface.tsx removed; e2e/result-states.spec.ts adapted; e2e/editor.spec.ts new"
+  summary: >
+    Layout A shell (editor, centre, results), toolbar with Run and result chip, banner for none,
+    computing, stale and error. The centre region has data-testid scene-region and an empty
+    scene-container for ML-TASK-023. All scenario fields and the six elements are editable in
+    km and deg (converted once, stored SI); validation is live from the engine's
+    buildSimulationRequest, shown per field with the engine's code and message. One maneuver can
+    be added, edited and removed, with a UTC label and the RSW note. PARTIAL: derived quantities,
+    the degenerate-orbit note and angle normalisation are NOT done (see risks_or_blockers).
+  engine_exports_used:
+    - "@mission-lab/simulation: buildSimulationRequest (validation and request)"
+    - "@mission-lab/contracts: types; the M1 one-maneuver message comes via validation (MANEUVER_COUNT_EXCEEDED)"
+    - "Result events: ManeuverEvent.deltaV_magnitude_mps for total |dv| (shown after a run)"
+  acceptance_mapping:
+    - "AC1 pnpm install --frozen-lockfile, lint, typecheck, test, build, format:check, check:boundaries and web e2e exit 0; 26 e2e passed, VE-02 and ML-UX-003 adapted with the same assertions (state read from data-state)"
+    - "AC2 unit: format/units.test.ts (conversions, typed-once round trip), editor/issue-map.test.ts (engine issue classes mapped to fields, real engine), state/editor-setters.test.ts (setters stale the result). Angle normalisation test NOT done (blocked)"
+    - "AC3 e2e: editor.spec.ts covers editing each field class, 13 validation classes plus perigee, maneuver add/edit/remove, second-maneuver message, keyboard-only run. NOT covered: degenerate convention note, derived values distinct (blocked)"
+    - "AC4 no physics in apps/web: the diff has only unit scaling and a Date addition for the UTC label"
+  tests_executed:
+    - "pnpm install --frozen-lockfile, lint, typecheck, test, build, format:check, check:boundaries: exit 0"
+    - "pnpm --filter @mission-lab/web test:e2e: 26 passed (Chromium, built app)"
+    - "Looked at the built app in the Browser pane at 1440 px and narrow widths: layout, units, current chip"
+  not_verified:
+    - "Contrast of italic stale values not measured; no colour-blind check; Firefox and Safari not run"
+    - "Keyboard operation checked by Chromium e2e only, no screen reader pass"
+    - "Each keystroke edits the store, so the result goes stale per keystroke"
+  known_limitations:
+    - "Add maneuver can be pressed twice; the second shows the engine's MANEUVER_COUNT_EXCEEDED message and blocks the run until removed"
+    - "UTC label of the maneuver time is epoch + t_s by Date (documented time convention, no leap seconds); a display date addition, flagged for review"
+    - "Total |dv| appears only after a run (engine value)"
+  risks_or_blockers:
+    - "BLOCKER: ML-FR-002 AC3 and AC4 and angle normalisation need closedOrbitQuantities, the degeneracy thresholds and DegenerateConvention, and normalizeAngle_rad. They live only in @mission-lab/astrodynamics. apps/web may import only simulation and contracts (eslint boundaries, ADR-002, fixture web/imports-astrodynamics) and simulation does not re-export them. Not reimplemented. DerivedPanel shows dashes and a not-available note. Needed: re-export from simulation, or a decision to allow web to astrodynamics. The approved 1e-5 thresholds (ADR-008, tolerances.md section 15) are also needed as an export."
+    - "Angles outside [0, 360) deg currently get the engine's ANGLE_OUT_OF_RANGE field message instead of being normalised (FR-002 AC2 says normalised)"
+  documentation_changes: []
+  recommended_next_action: "Decide the export route for derived quantities, degeneracy and angle normalisation; then a small follow-up completes FR-002 AC3, AC4, normalisation and the missing tests."

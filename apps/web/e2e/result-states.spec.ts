@@ -11,14 +11,14 @@ async function recordStates(page: Page): Promise<void> {
     if (target === null) {
       throw new Error('no result-state element');
     }
-    const seen: string[] = [target.textContent];
+    const seen: string[] = [target.getAttribute('data-state') ?? ''];
     (window as unknown as { __states: string[] }).__states = seen;
     new MutationObserver(() => {
-      const text = target.textContent;
+      const text = target.getAttribute('data-state') ?? '';
       if (seen[seen.length - 1] !== text) {
         seen.push(text);
       }
-    }).observe(target, { childList: true, characterData: true, subtree: true });
+    }).observe(target, { attributes: true, attributeFilter: ['data-state'] });
   });
 }
 
@@ -29,37 +29,37 @@ async function recordedStates(page: Page): Promise<string[]> {
 test('VE-02: result state goes none -> computing -> current -> stale', async ({ page }) => {
   await page.goto('/');
   const state = page.getByTestId('result-state');
-  await expect(state).toHaveText('none');
+  await expect(state).toHaveAttribute('data-state', 'none');
   await recordStates(page);
 
   await page.getByTestId('run-button').click();
-  await expect(state).toHaveText('current');
+  await expect(state).toHaveAttribute('data-state', 'current');
   expect(await recordedStates(page)).toEqual(['none', 'computing', 'current']);
   // The default scenario: 6000 s at 60 s gives 101 samples (real engine, in the worker).
   await expect(page.getByTestId('sample-count')).toHaveText('101');
 
   // Editing the name (display only) keeps the result current.
   await page.getByTestId('input-name').fill('Renamed');
-  await expect(state).toHaveText('current');
+  await expect(state).toHaveAttribute('data-state', 'current');
 
   // Editing a physical parameter makes the result stale and does not recompute it.
-  await page.getByTestId('input-duration-s').fill('3000');
-  await expect(state).toHaveText('stale');
+  await page.getByTestId('input-duration').fill('3000');
+  await expect(state).toHaveAttribute('data-state', 'stale');
   await expect(page.getByTestId('sample-count')).toHaveText('101');
   expect(await recordedStates(page)).toEqual(['none', 'computing', 'current', 'stale']);
 
   // A new run recomputes: stale -> computing -> current, with the new duration (51 samples).
   await page.getByTestId('run-button').click();
-  await expect(state).toHaveText('current');
+  await expect(state).toHaveAttribute('data-state', 'current');
   await expect(page.getByTestId('sample-count')).toHaveText('51');
 });
 
 test('validation issues prevent the run and show per field', async ({ page }) => {
   await page.goto('/');
-  await page.getByTestId('input-duration-s').fill('-5');
+  await page.getByTestId('input-duration').fill('-5');
   await page.getByTestId('run-button').click();
-  await expect(page.getByTestId('issue-duration_s')).toBeVisible();
-  await expect(page.getByTestId('result-state')).toHaveText('none');
+  await expect(page.getByTestId('error-duration')).toBeVisible();
+  await expect(page.getByTestId('result-state')).toHaveAttribute('data-state', 'none');
 });
 
 /**
@@ -74,8 +74,8 @@ test('validation issues prevent the run and show per field', async ({ page }) =>
 test('ML-UX-003: the page responds to input while a run is in progress', async ({ page }) => {
   await page.goto('/');
   const state = page.getByTestId('result-state');
-  await page.getByTestId('input-duration-s').fill('6000');
-  await page.getByTestId('input-output-step-s').fill('0.01');
+  await page.getByTestId('input-duration').fill('6000');
+  await page.getByTestId('input-step').fill('0.01');
   await recordStates(page);
 
   await page.evaluate(() => {
@@ -94,21 +94,23 @@ test('ML-UX-003: the page responds to input while a run is in progress', async (
   });
 
   await page.getByTestId('run-button').click();
-  await expect(state).toHaveText('computing');
+  await expect(state).toHaveAttribute('data-state', 'computing');
 
   const pings = 5;
   let pingedWhileComputing = 0;
   for (let i = 0; i < pings; i += 1) {
-    await page.getByTestId('ping-button').click();
-    if ((await state.textContent()) === 'computing') {
+    // The probe edits the scenario name (display only): the toolbar shows it only after the main
+    // thread handled the input and React painted, so it proves the page responds during the run.
+    await page.getByTestId('input-name').fill(`ping ${String(i)}`);
+    await expect(page.getByTestId('scenario-name')).toHaveText(`ping ${String(i)}`);
+    if ((await state.getAttribute('data-state')) === 'computing') {
       pingedWhileComputing += 1;
     }
   }
-  await expect(page.getByTestId('ping-count')).toHaveText(String(pings));
   // At least one click was handled and painted while the run was still going.
   expect(pingedWhileComputing).toBeGreaterThan(0);
 
-  await expect(state).toHaveText('current', { timeout: 60_000 });
+  await expect(state).toHaveAttribute('data-state', 'current', { timeout: 60_000 });
   const maxGap_ms = await page.evaluate(() => {
     const w = window as unknown as { __maxFrameGap_ms: number; __stop: boolean };
     w.__stop = true;
