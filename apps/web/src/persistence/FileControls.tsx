@@ -6,8 +6,13 @@
 import { useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import { getScenarioStore, hasUnsavedChanges } from '../state/scenario-store';
+import { resultToCsv, csvFileName } from '../export/csv-export';
+import { PresetMenu } from '../presets/PresetMenu';
+import { loadPreset } from '../presets/presets';
+import type { Preset } from '../presets/presets';
 import { NoticeDialog } from './NoticeDialog';
 import type { NoticeDialogModel } from './NoticeDialog';
+import type { LoadResult } from './scenario-file';
 import {
   checkFileSize,
   describeIssue,
@@ -16,8 +21,8 @@ import {
   suggestedFileName,
 } from './scenario-file';
 
-function downloadText(text: string, fileName: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+function downloadText(text: string, fileName: string, mimeType = 'application/json'): void {
+  const url = URL.createObjectURL(new Blob([text], { type: mimeType }));
   const link = document.createElement('a');
   link.href = url;
   link.download = fileName;
@@ -51,6 +56,7 @@ export function FileControls() {
   const store = getScenarioStore();
   const [dialog, setDialog] = useState<NoticeDialogModel | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const canExport = useStore(store, (s) => s.resultState.kind === 'current');
 
   const dismiss = (): void => {
     setDialog(null);
@@ -89,7 +95,11 @@ export function FileControls() {
       });
       return;
     }
-    const parsed = parseScenarioBytes(new Uint8Array(await file.arrayBuffer()));
+    offerLoad(parseScenarioBytes(new Uint8Array(await file.arrayBuffer())), file.name);
+  };
+
+  /** A parsed file or preset: shown as an error, loaded, or loaded after a confirmation. */
+  const offerLoad = (parsed: LoadResult, sourceName: string): void => {
     if (!parsed.ok) {
       setDialog({
         title: 'Could not load the file',
@@ -106,7 +116,7 @@ export function FileControls() {
     }
     setDialog({
       title: 'Discard unsaved changes?',
-      message: `Loading "${file.name}" replaces the current scenario, which has unsaved changes. The changes are lost.`,
+      message: `Loading "${sourceName}" replaces the current scenario, which has unsaved changes. The changes are lost.`,
       confirm: {
         label: 'Discard and load',
         run: () => {
@@ -115,6 +125,25 @@ export function FileControls() {
       },
       testId: 'confirm-dialog',
     });
+  };
+
+  const onPreset = (preset: Preset): void => {
+    // The same validation function as a user's file (parseScenarioBytes), then the same
+    // confirmation when there are unsaved changes.
+    offerLoad(loadPreset(preset), preset.label);
+  };
+
+  const onExportCsv = (): void => {
+    const { resultState, scenario } = store.getState();
+    if (resultState.kind !== 'current') {
+      return;
+    }
+    const csv = resultToCsv(resultState.result);
+    if (!csv.ok) {
+      showError('The result has no samples to export.');
+      return;
+    }
+    downloadText(csv.text, csvFileName(scenario.name), 'text/csv');
   };
 
   const onSave = (): void => {
@@ -165,6 +194,20 @@ export function FileControls() {
       />
       <button type="button" data-testid="save-button" onClick={onSave}>
         Save
+      </button>
+      <PresetMenu onPick={onPreset} />
+      <button
+        type="button"
+        data-testid="export-csv-button"
+        disabled={!canExport}
+        title={
+          canExport
+            ? 'Download the current result as CSV (SI units, one row per sample)'
+            : 'Run the simulation first: CSV export needs a current result'
+        }
+        onClick={onExportCsv}
+      >
+        Export CSV
       </button>
       <NoticeDialog model={dialog} onDismiss={dismiss} />
     </>

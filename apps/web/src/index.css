@@ -601,3 +601,40 @@ table.cmp td.unit-cell {
   font-size: 11px;
   color: var(--text-3);
 }
+
+/* Presets menu (ML-TASK-034) */
+.preset-menu {
+  position: relative;
+  display: inline-block;
+}
+.preset-list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--s1));
+  z-index: 20;
+  min-width: 340px;
+  margin: 0;
+  padding: var(--s1);
+  list-style: none;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-input);
+  border-radius: var(--r2);
+}
+.preset-list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border-color: transparent;
+}
+.preset-label {
+  display: block;
+  font-weight: 600;
+}
+.preset-summary {
+  display: block;
+  font-size: 11px;
+  color: var(--text-3);
+}
+.cmp-copy {
+  margin: var(--s1) 0 var(--s3);
+}

@@ -1,6 +1,6 @@
 task_id: ML-TASK-035
 title: "VE-01: the 13-step release acceptance scenario as one end-to-end test"
-status: in_progress
+status: review
 requirement_ids: [ML-FR-001, ML-FR-002, ML-FR-004, ML-FR-005, ML-FR-006, ML-FR-007, ML-FR-008, ML-FR-009, ML-FR-010, ML-FR-011, ML-FR-012]
 owner_role: verification-engineer
 reviewer_role: systems-architect
@@ -34,4 +34,41 @@ deliverables:
   - the spec, ve-01-acceptance.md, the report section of this file
 human_approval_required: true   # gate G3 evidence
 
-report: {}
+report:
+  files_changed:
+    - apps/web/e2e/acceptance.spec.ts
+    - docs/verification/ve-01-acceptance.md
+    - docs/backlog/tasks/ML-TASK-035.yaml
+  summary: >
+    VE-01 as one Playwright test with 13 named test.step blocks, on the built app with the real
+    engine in the worker. Each step asserts what the user sees; the scene and plot hooks are used
+    for exactness (vertices against engine arrays, marker position, coast and maneuvered runs).
+    Step 12 compares the raw bytes of every engine position array (maneuvered and coast) and the
+    requestIds of the two worker requests between the first run and the run after save and
+    reload. No product change. This is a flow test, not numerical verification.
+  tests_executed:
+    - "pnpm install --frozen-lockfile: exit 0"
+    - "pnpm lint: exit 0"
+    - "pnpm typecheck: exit 0"
+    - "pnpm format:check: exit 0"
+    - "pnpm --filter @mission-lab/web test:e2e (playwright test): 72 passed (1 new)"
+    - "playwright test acceptance --repeat-each=3: 3 passed (run on 3 parallel workers)"
+  reference_data_used: []
+  not_verified:
+    - "Numerical correctness of any value (G1 and conformance runs own that)."
+    - "Visual correctness of the 3D scene; only vertex data is checked."
+    - "Comparison-table values beyond presence, structure and the sign of the differences in a, period and specific energy."
+    - "Velocities and the rest of the result against any reference; only positions are compared between runs."
+    - "Chromium only; same machine, build and session for reproducibility."
+    - "Slow-CI behaviour beyond local repeats (all waits are polls, no fixed sleeps)."
+  known_limitations:
+    - "requestId is not shown in the UI or the hooks. The spec reads it by wrapping Worker.prototype.postMessage and a message listener in the page (observation, no product change). It is not user-visible."
+    - "The saved file name has spaces replaced by hyphens; the spec asserts a pattern, the file name is not specified."
+    - "The maneuvered run has one more sample than the coast run because the maneuver instant is a sample of both segments; the spec asserts at-least-coast and equality between runs, not a fixed number."
+    - "ML-SYS-001 has no dedicated FR for reproducibility; step 12 is mapped to section 14 and the requestId contract."
+  documentation_changes:
+    - "docs/verification/ve-01-acceptance.md: new; step map, observability notes, not-proven list."
+  risks_or_blockers:
+    - "ML-TASK-034 changes table formatting in parallel; the spec avoids display formatting, except derived-panel text '7200 km'/'8800 km' and '100' in the delta-v cells, which a format change could affect."
+  review_artifact: ""
+  recommended_next_action: "Systems Architect reviews the step map; owner reads ve-01-acceptance.md for G3."
