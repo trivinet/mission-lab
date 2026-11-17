@@ -1,7 +1,7 @@
-# Gate G2 — Workspace Review Package
+# Gate G2 — Workspace Review Decision
 
 **Date:** 2026-11-17 · **Prepared by:** Coordinator · **Decision owner:** Product Owner
-**Status:** **Proposed**, for the owner's decision. Evidence at `main` f5289fd.
+**Status:** **APPROVED** by the owner on 2026-11-17 ("Apruebo G2"), on the evidence at `main` f5289fd and with the limits in section C. Phase 3 may start on tasks marked *ready*.
 
 Gate G2, from the [verification plan](../verification/m1-verification-plan.md) §8: "VI-01, VI-02,
 VE-02 pass". The backlog adds the Phase 2 tasks ML-TASK-020…026 and the owner-approved performance

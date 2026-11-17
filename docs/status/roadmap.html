@@ -41,7 +41,7 @@ h2 { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: up
 /* Gate track */
 .track { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding-top: 34px; }
 .track::before { content: ""; position: absolute; left: 10%; right: 10%; top: 45px; height: 3px; background: var(--line); border-radius: 2px; }
-.track::after { content: ""; position: absolute; left: 10%; width: 30%; top: 45px; height: 3px; background: var(--ok); border-radius: 2px; }
+.track::after { content: ""; position: absolute; left: 10%; width: 50%; top: 45px; height: 3px; background: var(--ok); border-radius: 2px; }
 .gate { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; min-width: 0; }
 .gate .dot { width: 25px; height: 25px; border-radius: 50%; border: 3px solid var(--idle); background: var(--bg); display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--bg); }
 .gate.passed .dot { background: var(--ok); border-color: var(--ok); }
@@ -49,7 +49,7 @@ h2 { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: up
 .gate b { font-family: var(--mono); font-size: 13px; }
 .gate span { font-size: 12px; color: var(--muted); line-height: 1.3; }
 .gate em { font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--ok); }
-.here { position: absolute; top: 0; left: 40%; transform: translateX(-50%); z-index: 2; font-family: var(--mono); font-size: 11px;
+.here { position: absolute; top: 0; left: 60%; transform: translateX(-50%); z-index: 2; font-family: var(--mono); font-size: 11px;
   background: var(--accent); color: var(--bg); padding: 3px 8px; border-radius: 3px; white-space: nowrap; font-weight: 500; }
 .here::after { content: ""; position: absolute; left: 50%; bottom: -5px; transform: translateX(-50%); border: 5px solid transparent; border-bottom: 0; border-top-color: var(--accent); }
 
@@ -106,11 +106,11 @@ h2 { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: up
 <div class="wrap">
   <header>
     <h1>Mission Lab · hoja de ruta</h1>
-    <div class="sub mono">Release M1 «Orbital Sandbox» · estado a 16 nov 2026</div>
+    <div class="sub mono">Release M1 «Orbital Sandbox» · estado a 17 nov 2026</div>
   </header>
 
   <section class="kpis" aria-label="Resumen">
-    <div class="kpi"><b>2<small> / 5</small></b><span>gates superados</span></div>
+    <div class="kpi"><b>3<small> / 5</small></b><span>gates superados</span></div>
     <div class="kpi"><b>26<small> / 36</small></b><span>tareas terminadas</span></div>
     <div class="kpi"><b>1792</b><span>tests en verde (CI)</span></div>
     <div class="kpi"><b>0.094</b><span>peor error / tolerancia</span></div>
@@ -119,11 +119,11 @@ h2 { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: up
   <section aria-label="Gates">
     <h2>Gates de aprobación</h2>
     <div class="track">
-      <div class="here">ESTÁS AQUÍ · fase 2</div>
+      <div class="here">ESTÁS AQUÍ · fase 3</div>
       <div class="gate passed"><div class="dot">✓</div><b>G0</b><span>Base aprobada</span><em>11 nov</em></div>
       <div class="gate passed"><div class="dot">✓</div><b>G1</b><span>Motor verificado</span><em>16 nov</em></div>
-      <div class="gate next"><div class="dot"></div><b>G2</b><span>Workspace usable</span></div>
-      <div class="gate"><div class="dot"></div><b>G3</b><span>Flujo M1 completo</span></div>
+      <div class="gate passed"><div class="dot">✓</div><b>G2</b><span>Workspace usable</span><em>17 nov</em></div>
+      <div class="gate next"><div class="dot"></div><b>G3</b><span>Flujo M1 completo</span></div>
       <div class="gate"><div class="dot"></div><b>G4</b><span>Release M1</span></div>
     </div>
   </section>
@@ -193,8 +193,8 @@ h2 { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: up
         <div class="gatebox"><b>G1</b> aprobado el 16 nov · VT-17 pasa a G3</div>
       </article>
 
-      <article class="phase current">
-        <div class="ph-top"><div><div class="tag">FASE 2 · M1</div><h3>Workspace interactivo</h3></div><span class="pill p-now">G2 pendiente</span></div>
+      <article class="phase">
+        <div class="ph-top"><div><div class="tag">FASE 2 · M1</div><h3>Workspace interactivo</h3></div><span class="pill p-done">completada</span></div>
         <div class="prog"><div class="bar"><i style="width:100%;background:var(--ok)"></i></div>8 / 8</div>
         <div class="lbl">Entregas</div>
         <div class="chips">
@@ -211,11 +211,11 @@ h2 { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: up
           <li><i class="s done"></i><span class="id">025</span>Panel de modelo y supuestos</li>
           <li><i class="s done"></i><span class="id">026</span>Integración y rendimiento medido</li>
         </ul>
-        <div class="gatebox"><b>G2</b> «Workspace usable»</div>
+        <div class="gatebox"><b>G2</b> aprobado el 17 nov</div>
       </article>
 
-      <article class="phase">
-        <div class="ph-top"><div><div class="tag">FASE 3 · M1</div><h3>Análisis y comparación</h3></div><span class="pill p-next">pendiente</span></div>
+      <article class="phase current">
+        <div class="ph-top"><div><div class="tag">FASE 3 · M1</div><h3>Análisis y comparación</h3></div><span class="pill p-now">siguiente</span></div>
         <div class="prog"><div class="bar"></div>0 / 6</div>
         <div class="lbl">Entregas</div>
         <div class="chips">
