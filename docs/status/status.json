@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
-  "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Owner decided the sample limit: keep 1,000,000 as a hard ceiling, with a soft UI warning above 250,000 samples; maneuver ids derived in the UI. ML-TASK-026 part B is implementing that; then gate G2.",
+  "phase": "Phase 3 — Analysis and comparison (gate G3)",
+  "headline": "Gate G2 passed on 2026-11-17: the workspace is usable end to end. Next: Phase 3 (charting library, analysis module, plots and comparison, persistence, presets and CSV, acceptance scenario).",
   "gates": [
     {
       "id": "G0",
@@ -18,12 +18,13 @@
     {
       "id": "G2",
       "name": "Workspace usable",
-      "state": "next"
+      "state": "passed",
+      "date": "2026-11-17"
     },
     {
       "id": "G3",
       "name": "M1 flow complete",
-      "state": "pending"
+      "state": "next"
     },
     {
       "id": "G4",
@@ -272,8 +273,8 @@
           "title": "Integration with real engine; performance envelope",
           "role": "Frontend + Verification",
           "model": "sonnet / opus",
-          "status": "in_review",
-          "deps": "Part A in PR #57; verification review running; owner decisions OA-38",
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PR #57)",
           "approval": true
         }
       ]
@@ -376,6 +377,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Owner",
+      "text": "Approved gate G2 (docs/releases/G2-review.md)."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #56 and PR #57 (ML-TASK-026 parts A and B; 1792 tests, 53 e2e, CI green). Phase 2 complete. Wrote the G2 review package (PR #58)."
+    },
     {
       "date": "2026-11-17",
       "who": "Owner",
