@@ -1,0 +1,402 @@
+{
+  "tokenMismatches": [],
+  "tokenPairs": [
+    {
+      "fg": "text",
+      "bg": "bg-base",
+      "ratio": 16.016082890827004,
+      "min": 4.5
+    },
+    {
+      "fg": "text",
+      "bg": "bg-panel",
+      "ratio": 14.652537511723892,
+      "min": 4.5
+    },
+    {
+      "fg": "text",
+      "bg": "bg-raised",
+      "ratio": 13.25140864381403,
+      "min": 4.5
+    },
+    {
+      "fg": "text",
+      "bg": "bg-input",
+      "ratio": 16.378290818827995,
+      "min": 4.5
+    },
+    {
+      "fg": "text-2",
+      "bg": "bg-base",
+      "ratio": 8.898325464244296,
+      "min": 4.5
+    },
+    {
+      "fg": "text-2",
+      "bg": "bg-panel",
+      "ratio": 8.140757546343782,
+      "min": 4.5
+    },
+    {
+      "fg": "text-2",
+      "bg": "bg-raised",
+      "ratio": 7.362308735295806,
+      "min": 4.5
+    },
+    {
+      "fg": "text-2",
+      "bg": "bg-input",
+      "ratio": 9.099563435541782,
+      "min": 4.5
+    },
+    {
+      "fg": "text-3",
+      "bg": "bg-base",
+      "ratio": 6.5218003816498245,
+      "min": 4.5
+    },
+    {
+      "fg": "text-3",
+      "bg": "bg-panel",
+      "ratio": 5.96656032486136,
+      "min": 4.5
+    },
+    {
+      "fg": "text-3",
+      "bg": "bg-raised",
+      "ratio": 5.39601615074818,
+      "min": 4.5
+    },
+    {
+      "fg": "text-3",
+      "bg": "bg-input",
+      "ratio": 6.669292613001,
+      "min": 4.5
+    },
+    {
+      "fg": "accent",
+      "bg": "bg-base",
+      "ratio": 7.869060609960299,
+      "min": 4.5
+    },
+    {
+      "fg": "accent",
+      "bg": "bg-panel",
+      "ratio": 7.199120194083764,
+      "min": 4.5
+    },
+    {
+      "fg": "accent",
+      "bg": "bg-raised",
+      "ratio": 6.510714167522644,
+      "min": 4.5
+    },
+    {
+      "fg": "accent",
+      "bg": "bg-input",
+      "ratio": 8.04702148580469,
+      "min": 4.5
+    },
+    {
+      "fg": "input-text",
+      "bg": "bg-base",
+      "ratio": 10.591985063114619,
+      "min": 4.5
+    },
+    {
+      "fg": "input-text",
+      "bg": "bg-panel",
+      "ratio": 9.690225726153958,
+      "min": 4.5
+    },
+    {
+      "fg": "input-text",
+      "bg": "bg-raised",
+      "ratio": 8.763611138707,
+      "min": 4.5
+    },
+    {
+      "fg": "input-text",
+      "bg": "bg-input",
+      "ratio": 10.831525591799414,
+      "min": 4.5
+    },
+    {
+      "fg": "current",
+      "bg": "bg-base",
+      "ratio": 8.793372493257845,
+      "min": 4.5
+    },
+    {
+      "fg": "current",
+      "bg": "bg-panel",
+      "ratio": 8.044739852452684,
+      "min": 4.5
+    },
+    {
+      "fg": "current",
+      "bg": "bg-raised",
+      "ratio": 7.275472602116177,
+      "min": 4.5
+    },
+    {
+      "fg": "current",
+      "bg": "bg-input",
+      "ratio": 8.992236925506008,
+      "min": 4.5
+    },
+    {
+      "fg": "computing",
+      "bg": "bg-base",
+      "ratio": 7.869060609960299,
+      "min": 4.5
+    },
+    {
+      "fg": "computing",
+      "bg": "bg-panel",
+      "ratio": 7.199120194083764,
+      "min": 4.5
+    },
+    {
+      "fg": "computing",
+      "bg": "bg-raised",
+      "ratio": 6.510714167522644,
+      "min": 4.5
+    },
+    {
+      "fg": "computing",
+      "bg": "bg-input",
+      "ratio": 8.04702148580469,
+      "min": 4.5
+    },
+    {
+      "fg": "stale",
+      "bg": "bg-base",
+      "ratio": 9.202899709024432,
+      "min": 4.5
+    },
+    {
+      "fg": "stale",
+      "bg": "bg-panel",
+      "ratio": 8.41940155544178,
+      "min": 4.5
+    },
+    {
+      "fg": "stale",
+      "bg": "bg-raised",
+      "ratio": 7.614307791961166,
+      "min": 4.5
+    },
+    {
+      "fg": "stale",
+      "bg": "bg-input",
+      "ratio": 9.411025706993374,
+      "min": 4.5
+    },
+    {
+      "fg": "error",
+      "bg": "bg-base",
+      "ratio": 7.505116067725495,
+      "min": 4.5
+    },
+    {
+      "fg": "error",
+      "bg": "bg-panel",
+      "ratio": 6.866160437716814,
+      "min": 4.5
+    },
+    {
+      "fg": "error",
+      "bg": "bg-raised",
+      "ratio": 6.209593232665257,
+      "min": 4.5
+    },
+    {
+      "fg": "error",
+      "bg": "bg-input",
+      "ratio": 7.674846242002673,
+      "min": 4.5
+    },
+    {
+      "fg": "warning",
+      "bg": "bg-base",
+      "ratio": 7.4763797564558585,
+      "min": 4.5
+    },
+    {
+      "fg": "warning",
+      "bg": "bg-panel",
+      "ratio": 6.8398706213055815,
+      "min": 4.5
+    },
+    {
+      "fg": "warning",
+      "bg": "bg-raised",
+      "ratio": 6.185817344007246,
+      "min": 4.5
+    },
+    {
+      "fg": "warning",
+      "bg": "bg-input",
+      "ratio": 7.64546005149388,
+      "min": 4.5
+    },
+    {
+      "fg": "coast",
+      "bg": "bg-base",
+      "ratio": 8.898325464244296,
+      "min": 3
+    },
+    {
+      "fg": "coast",
+      "bg": "bg-panel",
+      "ratio": 8.140757546343782,
+      "min": 3
+    },
+    {
+      "fg": "coast",
+      "bg": "bg-raised",
+      "ratio": 7.362308735295806,
+      "min": 3
+    },
+    {
+      "fg": "coast",
+      "bg": "bg-input",
+      "ratio": 9.099563435541782,
+      "min": 3
+    },
+    {
+      "fg": "maneuver",
+      "bg": "bg-base",
+      "ratio": 10.48288480115717,
+      "min": 3
+    },
+    {
+      "fg": "maneuver",
+      "bg": "bg-panel",
+      "ratio": 9.590413825093805,
+      "min": 3
+    },
+    {
+      "fg": "maneuver",
+      "bg": "bg-raised",
+      "ratio": 8.673343614231753,
+      "min": 3
+    },
+    {
+      "fg": "maneuver",
+      "bg": "bg-input",
+      "ratio": 10.719957998716286,
+      "min": 3
+    },
+    {
+      "fg": "marker",
+      "bg": "bg-base",
+      "ratio": 10.731637051347173,
+      "min": 3
+    },
+    {
+      "fg": "marker",
+      "bg": "bg-panel",
+      "ratio": 9.817988301442345,
+      "min": 3
+    },
+    {
+      "fg": "marker",
+      "bg": "bg-raised",
+      "ratio": 8.879156592399086,
+      "min": 3
+    },
+    {
+      "fg": "marker",
+      "bg": "bg-input",
+      "ratio": 10.97433584648474,
+      "min": 3
+    },
+    {
+      "fg": "focus",
+      "bg": "bg-base",
+      "ratio": 10.591985063114619,
+      "min": 3
+    },
+    {
+      "fg": "focus",
+      "bg": "bg-panel",
+      "ratio": 9.690225726153958,
+      "min": 3
+    },
+    {
+      "fg": "focus",
+      "bg": "bg-raised",
+      "ratio": 8.763611138707,
+      "min": 3
+    },
+    {
+      "fg": "focus",
+      "bg": "bg-input",
+      "ratio": 10.831525591799414,
+      "min": 3
+    },
+    {
+      "fg": "border-input",
+      "bg": "bg-base",
+      "ratio": 3.834250250165666,
+      "min": 3
+    },
+    {
+      "fg": "border-input",
+      "bg": "bg-panel",
+      "ratio": 3.507817485888908,
+      "min": 3
+    },
+    {
+      "fg": "border-input",
+      "bg": "bg-raised",
+      "ratio": 3.1723872343774957,
+      "min": 3
+    },
+    {
+      "fg": "border-input",
+      "bg": "bg-input",
+      "ratio": 3.9209628282670943,
+      "min": 3
+    }
+  ],
+  "dom": {
+    "none": {
+      "texts": 136,
+      "min": 5.96656032486136,
+      "below45": []
+    },
+    "current": {
+      "texts": 212,
+      "min": 5.96656032486136,
+      "below45": []
+    },
+    "stale": {
+      "texts": 218,
+      "min": 5.96656032486136,
+      "below45": []
+    },
+    "invalid": {
+      "texts": 195,
+      "min": 5.96656032486136,
+      "below45": []
+    },
+    "error": {
+      "texts": 154,
+      "min": 5.39601615074818,
+      "below45": []
+    },
+    "maneuver": {
+      "texts": 346,
+      "min": 5.39601615074818,
+      "below45": []
+    },
+    "dialog": {
+      "texts": 350,
+      "min": 5.39601615074818,
+      "below45": []
+    }
+  }
+}

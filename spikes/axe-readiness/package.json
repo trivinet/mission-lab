@@ -1,0 +1,13 @@
+{
+  "name": "mission-lab-axe-readiness",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "ML-TASK-040 throwaway accessibility harness. NOT a pnpm workspace member; installed with npm.",
+  "scripts": {
+    "axe": "node run-axe.mjs"
+  },
+  "dependencies": {
+    "axe-core": "4.11.1"
+  }
+}

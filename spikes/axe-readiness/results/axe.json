@@ -1,0 +1,1670 @@
+{
+  "axeVersion": "4.11.1",
+  "states": {
+    "1 none": {
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            {
+              "target": ["div[aria-label=\"Scenario editor\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Simulation view and analysis\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Results and assumptions\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".chip > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["button[data-testid=\"presets-button\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".banner > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".bg-\\[\\#151b23\\]\\/90"],
+              "reason": "Element's background color could not be determined because element contains an image node"
+            },
+            {
+              "target": ["li:nth-child(3) > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "passes": 46
+    },
+    "2 none + field error": {
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            {
+              "target": ["div[aria-label=\"Scenario editor\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Simulation view and analysis\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Results and assumptions\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".unsaved > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["#run-blocked > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".chip > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["button[data-testid=\"presets-button\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".msg-line > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["p[data-testid=\"rsw-note\"]"],
+              "reason": "Element's background color could not be determined because it partially overlaps other elements"
+            },
+            {
+              "target": [".banner > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".bg-\\[\\#151b23\\]\\/90"],
+              "reason": "Element's background color could not be determined because element contains an image node"
+            },
+            {
+              "target": ["li:nth-child(3) > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "passes": 46
+    },
+    "3 current (coast)": {
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            {
+              "target": ["div[aria-label=\"Scenario editor\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Simulation view and analysis\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Results and assumptions\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".chip > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["button[data-testid=\"presets-button\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".bg-\\[\\#151b23\\]\\/90"],
+              "reason": "Element's background color could not be determined because element contains an image node"
+            },
+            {
+              "target": ["li:nth-child(3) > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["li[data-testid=\"model-limitation\"]:nth-child(1)"],
+              "reason": "Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ],
+      "passes": 47
+    },
+    "4 stale": {
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            {
+              "target": ["div[aria-label=\"Scenario editor\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Simulation view and analysis\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Results and assumptions\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".unsaved > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".chip > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["button[data-testid=\"presets-button\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".banner > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".bg-\\[\\#151b23\\]\\/90"],
+              "reason": "Element's background color could not be determined because element contains an image node"
+            },
+            {
+              "target": ["li:nth-child(3) > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["p[data-testid=\"plots-stale-note\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "passes": 47
+    },
+    "5 maneuver added (stale)": {
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            {
+              "target": ["div[aria-label=\"Scenario editor\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Simulation view and analysis\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Results and assumptions\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".unsaved > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".chip > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["button[data-testid=\"presets-button\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".banner > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".bg-\\[\\#151b23\\]\\/90"],
+              "reason": "Element's background color could not be determined because element contains an image node"
+            },
+            {
+              "target": ["li:nth-child(3) > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["p[data-testid=\"plots-stale-note\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "passes": 47
+    },
+    "6 maneuver current + comparison": {
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            {
+              "target": ["div[aria-label=\"Scenario editor\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Simulation view and analysis\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Results and assumptions\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".unsaved > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".chip > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["button[data-testid=\"presets-button\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".bg-\\[\\#151b23\\]\\/90"],
+              "reason": "Element's background color could not be determined because element contains an image node"
+            },
+            {
+              "target": ["li:nth-child(3) > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["li[data-testid=\"model-limitation\"]:nth-child(1)"],
+              "reason": "Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ],
+      "passes": 52
+    },
+    "7 preset menu open": {
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            {
+              "target": ["div[aria-label=\"Scenario editor\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Simulation view and analysis\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Results and assumptions\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            }
+          ]
+        },
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": ["button[data-testid=\"presets-button\"]"],
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".unsaved > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".chip > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["button[data-testid=\"presets-button\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".bg-\\[\\#151b23\\]\\/90"],
+              "reason": "Element's background color could not be determined because element contains an image node"
+            },
+            {
+              "target": ["li:nth-child(3) > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["#h-diag"],
+              "reason": "Element's background color could not be determined because it is overlapped by another element"
+            },
+            {
+              "target": ["section[aria-labelledby=\"h-diag\"] > .note"],
+              "reason": "Element's background color could not be determined because it is overlapped by another element"
+            },
+            {
+              "target": ["#h-sum"],
+              "reason": "Element's background color could not be determined because it is overlapped by another element"
+            },
+            {
+              "target": ["section[aria-labelledby=\"h-sum\"] > dl > dt:nth-child(1)"],
+              "reason": "Element's background color could not be determined because it is overlapped by another element"
+            },
+            {
+              "target": ["section[aria-labelledby=\"h-sum\"] > dl > dt:nth-child(3)"],
+              "reason": "Element's background color could not be determined because it is overlapped by another element"
+            },
+            {
+              "target": ["li[data-testid=\"model-limitation\"]:nth-child(1)"],
+              "reason": "Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ],
+      "passes": 55
+    },
+    "8 error (failed run)": {
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            {
+              "target": ["div[aria-label=\"Scenario editor\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Simulation view and analysis\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Results and assumptions\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".unsaved > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".chip > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["button[data-testid=\"presets-button\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".banner > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".bg-\\[\\#151b23\\]\\/90"],
+              "reason": "Element's background color could not be determined because element contains an image node"
+            },
+            {
+              "target": ["li:nth-child(3) > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["b > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "passes": 46
+    },
+    "9 confirm dialog open": {
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": ["p[data-testid=\"notice-message\"]"],
+              "reason": "Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ],
+      "passes": 18
+    },
+    "10 error dialog open": {
+      "violations": [],
+      "incomplete": [],
+      "passes": 18
+    },
+    "11 current with warning diagnostic": {
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": [
+            {
+              "target": ["div[aria-label=\"Scenario editor\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Simulation view and analysis\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            },
+            {
+              "target": ["div[aria-label=\"Results and assumptions\"]"],
+              "reason": "aria-label attribute is not well supported on a div with no valid role attribute."
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [".unsaved > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".chip > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["button[data-testid=\"presets-button\"] > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": [".bg-\\[\\#151b23\\]\\/90"],
+              "reason": "Element's background color could not be determined because element contains an image node"
+            },
+            {
+              "target": ["li:nth-child(3) > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            },
+            {
+              "target": ["b > span[aria-hidden=\"true\"]"],
+              "reason": "Element content contains only non-text characters"
+            }
+          ]
+        }
+      ],
+      "passes": 52
+    }
+  },
+  "structure": {
+    "controls": [
+      {
+        "tag": "a",
+        "type": null,
+        "role": null,
+        "testid": null,
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Skip to workspace",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "new-scenario-button",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "New scenario",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "load-button",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Load…",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "file",
+        "role": null,
+        "testid": "load-input",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "",
+        "tabindex": "-1",
+        "hidden": "true"
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "save-button",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Save",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "presets-button",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Presets ▾",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "export-csv-button",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Export CSV",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "run-button",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Run simulation",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "main",
+        "type": null,
+        "role": null,
+        "testid": "workspace",
+        "ariaLabel": "Workspace",
+        "labelledby": null,
+        "labels": [],
+        "text": "Scenario editableNameDisplay only: chang",
+        "tabindex": "-1",
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "text",
+        "role": null,
+        "testid": "input-name",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Name"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "text",
+        "role": null,
+        "testid": "input-epoch",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Epoch (UTC)"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "text",
+        "role": null,
+        "testid": "input-duration",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Duration"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "text",
+        "role": null,
+        "testid": "input-step",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Output step"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "text",
+        "role": null,
+        "testid": "input-a",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Semi-major axis a"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "text",
+        "role": null,
+        "testid": "input-e",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Eccentricity e"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "text",
+        "role": null,
+        "testid": "input-i",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Inclination i"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "text",
+        "role": null,
+        "testid": "input-raan",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["RAAN Ω"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "text",
+        "role": null,
+        "testid": "input-argp",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Arg. of perigee ω"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "text",
+        "role": null,
+        "testid": "input-nu",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["True anomaly ν"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "add-maneuver",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Add maneuver",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "canvas",
+        "type": null,
+        "role": "img",
+        "testid": null,
+        "ariaLabel": "Orbit view, inertial GCRF axes, +Z up. Arrow keys orbit, plus and minus zoom, Home resets the camera.",
+        "labelledby": null,
+        "labels": [],
+        "text": "",
+        "tabindex": "0",
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "camera-reset",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Reset camera",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "option-axes",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Inertial axes (GCRF: X red, Y green, Z blue)"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "playback-start",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Jump to start",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "playback-toggle",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Play",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "playback-maneuver",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Next maneuver",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "button",
+        "type": "button",
+        "role": null,
+        "testid": "playback-end",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": [],
+        "text": "Jump to end",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "select",
+        "type": null,
+        "role": null,
+        "testid": "playback-rate",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Rate1 s/s10 s/s60 s/s300 s/s1000 s/s"],
+        "text": "1 s/s10 s/s60 s/s300 s/s1000 s/s",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "range",
+        "role": null,
+        "testid": "playback-slider",
+        "ariaLabel": "Playback time, seconds since epoch",
+        "labelledby": null,
+        "labels": ["Time"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-radius_m",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Radius"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-altitude_m",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Altitude above the reference sphere"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-speed_mps",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Speed"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-trueAnomaly_rad",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["True anomaly"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-semiMajorAxis_m",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Semi-major axis"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-eccentricity",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Eccentricity"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-inclination_rad",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Inclination"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-raan_rad",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["RAAN"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-argPeriapsis_rad",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Argument of periapsis"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-specificEnergy_m2ps2",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Specific orbital energy"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-periapsisRadius_m",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Periapsis radius"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-apoapsisRadius_m",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Apoapsis radius"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      },
+      {
+        "tag": "input",
+        "type": "checkbox",
+        "role": null,
+        "testid": "plot-toggle-period_s",
+        "ariaLabel": null,
+        "labelledby": null,
+        "labels": ["Orbital period"],
+        "text": "",
+        "tabindex": null,
+        "hidden": null
+      }
+    ],
+    "tabOrder": [
+      {
+        "testid": "skip",
+        "tag": "a",
+        "name": "Skip to workspace",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 8,
+        "y": 8,
+        "w": 128,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "new-scenario-button",
+        "tag": "button",
+        "name": "New scenario",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 860,
+        "y": 8,
+        "w": 103,
+        "h": 29,
+        "inViewport": true
+      },
+      {
+        "testid": "load-button",
+        "tag": "button",
+        "name": "Load…",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 975,
+        "y": 8,
+        "w": 64,
+        "h": 29,
+        "inViewport": true
+      },
+      {
+        "testid": "save-button",
+        "tag": "button",
+        "name": "Save",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 1050,
+        "y": 8,
+        "w": 53,
+        "h": 29,
+        "inViewport": true
+      },
+      {
+        "testid": "presets-button",
+        "tag": "button",
+        "name": "Presets ▾",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 1115,
+        "y": 8,
+        "w": 81,
+        "h": 29,
+        "inViewport": true
+      },
+      {
+        "testid": "run-button",
+        "tag": "button",
+        "name": "Run simulation",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 1309,
+        "y": 8,
+        "w": 115,
+        "h": 29,
+        "inViewport": true
+      },
+      {
+        "testid": "input-name",
+        "tag": "input",
+        "name": "Name",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "1px",
+        "x": 204,
+        "y": 93,
+        "w": 130,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "input-epoch",
+        "tag": "input",
+        "name": "Epoch (UTC)",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "1px",
+        "x": 22,
+        "y": 169,
+        "w": 275,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "input-duration",
+        "tag": "input",
+        "name": "Duration",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "1px",
+        "x": 204,
+        "y": 224,
+        "w": 108,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "input-step",
+        "tag": "input",
+        "name": "Output step",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "1px",
+        "x": 204,
+        "y": 260,
+        "w": 108,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "input-a",
+        "tag": "input",
+        "name": "Semi-major axis a",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "1px",
+        "x": 204,
+        "y": 389,
+        "w": 98,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "input-e",
+        "tag": "input",
+        "name": "Eccentricity e",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "1px",
+        "x": 204,
+        "y": 425,
+        "w": 109,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "input-i",
+        "tag": "input",
+        "name": "Inclination i",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "1px",
+        "x": 204,
+        "y": 462,
+        "w": 94,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "input-raan",
+        "tag": "input",
+        "name": "RAAN Ω",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "1px",
+        "x": 204,
+        "y": 499,
+        "w": 94,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "input-argp",
+        "tag": "input",
+        "name": "Arg. of perigee ω",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "1px",
+        "x": 204,
+        "y": 536,
+        "w": 94,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "input-nu",
+        "tag": "input",
+        "name": "True anomaly ν",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "1px",
+        "x": 204,
+        "y": 573,
+        "w": 94,
+        "h": 27,
+        "inViewport": true
+      },
+      {
+        "testid": "add-maneuver",
+        "tag": "button",
+        "name": "Add maneuver",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 21,
+        "y": 731,
+        "w": 110,
+        "h": 29,
+        "inViewport": true
+      },
+      {
+        "testid": "",
+        "tag": "canvas",
+        "name": "Orbit view, inertial GCRF axes, +Z up. Arrow keys orbit, plus and minus zoom, Home resets the camera.",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 371,
+        "y": 0,
+        "w": 698,
+        "h": 418,
+        "inViewport": true
+      },
+      {
+        "testid": "camera-reset",
+        "tag": "button",
+        "name": "Reset camera",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 370,
+        "y": 427,
+        "w": 102,
+        "h": 29,
+        "inViewport": true
+      },
+      {
+        "testid": "option-axes",
+        "tag": "input",
+        "name": "Inertial axes (GCRF: X red, Y green, Z b",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 484,
+        "y": 435,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "playback-rate",
+        "tag": "select",
+        "name": "Rate1 s/s10 s/s60 s/s300 s/s1000 s/s",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 798,
+        "y": 613,
+        "w": 68,
+        "h": 19,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-radius_m",
+        "tag": "input",
+        "name": "Radius",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 382,
+        "y": 836,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-altitude_m",
+        "tag": "input",
+        "name": "Altitude above the reference sphere",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 453,
+        "y": 836,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-speed_mps",
+        "tag": "input",
+        "name": "Speed",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 691,
+        "y": 836,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-trueAnomaly_rad",
+        "tag": "input",
+        "name": "True anomaly",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 760,
+        "y": 836,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-semiMajorAxis_m",
+        "tag": "input",
+        "name": "Semi-major axis",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 870,
+        "y": 836,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-eccentricity",
+        "tag": "input",
+        "name": "Eccentricity",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 382,
+        "y": 864,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-inclination_rad",
+        "tag": "input",
+        "name": "Inclination",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 480,
+        "y": 864,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-raan_rad",
+        "tag": "input",
+        "name": "RAAN",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 572,
+        "y": 864,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-argPeriapsis_rad",
+        "tag": "input",
+        "name": "Argument of periapsis",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 640,
+        "y": 864,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-specificEnergy_m2ps2",
+        "tag": "input",
+        "name": "Specific orbital energy",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 800,
+        "y": 864,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-periapsisRadius_m",
+        "tag": "input",
+        "name": "Periapsis radius",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 382,
+        "y": 887,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-apoapsisRadius_m",
+        "tag": "input",
+        "name": "Apoapsis radius",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 503,
+        "y": 887,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      },
+      {
+        "testid": "plot-toggle-period_s",
+        "tag": "input",
+        "name": "Orbital period",
+        "outlineStyle": "solid",
+        "outlineWidth": "2px",
+        "outlineColor": "rgb(156, 196, 255)",
+        "outlineOffset": "2px",
+        "x": 627,
+        "y": 887,
+        "w": 13,
+        "h": 13,
+        "inViewport": true
+      }
+    ],
+    "hasTabTrapOrWrap": 34,
+    "staleOpacity": [],
+    "tabOrderManeuverRun": [
+      "input-name",
+      "input-epoch",
+      "input-duration",
+      "input-step",
+      "input-a",
+      "input-e",
+      "input-i",
+      "input-raan",
+      "input-argp",
+      "input-nu",
+      "input-m0-time",
+      "input-m0-dv-r",
+      "input-m0-dv-s",
+      "input-m0-dv-w",
+      "remove-maneuver-0",
+      "add-maneuver",
+      "CANVAS",
+      "camera-reset",
+      "option-axes",
+      "playback-start",
+      "playback-toggle",
+      "playback-maneuver",
+      "playback-end",
+      "playback-rate",
+      "playback-slider",
+      "plot-toggle-radius_m",
+      "plot-toggle-altitude_m",
+      "plot-toggle-speed_mps",
+      "plot-toggle-trueAnomaly_rad",
+      "plot-toggle-semiMajorAxis_m",
+      "plot-toggle-eccentricity",
+      "plot-toggle-inclination_rad",
+      "plot-toggle-raan_rad",
+      "plot-toggle-argPeriapsis_rad",
+      "plot-toggle-specificEnergy_m2ps2",
+      "plot-toggle-periapsisRadius_m",
+      "plot-toggle-apoapsisRadius_m",
+      "plot-toggle-period_s",
+      "cmp-copy-exact",
+      "model-toggle",
+      "BODY",
+      "A",
+      "new-scenario-button",
+      "load-button",
+      "save-button",
+      "presets-button",
+      "export-csv-button",
+      "run-button",
+      "input-name",
+      "input-epoch",
+      "input-duration",
+      "input-step",
+      "input-a",
+      "input-e",
+      "input-i",
+      "input-raan",
+      "input-argp",
+      "input-nu",
+      "input-m0-time",
+      "input-m0-dv-r",
+      "input-m0-dv-s",
+      "input-m0-dv-w",
+      "remove-maneuver-0",
+      "add-maneuver",
+      "CANVAS",
+      "camera-reset",
+      "option-axes",
+      "playback-start",
+      "playback-toggle",
+      "playback-maneuver",
+      "playback-end",
+      "playback-rate",
+      "playback-slider",
+      "plot-toggle-radius_m",
+      "plot-toggle-altitude_m",
+      "plot-toggle-speed_mps",
+      "plot-toggle-trueAnomaly_rad",
+      "plot-toggle-semiMajorAxis_m",
+      "plot-toggle-eccentricity",
+      "plot-toggle-inclination_rad",
+      "plot-toggle-raan_rad",
+      "plot-toggle-argPeriapsis_rad",
+      "plot-toggle-specificEnergy_m2ps2",
+      "plot-toggle-periapsisRadius_m",
+      "plot-toggle-apoapsisRadius_m",
+      "plot-toggle-period_s",
+      "cmp-copy-exact",
+      "model-toggle",
+      "BODY",
+      "A",
+      "new-scenario-button",
+      "load-button",
+      "save-button",
+      "presets-button",
+      "export-csv-button",
+      "run-button",
+      "input-name",
+      "input-epoch",
+      "input-duration",
+      "input-step",
+      "input-a",
+      "input-e",
+      "input-i",
+      "input-raan",
+      "input-argp",
+      "input-nu",
+      "input-m0-time",
+      "input-m0-dv-r",
+      "input-m0-dv-s",
+      "input-m0-dv-w",
+      "remove-maneuver-0",
+      "add-maneuver",
+      "CANVAS",
+      "camera-reset",
+      "option-axes",
+      "playback-start",
+      "playback-toggle",
+      "playback-maneuver",
+      "playback-end",
+      "playback-rate"
+    ],
+    "reflow": {
+      "400": {
+        "scrollWidth": 441,
+        "clientWidth": 400,
+        "bodyScrollW": 441
+      },
+      "768": {
+        "scrollWidth": 768,
+        "clientWidth": 768,
+        "bodyScrollW": 768
+      },
+      "1024": {
+        "scrollWidth": 1024,
+        "clientWidth": 1024,
+        "bodyScrollW": 1024
+      },
+      "1280": {
+        "scrollWidth": 1280,
+        "clientWidth": 1280,
+        "bodyScrollW": 1280
+      }
+    }
+  }
+}
