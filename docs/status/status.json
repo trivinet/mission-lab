@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 2 — Interactive workspace (gate G2)",
-  "headline": "Phase 2 is 7 of 8: editor, 3D scene, timeline, model panel and the simulation API are merged. Left before gate G2: ML-TASK-026 (integration with the real engine, measured performance envelope, sample limit).",
+  "headline": "Owner decided the sample limit: keep 1,000,000 as a hard ceiling, with a soft UI warning above 250,000 samples; maneuver ids derived in the UI. ML-TASK-026 part B is implementing that; then gate G2.",
   "gates": [
     {
       "id": "G0",
@@ -272,8 +272,8 @@
           "title": "Integration with real engine; performance envelope",
           "role": "Frontend + Verification",
           "model": "sonnet / opus",
-          "status": "todo",
-          "deps": "017, 022–024",
+          "status": "in_review",
+          "deps": "Part A in PR #57; verification review running; owner decisions OA-38",
           "approval": true
         }
       ]
@@ -376,6 +376,36 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Owner",
+      "text": "Decided ML-TASK-026: keep 1,000,000 samples as the hard limit, add a soft warning above 250,000; deterministic maneuver ids derived in apps/web (no contract change)."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Verification",
+      "text": "Reviewed the performance record: sound with notes, no blocking finding; all medians recomputed from the raw JSON match. Notes N1–N7 applied to performance-envelope.md (PR #57)."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Verification",
+      "text": "Bounded review of the ML-TASK-026 performance record started (Sonnet): method, medians recomputed from raw data, honesty of the envelope, the limit recommendation, the worker timing hook."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-026 part A: 18/18 measured runs 1e3…1e6 samples (engine ~1.4 µs/sample, transfer ≤ 3.2 ms, responsive during runs, ~0.5 s geometry pause and <3 fps software-WebGL playback at 1e6); proposed limit: keep 1,000,000; VI-01 integration test added; model panel readability fixed. Deterministic maneuver ids blocked: no counter field in the Scenario schema."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-026 part A started (Sonnet): reproducible performance harness (1e3…1e6 samples, ≥ 3 repetitions), performance-envelope.md with a Proposed limit, G2 evidence list, deterministic maneuver ids (contracts §14), model-panel readability."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #55 (status). Wrote the ML-TASK-026 contract: part A measures and proposes, part B sets the limit after the owner decides."
+    },
     {
       "date": "2026-11-17",
       "who": "Owner",
