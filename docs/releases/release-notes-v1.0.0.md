@@ -85,10 +85,30 @@ From G3 (`docs/releases/G3-review.md`):
 - Flight-path angle and mean anomaly histories are not provided. ML-SYS-001 section 2.2 lists
   them; ML-FR-009 AC1 does not.
 - No screen-reader test; real OS file dialogs and downloads were not tested outside Playwright.
-- Analysis and plot construction run on the main thread and were not measured near the
-  1,000,000-sample limit.
+- Analysis and plot construction ran on the main thread and were not measured near the
+  1,000,000-sample limit. Superseded: ML-TASK-044 moved the analysis into the simulation worker and
+  re-measured the envelope (`docs/verification/performance-envelope.md` section 8).
 - VE-01 is a flow test, not numerical verification.
 - Readings 5 to 9 of conformance run 5 section 4 have had no separate Systems Architect review.
+
+From the release-readiness review (ML-TASK-040, `docs/verification/release-readiness-review.md`),
+accepted by the owner for M1 on 2026-11-17 (finding ids as in that review):
+
+- D-4: physically implausible inputs are accepted. A burn of 1e12 m/s (about 3000 times the speed
+  of light) and a semi-major axis of 1e300 km both give a current result (an ESCAPE_TRAJECTORY
+  warning only for the burn). Overflow is caught only far out: burns of 1e154 and 1e300 m/s give
+  the error state with NON_FINITE_STATE. No plausibility limits on inputs in M1.
+- D-5: impact is a warning, not a stop. After a burn that lowers the periapsis below the reference
+  sphere, the run is current and the samples continue through the Earth's interior with a
+  REFERENCE_SPHERE_INTERSECTION warning; the part of the trajectory after the impact is not
+  marked in the 3D view (marking it is a candidate for M2). Read the warning before trusting such a trajectory.
+- D-8: the layout is desktop-first and does not reflow at narrow widths: the document is wider
+  than a 400 px viewport and scrolls horizontally (WCAG 1.4.10 asks for none at 320 CSS px).
+  Zooming to 400 per cent scrolls in two dimensions.
+- D-10: `pnpm audit --audit-level high` exits 1 (picomatch ReDoS, high, no patched version
+  listed; minimatch, moderate). Both are reached only through development tooling (eslint,
+  typescript-eslint, Vite); `pnpm audit --prod` reports no known vulnerabilities. The CI audit
+  job is informational. To be tracked upstream.
 
 Product limits (the model panel lists them): two-body point-mass Earth only; one maneuver;
 impulsive only; GCRF frame only; UTC labels without leap seconds; altitude above a reference
@@ -96,11 +116,13 @@ sphere; illustrative Earth orientation; at most 1,000,000 samples per run, with 
 above 250,000; scenario files up to 64 KiB.
 
 Gaps in evidence found while writing the traceability matrix (see its section 5): no direct test
-that a state declares frame, central body and epoch (ML-FR-003 AC3); no test of plot axis titles
-and units (ML-FR-009 AC2); no end-to-end test of the error state (ML-UX-001); no review record
-for ML-NFR-002; no lint rule against clocks and randomness (ML-NFR-003); no secret scan, and the
-audit job is informational (ML-NFR-006). These are not owner-accepted. They are listed for the
-owner to accept, fix or defer.
+that a state declares frame, central body and epoch (ML-FR-003 AC3); no end-to-end test of the
+error state (ML-UX-001); no review record for ML-NFR-002; no secret scan, and the audit job is
+informational (ML-NFR-006). These are not owner-accepted. They are listed for the owner to
+accept, fix or defer. Two gaps of that list were closed by ML-TASK-044: an end-to-end test of
+plot axis titles, units, legend and maneuver marker (ML-FR-009 AC2), and a lint rule against
+clock and randomness reads in the engine packages (ML-NFR-003, with fixtures; `Date.parse` and
+`new Date(value)` with an argument stay allowed because they read no clock).
 
 ## 4. Owner decisions that shape the release
 
