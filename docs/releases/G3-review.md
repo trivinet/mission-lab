@@ -1,7 +1,7 @@
-# Gate G3 — Analysis Review Package
+# Gate G3 — Analysis Review Decision
 
 **Date:** 2026-11-17 · **Prepared by:** Coordinator · **Decision owner:** Product Owner
-**Status:** **Proposed**, for the owner's decision. Evidence at `main` 3e7e502.
+**Status:** **APPROVED** by the owner on 2026-11-17 ("apruebo G3"), on the evidence at `main` 3e7e502 and with the limits in section C; the optional review of run-5 readings was not requested. Phase 4 may start.
 
 Gate G3, from the [verification plan](../verification/m1-verification-plan.md) §8: "VI-03, VE-01
 pass; VT-17 and the FR-011 AC3 part of VT-18 pass (moved from G1 with persistence, ML-TASK-033)".
