@@ -35,3 +35,29 @@ test('the large-run note shows at 259 201 samples, not at the default, and never
   });
   await expect(page.getByTestId('sample-count')).toContainText('259');
 });
+
+/**
+ * ML-TASK-044, D-2 and D-3. Above the engine's hard limit (1 000 000) the run is refused, so the
+ * "not blocked" note must not be shown; at the limit it still is. The toolbar text agrees in
+ * number with its subject.
+ */
+test('D-2: no large-run note above the hard limit; D-3: "1 problem prevents the run"', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByTestId('input-duration').fill('999999');
+  await page.getByTestId('input-step').fill('1');
+  await expect(page.getByTestId('sample-warning')).toHaveAttribute('data-count', '1000000');
+  await expect(page.getByTestId('run-blocked')).toHaveCount(0);
+
+  await page.getByTestId('input-duration').fill('1000000');
+  await expect(page.getByTestId('error-step')).toContainText('SAMPLE_COUNT_EXCEEDED');
+  await expect(page.getByTestId('sample-warning')).toHaveCount(0);
+  await expect(page.getByTestId('sample-warning-run')).toHaveCount(0);
+  await expect(page.getByTestId('run-blocked')).toContainText('1 problem prevents the run');
+
+  // Two problems: plural subject, plural verb.
+  await page.getByTestId('input-duration').fill('-5');
+  await page.getByTestId('input-step').fill('0');
+  await expect(page.getByTestId('run-blocked')).toContainText('2 problems prevent the run');
+});

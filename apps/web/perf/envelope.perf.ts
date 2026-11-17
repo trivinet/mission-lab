@@ -48,7 +48,7 @@ interface PerfPage {
   messages: {
     type: string;
     at: number;
-    timing?: { engine_ms: number; workerPostedAt_ms: number } | undefined;
+    timing?: { engine_ms: number; analysis_ms?: number; workerPostedAt_ms: number } | undefined;
   }[];
   frames: number[];
   longTasks: { start: number; duration: number }[];
@@ -64,6 +64,8 @@ interface Rep {
   n: number;
   // Latencies, ms.
   engine_ms?: number | undefined;
+  /** Worker time computing and packing the histories (ML-TASK-044); absent before that task. */
+  analysis_ms?: number | undefined;
   transfer_ms?: number | undefined;
   clickToWorkerPost_ms?: number | undefined;
   clickToCurrent_ms?: number | undefined;
@@ -299,6 +301,7 @@ async function measureOnce(browser: import('@playwright/test').Browser, n: numbe
       ok: true,
       n,
       engine_ms: resultMsg?.timing?.engine_ms,
+      analysis_ms: resultMsg?.timing?.analysis_ms,
       transfer_ms:
         resultMsg?.timing === undefined
           ? undefined
@@ -338,6 +341,7 @@ async function measureOnce(browser: import('@playwright/test').Browser, n: numbe
 
 const METRICS: readonly (keyof Rep)[] = [
   'engine_ms',
+  'analysis_ms',
   'transfer_ms',
   'clickToCurrent_ms',
   'currentToFirstFrame_ms',
@@ -452,7 +456,7 @@ test.afterAll(() => {
   writeFileSync(file, JSON.stringify({ environment, results }, null, 2));
   console.log(`raw data: ${file}`);
   console.log(
-    '| N | reps ok | engine | transfer | click->current | current->frame | click->frame | max rAF gap in run | max long task | probe median | probe max | playback frame med/p95/max | heap before->after (MB) |',
+    '| N | reps ok | engine | analysis (worker) | transfer | click->current | current->frame | click->frame | max rAF gap in run | max long task | probe median | probe max | playback frame med/p95/max | heap before->after (MB) |',
   );
   for (const r of results) {
     const s = r.summary;
@@ -462,7 +466,7 @@ test.afterAll(() => {
         : `${s[k].median.toFixed(1)} [${s[k].min.toFixed(1)}-${s[k].max.toFixed(1)}]`;
     const failed = r.reps.find((x) => !x.ok);
     console.log(
-      `| ${String(r.n)} | ${String(r.reps.filter((x) => x.ok).length)}/${String(r.reps.length)}${failed ? ` FAIL: ${failed.failure ?? ''}` : ''} | ${f('engine_ms')} | ${f('transfer_ms')} | ${f('clickToCurrent_ms')} | ${f('currentToFirstFrame_ms')} | ${f('clickToFirstFrame_ms')} | ${f('maxFrameGapDuringRun_ms')} | ${f('maxLongTaskDuringRun_ms')} | ${f('probeMedian_ms')} | ${f('probeMax_ms')} | ${f('playbackFrameMedian_ms')} / ${f('playbackFrameP95_ms')} / ${f('playbackFrameMax_ms')} | ${f('heapBefore_MB')} -> ${f('heapAfter_MB')} |`,
+      `| ${String(r.n)} | ${String(r.reps.filter((x) => x.ok).length)}/${String(r.reps.length)}${failed ? ` FAIL: ${failed.failure ?? ''}` : ''} | ${f('engine_ms')} | ${f('analysis_ms')} | ${f('transfer_ms')} | ${f('clickToCurrent_ms')} | ${f('currentToFirstFrame_ms')} | ${f('clickToFirstFrame_ms')} | ${f('maxFrameGapDuringRun_ms')} | ${f('maxLongTaskDuringRun_ms')} | ${f('probeMedian_ms')} | ${f('probeMax_ms')} | ${f('playbackFrameMedian_ms')} / ${f('playbackFrameP95_ms')} / ${f('playbackFrameMax_ms')} | ${f('heapBefore_MB')} -> ${f('heapAfter_MB')} |`,
     );
   }
 });

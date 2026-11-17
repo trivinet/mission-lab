@@ -9,7 +9,7 @@ import { ResultBanner } from './ResultStatus';
  */
 export function CenterRegion() {
   return (
-    <div className="col" aria-label="Simulation view and analysis">
+    <div className="col" role="group" aria-label="Simulation view and analysis">
       <ResultBanner />
       <section className="panel vp" aria-labelledby="h-vp" data-testid="scene-region">
         <h2 id="h-vp">Simulation view (3D)</h2>

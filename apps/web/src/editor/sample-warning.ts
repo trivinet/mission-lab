@@ -7,7 +7,7 @@
  * own `sampleCount`; the UI computes nothing about the grid.
  */
 import type { Scenario } from '@mission-lab/contracts';
-import { sampleCount } from '@mission-lab/simulation';
+import { PROVISIONAL_MAX_SAMPLE_COUNT, sampleCount } from '@mission-lab/simulation';
 
 /** Samples above which the note is shown. Owner decision of 2026-11-17 (ML-TASK-026). */
 export const SOFT_SAMPLE_WARNING_THRESHOLD = 250_000;
@@ -39,10 +39,18 @@ export function formatCount(count: number): string {
   return String(count).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 
-/** The sample count when the note applies (above the threshold), else null. */
+/**
+ * The sample count when the note applies, else null: above the threshold and within the engine's
+ * hard limit. Above the limit the run is refused (SAMPLE_COUNT_EXCEEDED), and a note saying that
+ * the run is not blocked would contradict the error (release-readiness D-2).
+ */
 export function softWarningCount(scenario: Scenario): number | null {
   const count = scenarioSampleCount(scenario);
-  return count !== null && count > SOFT_SAMPLE_WARNING_THRESHOLD ? count : null;
+  return count !== null &&
+    count > SOFT_SAMPLE_WARNING_THRESHOLD &&
+    count <= PROVISIONAL_MAX_SAMPLE_COUNT
+    ? count
+    : null;
 }
 
 export function softWarningText(count: number): string {

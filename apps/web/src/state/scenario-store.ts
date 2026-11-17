@@ -16,6 +16,7 @@ import { buildCoastRequest, buildSimulationRequest } from '@mission-lab/simulati
 import { createStore } from 'zustand/vanilla';
 import type { StoreApi } from 'zustand/vanilla';
 import { serialiseScenario } from '../persistence/scenario-file';
+import { attachAnalysis } from '../plots/analysis-model';
 import { createBrowserWorkerRunner } from '../worker/worker-runner';
 import type { SimulationRunner } from '../worker/worker-runner';
 import { nextManeuverId } from './maneuver-id';
@@ -272,6 +273,13 @@ export function createScenarioStore(runner: SimulationRunner): ScenarioStore {
           runner(runId, built.value),
           !coastBuilt?.ok ? Promise.resolve(null) : runner(-runId, coastBuilt.value),
         ]);
+        // The worker's histories travel with the results (ML-TASK-044); registering them is O(1).
+        if (response.type === 'result' && response.analysis !== undefined) {
+          attachAnalysis(response.result, response.analysis);
+        }
+        if (coastResponse?.type === 'result' && coastResponse.analysis !== undefined) {
+          attachAnalysis(coastResponse.result, coastResponse.analysis);
+        }
         // A superseded or stale run's response finds no matching computing state and is ignored.
         if (response.type === 'crashed') {
           apply({ type: 'RUN_CRASHED', runId, message: response.message });

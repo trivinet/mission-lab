@@ -23,7 +23,7 @@ Dark-first: there is no light theme in M1 (deliberately not decided, see
 | Text, muted | `--text-3` | `#8c99a8` | Units, notes (still 4.5:1) |
 | Accent | `--accent` | `#6aa9ff` | Primary action, selection |
 | Editable input text | `--input-text` | `#9cc4ff` | Value inside an editable field |
-| Focus ring | `--focus` | `#9cc4ff` | 2 px outline, 2 px offset, never removed |
+| Focus ring | `--focus` | `#9cc4ff` | 2 px outline, 2 px offset (1 px on text inputs, section 3), never removed |
 | State: current | `--current` | `#4cc77a` | Result matches inputs |
 | State: computing | `--computing` | `#6aa9ff` | Run in progress |
 | State: stale | `--stale` | `#e0ad3c` | Inputs changed since the result |
@@ -74,7 +74,11 @@ Weights: 400 body, 600 headings and emphasis.
 - Radii: 2 (tags), 4 (controls), 8 (panels, chips).
 - Minimum control height 28 px (desktop-first; touch sizing not decided).
 - Focus: `outline: 2px solid var(--focus); outline-offset: 2px` on `:focus-visible` for every
-  interactive element. Focus ring contrast is checked below.
+  interactive element, with one exception: the text inputs of the editor use `outline-offset: 1px`
+  (`.in input:focus-visible` in `apps/web/src/index.css`), as built: the input sits inside a bordered
+  field with a unit suffix, and the smaller offset keeps the ring close to the field. The 2 px width
+  and the colour are the same. Corrected from "2 px for every element" after release-readiness
+  finding D-9 (ML-TASK-044). Focus ring contrast is checked below.
 
 ## 4. Contrast
 

@@ -57,7 +57,10 @@ export const COMPARE_FAILURE_TEXT: Readonly<Record<CompareFailure, string>> = {
   NON_FINITE_STATE: 'a state could not be evaluated',
 };
 
-export const HISTORIES_FAILURE_TEXT: Readonly<Record<ComputeHistoriesFailure, string>> = {
+export const HISTORIES_FAILURE_TEXT: Readonly<
+  Record<ComputeHistoriesFailure | 'ANALYSIS_UNAVAILABLE', string>
+> = {
   RESULT_FAILED: 'the run failed, so there are no histories',
   NON_FINITE_SAMPLE: 'a sample could not be evaluated',
+  ANALYSIS_UNAVAILABLE: 'the worker sent no analysis for this result',
 };

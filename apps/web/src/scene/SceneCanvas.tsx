@@ -222,9 +222,11 @@ function CameraRig({
   }, [controls, camera, invalidate, cameraRef]);
 
   useEffect(() => {
-    // The canvas takes keyboard focus and has an accessible name (ML-UX-004).
+    // The canvas takes keyboard focus, handles arrow keys itself and has an accessible name that
+    // is also its text alternative (ML-UX-004). The role "application" signals the interaction (D-7); the
+    // name keeps saying what the view shows and which keys operate it.
     domElement.tabIndex = 0;
-    domElement.setAttribute('role', 'img');
+    domElement.setAttribute('role', 'application');
     domElement.setAttribute('aria-label', label);
   }, [domElement, label]);
 

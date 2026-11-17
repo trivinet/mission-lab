@@ -235,3 +235,129 @@ PERF_SIZES=1000,100000 PERF_REPS=3 pnpm perf:envelope
 
 Compare new numbers only with the environment table above; a different machine is a different
 record, not a regression.
+
+## 8. Release candidate re-measurement (2026-11-17, ML-TASK-044)
+
+Why: the release-readiness review (D-1, `release-readiness-review.md`) measured the release
+candidate once and found the main-thread block after a result had grown to 3187 ms at 1 000 000
+samples (503 ms in §3), with a main-page JS heap of 227 MB (7.1 MB in §3). The cause was the
+analysis (histories of every quantity, `computeHistories`) running on the main thread when a
+result arrives. ML-TASK-044 moves it into the simulation worker (typed arrays transferred) and
+this section re-measures. The method, machine and harness of §1 and §2 are unchanged; the figures
+in §3 stay as the record of 2026-11-17 10:39 UTC and are not edited.
+
+### 8.1 What changed in the app
+
+- `computeHistories` is called in the worker (`apps/web/src/worker/run-handler.ts`), and its
+  output is copied into one Float64Array per quantity and segment (NaN stands for the module's
+  `null`) and transferred next to the result (`analysis-pack.ts`). The main thread unpacks only the
+  quantities that are plotted. The values are the module's, unchanged: a Vitest check compares every
+  unpacked value with the module output with `Object.is`, nulls included (`analysis-pack.test.ts`),
+  and the VI-03 (a) plumbing test and e2e are unchanged.
+- `compareCoastAndManeuver` stays on the main thread. It reads the first sample of the coast run and
+  the maneuver events, so its cost does not depend on the number of samples (from the code; it was
+  not timed separately). Moving it would need both results in one worker call.
+- The harness (`apps/web/perf/envelope.perf.ts`) gained one additive metric, `analysis_ms` (worker
+  time computing and packing the histories). `engine_ms` now excludes it. Nothing else in the harness
+  changed.
+
+### 8.2 Environment and method
+
+Same machine and software as §1 (Intel Core i7-10875H, Windows 11, Node v24.22.2, Playwright 1.64.1,
+Chromium 156.0.8078.4 headless, software WebGL). Free RAM at start 19.3 GB (before) and 20.3 GB
+(after). The PC was not quiesced; nothing else was started by the author during the runs.
+
+- **Before**: the commit `768b9e1` (the app as of the readiness review, no change to `apps/web/src`),
+  sizes 250 000, 500 000 and 1 000 000 only, 3 repetitions each, run 18:37 UTC. Raw:
+  `docs/verification/data/performance-envelope-rc-before-2026-11-17.json`.
+- **After**: the commit `daeabfd` (app code identical to the preceding commit `055b901`), the full
+  ladder of six sizes, 3 repetitions each (18 of 18 succeeded), run 18:59 UTC. Raw:
+  `docs/verification/data/performance-envelope-rc-after-2026-11-17.json`. A first run of the three
+  large sizes on the same code, made before the other ML-TASK-044 fixes, gave the same picture (max
+  long task 227, 385 and 688 ms) and is not kept.
+- No "before" was run for 1 000 to 100 000 samples in this session. For those sizes the only
+  comparison is with §3 (a different session) and with the readiness review (100 000: 365 ms).
+
+"Post-result main-thread time" here is the sum of the long tasks (over 50 ms) on the main thread
+between the Run click and the first frame (`totalLongTaskDuringRun_ms`); "largest block" is the
+longest single one (`maxLongTaskDuringRun_ms`). Both include the cold first render of about
+100 ms noted in §2. Median [min to max] of 3 repetitions, milliseconds.
+
+### 8.3 Before and after (same session, same machine)
+
+| N samples | Post-result main-thread time, before | after | Largest block, before | after | Click to first frame, before | after |
+| --------: | ------------------------------------: | ----: | --------------------: | ----: | ---------------------------: | ----: |
+|   250 000 | 1097 [1009-1146] | 405 [403-411] | 885 [804-947] | 223 [222-229] | 1626 [1523-1785] | 1563 [1560-1565] |
+|   500 000 | 1826 [1821-1879] | 637 [635-641] | 1474 [1465-1558] | 348 [346-350] | 2709 [2677-2825] | 2841 [2838-2858] |
+| 1 000 000 | 3992 [3612-4054] | 1197 [1194-1208] | 3483 [3088-3486] | 613 [609-624] | 5577 [5239-5643] | 5309 [5287-5361] |
+
+| N samples | Main-page JS heap after the run (MB), before | after | Probe max during the run (ms), before | after |
+| --------: | -------------------------------------------: | ----: | ------------------------------------: | ----: |
+|   250 000 | 60 | 33 | 1152 [851-1197] | 268 [17-467] |
+|   500 000 | 115 | 60 | 1565 [1526-1969] | 17 [17-19] |
+| 1 000 000 | 227 | 115 | 39 [28-4120] | 19 [18-19] |
+
+What this shows, and what it does not:
+
+1. **The main-thread block is much shorter**: at 1 000 000 samples the sum of long tasks fell from
+   about 4.0 s to about 1.2 s and the largest block from 3.5 s to 0.6 s; at 250 000, from 0.9 s to
+   0.2 s. The page is therefore unresponsive for a fraction of the previous time after a result. The
+   remaining 0.6 s block is close to the 503 ms of §3. A CPU profile (one repetition at 1 000 000, not
+   kept) put most JavaScript self time in the minified scene and vendor chunk and none of the plot
+   code in its top 18 entries; what the remaining block consists of was not attributed further.
+2. **Click to first frame did not improve** (5.3 s against 5.6 s at 1 000 000, 1.56 s against 1.63 s
+   at 250 000). The analysis now takes place in the worker before the result is posted: 2.5 s at
+   1 000 000, 1.3 s at 500 000, 0.65 s at 250 000 (§8.4). The user waits the same time for the result;
+   the page can be used meanwhile (probe maximum 19 ms at 1 000 000). Showing the scene first and the
+   plots when their analysis arrives would shorten the wait; it needs a state for "analysis pending"
+   and was not done (not asked for).
+3. **JS heap fell by half** (227 to 115 MB at 1 000 000); the number is the main-page heap only. The
+   worker's heap was not measured and now holds the boxed arrays that `computeHistories` returns
+   (one worker call at a time; process memory was not measured, see §5).
+4. **Playback frame time is unchanged** (§8.4): it is rendering-bound, not analysis-bound.
+
+### 8.4 Ladder after the change (3 repetitions each)
+
+| N samples | Engine (worker) | Analysis (worker) | Transfer | Click to current | Current to first frame | Click to first frame |
+| --------: | --------------: | ----------------: | -------: | ---------------: | ---------------------: | -------------------: |
+|     1 000 | 20.1 [19.6-21.1] | 10.7 [10.1-11.5] | 0.4 [0.3-4.6] | 133.1 [123.0-154.9] | 118.1 [109.0-138.3] | 263.9 [241.1-271.4] |
+|    10 000 | 43.7 [40.3-44.5] | 51.1 [50.9-56.2] | 0.4 [0.4-0.6] | 207.4 [195.5-218.9] | 147.6 [142.6-152.3] | 359.7 [343.1-361.5] |
+|   100 000 | 185.6 [182.9-190.3] | 270.8 [269.0-277.2] | 0.6 [0.4-1.2] | 620.3 [614.7-626.4] | 198.5 [194.0-206.2] | 824.9 [808.7-826.5] |
+|   250 000 | 384.7 [384.1-392.5] | 649.8 [617.7-653.5] | 1.7 [1.1-2.2] | 1265.5 [1255.3-1287.2] | 294.3 [277.4-307.9] | 1563.2 [1559.8-1564.6] |
+|   500 000 | 739.0 [723.1-743.5] | 1333.9 [1320.3-1339.7] | 0.8 [0.7-0.8] | 2391.1 [2382.1-2407.4] | 450.7 [450.2-455.4] | 2841.3 [2837.5-2858.1] |
+| 1 000 000 | 1457.5 [1423.8-1459.4] | 2538.1 [2522.8-2602.4] | 0.7 [0.7-0.9] | 4535.6 [4521.3-4604.8] | 765.5 [756.2-773.0] | 5308.6 [5286.8-5361.0] |
+
+| N samples | Max frame gap in run | Largest block | Post-result main-thread time | Probe median | Probe max | Playback frame median [min-max] | JS heap after (MB) |
+| --------: | -------------------: | ------------: | ---------------------------: | -----------: | --------: | ------------------------------: | -----------------: |
+|     1 000 | 17.4 [16.9-18.6] | 81 [78-92] | 81 [78-146] | 19.4 [18.2-23.3] | 150.1 [70.4-173.1] | 16.7 [16.6-16.7] | 7.2 |
+|    10 000 | 18.2 [18.1-18.6] | 85 [84-86] | 149 [146-151] | 19.0 [16.4-19.1] | 182.5 [175.1-184.6] | 17.4 [16.9-18.2] | 8.5 |
+|   100 000 | 20.2 [19.5-21.1] | 138 [138-139] | 259 [257-260] | 15.7 [15.2-16.9] | 297.7 [20.9-297.9] | 46.0 [45.8-46.2] | 18.0 |
+|   250 000 | 19.8 [19.5-19.9] | 223 [222-229] | 405 [403-411] | 14.0 [13.6-14.2] | 267.9 [17.5-467.3] | 101.2 [101.1-102.7] | 32.9 |
+|   500 000 | 20.2 [19.5-20.3] | 348 [346-350] | 637 [635-641] | 13.7 [13.5-13.8] | 17.5 [17.1-19.4] | 194.5 [194.2-194.6] | 59.7 |
+| 1 000 000 | 20.1 [19.5-20.4] | 613 [609-624] | 1197 [1194-1208] | 13.1 [13.1-13.3] | 19.4 [18.4-19.4] | 377.4 [376.2-379.8] | 115.1 |
+
+At 1 000 to 100 000 samples the probe maximum (150 to 298 ms in one repetition) is the same kind of
+isolated round trip as in §3; probe timestamps are not recorded, so it is not placed against a
+long task.
+
+### 8.5 Do the decisions of §4 still read as decided?
+
+This is a reading of the numbers for the owner, who re-confirms; neither value was changed.
+
+- **Hard limit 1 000 000.** All 18 repetitions of the ladder succeeded; the engine and analysis in
+  the worker take 4.0 s in total at the limit, the page stays responsive during that time (probe
+  maximum 19 ms) and the main thread blocks for 0.6 s at most after the result. The limit is
+  unchanged and still not shown unsafe on this machine. The 5.3 s click to first frame and the
+  377 ms playback frame (about 2.6 frames per second) are the cost of a run at the ceiling.
+- **Soft warning above 250 000.** The reason for the threshold, playback of about 100 ms per frame
+  (about 10 frames per second), is unchanged because playback is rendering-bound (§3 item 4). At
+  250 000 the post-result block is now 0.2 s (largest) and the click to first frame 1.6 s. The
+  threshold reads as decided: nothing in the new numbers argues for moving it in either direction.
+  The wait before the result appears now includes the analysis (about 0.65 s at 250 000); a user of
+  the 30-day, 10 s scenario (259 201 samples) waits about 1.6 s.
+- The §4 text that 0.3 s to 0.5 s of main-thread pause follows a result above 250 000 samples is
+  superseded by the figures above (0.2 s to 0.6 s largest block between 250 000 and 1 000 000).
+
+Limits of this section: one machine, one session, not quiesced; "before" only for three sizes;
+software WebGL; process memory not measured (the worker's memory with the packed and the boxed
+arrays was not observed); the screen-reader and real-GPU questions of §5 are unchanged.
