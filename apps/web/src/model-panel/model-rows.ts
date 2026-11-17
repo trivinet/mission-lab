@@ -12,6 +12,8 @@ export interface ModelRow {
   readonly value: string;
   /** Display unit of a numeric value; empty for text values. */
   readonly unit: string;
+  /** Free text that can run long (shown left-aligned in proportional type, display only). */
+  readonly longText?: boolean;
 }
 
 export function modelRows(model: ResultModel): readonly ModelRow[] {
@@ -30,12 +32,24 @@ export function modelRows(model: ResultModel): readonly ModelRow[] {
       value: String(model.constants.referenceRadius_m),
       unit: 'm',
     },
-    { id: 'constants-source', label: 'Constants source', value: model.constants.source, unit: '' },
+    {
+      id: 'constants-source',
+      label: 'Constants source',
+      value: model.constants.source,
+      unit: '',
+      longText: true,
+    },
     { id: 'propagator', label: 'Propagator', value: model.propagator, unit: '' },
     { id: 'maneuver-model', label: 'Maneuver model', value: model.maneuverModel, unit: '' },
     { id: 'frame', label: 'Frame', value: model.frame, unit: '' },
     { id: 'epoch', label: `Epoch (${model.epoch.scale})`, value: model.epoch.iso, unit: '' },
-    { id: 'time-convention', label: 'Time convention', value: model.timeConvention, unit: '' },
+    {
+      id: 'time-convention',
+      label: 'Time convention',
+      value: model.timeConvention,
+      unit: '',
+      longText: true,
+    },
     { id: 'engine-version', label: 'Engine version', value: model.engineVersion, unit: '' },
     { id: 'duration', label: 'Duration', value: String(model.sampling.duration_s), unit: 's' },
     {

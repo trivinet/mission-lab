@@ -55,7 +55,10 @@ export function ModelPanel({ resultState }: { readonly resultState: ResultState 
           )}
           <dl className={stale ? 'out model-list stale-val' : 'out model-list'}>
             {modelRows(model).map((row) => (
-              <div className="model-row" key={row.id}>
+              <div
+                className={row.longText === true ? 'model-row model-row-long' : 'model-row'}
+                key={row.id}
+              >
                 <dt>{row.label}</dt>
                 <dd data-testid={`model-${row.id}`}>
                   {row.value}

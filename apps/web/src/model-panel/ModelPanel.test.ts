@@ -50,6 +50,17 @@ const SENTINEL_VALUES: readonly string[] = [
   'SENTINEL limitation three',
 ];
 
+describe('ModelPanel readability of long texts (ML-TASK-026 A4b)', () => {
+  it('marks the constants source and the time convention as long text, values unchanged', () => {
+    const out = html({ kind: 'current', result: RESULT, warnings: [] });
+    expect(out).toMatch(/model-row model-row-long"><dt>Constants source<\/dt>/);
+    expect(out).toMatch(/model-row model-row-long"><dt>Time convention<\/dt>/);
+    expect(out.match(/model-row-long/g)?.length).toBe(2);
+    expect(out).toContain('SENTINEL time convention text');
+    expect(out).toContain('SENTINEL-SOURCE');
+  });
+});
+
 describe('ModelPanel (AC2: nothing about the model is hard-coded)', () => {
   it('shows every sentinel value of a current result', () => {
     const out = html({ kind: 'current', result: RESULT, warnings: [] });

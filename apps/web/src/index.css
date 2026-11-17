@@ -418,6 +418,16 @@ dl.out dd {
   overflow-wrap: anywhere;
   max-width: 100%;
 }
+/* Long free text (constants source, time convention): own line, left-aligned, proportional. */
+.model-list .model-row-long dt {
+  grid-column: 1 / -1;
+}
+.model-list .model-row-long dd {
+  grid-column: 1 / -1;
+  text-align: left;
+  font-family: var(--font-ui);
+  margin-bottom: var(--s1);
+}
 .model-details > summary {
   cursor: pointer;
   color: var(--text-2);
