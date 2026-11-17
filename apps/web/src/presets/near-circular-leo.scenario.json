@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0",
+  "id": "9c1f6d2e-5b0a-4c53-8a7e-1d2f3a4b5c01",
+  "name": "Preset: near-circular LEO, no maneuver",
+  "centralBody": "EARTH",
+  "frame": "GCRF",
+  "epoch": {
+    "scale": "UTC",
+    "iso": "2026-01-01T00:00:00.000Z"
+  },
+  "initialOrbit": {
+    "kind": "KEPLERIAN",
+    "elements": {
+      "semiMajorAxis_m": 6900000,
+      "eccentricity": 0.001,
+      "inclination_rad": 0.8726646259971648,
+      "raan_rad": 0,
+      "argPeriapsis_rad": 0,
+      "trueAnomaly_rad": 0
+    }
+  },
+  "maneuvers": [],
+  "duration_s": 6000,
+  "outputStep_s": 60
+}
