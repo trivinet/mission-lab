@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 4 — Stabilisation and release (gate G4)",
-  "headline": "Pre-release fixes (044) delivered in PR #76: post-result main-thread time at 1M samples 4.0 s → 1.2 s; 1989 tests, 98 e2e. Owner: re-confirm the sample limits, merge, and choose the hosting provider (042); then release v1.0.0 (043) and G4.",
+  "headline": "Mission Lab is live at https://trivinet.github.io/mission-lab/ (GitHub Pages, deployed from main). Pre-release fixes merged. Left: release v1.0.0 (043) and gate G4 with the owner walkthrough.",
   "gates": [
     {
       "id": "G0",
@@ -35,9 +35,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-46",
-      "text": "Re-confirm the 250 000 soft warning and 1 000 000 hard limit on the re-measured envelope (performance-envelope.md §8); merge PRs #75 and #76; choose the hosting provider for ML-TASK-042 (GitHub Pages, Cloudflare Pages or Vercel Hobby) and authorise publishing.",
-      "blocking": "ML-TASK-042, 043"
+      "id": "OA-47",
+      "text": "Try the live site https://trivinet.github.io/mission-lab/ (ideally the 13-step walkthrough of ML-SYS-001 §14) and give the go-ahead for release v1.0.0 (ML-TASK-043).",
+      "blocking": "Gate G4"
     },
     {
       "id": "OA-3",
@@ -375,8 +375,8 @@
           "title": "Pre-release fixes: analysis off the main thread (D-1), readiness findings, traceability gaps",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "PR #76",
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PR #76)",
           "approval": true
         },
         {
@@ -384,8 +384,8 @@
           "title": "Hosting decision and deployment setup",
           "role": "Coordinator",
           "model": "session",
-          "status": "todo",
-          "deps": "040",
+          "status": "done",
+          "deps": "GitHub Pages, PR #77; live",
           "approval": true
         },
         {
@@ -401,6 +401,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "ML-TASK-042: Pages workflow (tests, base-path build, official Pages actions pinned by SHA), Pages enabled with Actions builds, PR #77 merged; deployment succeeded; live site checked in the browser: default run reaches Result current, no console errors."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Owner",
+      "text": "Re-confirmed the 250 000 soft warning and 1 000 000 hard limit on the re-measured envelope; chose GitHub Pages and authorised publishing. PRs #75 and #76 merged."
+    },
     {
       "date": "2026-11-17",
       "who": "Coordinator",
