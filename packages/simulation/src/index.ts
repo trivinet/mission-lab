@@ -6,6 +6,21 @@ export { PROVISIONAL_MAX_SAMPLE_COUNT } from './limits';
 export { MODEL_LIMITATIONS, TIME_CONVENTION, buildResultModel } from './model';
 export { buildSimulationRequest, computeRequestId, deriveRequestId } from './request';
 export { runSimulation } from './run';
+export { describeScenarioOrbit } from './scenario-view';
+export type {
+  ArgPeriapsisMeaning,
+  DegeneracyDescription,
+  DerivedOrbitQuantities,
+  DescribeScenarioOrbitFailure,
+  DescribeScenarioOrbitResult,
+  NormalizedOrbitAngles,
+  RaanMeaning,
+  ScenarioOrbitView,
+  ScenarioViewConstants,
+  TrueAnomalyMeaning,
+  UndefinedElement,
+} from './scenario-view';
+export type { DegeneracyThresholds, DegenerateConvention } from '@mission-lab/astrodynamics';
 export { buildSamplingGrid, gridCandidateCount, sampleCount } from './sampling-grid';
 export type { GridSegment } from './sampling-grid';
 export { validateScenarioSemantics } from './semantic-validation';
