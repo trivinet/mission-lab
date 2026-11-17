@@ -42,4 +42,71 @@ deliverables:
   - code, tests, the re-measured envelope section, release-notes update, the report section of this file
 human_approval_required: true   # the owner re-confirms the sample-limit decisions on the new numbers
 
-report: {}
+report:
+  files_changed:
+    - "apps/web/src/worker/analysis-pack.ts (+ .test.ts), protocol.ts, run-handler.ts (+ test), simulation.worker.ts: D-1, analysis in the worker, typed arrays transferred"
+    - "apps/web/src/plots/analysis-model.ts, plot-model.ts (types only), PlotsPanel.tsx, PlotChart.tsx, plot-hook.ts, quantity-labels.ts; apps/web/src/state/scenario-store.ts: main thread consumes the packed analysis"
+    - "apps/web/perf/envelope.perf.ts: additive analysis_ms metric"
+    - "apps/web/src/editor/sample-warning.ts (+ test), layout/Toolbar.tsx: D-2, D-3"
+    - "apps/web/src/persistence/unsaved-guard.ts, App.tsx: D-6"
+    - "apps/web/src/App.tsx, layout/CenterRegion.tsx, layout/ResultsColumn.tsx, scene/SceneCanvas.tsx: D-7"
+    - "docs/design/design-tokens.md: D-9 (document corrected)"
+    - "apps/web/e2e/prerelease-fixes.spec.ts (new), e2e/sample-warning.spec.ts: e2e for D-2, D-3, D-6, D-7, ML-FR-009 AC2"
+    - "eslint.config.js, tools/boundary-fixtures/{simulation,astrodynamics}/nfr003-*.ts: ML-NFR-003 rule and 8 fixtures"
+    - "docs/verification/performance-envelope.md (section 8), docs/verification/data/performance-envelope-rc-{before,after}-2026-11-17.json"
+    - "docs/releases/release-notes-v1.0.0.md: D-4, D-5, D-8, D-10 as known limits; two superseded lines updated"
+  summary: >
+    D-1: the O(N) analysis (computeHistories) now runs in the simulation worker next to the
+    engine and its output is transferred as Float64Arrays (NaN stands for the module's null; the
+    round trip is exact and tested with Object.is). The main thread unpacks only the plotted
+    quantities. compareCoastAndManeuver stays on the main thread: it reads only the first sample
+    of the coast run and the events (O(1) in N, from the code). Measured on the same machine in the
+    same session (3 repetitions), the sum of main-thread long tasks between click and first frame
+    fell from 3992 to 1197 ms at 1 000 000 samples, from 1826 to 637 ms at 500 000 and from 1097 to
+    405 ms at 250 000; the largest single block from 3483 to 613, 1474 to 348 and 885 to 223 ms.
+    Click to first frame did not improve (5577 to 5309 ms at 1 000 000) because the analysis time
+    (2.5 s at 1 000 000) moved into the worker before the result is posted. The 250 000 soft
+    threshold and the 1 000 000 hard limit are unchanged and read as decided on the new numbers
+    (performance-envelope.md section 8.5); the owner re-confirms. D-2, D-3, D-6, D-7 done. D-9:
+    the document was corrected (1 px offset on text inputs), not the CSS. FR-009 AC2 e2e added.
+    NFR-003 lint rule added with fixtures; it does not fire on existing code. Release notes list
+    D-4, D-5, D-8 and D-10.
+  tests_executed:
+    - "pnpm install --frozen-lockfile: exit 0"
+    - "pnpm lint: exit 0"
+    - "pnpm typecheck: exit 0 (all workspaces)"
+    - "pnpm test: 106 files, 1989 tests passed (1978 before this task)"
+    - "pnpm build: exit 0 (only the known chunk-size notice)"
+    - "pnpm format:check: exit 0"
+    - "pnpm check:boundaries: exit 0, 28/28 fixtures (20 before; 8 new NFR-003 fixtures, one of them a positive 'clean' fixture)"
+    - "pnpm test:e2e, three consecutive full runs: 98 / 98 / 98 passed (50.8 s, 51.1 s, 50.0 s); 91 before this task plus 7 new"
+    - "pnpm perf:envelope, PERF_SIZES=250000,500000,1000000, before (commit 768b9e1): 9 of 9 repetitions ok"
+    - "pnpm perf:envelope, full ladder after (commit daeabfd): 18 of 18 repetitions ok"
+    - "Ports 4173 and 4174 checked free before each e2e and perf run and after the last; a scratch preview server used for one CPU profile was stopped"
+    - "VI-03 (a) (plot-model.test.ts, plots.spec.ts) and VI-02 (scene-geometry.test.ts, scene.spec.ts) were not edited and pass"
+  reference_data_used: []
+  not_verified:
+    - "What the remaining 0.6 s main-thread block at 1 000 000 samples consists of: a CPU profile showed mostly scene/vendor chunk self time and no plot code in the top 18 entries, but it was not attributed further and is not kept."
+    - "compareCoastAndManeuver was not timed; its O(1) cost is from reading the code."
+    - "The 'before' measurement covers 250 000, 500 000 and 1 000 000 samples only; 1 000 to 100 000 have no same-session before."
+    - "One machine, not quiesced, software WebGL, headless Chromium; process and worker memory (now holds the boxed histories arrays during a run) were not measured; behaviour on a smaller machine unknown."
+    - "The beforeunload confirmation is observed through Playwright's dialog event in Chromium; the real browser UI, other browsers and the cases where a browser suppresses the dialog (no prior user interaction) were not checked."
+    - "Axis titles (ML-FR-009 AC2) are drawn by uPlot on its canvas: the e2e reads them back from uPlot's own axes through the plot hook, not from rendered pixels. The marker is checked by marker-coloured pixels in a column."
+    - "role=application on the 3D canvas and role=group on the columns: checked by DOM roles in Playwright only; no screen reader was run, so real announcements (and any effect of application mode on screen-reader key handling) are unverified."
+    - "An analysis NaN value that is a real value (not a null) cannot be told from null in the packed form; the worker reports NON_FINITE_SAMPLE instead. No such case occurs in any tested scenario."
+  known_limitations:
+    - "The result appears only after the analysis is done: at 1 000 000 samples the worker takes about 4.0 s (engine 1.5 s + analysis 2.5 s). Showing the scene first and the plots when their analysis arrives would shorten the wait; it needs an 'analysis pending' state and was not done."
+    - "NFR-003 rule scope: Date.now(), new Date() and Date() without an argument, performance (global and .now), Math.random, getRandomValues and randomUUID. Date.parse(text) and new Date(value) with an argument are allowed because they read no clock; the engine uses them in packages/simulation/src/utc-label.ts (and a unit test in earth-rotation.test.ts). Other sources (crypto from node:crypto imports, process.hrtime, Temporal) are not covered."
+    - "The plot hook's sources are plain arrays made on read (Array.from), O(N) per read; it exists only with ?sceneHook=1."
+  documentation_changes:
+    - "performance-envelope.md section 8 (new, dated 2026-11-17); sections 1 to 7 untouched."
+    - "design-tokens.md section 3 and the token table: focus offset 1 px on text inputs (D-9)."
+    - "release-notes-v1.0.0.md: known limits D-4, D-5, D-8, D-10; the 'analysis on the main thread' limit marked superseded; the traceability gaps for ML-FR-009 AC2 and ML-NFR-003 marked closed."
+  risks_or_blockers:
+    - "Existing run-handler.test.ts assertion about the transfer list was extended (it now also counts the 13 analysis arrays per segment and checks they are detached); the old assertions are kept."
+    - "The task text says to forbid Date; the rule forbids the clock reads of Date, not Date.parse or new Date(value), because the engine uses those. If the owner wants Date forbidden outright, utc-label.ts would need another implementation (engine change, out of scope here)."
+  review_artifact: ""
+  recommended_next_action: >
+    Verification Engineer review of the section 8 numbers and the NFR-003 rule scope; owner
+    re-confirms the sample-limit decisions on section 8.5 and decides whether to ask for the
+    scene-first, plots-later delivery to cut the wait at large sizes.
