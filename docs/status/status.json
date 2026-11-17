@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "Gate G2 passed on 2026-11-17: the workspace is usable end to end. Next: Phase 3 (charting library, analysis module, plots and comparison, persistence, presets and CSV, acceptance scenario).",
+  "headline": "Phase 3 started: the charting library spike with ADR-010 (030, Sonnet) and the analysis module (031, Opus) are running in parallel.",
   "gates": [
     {
       "id": "G0",
@@ -285,11 +285,11 @@
       "tasks": [
         {
           "id": "ML-TASK-030",
-          "title": "Charting library spike and ADR-008",
+          "title": "Charting library spike (OD-006) and ADR-010",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "026",
+          "status": "in_progress",
+          "deps": "Contract on docs/ml-task-030-031-contracts; agent running",
           "approval": true
         },
         {
@@ -297,8 +297,8 @@
           "title": "Analysis module: histories and comparison",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "todo",
-          "deps": "017"
+          "status": "in_progress",
+          "deps": "Contract on docs/ml-task-030-031-contracts; agent running"
         },
         {
           "id": "ML-TASK-032",
@@ -377,6 +377,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Phase 3 started on the owner's go-ahead. Contracts for ML-TASK-030 (charting spike, ADR-010 since ADR-008 is taken) and ML-TASK-031 (analysis module in packages/simulation/analysis). Both agents running in parallel."
+    },
     {
       "date": "2026-11-17",
       "who": "Owner",
