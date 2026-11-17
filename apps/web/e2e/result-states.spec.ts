@@ -12,11 +12,14 @@ async function recordStates(page: Page): Promise<void> {
       throw new Error('no result-state element');
     }
     const seen: string[] = [target.getAttribute('data-state') ?? ''];
-    (window as unknown as { __states: string[] }).__states = seen;
+    const w = window as unknown as { __states: string[]; __stateTimes: Record<string, number> };
+    w.__states = seen;
+    w.__stateTimes = {};
     new MutationObserver(() => {
       const text = target.getAttribute('data-state') ?? '';
       if (seen[seen.length - 1] !== text) {
         seen.push(text);
+        w.__stateTimes[text] = performance.now();
       }
     }).observe(target, { attributes: true, attributeFilter: ['data-state'] });
   });
@@ -97,20 +100,22 @@ test('ML-UX-003: the page responds to input while a run is in progress', async (
   await expect(state).toHaveAttribute('data-state', 'computing');
 
   const pings = 5;
-  let pingedWhileComputing = 0;
+  const pingEnds_ms: number[] = [];
   for (let i = 0; i < pings; i += 1) {
     // The probe edits the scenario name (display only): the toolbar shows it only after the main
     // thread handled the input and React painted, so it proves the page responds during the run.
     await page.getByTestId('input-name').fill(`ping ${String(i)}`);
     await expect(page.getByTestId('scenario-name')).toHaveText(`ping ${String(i)}`);
-    if ((await state.getAttribute('data-state')) === 'computing') {
-      pingedWhileComputing += 1;
-    }
+    pingEnds_ms.push(await page.evaluate(() => performance.now()));
   }
-  // At least one click was handled and painted while the run was still going.
-  expect(pingedWhileComputing).toBeGreaterThan(0);
 
   await expect(state).toHaveAttribute('data-state', 'current', { timeout: 60_000 });
+  // At least one ping was handled and painted before the run finished. This compares in-page
+  // timestamps, so it does not depend on when the test happened to read the state.
+  const currentAt_ms = await page.evaluate(
+    () => (window as unknown as { __stateTimes: Record<string, number> }).__stateTimes.current ?? 0,
+  );
+  expect(pingEnds_ms.filter((t) => t < currentAt_ms).length).toBeGreaterThan(0);
   const maxGap_ms = await page.evaluate(() => {
     const w = window as unknown as { __maxFrameGap_ms: number; __stop: boolean };
     w.__stop = true;
