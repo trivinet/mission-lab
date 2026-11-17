@@ -1,0 +1,51 @@
+task_id: ML-TASK-043
+title: "Release v1.0.0: version, final release notes, changelog, documentation clean-up, G4 package (tag and GitHub release only after owner approval)"
+status: in_progress
+requirement_ids: [ML-NFR-005]
+owner_role: docs-release
+reviewer_role: verification-engineer
+dependencies: [ML-TASK-040, ML-TASK-041, ML-TASK-042, ML-TASK-044]
+affected_paths:
+  - package.json
+  - packages/*/package.json
+  - apps/web/package.json
+  - verification/package.json
+  - conformance/package.json
+  - packages/astrodynamics/src/index.ts     # PACKAGE_VERSION only
+  - packages/contracts/src/index.ts         # PACKAGE_VERSION only
+  - packages/simulation/src/index.ts        # PACKAGE_VERSION only
+  - verification/src/index.ts               # version constant only
+  - CHANGELOG.md
+  - docs/releases/release-notes-v1.0.0.md
+  - docs/releases/G4-review.md
+  - docs/engineering/contributing.md
+  - docs/engineering/coding-standards.md
+  - docs/verification/conformance-run-5.md  # status line only
+  - verification/l3-d2/restart.py           # docstring line only (wrong test file name)
+  - docs/backlog/tasks/ML-TASK-043.yaml
+objective: >
+  Prepare release v1.0.0 of M1 so that the owner can walk through ML-SYS-001 §14 on the live site
+  and approve G4; the tag and the GitHub release are created only after that approval.
+scope:
+  - "Version 1.0.0 in every package.json and in the PACKAGE_VERSION constants (engineVersion in SimulationResult.model comes from packages/astrodynamics PACKAGE_VERSION). Update any test that asserts the old version string only where it asserts the version itself; do not weaken anything else. The contract requires engineVersion to be SemVer 2.0.0."
+  - "Release notes v1.0.0: Status 'Release candidate' (final after G4); features, verification summary with links (G1–G3 reviews, conformance runs 1–5, VE-01, release-readiness review), the live URL https://trivinet.github.io/mission-lab/, owner decisions, accepted known limits (G1/G2/G3 limits, D-4, D-5, D-8, D-10, flight-path angle and mean anomaly not provided), and what M2 may bring (ML-SYS-001 §2.3). Every claim backed by a linked document; nothing from memory."
+  - "CHANGELOG.md (Keep a Changelog style) with a 1.0.0 entry summarising M1."
+  - "Documentation clean-up reported by ML-TASK-041 and ML-TASK-044: stale statements in contributing.md and coding-standards.md; conformance-run-5.md status line (approved at G3, 2026-11-17); restart.py docstring test-file name. Do not touch hash-approved G1 files (G1-review.md decision 4) or approved records."
+  - "docs/releases/G4-review.md (Proposed): G4 evidence per the verification plan §8 ('Full suite green on the release commit; performance record; owner walkthrough of §14'): the suite counts on the release-candidate commit, the performance record (envelope §8), the live site, and a checklist of the 13 §14 steps for the owner to tick during the walkthrough; the decision requested."
+  - "Do NOT create the git tag, the GitHub release or push anything; the Coordinator does that after the owner approves G4."
+out_of_scope:
+  - "Code changes beyond the version constants; tests beyond version assertions; tolerances, ADRs, gate reviews G0–G3."
+inputs:
+  - AGENTS.md; docs/verification/m1-verification-plan.md §8; docs/product/ML-SYS-001.md §2.3, §14
+  - docs/releases/G0…G3 reviews; docs/releases/release-notes-v1.0.0.md (draft); docs/verification/* (runs 1–5, VE-01, readiness review, envelope, traceability matrix)
+  - reports of ML-TASK-040, 041, 044
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; web e2e passes."
+  - "Every link in the release notes, CHANGELOG and G4-review resolves to an existing file (path check output in the report)."
+test_requirements:
+  - "Existing suites; a path-existence check."
+deliverables:
+  - the files above; the report section of this file
+human_approval_required: true   # G4 and the release
+
+report: {}
