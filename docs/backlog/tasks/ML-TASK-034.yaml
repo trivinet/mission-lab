@@ -34,4 +34,33 @@ deliverables:
   - apps/web presets, CSV export, display precision with tests; the report section of this file
 human_approval_required: false   # preset values confirmed by the owner at PR review
 
-report: {}
+report:
+  files_changed:
+    - apps/web/src/presets/ (presets.ts, PresetMenu.tsx, three *.scenario.json, presets.test.ts)
+    - apps/web/src/export/csv-export.ts, csv-export.test.ts
+    - apps/web/src/format/display-precision.ts, display-precision.test.ts
+    - apps/web/src/plots/ComparisonTable.tsx, comparison-copy.ts, comparison-display.test.ts
+    - apps/web/src/persistence/FileControls.tsx, apps/web/src/index.css
+    - apps/web/e2e/presets-csv.spec.ts
+    - docs/backlog/tasks/ML-TASK-034.yaml
+  summary: >
+    Presets menu (three scenario files, loaded by parseScenarioBytes like a user file, same unsaved
+    confirmation, maneuver id m1). Export CSV button (enabled only for a current result): comment
+    header with frame, epoch and scale, units, requestId; columns segment,t_s,x_m,y_m,z_m,vx_mps,
+    vy_mps,vz_mps; one row per sample; numbers via String(x), -0 written as -0. Comparison table
+    shows fixed decimals per unit (km 3, deg 3, km2/s2 6, s 3, dimensionless 6); values that round to
+    zero show 0.000 (never -0.000, never exponent) with a note; each cell has the exact value in its
+    title and data-value-si, and a Copy exact values button copies full-precision SI text. No change
+    to packages/ and no new dependency.
+  tests_executed:
+    - "pnpm install --frozen-lockfile, lint, typecheck, build, format:check, check:boundaries: exit 0"
+    - "pnpm test: 105 files, 1978 tests passed"
+    - "pnpm --filter @mission-lab/web test:e2e: 76 passed (5 new in presets-csv.spec.ts)"
+  reference_data_used: []
+  not_verified:
+    - "Chromium only; real OS download and clipboard outside Playwright."
+    - "Preset values are product choices, not checked against any reference; owner to confirm."
+    - "Decimals for s, dimensionless and km2/s2 are my choice (tolerances.md section 5 fixes only 1 m, 1 mm/s, 0.001 deg)."
+  known_limitations:
+    - "CSV exports positions and velocities only, not derived history quantities."
+    - "A round-off-level value is detected only against the display resolution, not against a numerical-error bound."
