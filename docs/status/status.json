@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "Conformance run 5 passes (036, PR #65): analysis histories and the comparison table match independent references (worst ratio 0.090). Plots UI (032) in PR #64. Owner: merge, and decide the four quantities with no approved tolerance (informative for M1, or a record revision).",
+  "headline": "Plots and comparison (032) and conformance run 5 (036) merged. Persistence (033) is running. Left before G3: presets and CSV (034), the acceptance scenario (035).",
   "gates": [
     {
       "id": "G0",
@@ -33,11 +33,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-41",
-      "text": "Merge PRs #63, #64, #65. Decide the quantities with no approved tolerance row (e/ω/ν on hyperbolic states, r_p/r_a/T histories, hyperbolic r_p, convention-assigned angles on degenerate orbits): keep them informative for M1 (recommended; all measured ≤ 4.4e-15) or derive rows in a record revision 6.",
-      "blocking": "Gate G3"
-    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -310,16 +305,16 @@
           "title": "Plots and comparison UI",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "PR #64"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PRs #64, #65)"
         },
         {
           "id": "ML-TASK-033",
           "title": "Persistence: format, validation, save/load",
           "role": "Astrodynamics + Frontend",
           "model": "opus / sonnet",
-          "status": "todo",
-          "deps": "004, 022"
+          "status": "in_progress",
+          "deps": "Contract on docs/ml-task-033-contract; agent running"
         },
         {
           "id": "ML-TASK-034",
@@ -334,8 +329,8 @@
           "title": "Independent references for VI-03 (b) and FR-010 AC3 (conformance run 5)",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_review",
-          "deps": "PR #65",
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PRs #64, #65)",
           "approval": true
         },
         {
@@ -391,6 +386,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Owner",
+      "text": "Kept the quantities with no approved tolerance row informative for M1 (declared as a G3 limit). PRs #63, #64, #65 merged."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-033 started (Sonnet): versioned scenario file, validated load, save/load UI, unsaved indicator, confirmation dialog, VT-17 and VT-18 FR-011 AC3."
+    },
     {
       "date": "2026-11-17",
       "who": "Coordinator",
