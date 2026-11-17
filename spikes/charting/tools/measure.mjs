@@ -57,9 +57,10 @@ const env = {
 };
 console.log(JSON.stringify(env));
 
-async function oneRun(lib, dataset, mode) {
+async function oneRun(lib, dataset, mode, holder) {
   const [name, query] = lib.split('?');
   const context = await browser.newContext({ viewport: { width: 1400, height: 900 } });
+  holder.context = context;
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   await cdp.send('Performance.enable');
@@ -96,6 +97,7 @@ async function oneRun(lib, dataset, mode) {
       heapDelta_MB: (after - before) / 2 ** 20,
       cursorSync_ms: median(cur.sync),
       cursorFrame_ms: median(cur.frame),
+      cursorSamples: cur.sync.length,
       verifyCharts: verify.length,
       verifyMismatchCharts: bad.length,
     };
@@ -110,13 +112,17 @@ for (const dataset of SIZES) {
     for (const lib of LIBS) {
       if (mode === 'panel' && lib.includes('cursor=zr')) continue;
       const reps = [];
+      const holder = {};
       let failure = null;
       for (let r = 0; r < REPS; r += 1) {
         const started = Date.now();
         const out = await Promise.race([
-          oneRun(lib, dataset, mode).catch((e) => ({ error: String(e) })),
+          oneRun(lib, dataset, mode, holder).catch((e) => ({ error: String(e) })),
           new Promise((res) =>
-            setTimeout(() => res({ error: `timeout after ${TIMEOUT} ms` }), TIMEOUT),
+            setTimeout(() => {
+              void holder.context?.close().catch(() => {});
+              res({ error: `timeout after ${TIMEOUT} ms` });
+            }, TIMEOUT),
           ),
         ]);
         if (out.error) {
@@ -159,9 +165,9 @@ for (const dataset of SIZES) {
     }
   }
 }
-mkdirSync('out', { recursive: true });
+mkdirSync('results', { recursive: true });
 writeFileSync(
-  'out/measurements.json',
+  'results/measurements.json',
   JSON.stringify({ env, reps: REPS, timeout_ms: TIMEOUT, results }, null, 2),
 );
 await browser.close();

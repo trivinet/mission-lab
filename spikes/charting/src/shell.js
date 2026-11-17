@@ -115,7 +115,9 @@ export function runPage(lib, adapter) {
     const tMax = current.meta.duration_s;
     const sync = [];
     const frame = [];
+    const began = performance.now();
     for (let k = 0; k < count; k += 1) {
+      if (k >= 3 && performance.now() - began > 20000) break; // very slow chart: report what was measured
       const t = ((k * 0.61803398875) % 1) * tMax; // spread, not monotonic
       const s = performance.now();
       setCursor(t);
