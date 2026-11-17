@@ -1,8 +1,9 @@
-# Performance envelope and sample-limit proposal (ML-NFR-004)
+# Performance envelope and sample limit (ML-NFR-004)
 
-Task: ML-TASK-026 part A. Requirements: ML-NFR-004, ML-UX-003. Status of this document:
-**measured record plus a Proposed limit. The limit is not decided and `packages/` is unchanged.**
-The owner decides the value; the Verification Engineer reviews the record first.
+Task: ML-TASK-026. Requirements: ML-NFR-004, ML-UX-003. Status of this document:
+**measured record; §4 records the owner's decision of 2026-11-17 (keep 1,000,000 as the hard
+limit, soft UI warning above 250,000 samples).** The Verification Engineer reviewed the record
+before the decision.
 
 **All numbers come from one machine, one browser, one session, headless, with software WebGL.**
 They are not a guarantee for any other machine, and in particular not for a computer with a real
@@ -162,7 +163,9 @@ smoothly.** In the order of use:
 | above 250 000          | **Degraded.** 192 ms per frame at 500 000 (about 5 fps) and 386 ms at 1 000 000 (about 2.6 fps); a main-thread pause of 0.3 s to 0.5 s when the result appears; run 1.2 s to 2.2 s. The page stays responsive while computing. |
 | above 1 000 000        | **Not measured.** The engine and validation reject it under the current provisional limit.                                                                                  |
 
-## 4. Proposed sample limit (Proposed, not decided)
+## 4. Sample limit (Decided by the owner, 2026-11-17)
+
+**Decided by the owner, 2026-11-17: keep 1,000,000 as the hard limit, with a soft UI warning above 250,000 samples.** The text below is the proposal and reasoning as submitted for that decision.
 
 **Proposal: keep the limit at 1 000 000 samples** (the value of `PROVISIONAL_MAX_SAMPLE_COUNT`)
 as a hard ceiling, and record it as the decided limit in part B only if the owner agrees.
@@ -181,7 +184,7 @@ What the data support, and what they do not:
 - No evidence supports a higher value. Raising it needs a measurement above 1 000 000 (which
   needs the limit changed, out of scope for part A) and a rendering decision first.
 
-Alternatives for the owner:
+Alternatives that were offered to the owner (the first was chosen as the soft warning):
 
 - **Main alternative: keep the hard ceiling and add a soft warning above 250 000 samples**
   ("playback will be slow"). This is new behaviour and needs its own task.
