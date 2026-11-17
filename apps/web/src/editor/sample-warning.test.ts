@@ -1,3 +1,4 @@
+import { PROVISIONAL_MAX_SAMPLE_COUNT } from '@mission-lab/simulation';
 import { describe, expect, it } from 'vitest';
 import { newScenario } from '../state/default-scenario';
 import {
@@ -31,6 +32,15 @@ describe('soft sample warning (owner decision 2026-11-17)', () => {
     expect(softWarningCount(at)).toBeNull();
     const above = { ...newScenario(), duration_s: 250_000, outputStep_s: 1 };
     expect(softWarningCount(above)).toBe(250_001);
+  });
+
+  it('is absent above the engine limit, where the run is refused (D-2), and shown at the limit', () => {
+    const atLimit = { ...newScenario(), duration_s: 999_999, outputStep_s: 1 };
+    expect(scenarioSampleCount(atLimit)).toBe(PROVISIONAL_MAX_SAMPLE_COUNT);
+    expect(softWarningCount(atLimit)).toBe(1_000_000);
+    const over = { ...newScenario(), duration_s: 1_000_000, outputStep_s: 1 };
+    expect(scenarioSampleCount(over)).toBe(1_000_001);
+    expect(softWarningCount(over)).toBeNull();
   });
 
   it('is absent while the inputs are unusable (no count to show)', () => {

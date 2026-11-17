@@ -26,7 +26,7 @@ export function Toolbar({ issues }: Props) {
       {blocked && (
         <span className="run-blocked" data-testid="run-blocked" id="run-blocked">
           <span aria-hidden="true">&#10005;</span> {issues.length} problem
-          {issues.length === 1 ? '' : 's'} prevent the run
+          {issues.length === 1 ? ' prevents' : 's prevent'} the run
         </span>
       )}
       {largeRun && (
