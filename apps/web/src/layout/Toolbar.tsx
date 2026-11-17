@@ -1,5 +1,6 @@
 import type { ValidationIssue } from '@mission-lab/contracts';
 import { useStore } from 'zustand';
+import { softWarningCount } from '../editor/sample-warning';
 import { getScenarioStore } from '../state/scenario-store';
 import { ResultChip } from './ResultStatus';
 
@@ -10,6 +11,7 @@ interface Props {
 export function Toolbar({ issues }: Props) {
   const store = getScenarioStore();
   const name = useStore(store, (s) => s.scenario.name);
+  const largeRun = useStore(store, (s) => softWarningCount(s.scenario)) !== null;
   const { run, startNewScenario } = store.getState();
   const blocked = issues.length > 0;
   return (
@@ -25,6 +27,11 @@ export function Toolbar({ issues }: Props) {
           {issues.length === 1 ? '' : 's'} prevent the run
         </span>
       )}
+      {largeRun && (
+        <span className="run-note" data-testid="sample-warning-run" id="run-note">
+          <span aria-hidden="true">&#9888;</span> Large run: playback will be slower
+        </span>
+      )}
       <ResultChip />
       <button type="button" data-testid="new-scenario-button" onClick={startNewScenario}>
         New scenario
@@ -33,7 +40,7 @@ export function Toolbar({ issues }: Props) {
         type="button"
         className="primary"
         data-testid="run-button"
-        aria-describedby={blocked ? 'run-blocked' : undefined}
+        aria-describedby={blocked ? 'run-blocked' : largeRun ? 'run-note' : undefined}
         onClick={() => {
           void run();
         }}
