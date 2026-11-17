@@ -1,0 +1,37 @@
+task_id: ML-TASK-035
+title: "VE-01: the 13-step release acceptance scenario as one end-to-end test"
+status: in_progress
+requirement_ids: [ML-FR-001, ML-FR-002, ML-FR-004, ML-FR-005, ML-FR-006, ML-FR-007, ML-FR-008, ML-FR-009, ML-FR-010, ML-FR-011, ML-FR-012]
+owner_role: verification-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-032, ML-TASK-033]
+affected_paths:
+  - apps/web/e2e/acceptance*.spec.ts
+  - docs/verification/ve-01-acceptance.md
+  - docs/backlog/tasks/ML-TASK-035.yaml
+objective: >
+  Provide VE-01, the gate G3 end-to-end evidence: the 13 steps of ML-SYS-001 §14 executed in the
+  real built app in one Playwright test, each step asserting an observable outcome.
+scope:
+  - "One Playwright spec that walks ML-SYS-001 §14 steps 1–13 in order on the built app with the real engine in the worker: create an elliptical or circular orbit; inspect its elements (derived panel, degeneracy note); propagate; see the unmodified trajectory; define an RSW maneuver; run; see the resulting trajectory and the maneuver marker; inspect the parameter changes (plots and comparison table); compare both runs (coast and maneuvered shown together); save to a versioned JSON file; reload it; confirm reproducibility (same requestId and bit-identical samples through the scene-state hook, or equivalent observable); inspect the model, frame and metadata panel."
+  - "Each step is a named `test.step` with at least one assertion on what the user would see, not only on internal state; the hooks (?sceneHook=1) may be used for exactness checks."
+  - "docs/verification/ve-01-acceptance.md: the mapping step → assertions → requirement, the run result, and what the test does not prove (it is a flow test, not numerical verification; numerical evidence is G1 and conformance runs)."
+  - "Robust on slow CI: poll, never read once; no fixed sleeps except where documented."
+out_of_scope:
+  - "Any change to apps/web/src, packages/, or other tests. If a step cannot be observed without a product change, stop and report it."
+inputs:
+  - AGENTS.md
+  - docs/product/ML-SYS-001.md §14; docs/requirements/m1-requirements.md; docs/verification/m1-verification-plan.md (VE-01, G3)
+  - Existing e2e specs in apps/web/e2e (helpers, hooks, polling patterns)
+  - Reports of ML-TASK-022…026, 032, 033 (test ids and hooks)
+acceptance_criteria:
+  - "`pnpm --filter @mission-lab/web test:e2e` passes including the new spec, and the spec passes 3 times in a row (`--repeat-each=3`)."
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm format:check` exit 0."
+  - "ve-01-acceptance.md maps all 13 steps."
+test_requirements:
+  - "Playwright e2e only."
+deliverables:
+  - the spec, ve-01-acceptance.md, the report section of this file
+human_approval_required: true   # gate G3 evidence
+
+report: {}
