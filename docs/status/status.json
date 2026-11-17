@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "All Phase 3 tasks delivered: presets, CSV and table precision (034) and the VE-01 acceptance test (035) in PR #70 (1978 tests, 77 e2e). Next: confirm the presets, merge, then the gate G3 review.",
+  "headline": "Phase 3 complete: all 7 tasks merged; VI-03, VE-01, VT-17 and VT-18 (FR-011 AC3) pass (1978 tests, 77 e2e). Gate G3 package is ready for the owner (docs/releases/G3-review.md).",
   "gates": [
     {
       "id": "G0",
@@ -34,9 +34,9 @@
   ],
   "ownerActions": [
     {
-      "id": "OA-43",
-      "text": "PR #70: confirm the three preset scenarios and the display decimals for s, dimensionless and km²/s²; merge PRs #69 and #70; then gate G3 review.",
-      "blocking": "Gate G3"
+      "id": "OA-44",
+      "text": "Gate G3: read docs/releases/G3-review.md (PR #71) and approve, optionally after a bounded review of the run-5 readings.",
+      "blocking": "Phase 4"
     },
     {
       "id": "OA-3",
@@ -326,8 +326,8 @@
           "title": "Presets and CSV export",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "PR #70"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PR #70)"
         },
         {
           "id": "ML-TASK-036",
@@ -343,8 +343,8 @@
           "title": "Acceptance scenario end-to-end test",
           "role": "Verification Engineer",
           "model": "opus",
-          "status": "in_review",
-          "deps": "PR #70",
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PR #70)",
           "approval": true
         }
       ]
@@ -391,6 +391,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Owner approved the presets and display decimals; PRs #69 and #70 merged. Phase 3 complete. Wrote the G3 review package (PR #71)."
+    },
     {
       "date": "2026-11-17",
       "who": "Coordinator",
