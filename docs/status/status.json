@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "Persistence (033) delivered in PR #67: save and load with validation, VT-17 and VT-18 (FR-011 AC3) pass; 1944 tests, 71 e2e. Owner confirms the 64 KiB file limit. Then presets and CSV (034) and the acceptance scenario (035).",
+  "headline": "Persistence (033) merged with the 64 KiB limit confirmed. Presets, CSV export and comparison-table precision (034) are running. Then the acceptance scenario (035) and gate G3.",
   "gates": [
     {
       "id": "G0",
@@ -33,11 +33,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-42",
-      "text": "Confirm the scenario file size limit of 64 KiB (PR #67) so it can be merged.",
-      "blocking": "ML-TASK-034"
-    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -318,16 +313,16 @@
           "title": "Persistence: format, validation, save/load",
           "role": "Astrodynamics + Frontend",
           "model": "opus / sonnet",
-          "status": "in_review",
-          "deps": "PR #67; owner confirms the 64 KiB limit"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PR #67)"
         },
         {
           "id": "ML-TASK-034",
           "title": "Presets and CSV export",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "033"
+          "status": "in_progress",
+          "deps": "Contract on docs/ml-task-034-contract; agent running"
         },
         {
           "id": "ML-TASK-036",
@@ -391,6 +386,16 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Owner",
+      "text": "Confirmed the 64 KiB scenario file limit; PRs #67 and #68 merged."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-034 started (Sonnet): three presets through the user-file validation path, round-trip CSV export, comparison-table display precision."
+    },
     {
       "date": "2026-11-17",
       "who": "Coordinator",
