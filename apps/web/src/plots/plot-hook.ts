@@ -38,6 +38,8 @@ export interface PlotHookEntry {
   /** The analysis module's output for each segment shown. */
   readonly sources: readonly PlotHookSource[];
   readonly maneuverTimes_s: readonly number[];
+  /** The axis titles uPlot draws (read from its axes): x first, then y. */
+  readonly axisLabels: readonly string[];
   /** The playback cursor of this chart: the time it shows and whether it is inside the axis. */
   readonly cursor: { readonly t_s: number | null; readonly visible: boolean };
 }

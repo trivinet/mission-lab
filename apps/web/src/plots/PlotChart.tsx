@@ -175,6 +175,7 @@ export function PlotChart({ model, describedBy, title, yLabel, stale }: PlotChar
         values: Array.from(source.values),
       })),
       maneuverTimes_s: model.maneuverTimes_s,
+      axisLabels: u.axes.map((axis) => (typeof axis.label === 'string' ? axis.label : '')),
       cursor: { t_s: shownT, visible },
     }));
 
