@@ -5,6 +5,7 @@
  * the `from*` function, and that result is what the store holds. The `to*` functions are used only
  * to show a stored value. These are unit scalings, not physics.
  */
+import { utcIsoAtElapsed } from '@mission-lab/simulation';
 
 /** m -> km. */
 export function toKm(value_m: number): number {
@@ -55,14 +56,16 @@ export function formatInputNumber(value: number): string {
 }
 
 /**
- * UTC label of an elapsed time: epoch + t_s, millisecond precision, no leap-second handling
- * (the documented time convention, ADR-004 and `TIME_CONVENTION` of the engine). Null when the
- * result is not a representable instant.
+ * UTC label of an elapsed time: the engine's `utcIsoAtElapsed` (epoch + t_s, millisecond
+ * precision, no leap-second handling; ADR-004). Null when the engine declines. No date
+ * arithmetic happens in the UI.
  */
 export function utcLabel(epochIso: string, elapsed_s: number): string | null {
-  const ms = Date.parse(epochIso) + elapsed_s * 1000;
-  if (!Number.isFinite(ms) || Math.abs(ms) > 8.64e15) {
-    return null;
-  }
-  return new Date(ms).toISOString();
+  const label = utcIsoAtElapsed(epochIso, elapsed_s);
+  return label.ok ? label.iso : null;
+}
+
+/** m^2/s^2 -> km^2/s^2 (unit scaling only). */
+export function toKm2ps2(value_m2ps2: number): number {
+  return value_m2ps2 / 1e6;
 }
