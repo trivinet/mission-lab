@@ -12,7 +12,8 @@
  */
 import type { ResultState } from '../state/result-state';
 import { EARTH_ORIENTATION_LABEL, earthRotationAngle_rad } from './earth-orientation';
-import { earthRadiusScene, locateSample, sampleVertex } from './scene-geometry';
+import { earthRadiusScene } from './scene-geometry';
+import type { SceneMarker } from './scene-marker';
 import type { SceneGeometry, SegmentKind } from './scene-geometry';
 
 export interface SceneHookSegment {
@@ -38,12 +39,12 @@ export interface SceneHookState {
     readonly maneuverId: string;
     readonly position: Float32Array;
   }[];
-  readonly spacecraftMarker: {
-    readonly segmentIndex: number;
-    readonly sampleIndex: number;
-    readonly t_s: number;
-    readonly position: Float32Array;
-  } | null;
+  /**
+   * The spacecraft marker as drawn: `t_s` is the playback time it was computed from (the same
+   * value as the timeline read-out and the playback store, ML-FR-008 AC2), `position` the scene
+   * coordinates it is drawn at, `interpolated` whether that is a display-only interpolation.
+   */
+  readonly spacecraftMarker: SceneMarker | null;
   readonly axesVisible: boolean;
   readonly camera: {
     readonly position: readonly [number, number, number];
@@ -61,22 +62,15 @@ export interface SceneHookInput {
   readonly fallbackEpochIso: string;
   readonly scale: number;
   readonly axesVisible: boolean;
-  readonly markerFlatIndex: number;
+  /** The marker, computed by markerAt() from the playback time; null without a result. */
+  readonly marker: SceneMarker | null;
   readonly camera: SceneHookState['camera'];
 }
 
 export function buildSceneHookState(input: SceneHookInput): SceneHookState {
   const { geometry } = input;
   const referenceRadius_m = geometry?.referenceRadius_m ?? input.fallbackReferenceRadius_m;
-  const location = geometry === null ? null : locateSample(geometry, input.markerFlatIndex);
-  const markerPosition =
-    geometry === null || location === null ? null : sampleVertex(geometry, location);
-  const markerSegment =
-    geometry === null || location === null ? undefined : geometry.segments[location.segmentIndex];
-  const markerTime_s =
-    markerSegment === undefined || location === null
-      ? 0
-      : (markerSegment.t_s[location.sampleIndex] ?? 0);
+  const markerTime_s = input.marker?.t_s ?? 0;
   return {
     scale: input.scale,
     resultKind: input.resultKind,
@@ -98,15 +92,7 @@ export function buildSceneHookState(input: SceneHookInput): SceneHookState {
         maneuverId: m.maneuverId,
         position: m.position,
       })) ?? [],
-    spacecraftMarker:
-      location === null || markerPosition === null
-        ? null
-        : {
-            segmentIndex: location.segmentIndex,
-            sampleIndex: location.sampleIndex,
-            t_s: markerTime_s,
-            position: markerPosition,
-          },
+    spacecraftMarker: input.marker,
     axesVisible: input.axesVisible,
     camera: input.camera,
     sourcePosition_m: geometry?.source.segments.map((s) => s.position_m) ?? null,

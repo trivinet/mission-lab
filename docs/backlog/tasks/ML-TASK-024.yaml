@@ -43,4 +43,40 @@ deliverables:
   - apps/web/src/playback/ with tests; marker wiring; e2e; the report section of this file
 human_approval_required: false
 
-report: {}
+report:
+  files_changed:
+    - "apps/web/src/playback/ (new): interpolate.ts (hermite, displayPositionAt, resultTimeSpan_s), time-control.ts (rates, maneuver times, advanceTime), playback-store.ts (t_s, playing, rate; separate store, no runner), Timeline.tsx (controls, read-out, frame loop), index.ts, interpolate.test.ts, playback.test.ts"
+    - "apps/web/src/scene/: scene-marker.ts (new, markerAt); scene-hook.ts (input marker replaces markerFlatIndex; spacecraftMarker now sampleIndex|null, interpolated, t_s = playback time); scene-options.ts (markerFlatIndex removed); WorkspaceScene.tsx (marker from the playback store; the marker-sample slider removed); tests adapted"
+    - "apps/web/src/layout/CenterRegion.tsx: mounts Timeline under the scene"
+    - "apps/web/e2e/playback.spec.ts (new, 7 tests); scene.spec.ts: the old marker-sample slider step now uses the playback slider"
+  summary: >
+    One playback store holds t_s, playing and rate. The timeline read-out, the slider and the
+    marker all read that t_s; the marker is computed by markerAt(result, t_s) from
+    displayPositionAt (display only) and converted with the single scene scale. displayPositionAt
+    picks the last segment whose span contains t (so segment n + 1 at a maneuver time), returns the
+    engine sample exactly after an explicit sample-time check, and otherwise applies cubic Hermite
+    (hermite()) on position and velocity between the two bracketing samples of that one segment.
+    The scene hook marker reports t_s (its source time), sampleIndex (null when interpolated),
+    interpolated and the Float32 position. A new run or no result resets playback to 0, paused;
+    the same result shown stale keeps the playback time. Playback has no access to the runner.
+  interpolation: >
+    p(t) = h00 p0 + h10 h v0 + h01 p1 + h11 h v1, h = t1 - t0, u = (t - t0)/h,
+    h00 = 2u^3 - 3u^2 + 1, h10 = u^3 - 2u^2 + u, h01 = -2u^3 + 3u^2, h11 = u^3 - u^2.
+    Hand-worked test: p0 = 0, v0 = 1, p1 = 4, v1 = 3 on t = 0..2 is p = t^2/2 + t, so p(1) = 1.5
+    (checked exactly), p(0.5) = 0.625.
+  tests_executed:
+    - "pnpm install --frozen-lockfile, lint, typecheck, build, format:check, check:boundaries: exit 0"
+    - "pnpm test: 86 files, 1764 tests passed (new: interpolate.test.ts 15, playback.test.ts)"
+    - "pnpm --filter @mission-lab/web test:e2e (Chromium, built app): 49 passed; playback.spec.ts also run with --repeat-each=3, 21 passed"
+    - "AC3 unit (real engine: default, maneuver on grid at 3000 s, off grid at 2500.25 s): every sample time returns the engine sample with Object.is on all three components; maneuver time returns segment 1 sample 0; midpoints are interpolated and stay in their own segment; hand-worked Hermite case"
+    - "AC2 unit: store t_s equals the marker source t_s in the hook at 0, 1234.5, 2999.75, 3000, 3000.5, 6000; e2e: read-out data-t-s, hook marker t_s equal at 0, 1234, 2999, 3000, 3001, 4500, 6000"
+    - "AC1 e2e: play advances, pause holds, scrub sets, jump start/end/maneuver land on 0, 6000, 3000, rate 1 vs 1000 changes the advance, play stops itself exactly at 6000, keyboard operation (Tab order, Enter, Space, Home, ArrowRight) with focus-visible outline; Worker.postMessage counter unchanged across playback (and shown to be > 0 after the run)"
+    - "e2e: marker at a sample time equals Math.fround(sample * scale) from the hook's source arrays; between samples interpolated is true"
+  not_verified:
+    - "No screenshot of the timeline layout was viewed; layout and visual polish are unreviewed."
+    - "The frame loop's real-time pacing on very slow runners is checked only by loose bounds (advance > 20 s at 1000 s/s, < 10 s at 1 s/s)."
+    - "The interpolation accuracy against the true orbit between samples is not measured (display only); only the formula and the bit-exact sample rule are tested."
+    - "A slider step of 1 s cannot reach a non-integer end or maneuver time; the jump buttons do."
+  notes:
+    - "File time-control.ts rather than timeline.ts: on Windows it collides in casing with Timeline.tsx (TS1149)."
+    - "Rates are simulated s per real s: 1, 10, 60, 300 (default), 1000; a frame never advances more than 0.25 s of real time."
