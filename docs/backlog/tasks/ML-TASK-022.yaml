@@ -1,6 +1,6 @@
 task_id: ML-TASK-022
 title: "Workspace layout shell and scenario editor with validation and derived values (apps/web)"
-status: in_progress
+status: review
 requirement_ids: [ML-FR-001, ML-FR-002, ML-FR-005, ML-UX-001, ML-UX-002, ML-UX-004]
 owner_role: frontend-engineer
 reviewer_role: systems-architect
@@ -48,4 +48,50 @@ deliverables:
   - apps/web layout shell, editor, tests; the report section of this file
 human_approval_required: false
 
-report: {}
+report:
+  files_changed:
+    - "apps/web/src/App.tsx, index.css (tokens as CSS custom properties, dark only), layout/ (Toolbar, ResultStatus chip and banner, CenterRegion, ResultsColumn)"
+    - "apps/web/src/editor/ (Fields, ScenarioPanel, ManeuverPanel, DerivedPanel, issue-map, useIssues) and format/units.ts (m<->km, rad<->deg, km2/s2, UTC label via the engine), editor/normalise-angles.ts"
+    - "apps/web/src/state/scenario-store.ts: additions only (setElement, addManeuver, setManeuverTime_s, setManeuverDeltaV_mps, removeManeuver); five-state rules untouched"
+    - "apps/web/src/debug/DebugSurface.tsx removed; e2e/result-states.spec.ts adapted; e2e/editor.spec.ts new"
+  summary: >
+    Layout A shell (editor, centre, results), toolbar with Run and result chip, banner for none,
+    computing, stale and error. The centre region (scene-region) holds the 3D scene of ML-TASK-023
+    in scene-container. All scenario fields and the six elements are editable in km and deg
+    (converted once, stored SI); validation is live from the engine's buildSimulationRequest,
+    shown per field with the engine's code and message. One maneuver can be added, edited and
+    removed, with a UTC label from the engine (utcIsoAtElapsed) and the RSW note. Finished by the
+    integration on ML-TASK-027 (branch feat/phase2-workspace-integration): Omega, omega and nu are
+    normalised to [0, 360) deg when an angle field loses focus, using
+    describeScenarioOrbit(...).view.normalizedAngles; the derived panel shows perigee and apogee
+    radius and altitude, period and specific energy from view.derived (tagged computed, no input
+    chrome); view.degeneracy gives the classification, the undefined elements, the reported
+    angles and the convention note.
+  engine_exports_used:
+    - "@mission-lab/simulation: buildSimulationRequest, describeScenarioOrbit, ENGINE_CONSTANTS, utcIsoAtElapsed"
+    - "@mission-lab/contracts: types; the M1 one-maneuver message comes via validation (MANEUVER_COUNT_EXCEEDED)"
+    - "Result events: ManeuverEvent.deltaV_magnitude_mps for total |dv| (shown after a run)"
+  acceptance_mapping:
+    - "AC1 install --frozen-lockfile, lint, typecheck, test (84 files, 1738 tests), build, format:check, check:boundaries and web e2e (42 passed) exit 0; VE-02 and ML-UX-003 kept with the same assertions (state read from data-state)"
+    - "AC2 unit: format/units.test.ts, editor/issue-map.test.ts, state/editor-setters.test.ts, and the new editor/normalise-angles.test.ts (370 -> 10 deg, -10 -> 350, 720 -> 0, exactly 360 -> 0, in-range untouched and no stale, engine declines on an invalid orbit)"
+    - "AC3 e2e (editor.spec.ts): editing each field class; 13 validation classes plus perigee; angle normalisation on blur (4 cases); degenerate classification for non-degenerate, circular, equatorial and circular-equatorial orbits (convention, undefined elements, note); derived values with units that follow the inputs (hand-calculated r_p and r_a), no input element in the panel, tagged computed; withheld with a reason when the orbit is invalid; maneuver add, edit, remove and second-maneuver message; keyboard-only run"
+    - "AC4 no physics in apps/web: unit scaling only (m/km, rad/deg, m2/s2 to km2/s2); derived values, normalisation, classification and the UTC label come from engine exports"
+  tests_executed:
+    - "pnpm install --frozen-lockfile, lint, typecheck, test, build, format:check, check:boundaries: exit 0"
+    - "pnpm test: 84 files, 1738 tests passed"
+    - "pnpm --filter @mission-lab/web test:e2e: 42 passed (Chromium, built app)"
+    - "Looked at screenshots of the built app at 1440 px: default state and maneuvered current state"
+  not_verified:
+    - "Contrast of italic stale values and of the derived and degeneracy text not measured; no colour-blind check; Firefox and Safari not run"
+    - "Keyboard operation checked by Chromium e2e only, no screen reader pass"
+    - "Each keystroke edits the store, so the result goes stale per keystroke"
+    - "Normalisation runs when an angle field loses focus, not per keystroke. If the rest of the orbit is invalid at that moment the engine declines, the angle stays out of range and its message stays"
+  known_limitations:
+    - "Add maneuver can be pressed twice; the second shows the engine's MANEUVER_COUNT_EXCEEDED message and blocks the run until removed"
+    - "Total |dv| appears only after a run (engine value)"
+    - "Because normalisation happens on blur, the three ANGLE_OUT_OF_RANGE e2e cases keep their assertions but press Run with a dispatched click that does not blur the field; a normal click normalises first and the run proceeds (covered by the new normalisation e2e)"
+    - "The e2e 'derived values are not available (blocked)' was replaced by the derived and degeneracy tests: it asserted the blocker, not a requirement"
+    - "Merge commit bb49fce lacks the Co-Authored-By trailer"
+  risks_or_blockers: []
+  documentation_changes: []
+  recommended_next_action: "Owner review of the integrated branch (ML-TASK-022 and 023 on 027)."

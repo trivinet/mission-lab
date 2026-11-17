@@ -6,7 +6,12 @@
  * buildSimulationRequest (validation, element-to-state conversion, requestId) and hands it to a
  * runner, which executes the engine in a Web Worker. The main thread never calls runSimulation.
  */
-import type { Scenario, ValidationIssue } from '@mission-lab/contracts';
+import type {
+  ImpulsiveManeuver,
+  KeplerianElements,
+  Scenario,
+  ValidationIssue,
+} from '@mission-lab/contracts';
 import { buildSimulationRequest } from '@mission-lab/simulation';
 import { createStore } from 'zustand/vanilla';
 import type { StoreApi } from 'zustand/vanilla';
@@ -42,6 +47,19 @@ export interface ScenarioStoreState {
   setDuration_s: (duration_s: number) => void;
   /** Physical: output step in seconds. */
   setOutputStep_s: (outputStep_s: number) => void;
+  /** Physical: one Keplerian element, in SI (m, rad; eccentricity dimensionless). */
+  setElement: (key: keyof KeplerianElements, value: number) => void;
+  /**
+   * Physical: appends a maneuver (t = 0 s, Δv = 0 m/s). The M1 one-maneuver limit is enforced by
+   * the engine's validation, not here, so a second maneuver is rejected with its message at run.
+   */
+  addManeuver: () => void;
+  /** Physical: sets the time (s since epoch) of the maneuver at `index`. */
+  setManeuverTime_s: (index: number, t_s: number) => void;
+  /** Physical: sets one RSW component (0 = R, 1 = S, 2 = W) of the maneuver at `index`, m/s. */
+  setManeuverDeltaV_mps: (index: number, component: 0 | 1 | 2, value: number) => void;
+  /** Physical: removes the maneuver at `index`. */
+  removeManeuver: (index: number) => void;
   /** Replaces the scenario by a fresh default and resets the result (confirmation: ML-TASK-033). */
   startNewScenario: () => void;
   /** Resolves when this run has settled (finished, failed, or been superseded). */
@@ -55,6 +73,14 @@ function withoutKey(issues: FieldIssues, key: string): FieldIssues {
     return issues;
   }
   return Object.fromEntries(Object.entries(issues).filter(([k]) => k !== key));
+}
+
+function replaceManeuver(
+  maneuvers: Scenario['maneuvers'],
+  index: number,
+  patch: Partial<ImpulsiveManeuver>,
+): Scenario['maneuvers'] {
+  return maneuvers.map((m, i) => (i === index ? { ...m, ...patch } : m));
 }
 
 export function createScenarioStore(runner: SimulationRunner): ScenarioStore {
@@ -115,6 +141,63 @@ export function createScenarioStore(runner: SimulationRunner): ScenarioStore {
             outputStep_s,
           }),
         );
+      },
+      setElement: (key, value) => {
+        editPhysical(
+          `initialOrbit.elements.${key}`,
+          !Object.is(value, get().scenario.initialOrbit.elements[key]),
+          (s) => ({
+            ...s,
+            initialOrbit: {
+              ...s.initialOrbit,
+              elements: { ...s.initialOrbit.elements, [key]: value },
+            },
+          }),
+        );
+      },
+      addManeuver: () => {
+        // A new maneuver is a physical change; clear the stale list-level issue (count limit).
+        editPhysical('maneuvers', true, (s) => ({
+          ...s,
+          maneuvers: [
+            ...s.maneuvers,
+            { id: crypto.randomUUID(), t_s: 0, frame: 'RSW', deltaV_mps: [0, 0, 0] },
+          ],
+        }));
+      },
+      setManeuverTime_s: (index, t_s) => {
+        const current = get().scenario.maneuvers[index];
+        editPhysical(
+          `maneuvers.${String(index)}.t_s`,
+          current !== undefined && !Object.is(current.t_s, t_s),
+          (s) => ({ ...s, maneuvers: replaceManeuver(s.maneuvers, index, { t_s }) }),
+        );
+      },
+      setManeuverDeltaV_mps: (index, component, value) => {
+        const current = get().scenario.maneuvers[index];
+        editPhysical(
+          `maneuvers.${String(index)}.deltaV_mps.${String(component)}`,
+          current !== undefined && !Object.is(current.deltaV_mps[component], value),
+          (s) => {
+            const deltaV_mps: [number, number, number] = [0, 0, 0];
+            for (const i of [0, 1, 2] as const) {
+              deltaV_mps[i] = i === component ? value : (current?.deltaV_mps[i] ?? 0);
+            }
+            return { ...s, maneuvers: replaceManeuver(s.maneuvers, index, { deltaV_mps }) };
+          },
+        );
+      },
+      removeManeuver: (index) => {
+        editPhysical('maneuvers', index >= 0 && index < get().scenario.maneuvers.length, (s) => ({
+          ...s,
+          maneuvers: s.maneuvers.filter((_, i) => i !== index),
+        }));
+        // Issues of the removed row's fields no longer apply.
+        set({
+          validationIssues: Object.fromEntries(
+            Object.entries(get().validationIssues).filter(([k]) => !k.startsWith('maneuvers.')),
+          ),
+        });
       },
       startNewScenario: () => {
         // A run in flight finds no computing state when it returns, so it is ignored.
