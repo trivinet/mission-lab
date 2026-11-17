@@ -29,6 +29,8 @@ export type {
 export { buildSamplingGrid, gridCandidateCount, sampleCount } from './sampling-grid';
 export type { GridSegment } from './sampling-grid';
 export { validateScenarioSemantics } from './semantic-validation';
+export { utcIsoAtElapsed } from './utc-label';
+export type { UtcLabelFailure, UtcLabelResult } from './utc-label';
 export {
   SHA256_INITIAL_HASH,
   SHA256_ROUND_CONSTANTS,
