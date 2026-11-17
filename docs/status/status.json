@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "ML-TASK-030 delivered: ADR-010 proposes uPlot (8 charts × 250 000 points: 364 ms first render, 0.1 ms cursor). ML-TASK-031 (analysis) is in PR #60. Owner decides ADR-010 and the angle-plotting policy; then the plots UI (032).",
+  "headline": "ADR-010 accepted (uPlot; angles break at each wrap) and the analysis module merged. Next in Phase 3: plots and comparison UI (032), independent references for VI-03 and the comparison (new verification task), persistence (033).",
   "gates": [
     {
       "id": "G0",
@@ -33,11 +33,6 @@
     }
   ],
   "ownerActions": [
-    {
-      "id": "OA-40",
-      "text": "Approve ADR-010 (PR #61): uPlot 1.6.32 as the charting library; decide how wrapping angles (ν, Ω) are plotted (recommended: break the line at each wrap, values unchanged); merge PRs #59, #60, #61.",
-      "blocking": "ML-TASK-032 (plots)"
-    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -293,8 +288,8 @@
           "title": "Charting library spike (OD-006) and ADR-010",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_review",
-          "deps": "ADR-010 proposed in PR #61",
+          "status": "done",
+          "deps": "ADR-010 accepted 2026-11-17 (PR #61)",
           "approval": true
         },
         {
@@ -302,8 +297,8 @@
           "title": "Analysis module: histories and comparison",
           "role": "Astrodynamics Engineer",
           "model": "opus",
-          "status": "in_review",
-          "deps": "PR #60; independent references for VI-03/FR-010 AC3 still needed"
+          "status": "done",
+          "deps": "Merged (PR #60)"
         },
         {
           "id": "ML-TASK-032",
@@ -382,6 +377,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Owner",
+      "text": "Accepted ADR-010 (uPlot 1.6.32) and the angle plotting policy (break the line at each wrap, values unchanged). PRs #59, #60, #61 merged, CI green."
+    },
     {
       "date": "2026-11-17",
       "who": "Frontend",
