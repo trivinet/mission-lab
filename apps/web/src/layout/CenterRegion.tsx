@@ -1,4 +1,5 @@
 import { Timeline } from '../playback';
+import { PlotsPanel } from '../plots/PlotsPanel';
 import { WorkspaceScene } from '../scene';
 import { ResultBanner } from './ResultStatus';
 
@@ -17,6 +18,7 @@ export function CenterRegion() {
         </div>
       </section>
       <Timeline />
+      <PlotsPanel />
     </div>
   );
 }

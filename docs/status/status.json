@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "ADR-010 accepted (uPlot; angles break at each wrap) and the analysis module merged. Next in Phase 3: plots and comparison UI (032), independent references for VI-03 and the comparison (new verification task), persistence (033).",
+  "headline": "Plots and comparison (032) and conformance run 5 (036) merged. Persistence (033) is running. Left before G3: presets and CSV (034), the acceptance scenario (035).",
   "gates": [
     {
       "id": "G0",
@@ -305,16 +305,16 @@
           "title": "Plots and comparison UI",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "030, 031"
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PRs #64, #65)"
         },
         {
           "id": "ML-TASK-033",
           "title": "Persistence: format, validation, save/load",
           "role": "Astrodynamics + Frontend",
           "model": "opus / sonnet",
-          "status": "todo",
-          "deps": "004, 022"
+          "status": "in_progress",
+          "deps": "Contract on docs/ml-task-033-contract; agent running"
         },
         {
           "id": "ML-TASK-034",
@@ -323,6 +323,15 @@
           "model": "sonnet",
           "status": "todo",
           "deps": "033"
+        },
+        {
+          "id": "ML-TASK-036",
+          "title": "Independent references for VI-03 (b) and FR-010 AC3 (conformance run 5)",
+          "role": "Verification Engineer",
+          "model": "opus",
+          "status": "done",
+          "deps": "Merged 2026-11-17 (PRs #64, #65)",
+          "approval": true
         },
         {
           "id": "ML-TASK-035",
@@ -377,6 +386,41 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Owner",
+      "text": "Kept the quantities with no approved tolerance row informative for M1 (declared as a G3 limit). PRs #63, #64, #65 merged."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-033 started (Sonnet): versioned scenario file, validated load, save/load UI, unsaved indicator, confirmation dialog, VT-17 and VT-18 FR-011 AC3."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Checked ML-TASK-036: 1877 tests; reference imports only the verification hp/vec libraries; phase order confirmed (boundary 894ad6b). Shrinking one committed a-tolerance to 1e-30 failed exactly that comparison (restored). PR #65."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Verification",
+      "text": "ML-TASK-036 (conformance run 5): VI-03 (b) histories on 1217 samples and FR-010 AC3 comparison rows on 5 maneuver cases, all asserted rows pass (worst 0.090); 4 quantity groups informative only (no approved row); no defect."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Checked ML-TASK-032: 1845 tests, 60 e2e pass; scope apps/web, lockfile, three architecture docs. Screenshot reviewed and sent; Δa ≈ 190 km for +100 m/s matches the first-order estimate. Follow-up: display precision of the comparison table. PR #64."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-032 delivered: uPlot plots (13 quantities, maneuver marker, playback cursor, wrap breaks, text alternatives), coast run in scene and plots, comparison table; VI-03 (a) Object.is 0 mismatches."
+    },
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #62. Wrote contracts for ML-TASK-032 (plots and comparison UI with uPlot, coast run, VI-03 (a)) and the new ML-TASK-036 (VI-03 (b) and FR-010 AC3 references, conformance run 5). Both running in parallel."
+    },
     {
       "date": "2026-11-17",
       "who": "Owner",

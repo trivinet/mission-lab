@@ -13,7 +13,7 @@ existing framework to retain.
 - **Tailwind CSS** with a small in-repo component set.
 - **Persistence:** versioned JSON file import/export; optional local-storage autosave of the
   working scenario. No IndexedDB or other browser database in M1.
-- **Charting library:** not decided here; chosen by a spike at the start of Phase 3 (OD-006).
+- **Charting library:** not decided here; decided by ADR-010 (accepted 2026-11-17): uPlot 1.6.32 (OD-006 resolved).
 
 Exact versions are selected against current stable releases and pinned in ML-TASK-002.
 
