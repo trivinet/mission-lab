@@ -72,6 +72,14 @@ const CASES: readonly Case[] = [
   }),
 ];
 
+function caseAt(index: number): Case {
+  const found = CASES[index];
+  if (found === undefined) {
+    throw new Error('no such case');
+  }
+  return found;
+}
+
 function models(c: Case): PlotModel[] {
   return HISTORY_QUANTITIES.map(({ quantity, unit }) =>
     buildPlotModel(c.result, c.coast, quantity, unit, c.maneuverTimes_s),
@@ -126,7 +134,9 @@ describe.each(CASES)('plot model: $name', (c) => {
         const source = model.sources.find(
           (s) => s.run === series.run && s.segmentIndex === series.segmentIndex,
         );
-        expect(source).toBeDefined();
+        if (source === undefined) {
+          throw new Error('series without a source');
+        }
         for (let i = 0; i + 1 < model.x.length; i += 1) {
           const a = series.values[i];
           const b = series.values[i + 1];
@@ -134,8 +144,8 @@ describe.each(CASES)('plot model: $name', (c) => {
             continue;
           }
           // A drawn line segment joins two consecutive samples of one segment ...
-          const ia = source?.t_s.findIndex((t) => Object.is(t, model.x[i])) ?? -1;
-          const ib = source?.t_s.findIndex((t) => Object.is(t, model.x[i + 1])) ?? -1;
+          const ia = source.t_s.findIndex((t) => Object.is(t, model.x[i]));
+          const ib = source.t_s.findIndex((t) => Object.is(t, model.x[i + 1]));
           expect(ia).toBeGreaterThanOrEqual(0);
           expect(ib).toBe(ia + 1);
           // ... and for an angle the two values are on the same side of the wrap.
@@ -144,8 +154,8 @@ describe.each(CASES)('plot model: $name', (c) => {
           }
         }
         // A series never has a value outside the time span of its own segment.
-        const first = source?.t_s[0] ?? Number.NaN;
-        const last = source?.t_s[(source?.t_s.length ?? 0) - 1] ?? Number.NaN;
+        const first = source.t_s[0] ?? Number.NaN;
+        const last = source.t_s[source.t_s.length - 1] ?? Number.NaN;
         for (const [i, v] of series.values.entries()) {
           if (v !== null) {
             expect(model.x[i]).toBeGreaterThanOrEqual(first);
@@ -169,16 +179,11 @@ describe.each(CASES)('plot model: $name', (c) => {
 });
 
 describe('maneuver structure', () => {
-  const maneuvered = CASES[1];
+  const maneuvered = caseAt(1);
+  const plainCase = caseAt(0);
 
   it('the two sides of the maneuver are separate series that both have the maneuver time', () => {
-    const model = buildPlotModel(
-      maneuvered?.result as ResultHistories,
-      maneuvered?.coast ?? null,
-      'speed_mps',
-      'm/s',
-      [3000],
-    );
+    const model = buildPlotModel(maneuvered.result, maneuvered.coast, 'speed_mps', 'm/s', [3000]);
     const before = model.series.find((s) => s.run === 'maneuvered' && s.segmentIndex === 0);
     const after = model.series.find((s) => s.run === 'maneuvered' && s.segmentIndex === 1);
     const at = model.x.findIndex((t) => t === 3000);
@@ -189,33 +194,21 @@ describe('maneuver structure', () => {
   });
 
   it('with a coast run the coast is its own series; without one segment 0 is the coast', () => {
-    const withCoast = buildPlotModel(
-      maneuvered?.result as ResultHistories,
-      maneuvered?.coast ?? null,
-      'radius_m',
-      'm',
-      [3000],
-    );
+    const withCoast = buildPlotModel(maneuvered.result, maneuvered.coast, 'radius_m', 'm', [3000]);
     expect(withCoast.series.some((s) => s.run === 'coast')).toBe(true);
-    const plain = buildPlotModel(CASES[0]?.result as ResultHistories, null, 'radius_m', 'm', []);
+    const plain = buildPlotModel(plainCase.result, null, 'radius_m', 'm', []);
     expect(plain.series.map((s) => s.run)).toEqual(['coast']);
   });
 
   it('breaks an angle where it wraps, and leaves the values unchanged', () => {
     // The default scenario covers about one orbit: the true anomaly wraps once.
-    const model = buildPlotModel(
-      CASES[0]?.result as ResultHistories,
-      null,
-      'trueAnomaly_rad',
-      'rad',
-      [],
-    );
+    const model = buildPlotModel(plainCase.result, null, 'trueAnomaly_rad', 'rad', []);
     expect(model.series.length).toBeGreaterThan(1);
     const plotted = model.series.flatMap((s) => s.values).filter((v) => v !== null);
     const source = model.sources[0]?.values.filter((v) => v !== null);
     expect(plotted).toHaveLength(source?.length ?? -1);
     // A non-angle quantity is never split.
-    const radius = buildPlotModel(CASES[0]?.result as ResultHistories, null, 'radius_m', 'm', []);
+    const radius = buildPlotModel(plainCase.result, null, 'radius_m', 'm', []);
     expect(radius.series).toHaveLength(1);
   });
 });

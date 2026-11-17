@@ -234,9 +234,7 @@ export function createScenarioStore(runner: SimulationRunner): ScenarioStore {
           built.value.maneuvers.length > 0 ? buildCoastRequest(get().scenario) : null;
         const [response, coastResponse] = await Promise.all([
           runner(runId, built.value),
-          coastBuilt === null || !coastBuilt.ok
-            ? Promise.resolve(null)
-            : runner(-runId, coastBuilt.value),
+          !coastBuilt?.ok ? Promise.resolve(null) : runner(-runId, coastBuilt.value),
         ]);
         // A superseded or stale run's response finds no matching computing state and is ignored.
         if (response.type === 'crashed') {
