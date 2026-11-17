@@ -40,4 +40,60 @@ deliverables:
   - apps/web changes, harness, docs/verification/performance-envelope.md, the report section of this file
 human_approval_required: true   # the sample limit value (part B) and gate G2
 
-report: {}
+report:
+  files_changed:
+    - apps/web/src/model-panel/model-rows.ts
+    - apps/web/src/model-panel/ModelPanel.tsx
+    - apps/web/src/model-panel/ModelPanel.test.ts
+    - apps/web/src/index.css
+    - apps/web/src/worker/protocol.ts
+    - apps/web/src/worker/simulation.worker.ts
+    - apps/web/src/worker/vi01-integration.test.ts
+    - apps/web/perf/envelope.perf.ts
+    - apps/web/playwright.perf.config.ts
+    - apps/web/package.json
+    - apps/web/tsconfig.json
+    - apps/web/e2e/scene.spec.ts
+    - apps/web/e2e/result-states.spec.ts
+    - package.json
+    - .gitignore
+    - docs/verification/performance-envelope.md
+    - docs/verification/data/performance-envelope-2026-11-17.json
+    - docs/backlog/tasks/ML-TASK-026.yaml
+  summary: >
+    A1/A2 done: a dev-only Playwright harness (pnpm perf:envelope) measured 1e3 to 1e6 samples,
+    3 repetitions each, 18/18 succeeded; record and a Proposed limit (keep 1 000 000) are in
+    docs/verification/performance-envelope.md. A3 done: G2 evidence listed there. A4b done.
+    A4a (deterministic maneuver ids) NOT done: the Scenario schema in packages/contracts is a
+    strict object with no field for a counter, so per the task rules the work stopped and is
+    reported as a blocker. Also hardened e2e reads (poll instead of read-once) and added
+    optional diagnostic timing to the worker response (engine_ms, workerPostedAt_ms).
+  tests_executed:
+    - "pnpm install --frozen-lockfile: exit 0"
+    - "pnpm lint: exit 0"
+    - "pnpm typecheck: exit 0"
+    - "pnpm test: 88 files, 1783 tests passed"
+    - "pnpm build: exit 0"
+    - "pnpm format:check: exit 0"
+    - "pnpm check:boundaries: 20/20 fixtures ok"
+    - "pnpm --filter @mission-lab/web test:e2e: 52 passed"
+    - "pnpm perf:envelope: 6 sizes x 3 repetitions, all ok (not part of CI)"
+  reference_data_used: []
+  not_verified:
+    - "Behaviour above 1 000 000 samples (bounded by the provisional limit; packages/ not changed)."
+    - "Rendering on a real GPU (the run used software WebGL, SwiftShader)."
+    - "Process-level memory (worker arrays, GPU buffers); only main-page JS heap was read."
+    - "Any machine other than the one recorded; one session only."
+    - "Deterministic maneuver ids (blocked, see risks_or_blockers)."
+  known_limitations:
+    - "Timing fields on the worker response are diagnostic and untested beyond the harness."
+    - "Probe latency includes Playwright protocol latency."
+  documentation_changes:
+    - docs/verification/performance-envelope.md
+  risks_or_blockers:
+    - "A4a blocked: scenarioSchema (packages/contracts/src/scenario.ts) is z.strictObject with no maneuver-counter field, and the contracts may not be changed in this task. Maneuver ids are still crypto.randomUUID() in apps/web/src/state/scenario-store.ts, so two identical scenarios built independently get different requestIds. Needs a contract decision (add an optional counter field, or define the id as derived from the scenario, e.g. next free 'm<k>' over the existing ids, which needs no new field)."
+    - "The sample limit decision is the owner's (part B)."
+  review_artifact: ""
+  recommended_next_action: >
+    Verification Engineer reviews the envelope record; owner decides the limit and the maneuver-id
+    contract question; then part B.
