@@ -1,10 +1,11 @@
 # Mission Lab v1.0.0 (M1 Orbital Sandbox): release notes
 
-**Status: Draft.** Remains a draft until ML-TASK-043 (release checklist and tag). Gate G4 has not
-been approved. Nothing here is released, published or deployed. Prepared by the Documentation and
-Release agent under ML-TASK-041 on 2026-11-17 from the gate reviews G0 to G3 and the documents they
-cite; no content is written from memory. Not yet in the draft: the result of ML-TASK-040
-(`docs/verification/release-readiness-review.md` does not exist yet) and the G4 evidence.
+**Status: Release candidate.** Final after the owner approves gate G4
+([G4-review.md](G4-review.md), Proposed). Nothing is tagged or released yet. The live site is
+<https://trivinet.github.io/mission-lab/> (deployed by `.github/workflows/pages.yml`, ML-TASK-042).
+Prepared by the Documentation and Release agent under ML-TASK-041 and updated under ML-TASK-043 on
+2026-11-17 from the gate reviews G0 to G3 and the documents they cite. Counts and decisions are
+taken from those documents or from the measurements in [G4-review.md](G4-review.md).
 
 **Mission Lab is not qualified for operational use.** It is an educational and exploratory tool.
 
@@ -12,7 +13,8 @@ cite; no content is written from memory. Not yet in the draft: the result of ML-
 
 Requirements are in `docs/requirements/m1-requirements.md`; the mapping to tests is in the
 [traceability matrix](../verification/traceability-matrix.md). How to use it is in the
-[user guide](../user-guide.md).
+[user guide](../user-guide.md). The app runs in the browser at
+<https://trivinet.github.io/mission-lab/>.
 
 - Create, edit and validate an Earth orbit from Keplerian elements; derived values and the
   degenerate-orbit convention are shown (ML-FR-001, ML-FR-002).
@@ -45,15 +47,25 @@ not restated here.
 
 Test counts as the reviews state them: 1574 tests at G1; 1792 unit and integration tests and 53
 browser tests at G2; 1978 unit and integration tests and 77 browser tests (Chromium) at G3, all
-passing locally and in CI at the time. These are not re-run for this draft.
+passing locally and in CI at the time. On the release-candidate branch the suites were run again:
+1989 unit and integration tests (106 files, 6 Vitest projects), 98 browser tests, 28 of 28 boundary
+fixtures ([G4-review.md](G4-review.md) section A).
+
+Release-readiness review (ML-TASK-040): [release-readiness-review.md](../verification/release-readiness-review.md).
+It found one major finding (D-1, main-thread time after a result) and nine minor ones (D-2 to D-10). The owner
+approved the pre-release fix package and accepted D-4, D-5, D-8 and D-10 for M1
+([status.json](../status/status.json), activity log, 2026-11-17). ML-TASK-044 fixed D-1, D-2, D-3,
+D-6, D-7 and D-9 and re-measured the performance record
+([performance-envelope.md](../verification/performance-envelope.md) section 8).
 
 Evidence layers: invariants (L1), independent implementation (L2), and Orekit as an external
 tool (L3). Worst measured ratio to tolerance in conformance run 5: 0.090 for the history
 comparison and 0.035 for the comparison table (`docs/verification/conformance-run-5.md`).
 
-Full suite on the release commit and the owner walkthrough of the 13-step acceptance scenario
-(ML-SYS-001 section 14) are G4 evidence and are not yet done. The automated acceptance flow is
-`apps/web/e2e/acceptance.spec.ts` (`docs/verification/ve-01-acceptance.md`).
+The full suite on the release-candidate branch is in [G4-review.md](G4-review.md). The owner
+walkthrough of the 13-step acceptance scenario (ML-SYS-001 section 14) is not done yet; it is the
+remaining G4 evidence. The automated acceptance flow is `apps/web/e2e/acceptance.spec.ts`
+([ve-01-acceptance.md](../verification/ve-01-acceptance.md)).
 
 ## 3. Known limits and accepted gaps
 
@@ -152,11 +164,11 @@ import and export of orbital data formats; parabolic and hyperbolic initial orbi
 impact handling as a simulation event once an Earth-fixed frame exists. Each would get its own
 requirements and verification cases.
 
-## 6. Before this draft can become the release notes
+## 6. Before this release candidate becomes the release
 
-- ML-TASK-040 result and the owner's decisions on its findings.
-- ML-TASK-042 (hosting) and ML-TASK-043 (checklist and tag); the version number: every package
-  is still `0.0.0` in its `package.json` and nothing in the repository defines the versioning
-  process.
-- `CHANGELOG.md` does not exist; creating it is not part of ML-TASK-041.
-- The owner walkthrough of the acceptance scenario and gate G4.
+- The owner walkthrough of the 13 steps of ML-SYS-001 section 14 on the live site, and the
+  decision on gate G4 ([G4-review.md](G4-review.md)).
+- After approval: the tag `v1.0.0` and the GitHub release, created by the Coordinator. Neither
+  exists yet.
+- Version: every `package.json` and the `PACKAGE_VERSION` constants are `1.0.0`
+  (ML-TASK-043). The change history is in [CHANGELOG.md](../../CHANGELOG.md).
