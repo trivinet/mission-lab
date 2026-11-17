@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "ML-TASK-031 (analysis module) delivered in PR #60: histories per segment and the coast-vs-maneuver comparison, no new physics. The charting spike (030) is still running.",
+  "headline": "ML-TASK-030 delivered: ADR-010 proposes uPlot (8 charts × 250 000 points: 364 ms first render, 0.1 ms cursor). ML-TASK-031 (analysis) is in PR #60. Owner decides ADR-010 and the angle-plotting policy; then the plots UI (032).",
   "gates": [
     {
       "id": "G0",
@@ -33,6 +33,11 @@
     }
   ],
   "ownerActions": [
+    {
+      "id": "OA-40",
+      "text": "Approve ADR-010 (PR #61): uPlot 1.6.32 as the charting library; decide how wrapping angles (ν, Ω) are plotted (recommended: break the line at each wrap, values unchanged); merge PRs #59, #60, #61.",
+      "blocking": "ML-TASK-032 (plots)"
+    },
     {
       "id": "OA-3",
       "text": "Check the MAPBOX_ACCESS_TOKEN entry in Satellite Viewer's next.config.js and rotate it if it is a live token.",
@@ -288,8 +293,8 @@
           "title": "Charting library spike (OD-006) and ADR-010",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "in_progress",
-          "deps": "Contract on docs/ml-task-030-031-contracts; agent running",
+          "status": "in_review",
+          "deps": "ADR-010 proposed in PR #61",
           "approval": true
         },
         {
@@ -377,6 +382,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Frontend",
+      "text": "ML-TASK-030 delivered: uPlot, ECharts, Plotly basic, Recharts built on engine data and measured (3 reps); ADR-010 proposes uPlot 1.6.32 (23.9 kB gzip, no deps, MIT). Found that ν and Ω plots jump at every wrap; a plotting policy is needed."
+    },
     {
       "date": "2026-11-17",
       "who": "Coordinator",
