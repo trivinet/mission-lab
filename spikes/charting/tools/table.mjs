@@ -6,7 +6,7 @@ const {
   reps,
   timeout_ms: timeout,
   results,
-} = JSON.parse(readFileSync('results/measurements.json', 'utf8'));
+} = JSON.parse(readFileSync(process.argv[2] ?? 'results/measurements.json', 'utf8'));
 const NAMES = {
   uplot: 'uPlot',
   echarts: 'ECharts (cursor: setOption graphic)',
@@ -19,7 +19,8 @@ const f = (s, d = 0) =>
 console.log(JSON.stringify(env));
 console.log(`repetitions: ${reps}, timeout per run: ${timeout} ms\n`);
 for (const mode of ['single', 'panel']) {
-  for (const dataset of ['n1e4', 'n2_5e5']) {
+  for (const dataset of ['small', 'n1e4', 'n2_5e5']) {
+    if (!results.some((x) => x.mode === mode && x.dataset === dataset)) continue;
     console.log(`\n### ${mode}, ${dataset}\n`);
     console.log(
       '| Library | First render ms | Cursor call ms | Cursor to next frame ms | JS heap MB |',

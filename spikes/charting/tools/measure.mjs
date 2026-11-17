@@ -167,7 +167,7 @@ for (const dataset of SIZES) {
 }
 mkdirSync('results', { recursive: true });
 writeFileSync(
-  'results/measurements.json',
+  process.env.SPIKE_OUT ?? 'results/measurements.json',
   JSON.stringify({ env, reps: REPS, timeout_ms: TIMEOUT, results }, null, 2),
 );
 await browser.close();
