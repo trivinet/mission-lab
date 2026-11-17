@@ -102,7 +102,7 @@ pinned by commit hash.
 
 `pnpm test` includes the whole `conformance` project, so the reference comparisons run in CI. CI
 has no Orekit, Python or JDK, so the L3 datasets are committed files and are never regenerated in
-CI (`l3-restart-procedure.md`). That `checks` is a required status check on `main` is stated in the
+CI (`docs/verification/l3-restart-procedure.md`). That `checks` is a required status check on `main` is stated in the
 G1 verification report (section on gate criterion 4); branch protection settings themselves are not
 in the repository.
 
@@ -121,7 +121,7 @@ Principles (`docs/verification/m1-verification-plan.md` sections 1 and 2; ADR-00
 |---|---|
 | L1 | Closed-form invariants and relations |
 | L2 | Independent implementation in `verification/` (different algorithm; engine source not read) |
-| L3 | External: Orekit datasets in `test-data/l3-orekit/` (owner decision D-5). Textbook L3 does not exist (owner decision OA-15 open; `l3-textbook-assessment.md`) |
+| L3 | External: Orekit datasets in `test-data/l3-orekit/` (owner decision D-5). Textbook L3 does not exist (owner decision OA-15 open; `docs/verification/l3-textbook-assessment.md`) |
 
 **Test families.** VT-01…VT-19 (numerical), VI-01…VI-03 (integration), VE-01…VE-02 (end to end);
 the table is in the verification plan section 3. Test files are named after their family, for
@@ -140,7 +140,7 @@ valid only if the dataset and the evaluated tolerance are committed before the e
 that dataset (evidence: commit order in `main`). Inputs to the evaluation come from the reference
 side, never from engine output. Making a tolerance larger than the approved formula gives needs
 owner sign-off before the engine is run against it. The conformance run reports record this as a
-table of commits ("phase boundary", for example `conformance-run-5.md` section 1).
+table of commits ("phase boundary", for example `docs/verification/conformance-run-5.md` section 1).
 
 **Conformance runs.** Reports of running the engine or the analysis module against the reference
 datasets, written by the Verification Engineer:
@@ -204,7 +204,7 @@ Roles and model allocation are in ADR-007 and `.claude/agents/`.
 | Engine and UI contract | `docs/architecture/contracts-v1.md` |
 | Why this layout, frame, algorithm, stack, charting library | ADR-002, 004, 005, 006, 010 |
 | Degenerate elements and angular accuracy | ADR-008 |
-| Gate decisions and accepted limits | `docs/releases/G0-review.md` … `G3-review.md` |
+| Gate decisions and accepted limits | `docs/releases/G0-review.md`, `docs/releases/G1-review.md`, `docs/releases/G2-review.md`, `docs/releases/G3-review.md` |
 | Task status | `docs/status/status.json`, `docs/backlog/backlog.md` |
 | Sample limit and performance | `docs/verification/performance-envelope.md` |
 
@@ -212,7 +212,7 @@ Roles and model allocation are in ADR-007 and `.claude/agents/`.
 
 - Allowed branch `<type>` values, commit message format, merge method, reviewer counts and branch
   protection are not defined in the repository (contributing.md section 8).
-- `contributing.md` and `coding-standards.md` still contain statements from before Phase 1
+- `docs/engineering/contributing.md` and `docs/engineering/coding-standards.md` still contain statements from before Phase 1
   (for example "five Vitest projects", "no test has been written yet", "no L3 dataset exists
   yet"). This guide follows the repository as it is now; the differences are listed in the
   ML-TASK-041 report.
