@@ -1,0 +1,43 @@
+task_id: ML-TASK-026
+title: "Integration with the real engine: measured performance envelope, sample-limit proposal, G2 evidence (VI-01, VI-02, VE-02)"
+status: in_progress
+requirement_ids: [ML-NFR-004, ML-UX-003, ML-FR-007, ML-FR-008, ML-FR-012]
+owner_role: frontend-engineer
+reviewer_role: verification-engineer   # the measured record is reviewed before the owner decides the limit
+dependencies: [ML-TASK-017, ML-TASK-022, ML-TASK-023, ML-TASK-024, ML-TASK-025]
+affected_paths:
+  - apps/web/                       # measurement harness (dev/test only), small fixes listed in scope
+  - docs/verification/performance-envelope.md
+  - docs/backlog/tasks/ML-TASK-026.yaml
+objective: >
+  Close Phase 2: measure what the workspace supports with the real engine, record it, propose the
+  ML-NFR-004 sample limit for the owner, and collect the G2 evidence. Part A (this contract) does
+  not change the limit; part B, after the owner decides, sets it in packages/simulation.
+scope:
+  - "Part A1, measurement (ML-NFR-004). A reproducible harness (Playwright on the built app, dev/test only, never shipped) that runs scenarios of increasing total sample count (for example 1e3, 1e4, 1e5, 2.5e5, 5e5, 1e6) and records per run: engine time in the worker, transfer time to the main thread, time to first rendered frame, frame time during playback, main-thread responsiveness during the run (probe as in the ML-UX-003 e2e), and JS heap if available. Record machine, OS, browser and versions. Repeat each point at least 3 times; report median and spread."
+  - "Part A2, the record. `docs/verification/performance-envelope.md`: method, raw table, the supported envelope stated as measured (what stays interactive and below which frame time), and a proposed sample limit with its reasoning. The limit is a proposal for the owner; mark it 'Proposed'. State plainly that the numbers are from one machine."
+  - "Part A3, G2 evidence. Confirm VI-01 (request to result structure, segments, events, metadata completeness: point to the existing conformance/simulation tests that cover it and add any missing one in apps/web only if needed), VI-02 (scene hook, already in place) and VE-02 (result states e2e) pass on the integrated app; list the test files."
+  - "Part A4, follow-ups found in review. (a) Deterministic maneuver ids per contracts-v1 §14: the editor generates ids from a counter persisted in the scenario, so re-creating the same scenario gives the same requestId; add a test that two identical scenarios built independently get the same requestId. (b) Readability of long texts in the model panel (constants source, time convention): left-aligned proportional text, values unchanged, AC2 sentinel test still passing."
+out_of_scope:
+  - "Changing PROVISIONAL_MAX_SAMPLE_COUNT or anything in packages/ (part B, after the owner decides)."
+  - "Performance optimisation work beyond trivial fixes; if a bottleneck needs real work, report it."
+  - "New runtime dependencies. A dev-only measurement script uses Playwright already in the repo."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/requirements/m1-requirements.md (NFR-004, UX-003); docs/verification/m1-verification-plan.md (VI-01, VI-02, VE-02, gate G2)
+  - packages/simulation/src/limits.ts (read only; the placeholder and its rationale)
+  - docs/architecture/contracts-v1.md §3, §5.2, §6, §14
+  - Reports of ML-TASK-021…025 and 027
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; `pnpm --filter @mission-lab/web test:e2e` passes."
+  - "performance-envelope.md exists with environment, method, raw data (≥ 3 repetitions per point), the envelope and a Proposed limit with reasoning; the harness reproduces it with one documented command."
+  - "Deterministic maneuver ids: test shows identical scenarios give the same requestId."
+  - "Model panel readability change keeps the AC2 sentinel test passing unchanged."
+  - "G2 evidence list (VI-01, VI-02, VE-02) with test files, all passing."
+test_requirements:
+  - "Existing suites; new unit/e2e tests for deterministic ids; the measurement harness is not part of the normal CI run (too slow) and is documented."
+deliverables:
+  - apps/web changes, harness, docs/verification/performance-envelope.md, the report section of this file
+human_approval_required: true   # the sample limit value (part B) and gate G2
+
+report: {}
