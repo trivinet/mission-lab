@@ -1,5 +1,5 @@
 export const PACKAGE_NAME = '@mission-lab/verification';
-export const PACKAGE_VERSION = '0.0.0';
+export const PACKAGE_VERSION = '1.0.0';
 
 // Public surface for the conformance workspace (ADR-009). Re-exports only; no behaviour change.
 // The engine is never imported here (ADR-003).

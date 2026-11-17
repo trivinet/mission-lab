@@ -108,9 +108,9 @@ then the task contract.
 
 ### 7.1 Layout
 
-- Unit tests live in `src/` in each workspace as `*.test.ts`. Vitest runs five projects declared
-  in `vitest.config.ts`: `astrodynamics`, `contracts`, `simulation`, `verification`, `web`.
-- The current placeholder tests are `src/index.test.ts` in each package (ML-TASK-003 report).
+- Unit tests live in `src/` in each workspace as `*.test.ts`. Vitest runs six projects declared
+  in `vitest.config.ts`: `astrodynamics`, `conformance`, `contracts`, `simulation`,
+  `verification`, `web`.
 - End-to-end tests live in `apps/web/e2e/` as `*.spec.ts`. Playwright runs Chromium only
   (`apps/web/playwright.config.ts`).
 - Reference datasets go in `test-data/reference-cases/<family>/<case>.json` with the fields in
@@ -133,11 +133,12 @@ only against all of them.
 
 - L2 methods: classical elements with Newton solution of Kepler's equation; fixed-step
   Runge–Kutta integration with step-halving check; direct rotation-matrix construction.
-- L3 source: Python + Orekit (owner decision D-5, 2026-11-11, `docs/releases/G0-review.md`). No L3 dataset exists yet (ML-TASK-012).
+- L3 source: Python + Orekit (owner decision D-5, 2026-11-11, `docs/releases/G0-review.md`). L3 datasets are in `test-data/l3-orekit/`.
 - Tolerances are derived before the engine's results are seen, and the owner approves them.
   The method is fixed; the values are fixed at G1 (ADR-003; m1-verification-plan.md §4).
 - Test families VT-01…VT-19, VI-01…VI-03 and VE-01…VE-02 are defined in
-  m1-verification-plan.md §3. No test in these families has been written yet (plan header).
+  m1-verification-plan.md §3. The mapping of requirements to tests is in
+  [traceability-matrix.md](../verification/traceability-matrix.md).
 - Implementation under test is never the only reference for its own verification (AGENTS.md).
 
 ## 8. Documentation identifiers

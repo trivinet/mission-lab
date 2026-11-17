@@ -1,6 +1,6 @@
 # Conformance Run 5 — VI-03 (b) and ML-FR-010 AC3: analysis module vs independent references
 
-**Document ID:** ML-VER-010 · **Date:** 2026-11-17 · **Author:** Verification Engineer (ML-TASK-036, phase 2) · **Status:** In review (not approved)
+**Document ID:** ML-VER-010 · **Date:** 2026-11-17 · **Author:** Verification Engineer (ML-TASK-036, phase 2) · **Status:** Approved at gate G3 (2026-11-17), see [G3-review.md](../releases/G3-review.md)
 
 First run of the analysis module (ML-TASK-031: `computeHistories`, `compareCoastAndManeuver`)
 against independent references, as gate G3 evidence for VI-03 (b) (ML-FR-009 histories) and
