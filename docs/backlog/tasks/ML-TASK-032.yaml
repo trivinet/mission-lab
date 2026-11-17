@@ -1,0 +1,48 @@
+task_id: ML-TASK-032
+title: "Plots and coast-vs-maneuver comparison UI (apps/web, uPlot per ADR-010)"
+status: in_progress
+requirement_ids: [ML-FR-009, ML-FR-010, ML-FR-008, ML-UX-004]
+owner_role: frontend-engineer
+reviewer_role: verification-engineer   # FR-009 AC3 / VI-03 (a) plumbing is exact
+dependencies: [ML-TASK-030, ML-TASK-031]
+affected_paths:
+  - apps/web/
+  - pnpm-lock.yaml
+  - docs/architecture/tech-baseline.md          # add uplot 1.6.32 with source, per ADR-010 consequences
+  - docs/architecture/adr/ADR-006-frontend-stack.md   # charting bullet: point to ADR-010
+  - docs/architecture/proposed-architecture.md        # Charts row: point to ADR-010
+  - docs/backlog/tasks/ML-TASK-032.yaml
+objective: >
+  Show the analysis module's histories and the coast-vs-maneuver comparison in the workspace,
+  with the plotted values exactly the module's output.
+scope:
+  - "Add uplot 1.6.32 (exact pin) to apps/web; record it in tech-baseline.md with version, licence and source, and point ADR-006 and proposed-architecture §5 to ADR-010 (accepted 2026-11-17)."
+  - "Plots of the computeHistories series (ML-FR-009 AC1): radius, altitude, speed, true anomaly and the classical elements, selectable; axis titles with units, legend, maneuver marker (AC2); no line across the maneuver (segments as separate series); angles in [0, 2π) break the line at each wrap with values unchanged (ADR-010 angle policy); playback cursor synchronised with the timeline t_s (ML-FR-008 AC2)."
+  - "Coast run: when a maneuver exists, Run also runs the coast request (buildCoastRequest) in the worker; both trajectories shown together with distinct, labelled styles in the 3D scene and in the plots (ML-FR-010 AC1). The result-state rules and latest-run-wins apply to the pair."
+  - "Comparison table from compareCoastAndManeuver (ML-FR-010 AC2): before/after/difference rows with units and the applied Δv (inertial, RSW, magnitude); absent values shown with their reason."
+  - "Accessibility: every plot has a text alternative (values at the cursor time plus the comparison table); controls operable by keyboard (ML-UX-004)."
+  - "VI-03 (a) plumbing test: every plotted value equals the module output with Object.is (read back from uPlot's data), including the coast series."
+out_of_scope:
+  - "VI-03 (b) correctness and FR-010 AC3 (ML-TASK-036, Verification Engineer)."
+  - "Any change to packages/; persistence (033); presets and CSV (034)."
+  - "Dependencies other than uplot 1.6.32."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/architecture/adr/ADR-010-charting-library.md (accepted, angle policy) and spikes/charting/ (reference implementation of marker, cursor, gaps, read-back)
+  - docs/requirements/m1-requirements.md (FR-008 AC2, FR-009, FR-010, UX-004)
+  - docs/verification/tolerances.md §1 (VI-03 plumbing row) and §8 VI-03 (a)
+  - docs/backlog/tasks/ML-TASK-031.yaml report (analysis API), ML-TASK-024 (playback store), 026 (performance envelope)
+  - docs/design/design-tokens.md (coast vs maneuvered colours)
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; `pnpm --filter @mission-lab/web test:e2e` passes (e2e polls, never single reads)."
+  - "VI-03 (a): Object.is on every plotted value vs computeHistories, default and maneuvered, coast included, unit test and browser e2e."
+  - "No plotted line crosses a maneuver or an angle wrap (test on the series structure)."
+  - "e2e: maneuver run shows coast and maneuvered in scene and plots with distinct labelled styles; comparison table shows every AC2 row; cursor follows playback t_s; keyboard operation."
+  - "uplot is the only new dependency, at exactly 1.6.32."
+test_requirements:
+  - "Vitest unit tests in apps/web/src; Playwright e2e."
+deliverables:
+  - apps/web plots and comparison UI with tests; doc updates listed in affected_paths; the report section of this file
+human_approval_required: false
+
+report: {}

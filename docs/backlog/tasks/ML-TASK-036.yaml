@@ -1,0 +1,44 @@
+task_id: ML-TASK-036
+title: "VI-03 (b) and ML-FR-010 AC3: independent references for the analysis module and the comparison table"
+status: in_progress
+requirement_ids: [ML-FR-009, ML-FR-010]
+owner_role: verification-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-031]
+affected_paths:
+  - verification/src/**
+  - conformance/**
+  - test-data/reference-cases/**     # new files only
+  - docs/verification/conformance-run-5.md
+  - docs/backlog/tasks/ML-TASK-036.yaml
+objective: >
+  Provide the G3 evidence that the analysis module's outputs are correct: VI-03 (b) per-sample
+  correctness against an independent recomputation, and ML-FR-010 AC3 comparison-table values
+  against independent references, both under the approved tolerance record.
+scope:
+  - "Phase 1 (no engine or analysis-module output seen): independent reference recomputation in verification/src (L2c forms as tolerances.md §8 VI-03 (b) prescribes: atan2 forms, high precision where the record says so; it must not import or call the analysis module or packages/simulation). Datasets in test-data/reference-cases/ (new files only) with per-sample tolerances evaluated from the reference side per tolerances.md §8 VI-03 (b) table and, for the comparison table, the FR-010 AC3 rows of §7 VT-15; samples within a factor 2 of a §10 threshold excluded as the record says. Conformance tests in conformance/ that will compare computeHistories and compareCoastAndManeuver outputs with the datasets. All committed before any run of the analysis module on these cases (§4.1)."
+  - "Phase 2: run, report in docs/verification/conformance-run-5.md (families, cases, worst ratios, asserted vs informative, limits, findings). A failure is investigated (reference defect vs module defect) and reported; nothing in packages/ is changed; references are corrected only as new versions with the reason stated, never loosened."
+  - "Cases: at least the default scenario, a tangential burn, a non-tangential burn, an inclined eccentric orbit (C4-like), a Molniya-like orbit (C5-like) and one post-maneuver hyperbolic case for the quantities defined there."
+out_of_scope:
+  - "Changing tolerances.md (if a needed row is missing or ambiguous, stop and report; a new revision needs the owner)."
+  - "Changing packages/ or apps/web."
+  - "New dependencies."
+inputs:
+  - AGENTS.md
+  - docs/verification/tolerances.md (revision 5, approved): §1, §4.1, §7 VT-15 (FR-010 AC3 rows), §8 VI-03, §10
+  - docs/verification/m1-verification-plan.md (VI-03, G3)
+  - docs/requirements/m1-requirements.md (FR-009, FR-010)
+  - ADR-003, ADR-008, ADR-009; contracts-v1 (result layout, R8)
+  - docs/backlog/tasks/ML-TASK-031.yaml report (the module's public API only; do not read its implementation in phase 1)
+  - Previous conformance runs 1–4 for style and helpers
+acceptance_criteria:
+  - "Phase discipline evidenced by commit order (phase-1 boundary commit named in the report)."
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0."
+  - "conformance-run-5.md with per-family results and worst ratios; every comparison asserted unless the record makes it conditional."
+test_requirements:
+  - "Reference self-tests in verification/src; conformance tests in conformance/."
+deliverables:
+  - references, datasets, conformance tests, conformance-run-5.md, the report section of this file
+human_approval_required: true   # evidence for gate G3
+
+report: {}
