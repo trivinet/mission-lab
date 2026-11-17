@@ -41,4 +41,69 @@ deliverables:
   - packages/simulation/src new module(s), index exports, tests; the report section of this file
 human_approval_required: false
 
-report: {}
+report:
+  files_changed:
+    - "packages/simulation/src/degeneracy-thresholds.ts (new): DEGENERACY_THRESHOLDS"
+    - "packages/simulation/src/scenario-view.ts (new): describeScenarioOrbit and its result types"
+    - "packages/simulation/src/utc-label.ts (new): utcIsoAtElapsed; internal epochTimeValue_ms (not exported from the index)"
+    - "packages/simulation/src/engine-constants.ts (new, Coordinator scope addition): ENGINE_CONSTANTS"
+    - "packages/simulation/src/earth-rotation.ts (new, Coordinator scope addition): earthRotationAngle_rad, ERA_AT_J2000_rev, ERA_RATE_revpday"
+    - "packages/simulation/src/index.ts (modified: export lines only; also re-exports the types CentralBodyConstants, DegeneracyThresholds, DegenerateConvention from astrodynamics)"
+    - "packages/simulation/src/{degeneracy-thresholds,scenario-view,utc-label,engine-constants,earth-rotation}.test.ts (new): 2 + 26 + 7 + 2 + 10 = 47 tests"
+    - "docs/backlog/tasks/ML-TASK-027.yaml: this report"
+  summary: >
+    Plumbing only; no astrodynamics, contracts, apps/web, verification or tolerance change.
+    DEGENERACY_THRESHOLDS = { circularEccentricity: 1e-5, equatorialInclination_rad: 1e-5 },
+    transcribed from ADR-008 ("Thresholds and target value", owner 2026-11-13) and tolerances.md
+    §10 / §15 (row "Thresholds ε_e, ε_i"). describeScenarioOrbit(elements, constants) returns
+    Ω, ω, ν through normalizeAngle_rad; derived quantities from closedOrbitQuantities plus
+    altitude = radius − referenceRadius_m; and the degenerate classification. Detection runs on
+    the state, not on the input e and i: elementsToState (regular map) then stateToElements with
+    DEGENERACY_THRESHOLDS, because ADR-008 decision 1 applies the convention only to
+    state→elements and reports e and i as computed from the state; stateToElements implements the
+    record's rule (strict e < ε_e and min(i, π − i) < ε_i, plus exactly degenerate e = 0 / node
+    vector = 0). The description lists undefined elements and the meaning of each reported angle,
+    restating the DegenerateConvention documentation of astrodynamics, and carries the elements the
+    engine reports (convention applied). Failures are typed codes passed through from the
+    astrodynamics functions plus NON_FINITE_INPUT and REFERENCE_RADIUS_NOT_POSITIVE.
+    utcIsoAtElapsed(epochIso, t_s) gives the canonical YYYY-MM-DDTHH:MM:SS.sssZ of epoch + t_s
+    under TIME_CONVENTION (no leap seconds), the offset rounded to the nearest millisecond
+    (Math.round, halves toward +∞), with EPOCH_INVALID / NON_FINITE_TIME / OUT_OF_RANGE failures.
+    Coordinator scope addition (message of 2026-11-16): ENGINE_CONSTANTS is the astrodynamics
+    EARTH_CONSTANTS object that buildSimulationRequest copies into request.constants (no value
+    retyped). earthRotationAngle_rad(epochIso, t_s) evaluates ADR-004's ERA = 2π(0.7790572732640 +
+    1.00273781191135448·T_u) as written (TN36 Eq. 5.14, confirmed in vt-19-constants.md §4.3),
+    UT1 ≈ UTC, T_u = (time value − J2000 time value)/86 400 000 + t_s/86 400, reduced by
+    normalizeAngle_rad; documented as illustrative and display-only. The rate is written as
+    1.0027378119113546, the shortest decimal of the binary64 value that 1.00273781191135448
+    parses to (vt-19-constants.md §4.3 notes); a test asserts Number('1.00273781191135448') equals
+    it. The Julian-date relation (Unix time = (JD − 2440587.5) × 86 400 s, leap seconds excluded)
+    is from Wikipedia "Julian day" (accessed 2026-11-17), a secondary source; a test checks that
+    Date.parse('2000-01-01T12:00:00.000Z') equals the derived J2000 time value 946 728 000 000 ms.
+  tests_executed:
+    - "pnpm install --frozen-lockfile: exit 0"
+    - "pnpm lint: exit 0"
+    - "pnpm typecheck: exit 0"
+    - "pnpm test: exit 0; Test Files 78 passed (78), Tests 1677 passed (1677)"
+    - "pnpm format:check: exit 0"
+    - "pnpm check:boundaries: exit 0; 20/20 fixtures reported"
+    - "npx vitest run --project simulation: 160 passed (113 before this task; existing test files unchanged)"
+  reference_data_used:
+    - "None from test-data/. Expected values are either the astrodynamics functions' own output (plumbing tests), hand calendar arithmetic (UTC labels) or hand multiplication written in the test comments (ERA at T_u = 0, T_u = 10, daily advance)."
+  not_verified:
+    - "No independent reference comparison of any new function (Verification Engineer's role). The physics called is the G1-verified astrodynamics code."
+    - "ECMA-262 time-value semantics (leap seconds excluded, ±8.64e15 ms range) not opened; relied on as packages/contracts isCanonicalUtcIso already does, and checked behaviourally."
+    - "The Julian-date relation is from a secondary source (Wikipedia); not confirmed against a primary text (e.g. IERS or an almanac)."
+    - "ERA values not compared with an external ERA/GMST service; only hand arithmetic from ADR-004's formula."
+    - "Classification exactly at a threshold (within about 1e-13 of ε) depends on rounding of the state round trip; tests use ±1 % offsets only."
+    - "The editor (ML-TASK-022) and the 3D scene (ML-TASK-023) have not consumed the API yet."
+  known_limitations:
+    - "UTC labels and ERA ignore leap seconds (M1 convention); ERA uses UT1 ≈ UTC and Eq. 5.14 as written, not TN36's split Eq. 5.15 (binary64 spacing about 1e-11 rad at |T_u| ≈ 1e4 days; immaterial for the illustrative view)."
+    - "UTC label rounds to the nearest millisecond; a t_s whose millisecond part is exactly .5 may round either way by one ulp of t_s·1000."
+    - "describeScenarioOrbit does not apply the FR-002 AC2 perigee-above-reference-radius rule; that stays in validateScenarioSemantics. Negative altitudes are returned as computed."
+  documentation_changes:
+    - "Doc comments on every new public symbol (units, frame, valid domain, sources)."
+  risks_or_blockers:
+    - "Scope was extended by the Coordinator mid-task (ENGINE_CONSTANTS, earthRotationAngle_rad); the contract's scope list does not yet name them. The architect review should confirm them."
+  review_artifact: "Not opened (branch feat/ml-task-027-scenario-view, not pushed, per instruction)."
+  recommended_next_action: "Systems Architect review of the exported API, then unblock ML-TASK-022 and ML-TASK-023."
