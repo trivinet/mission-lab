@@ -41,4 +41,66 @@ deliverables:
   - references, datasets, conformance tests, conformance-run-5.md, the report section of this file
 human_approval_required: true   # evidence for gate G3
 
-report: {}
+report:
+  files_changed:
+    - verification/src/ref/analysis.ts                    # reference: method H (200-bit polar) and method B (binary64 e-vector)
+    - verification/src/ref/analysis.test.ts               # reference self-tests (two methods, known elements, ADR-008 view)
+    - verification/src/tol/tolerances-vi03.ts             # transcription of §8 VI-03 (b), §7 VT-15 FR-010 AC3, VT-12, VT-13 rows
+    - verification/src/tol/tolerances-vi03.test.ts        # transcription vs every value the record prints
+    - verification/src/datasets/build-vi03.ts             # dataset builder (6 cases)
+    - verification/src/datasets/datasets-vi03.test.ts     # reference-side checks of vi-03-b
+    - verification/src/datasets/datasets.test.ts          # vi-03-b added to the reproducibility check (write mode VI03)
+    - verification/src/index.ts                           # re-exports analysisReferenceHp, normHp
+    - test-data/reference-cases/vi-03-b/*.json            # new: 6 datasets (codeRevision 012216262e97)
+    - conformance/src/support/vi03.ts                     # comparison logic
+    - conformance/src/support/vi03.test.ts                # comparison logic self-test on synthetic inputs
+    - conformance/src/vi03-analysis.test.ts               # VI-03 (b) and FR-010 AC3 conformance test
+    - docs/verification/conformance-run-5.md              # run report (ML-VER-010)
+    - docs/backlog/tasks/ML-TASK-036.yaml                 # this report
+  summary: >
+    Phase 1 (d7be9dd, 0122162, 39d3152; boundary 894ad6b): independent reference of the analysis
+    quantities of one state (200-bit in-plane polar formulation with the ADR-008 convention,
+    validated against the binary64 e-vector formulation within M x the per-side budgets, against
+    known elements and against the earlier L2c view); six datasets (default, tangential, combined,
+    C4 normal burn, C5 prograde, post-maneuver hyperbolic) with the §5.2 grid, a 200-bit reference
+    trajectory and per-sample tolerances evaluated from it (§4.1 items 1-2); a conformance test that
+    runs buildSimulationRequest/buildCoastRequest, computeHistories and compareCoastAndManeuver and
+    compares every value with the reference recomputed from the same engine state. Phase 2: every
+    asserted comparison passed (1 217 history samples x 10 rows, 5 comparison tables, applied Δv);
+    worst ratio 0.0897 (Ω history, C5). No defect found. Quantities without an approved row
+    (e, ω, ν on hyperbolic states; r_p, r_a, T histories; hyperbolic r_p; convention-assigned
+    angles) stayed informative; see conformance-run-5.md §4.
+  tests_executed:
+    - "pnpm install --frozen-lockfile -> exit 0 (Lockfile is up to date)"
+    - "pnpm lint -> exit 0"
+    - "pnpm typecheck -> exit 0"
+    - "pnpm test -> exit 0; Test Files 98 passed (98), Tests 1877 passed (1877)"
+    - "pnpm format:check -> exit 0 (All matched files use Prettier code style!)"
+    - "pnpm check:boundaries -> exit 0 (20/20 fixtures reported)"
+    - "Phase 1, before 894ad6b: pnpm exec vitest run --project verification -> 21 files, 294 tests passed; pnpm exec vitest run --project conformance src/support/vi03.test.ts -> 12 passed (synthetic inputs; no engine or analysis-module run)"
+    - "Phase 2: pnpm exec vitest run --project conformance src/vi03-analysis.test.ts --reporter=verbose --silent=false -> 7 passed; ratios in conformance-run-5.md §3"
+  reference_data_used:
+    - "test-data/reference-cases/vi-03-b (new; produced by verification/src/datasets/build-vi03.ts at 012216262e97, committed in 39d3152 before any run)"
+    - "Default-scenario values from apps/web/src/state/default-scenario.ts (product default, read only); grid C4/C5 elements from verification/src/datasets/cases.ts"
+    - "No external or textbook value"
+  not_verified:
+    - "e, ω, ν on hyperbolic states (history and table after/difference): no approved row (e-vector budget derived for bound orbits); measured only (≤ 4.4e-15)."
+    - "r_p, r_a, T histories: no VI-03 (b) row; measured only (≤ 1.9e-15 relative)."
+    - "r_p on a hyperbolic state: not provided by the module; no record row."
+    - "Convention-assigned angles on near-circular / near-equatorial / retrograde-equatorial orbits: no row and no case."
+    - "Flight-path angle and mean anomaly: not provided by the module."
+    - "VI-03 (a) plumbing (plots = module output) and FR-009 AC2: ML-TASK-032, not part of this task."
+  known_limitations:
+    - "Interpretations to be confirmed by the reviewer/owner: |δa|, |δe| of the FR-010 AC3 rows taken as the VI-03 (b) a and e tolerances of the same event state; κ_h of the VT-12 row = 1/√(1 − e⁻²); exclusion rule applied to the whole sample (no sample affected)."
+    - "test-data/reference-cases/README.md not updated (the contract allows new files only there); vi-03-b is documented in its own files and in conformance-run-5.md."
+    - "The phase-1 reading of the analysis module's public surface used a filter on export declarations that also printed two trivial private helpers (valueOf, firstSample); stated in conformance-run-5.md §1."
+  documentation_changes:
+    - docs/verification/conformance-run-5.md
+  risks_or_blockers:
+    - "Record gaps (conformance-run-5.md §4 items 3, 4, 5, 9) need a record revision with owner approval if they are to count as G3 evidence."
+  review_artifact: ""   # branch test/ml-task-036-vi03-references, not pushed (Coordinator instruction)
+  recommended_next_action: >
+    Coordinator: review (systems-architect) and owner acceptance of conformance-run-5.md; owner
+    decision on the record gaps of §4 and on the interpretations of §4 items 1, 6, 7. Remaining for
+    G3: VI-03 (a) and FR-009 AC2 in the UI (ML-TASK-032), VE-01, VT-17 and the FR-011 AC3 part of
+    VT-18 (ML-TASK-033), and the flight-path angle / mean anomaly decision.
