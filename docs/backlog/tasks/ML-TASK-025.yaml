@@ -1,0 +1,43 @@
+task_id: ML-TASK-025
+title: "Model and assumptions panel rendered from SimulationResult.model (apps/web)"
+status: in_progress
+requirement_ids: [ML-FR-012, ML-UX-004]
+owner_role: frontend-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-017, ML-TASK-021]
+affected_paths:
+  - apps/web/src/model-panel/
+  - apps/web/src/layout/ResultsColumn.tsx   # mount the panel in the results column
+  - apps/web/e2e/model-panel*.spec.ts
+  - docs/backlog/tasks/ML-TASK-025.yaml
+objective: >
+  Show the user, for the current result, exactly which physical models and assumptions produced
+  it, rendered from the engine's own metadata, and state that the tool is not qualified for
+  operational use.
+scope:
+  - "A panel in the results column that shows, for the current (or stale, marked stale) result: dynamics model, central body and constants with source, propagator, maneuver model, frame, time convention, engine version, sampling configuration and the list of limitations (ML-FR-012 AC1; ML-SYS-001 §5.7)."
+  - "All content rendered from `SimulationResult.model` and the result's sampling metadata; nothing about the model hard-coded in the UI (AC2). Labels and layout are UI wording; values and limitation texts come from the result."
+  - "A permanent, visible statement that the application is not qualified for operational use (AC3); its wording is UI text, listed in the report for the owner."
+  - "With no result (none) or an error without a model, the panel says so; it never shows a model for a result that does not exist."
+  - "Keyboard and focus per ML-UX-004 if the panel is collapsible."
+out_of_scope:
+  - "Timeline (024), plots (030–032), persistence (033). Any change to packages/ or to the contracts."
+  - "New dependencies."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/requirements/m1-requirements.md (FR-012); docs/product/ML-SYS-001.md §5.7
+  - docs/architecture/contracts-v1.md (SimulationResult.model, metadata)
+  - packages/simulation/src/model.ts (read only)
+  - docs/design/visual-direction.md, design-tokens.md (approved)
+  - docs/backlog/tasks/ML-TASK-021.yaml, ML-TASK-022.yaml reports (store, layout)
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; `pnpm --filter @mission-lab/web test:e2e` passes."
+  - "AC2 test: a unit test renders the panel from a result whose model fields are replaced by sentinel values and asserts every displayed value is the sentinel (proves nothing is hard-coded); every limitation string in the result appears."
+  - "e2e: after a run every AC1 item is visible with its value; with no result the panel says there is none; the not-qualified statement is always visible."
+test_requirements:
+  - "Vitest unit tests in apps/web/src/model-panel; Playwright e2e."
+deliverables:
+  - apps/web/src/model-panel/ with tests; mount; e2e; the report section of this file
+human_approval_required: false
+
+report: {}

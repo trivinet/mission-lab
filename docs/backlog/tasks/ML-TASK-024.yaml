@@ -1,0 +1,46 @@
+task_id: ML-TASK-024
+title: "Timeline and playback with display interpolation (apps/web)"
+status: in_progress
+requirement_ids: [ML-FR-008, ML-UX-004]
+owner_role: frontend-engineer
+reviewer_role: verification-engineer   # FR-008 AC2/AC3 are integration/unit checks of displayed values
+dependencies: [ML-TASK-023]
+affected_paths:
+  - apps/web/src/playback/
+  - apps/web/src/scene/          # marker position from the playback time only; no change to the trajectory geometry or the scale
+  - apps/web/src/layout/CenterRegion.tsx   # mount the timeline under the scene
+  - apps/web/src/state/          # additions only: playback time, play state, rate; never the five-state result rules
+  - apps/web/e2e/playback*.spec.ts
+  - docs/backlog/tasks/ML-TASK-024.yaml
+objective: >
+  Let the user play, pause and scrub through the result, with the spacecraft marker, the displayed
+  time and (later) the plot cursor always referring to the same t_s, and with smooth display
+  positions that never cross a maneuver and equal the engine sample at sample times.
+scope:
+  - "Playback state: current t_s, playing/paused, rate. Controls: play, pause, scrub (slider), jump to start, end and maneuver, selectable time rates (ML-FR-008 AC1). Replaces the ML-TASK-023 marker-sample slider."
+  - "One source of truth for the displayed time: the timeline read-out, the spacecraft marker and any future plot cursor read the same t_s from the store (ML-FR-008 AC2)."
+  - "Display interpolation per proposed-architecture.md §5 Playback row: cubic Hermite between consecutive engine samples of the same segment, from position and velocity; never across a segment boundary; at a maneuver time the post-maneuver segment n + 1 is shown (contracts-v1 §14 Playback). At a sample time the displayed position equals the engine sample exactly (before scaling), so the scene shows Math.fround(sample * s) there (ML-FR-008 AC3, consistent with VI-02). Interpolated positions are display only, labelled as such in code, and scaled with the same single scene scale."
+  - "Playback never triggers a simulation and never changes the result state."
+  - "Keyboard: every control operable by keyboard with visible focus (ML-UX-004)."
+out_of_scope:
+  - "Plots and the plot cursor UI (030–032), the model panel (025), persistence (033), performance envelope (026)."
+  - "Any change to packages/, the scene scale, the trajectory geometry or VI-02."
+  - "New dependencies."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/requirements/m1-requirements.md (FR-008, UX-004)
+  - docs/architecture/proposed-architecture.md §5 (Playback row); docs/architecture/contracts-v1.md §14 (Playback), result sample layout and segments
+  - docs/design/visual-direction.md, design-tokens.md (approved)
+  - docs/backlog/tasks/ML-TASK-021.yaml, ML-TASK-022.yaml, ML-TASK-023.yaml reports (store, layout, scene hook)
+acceptance_criteria:
+  - "`pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format:check`, `pnpm check:boundaries` exit 0; `pnpm --filter @mission-lab/web test:e2e` passes."
+  - "Unit (AC3): for every sample time of the default and a maneuvered scenario, the interpolated position equals the engine sample bit for bit; at the maneuver time the post-maneuver segment's first sample is returned; no interpolation uses samples from two segments; the Hermite formula is checked against a hand-worked case."
+  - "Integration (AC2): at several t_s, including a maneuver time, the read-out t_s, the marker's source t_s in the scene hook and the store's t_s are identical."
+  - "e2e (AC1): play advances time, pause stops it, scrub sets it, jump to start, end and maneuver land exactly on 0, the end time and the maneuver time, rate change changes the advance; all keyboard-operable; no run is started (worker message count unchanged)."
+test_requirements:
+  - "Vitest unit tests in apps/web/src/playback; Playwright e2e."
+deliverables:
+  - apps/web/src/playback/ with tests; marker wiring; e2e; the report section of this file
+human_approval_required: false
+
+report: {}
