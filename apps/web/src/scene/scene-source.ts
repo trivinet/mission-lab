@@ -10,6 +10,11 @@ import type { SimulationResult } from '@mission-lab/contracts';
 import { ENGINE_CONSTANTS } from '@mission-lab/simulation';
 import type { ResultState } from '../state/result-state';
 
+/** The coast run that goes with the shown result, or undefined (no maneuver, or no result). */
+export function coastToShow(state: ResultState): SimulationResult | undefined {
+  return state.kind === 'current' || state.kind === 'stale' ? state.pair?.coast : undefined;
+}
+
 export function resultToShow(state: ResultState): SimulationResult | null {
   switch (state.kind) {
     case 'current':
