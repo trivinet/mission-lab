@@ -36,4 +36,44 @@ deliverables:
   - docs/verification/release-readiness-review.md, any new e2e, the report section of this file
 human_approval_required: true   # the owner accepts or rejects each finding before G4
 
-report: {}
+report:
+  files_changed:
+    - docs/verification/release-readiness-review.md
+    - apps/web/e2e/release-readiness.spec.ts
+    - spikes/axe-readiness/ (throwaway harness: package.json, package-lock.json, harness.mjs, run-axe.mjs, contrast.mjs, probe*.mjs, README.md, results/axe.json, results/contrast.json)
+    - docs/backlog/tasks/ML-TASK-040.yaml
+  summary: >
+    Release-readiness review on the release candidate. Full regression green (1978 unit and
+    integration tests, 636 of them in the conformance project; e2e 77/77 x3 baseline and 91/91 x3
+    with 14 new tests; no flake). axe-core 4.11.1 (runtime injection from a throwaway npm folder,
+    no app dependency) found 0 violations in 11 states; contrast computed from tokens and from
+    every text node (minimum 5.40:1). New keyboard-only VE-01 e2e passes. Error paths walked,
+    including failed runs, the sample limit, and worker failure doubles. Ten findings D-1..D-10,
+    no blocker; D-1 (major) the performance record no longer matches the RC.
+  tests_executed:
+    - "pnpm install --frozen-lockfile: exit 0"
+    - "pnpm lint: exit 0; pnpm typecheck: exit 0; pnpm format:check: exit 0; pnpm build: exit 0; pnpm check:boundaries: exit 0 (20/20)"
+    - "pnpm test: 105 files, 1978 tests passed; vitest run --project conformance: 28 files, 636 tests passed"
+    - "pnpm test:e2e x3 before my spec: 77 passed each; x3 after: 91 passed each (0 flaky)"
+    - "pnpm perf:envelope (once, 2m20s): 6 sizes x 3 reps ok; differs from the record (D-1)"
+    - "node spikes/axe-readiness/run-axe.mjs: 0 violations in 11 states; node contrast.mjs: 0 of 60 token pairs and 0 of 7 DOM state scans below threshold"
+    - "pnpm audit --audit-level high: exit 1 (picomatch high, minimatch moderate, dev tooling only); pnpm audit --prod: no known vulnerabilities"
+  reference_data_used:
+    - "WCAG 2.1 relative luminance and contrast ratio definition (https://www.w3.org/TR/WCAG21/#dfn-contrast-ratio); axe-core 4.11.1"
+    - "mu = 398600441800000 m^3/s^2 as displayed by the app's model panel, used only for the hand-derived rectilinear-fall burn in one e2e"
+  not_verified:
+    - "Screen readers; text over the WebGL canvas; plot and scene pixel contrast; colour-blind simulation"
+    - "Browsers other than Chromium; hardware GPU; touch; forced colours; browser zoom 200 and 400 percent"
+    - "3D view render-failure path; a real worker crash (doubles used)"
+    - "Cause of the D-1 performance difference (single measurement, no bisect)"
+    - "Numerical correctness of anything shown"
+  known_limitations:
+    - "messageerror double calls the installed handler directly because Chromium does not deliver a synthetic messageerror event to the handler property."
+    - "The OS file chooser and download prompt are observed as Playwright events."
+  documentation_changes:
+    - "docs/verification/release-readiness-review.md: new."
+    - "spikes/axe-readiness/README.md: new."
+  risks_or_blockers:
+    - "D-1: the owner's sample-limit decision cites performance numbers that the RC does not reproduce on the same machine."
+  review_artifact: ""
+  recommended_next_action: "Owner accepts or rejects D-1..D-10; re-measure the envelope on a quiet machine before G4."
