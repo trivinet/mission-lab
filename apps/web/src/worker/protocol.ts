@@ -8,7 +8,25 @@ export interface RunRequestMessage {
   readonly request: SimulationRequest;
 }
 
+/** Diagnostic timing the worker attaches to a response (ML-TASK-026 harness); the UI ignores it. */
+export interface WorkerTiming {
+  /** Time spent in the engine handler (validation, propagation, result checks), ms. */
+  readonly engine_ms: number;
+  /** Wall-clock time (ms since the Unix epoch) at which the worker called postMessage. */
+  readonly workerPostedAt_ms: number;
+}
+
 /** Worker → main thread. Typed arrays of `result` are transferred, not copied. */
 export type RunResponseMessage =
-  | { readonly type: 'result'; readonly runId: number; readonly result: SimulationResult }
-  | { readonly type: 'crashed'; readonly runId: number; readonly message: string };
+  | {
+      readonly type: 'result';
+      readonly runId: number;
+      readonly result: SimulationResult;
+      readonly timing?: WorkerTiming;
+    }
+  | {
+      readonly type: 'crashed';
+      readonly runId: number;
+      readonly message: string;
+      readonly timing?: WorkerTiming;
+    };

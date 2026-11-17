@@ -16,3 +16,4 @@ Thumbs.db
 .claude/worktrees/
 .eslintcache
 playwright/.cache/
+apps/web/perf/out/
