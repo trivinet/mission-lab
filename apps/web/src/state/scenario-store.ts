@@ -12,7 +12,7 @@ import type {
   Scenario,
   ValidationIssue,
 } from '@mission-lab/contracts';
-import { buildSimulationRequest } from '@mission-lab/simulation';
+import { buildCoastRequest, buildSimulationRequest } from '@mission-lab/simulation';
 import { createStore } from 'zustand/vanilla';
 import type { StoreApi } from 'zustand/vanilla';
 import { createBrowserWorkerRunner } from '../worker/worker-runner';
@@ -227,13 +227,57 @@ export function createScenarioStore(runner: SimulationRunner): ScenarioStore {
         lastRunId += 1;
         const runId = lastRunId;
         apply({ type: 'RUN_STARTED', runId });
-        const response = await runner(runId, built.value);
+        // With a maneuver, the coast run (same scenario, no maneuver) goes through the same worker
+        // (ML-FR-010 AC1). Messages of the pair are told apart by their id: the maneuvered run
+        // keeps the run id, the coast run uses its negative (never reused by a later run).
+        const coastBuilt =
+          built.value.maneuvers.length > 0 ? buildCoastRequest(get().scenario) : null;
+        const [response, coastResponse] = await Promise.all([
+          runner(runId, built.value),
+          coastBuilt === null || !coastBuilt.ok
+            ? Promise.resolve(null)
+            : runner(-runId, coastBuilt.value),
+        ]);
         // A superseded or stale run's response finds no matching computing state and is ignored.
-        if (response.type === 'result') {
-          apply({ type: 'RUN_FINISHED', runId, result: response.result });
-        } else {
+        if (response.type === 'crashed') {
           apply({ type: 'RUN_CRASHED', runId, message: response.message });
+          return;
         }
+        if (response.result.status === 'failed' || coastBuilt === null) {
+          apply({ type: 'RUN_FINISHED', runId, result: response.result });
+          return;
+        }
+        if (!coastBuilt.ok) {
+          apply({
+            type: 'RUN_CRASHED',
+            runId,
+            message: 'The coast run for the comparison could not be built from the scenario.',
+          });
+          return;
+        }
+        if (coastResponse === null || coastResponse.type === 'crashed') {
+          apply({
+            type: 'RUN_CRASHED',
+            runId,
+            message: `The coast run for the comparison failed: ${coastResponse?.message ?? 'no response'}`,
+          });
+          return;
+        }
+        if (coastResponse.result.status === 'failed') {
+          apply({
+            type: 'RUN_CRASHED',
+            runId,
+            message:
+              'The coast run for the comparison failed although the maneuvered run succeeded.',
+          });
+          return;
+        }
+        apply({
+          type: 'RUN_FINISHED',
+          runId,
+          result: response.result,
+          pair: { coast: coastResponse.result, request: built.value },
+        });
       },
     };
   });
