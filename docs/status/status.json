@@ -1,7 +1,7 @@
 {
   "updated": "2026-11-17",
   "phase": "Phase 3 — Analysis and comparison (gate G3)",
-  "headline": "ADR-010 accepted (uPlot; angles break at each wrap) and the analysis module merged. Next in Phase 3: plots and comparison UI (032), independent references for VI-03 and the comparison (new verification task), persistence (033).",
+  "headline": "Phase 3: plots and comparison UI (032, Sonnet) and the independent references for the analysis module (036, Opus, G3 evidence) are running in parallel. Then persistence (033).",
   "gates": [
     {
       "id": "G0",
@@ -305,8 +305,8 @@
           "title": "Plots and comparison UI",
           "role": "Frontend Engineer",
           "model": "sonnet",
-          "status": "todo",
-          "deps": "030, 031"
+          "status": "in_progress",
+          "deps": "Contract on docs/ml-task-032-036-contracts; agent running"
         },
         {
           "id": "ML-TASK-033",
@@ -323,6 +323,15 @@
           "model": "sonnet",
           "status": "todo",
           "deps": "033"
+        },
+        {
+          "id": "ML-TASK-036",
+          "title": "Independent references for VI-03 (b) and FR-010 AC3 (conformance run 5)",
+          "role": "Verification Engineer",
+          "model": "opus",
+          "status": "in_progress",
+          "deps": "Contract on docs/ml-task-032-036-contracts; agent running",
+          "approval": true
         },
         {
           "id": "ML-TASK-035",
@@ -377,6 +386,11 @@
     }
   ],
   "log": [
+    {
+      "date": "2026-11-17",
+      "who": "Coordinator",
+      "text": "Merged PR #62. Wrote contracts for ML-TASK-032 (plots and comparison UI with uPlot, coast run, VI-03 (a)) and the new ML-TASK-036 (VI-03 (b) and FR-010 AC3 references, conformance run 5). Both running in parallel."
+    },
     {
       "date": "2026-11-17",
       "who": "Owner",
