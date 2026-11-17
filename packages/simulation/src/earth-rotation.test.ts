@@ -35,15 +35,15 @@ describe('earthRotationAngle_rad', () => {
   it('at J2000.0 (T_u = 0) equals 2π · 0.7790572732640', () => {
     // By hand: 6.283185307179586 × 0.779057273264
     //   = 4.398229715026 (×0.7) + 0.439822971503 (×0.07) + 0.056548667765 (×0.009)
-    //   + 0.000359858519 (×0.000057273264) = 4.894961212813 rad (< 2π, no reduction).
-    expect(eraOf(J2000_ISO, 0)).toBeCloseTo(4.894961212813, 8);
+    //   + 0.000359858519 (×0.000057273264) = 4.894961212813 rad by hand; 40-digit decimal gives 4.894961212823757 (Coordinator check, used below).
+    expect(eraOf(J2000_ISO, 0)).toBeCloseTo(4.894961212823757, 12);
   });
 
   it('10 days after J2000.0 (T_u = 10, via t_s = 864 000 s)', () => {
     // Turns = 0.7790572732640 + 10.0273781191135448 = 10.8064353923775448 → fraction
     // 0.8064353923775448. By hand: 6.283185307179586 × 0.8064353923775448
     //   = 5.026548245744 (×0.8) + 0.040434762834 (×0.0064353923775448) = 5.066983008578 rad.
-    expect(eraOf(J2000_ISO, 864_000)).toBeCloseTo(5.066983008578, 8);
+    expect(eraOf(J2000_ISO, 864_000)).toBeCloseTo(5.066983008576194, 12);
   });
 
   it('gives the same angle for (epoch, t_s) and (epoch + t_s, 0)', () => {
@@ -62,7 +62,7 @@ describe('earthRotationAngle_rad', () => {
     const b = eraOf('2026-01-01T00:00:00.000Z', 86_400);
     let delta = b - a;
     if (delta < 0) delta += 2 * Math.PI;
-    expect(delta).toBeCloseTo(0.017202179574, 8);
+    expect(delta).toBeCloseTo(0.017202179575244, 10);
   });
 
   it('always lies in [0, 2π)', () => {
