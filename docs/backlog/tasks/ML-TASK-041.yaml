@@ -34,4 +34,38 @@ deliverables:
   - the five documents, the report section of this file
 human_approval_required: false
 
-report: {}
+report:
+  files_changed:
+    - README.md
+    - docs/user-guide.md
+    - docs/developer-guide.md
+    - docs/verification/traceability-matrix.md
+    - docs/releases/release-notes-v1.0.0.md
+    - docs/backlog/tasks/ML-TASK-041.yaml
+  summary: >
+    Wrote the user guide, developer guide, requirements traceability matrix, v1.0.0 release notes
+    (Status: Draft) and the README entry point. The matrix covers all 14 ML-FR (47 ACs), 4 ML-UX and
+    7 ML-NFR. Result: ML-FR 9 covered and 5 partial; ML-UX 2 covered and 2 partial; ML-NFR 2
+    covered, 4 partial and 1 gap (ML-NFR-002, no review record). No code, test, ADR, tolerance
+    record, review or other approved document was changed.
+  tests_executed:
+    - "pnpm format:check -> exit 0 ('All matched files use Prettier code style!'). Note: .prettierignore excludes *.md and docs/, so this check does not read the new documents."
+    - "Path-existence script (outside the repo, Node) over README.md, user-guide, developer-guide, traceability-matrix, release-notes: checked=230 missing=3 skipped_globs=2. Matrix alone: 0 missing. The 3 are intentional: '.scenario.json' (a file-name suffix in the user guide), docs/verification/release-readiness-review.md (ML-TASK-040 output, not yet written; the release notes say so) and CHANGELOG.md (does not exist; the release notes say so). Skipped globs: apps/web/e2e/*.spec.ts and @react-three/* (checked by listing; the 11 specs exist)."
+  reference_data_used: []
+  not_verified:
+    - "No test or suite was run in this task; counts quoted are from the G1, G2 and G3 reviews."
+    - "Test-to-AC links were made by reading test titles, headers and grep matches, not by running tests or reading every assertion."
+    - "UI behaviour described in the user guide was read from source; the application was not started."
+    - "Release notes owner decisions are taken from the review documents; ML-TASK-040 result and G4 evidence are absent."
+    - "The statement that 'checks' is a required status check on main rests on the G1 verification report; branch protection is not in the repository."
+  known_limitations:
+    - "Gaps and partials are listed in docs/verification/traceability-matrix.md section 5."
+    - "Matrix section 6 (tests with no requirement) is judged from titles and headers."
+  documentation_changes:
+    - "Inconsistencies found (reported, not resolved): docs/engineering/contributing.md lines 53-54 (PR templates and CI 'none exist yet') and line 85 ('five Vitest projects') versus .github/ and six projects in vitest.config.ts; contributing.md line 135 says CHANGELOG.md does not exist (still true); docs/engineering/coding-standards.md lines 111-113 ('five projects', placeholder tests), 136 ('No L3 dataset exists yet'), 139-140 ('No test in these families has been written yet') versus the repository; docs/verification/conformance-run-5.md line 3 status 'In review (not approved)' versus G3-review.md (approved on its evidence); docs/verification/ve-01-acceptance.md refers to ML-TASK-035 report for results; docs/verification/l3-restart-procedure.md section 6 (verification/l3-d2/restart.py names a non-existent test file); docs/product/ML-SYS-001.md line 119 lists mean anomaly and flight-path angle histories, ML-FR-009 AC1 and G3-review.md section C do not provide them (owner-accepted); package.json version fields are all 0.0.0 versus v1.0.0 release."
+  risks_or_blockers:
+    - "ML-TASK-040 output is missing, so the keyboard and accessibility part of ML-UX-004 and the draft release notes are incomplete until it lands."
+  review_artifact: ""
+  recommended_next_action: >
+    Verification Engineer reviews the traceability matrix (reviewer role). Owner decides on the
+    evidence gaps in matrix section 5 (accept, fix or defer) before G4.
