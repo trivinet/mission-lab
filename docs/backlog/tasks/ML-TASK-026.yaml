@@ -91,8 +91,18 @@ report:
   documentation_changes:
     - docs/verification/performance-envelope.md
   risks_or_blockers:
-    - "A4a blocked: scenarioSchema (packages/contracts/src/scenario.ts) is z.strictObject with no maneuver-counter field, and the contracts may not be changed in this task. Maneuver ids are still crypto.randomUUID() in apps/web/src/state/scenario-store.ts, so two identical scenarios built independently get different requestIds. Needs a contract decision (add an optional counter field, or define the id as derived from the scenario, e.g. next free 'm<k>' over the existing ids, which needs no new field)."
-    - "The sample limit decision is the owner's (part B)."
+    - "A4a resolved in part B by the owner's UI-only option (first free m<k> id); no contract change."
+  part_b:
+    owner_decision: "2026-11-17: keep 1,000,000 as the hard limit (constant name and value unchanged); soft UI warning above 250,000 samples; maneuver ids by the UI-only option."
+    done:
+      - "packages/simulation/src/limits.ts doc comment records the decision; MODEL_LIMITATIONS text states the hard limit and refers to the envelope (still contains the number 1000000, so the existing run.test.ts assertion passes unchanged; no conformance or verification test asserts the old wording)."
+      - "performance-envelope.md section 4 states the decision."
+      - "Soft warning: apps/web/src/editor/sample-warning.ts (threshold constant SOFT_SAMPLE_WARNING_THRESHOLD, count from the engine's sampleCount), SampleWarning.tsx under the step field, a short note beside Run; never blocks; unit test and e2e (259 201 samples shown, default not shown, run still completes)."
+      - "Deterministic maneuver ids: apps/web/src/state/maneuver-id.ts; tests for identical requestId across independently built scenarios and for add/remove/add."
+    notes:
+      - "The note names docs/verification/performance-envelope.md as text; the app has no hosted URL for it, so it is not a hyperlink."
+      - "The note is shown while the count is above 250,000, including above the hard limit (where the engine's SAMPLE_COUNT_EXCEEDED also shows); it needs usable duration, step and maneuver times to compute a count."
+    checks: "install, lint, typecheck, test (90 files, 1792 tests), build, format:check, check:boundaries, web e2e (53) all pass."
   review_artifact: ""
   recommended_next_action: >
     Verification Engineer reviews the envelope record; owner decides the limit and the maneuver-id
