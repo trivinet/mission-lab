@@ -5,7 +5,10 @@
  * the plots (ADR-010 consequences): the table is plain HTML.
  */
 import type { CompareResult, ComparisonRow, ManeuverComparison } from '@mission-lab/simulation';
-import { displayUnit, formatDisplayValue, formatInputNumber } from '../format/units';
+import { useState } from 'react';
+import { formatComparisonValue } from '../format/display-precision';
+import { displayUnit, formatInputNumber } from '../format/units';
+import { exactComparisonText } from './comparison-copy';
 import { ABSENCE_TEXT, COMPARE_FAILURE_TEXT, COMPARISON_LABELS } from './quantity-labels';
 
 type Side = 'before' | 'after' | 'difference';
@@ -25,9 +28,17 @@ function Cell({ row, side, stale }: { row: ComparisonRow; side: Side; stale: boo
       </td>
     );
   }
+  const shown = formatComparisonValue(value, row.unit);
   return (
-    <td data-testid={testId} data-value-si={String(value)} className={stale ? 'stale-val' : ''}>
-      {formatDisplayValue(value, row.unit)}
+    <td
+      data-testid={testId}
+      data-value-si={String(value)}
+      data-rounded-to-zero={shown.roundedToZero ? 'true' : undefined}
+      className={stale ? 'stale-val' : ''}
+      title={`Exact: ${shown.exactText}`}
+    >
+      {shown.text}
+      {shown.roundedToZero && <span className="absent-reason">round-off level, shown as 0</span>}
     </td>
   );
 }
@@ -46,6 +57,36 @@ function DeltaVRow({
       <dt>{label}</dt>
       <dd data-testid={testId}>[{vector.map((c) => formatInputNumber(c)).join(', ')}] m/s</dd>
     </>
+  );
+}
+
+function CopyExact({ maneuver }: { maneuver: ManeuverComparison }) {
+  const [status, setStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
+  return (
+    <p className="cmp-copy">
+      <button
+        type="button"
+        data-testid="cmp-copy-exact"
+        onClick={() => {
+          navigator.clipboard.writeText(exactComparisonText(maneuver)).then(
+            () => {
+              setStatus('copied');
+            },
+            () => {
+              setStatus('failed');
+            },
+          );
+        }}
+      >
+        Copy exact values
+      </button>{' '}
+      <span role="status" data-testid="cmp-copy-status" className="note">
+        {status === 'copied' && 'Copied: full-precision SI values.'}
+        {status === 'failed' && 'Could not copy: the browser refused clipboard access.'}
+        {status === 'idle' &&
+          'Cells show a display resolution (1 m, 0.001 deg); hover a value or copy for the exact numbers.'}
+      </span>
+    </p>
   );
 }
 
@@ -106,6 +147,7 @@ function ManeuverBlock({ maneuver, stale }: { maneuver: ManeuverComparison; stal
           })}
         </tbody>
       </table>
+      <CopyExact maneuver={maneuver} />
     </div>
   );
 }
