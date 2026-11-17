@@ -37,4 +37,64 @@ deliverables:
   - packages/simulation/src/analysis/ with tests; index exports; the report section of this file
 human_approval_required: false
 
-report: {}
+report:
+  files_changed:
+    - packages/simulation/src/analysis/state-quantities.ts   # per-state evaluation shared by histories and comparison
+    - packages/simulation/src/analysis/histories.ts          # computeHistories, HISTORY_QUANTITIES, historySeries
+    - packages/simulation/src/analysis/comparison.ts         # compareCoastAndManeuver, COMPARISON_QUANTITIES
+    - packages/simulation/src/analysis/coast-request.ts      # buildCoastRequest
+    - packages/simulation/src/analysis/index.ts
+    - packages/simulation/src/analysis/test-helpers.ts       # test-only helpers (not exported)
+    - packages/simulation/src/analysis/histories.test.ts
+    - packages/simulation/src/analysis/comparison.test.ts
+    - packages/simulation/src/analysis/coast-request.test.ts
+    - packages/simulation/src/index.ts                       # exports only
+    - docs/backlog/tasks/ML-TASK-031.yaml                    # this report
+  summary: >
+    Analysis module derived only from SimulationResult (plus the maneuvered request for the RSW
+    components of the applied Δv, which the result does not carry). stateQuantities(r, v,
+    constants) evaluates one state with existing astrodynamics functions: normVec3 (radius,
+    speed), radius − referenceRadius_m (altitude above the reference sphere, as in
+    describeScenarioOrbit), stateToElements with DEGENERACY_THRESHOLDS (a, e, i, Ω, ω, ν,
+    convention, conic), stateIntegrals (specific energy), closedOrbitQuantities (r_p, r_a, T).
+    computeHistories(result) returns, per segment (never joined across a maneuver), one series
+    per quantity carrying quantity id, unit, segmentIndex, t_s (bit-identical copy) and values;
+    plus per-sample convention, conic and failure reasons. Values not defined (r_p, r_a, T on a
+    hyperbolic sample) are null with reason NOT_CLOSED_ORBIT; no NaN/Infinity is returned, nothing
+    throws. compareCoastAndManeuver(coast, maneuvered, maneuveredRequest) returns, per event,
+    before/after/difference rows for a, e, i, Ω, ω, r_p, r_a, T, ξ from the R8 event states, plus
+    Δv inertial (event), RSW (request) and magnitude (event); the coast result is checked for
+    consistency (ok, no event, same duration/epoch/constants, bit-identical first sample).
+    Differences are after − before; Ω/ω differences are reduced to (−π, π] and are null
+    (NOT_COMPARABLE) when the element is undefined or changes meaning under the ADR-008
+    convention. buildCoastRequest(scenario) = buildSimulationRequest of the scenario with
+    maneuvers: [].
+    NOT PROVIDED: flight-path angle and mean anomaly (ML-SYS-001 §2.2). packages/astrodynamics
+    exports no function for either; adding one is out of scope (would be an astrodynamics task).
+  tests_executed:
+    - "pnpm install --frozen-lockfile -> exit 0"
+    - "pnpm lint -> exit 0"
+    - "pnpm typecheck -> exit 0"
+    - "pnpm test -> exit 0; Test Files 93 passed (93), Tests 1822 passed (1822)"
+    - "pnpm exec vitest run --project simulation packages/simulation/src/analysis -> 3 files, 30 tests passed"
+    - "pnpm format:check -> exit 0 (All matched files use Prettier code style!)"
+    - "pnpm check:boundaries -> exit 0 (20/20 fixtures reported)"
+  reference_data_used: []   # none; plumbing/structure tests only, no reference values
+  not_verified:
+    - "Correctness of any analysis value against an independent reference (VI-03 (b), FR-010 AC3): Verification Engineer, later task."
+    - "The flat-history unit test uses ad-hoc smoke bounds (1e-9 relative / 1e-9 rad), not approved tolerances."
+    - "Whether the UI's plotting library accepts null gaps as returned (ML-TASK-030)."
+    - "Performance of computeHistories on results near PROVISIONAL_MAX_SAMPLE_COUNT (not measured)."
+  known_limitations:
+    - "Flight-path angle and mean anomaly histories are missing (no astrodynamics function)."
+    - "ν, Ω, ω histories are the values reported under the per-sample ADR-008 convention (e.g. ν = argument of latitude on a CIRCULAR sample); the segment's convention array says which."
+    - "The coast result does not enter the table values: 'before' is the R8 pre-maneuver state of the maneuvered run (same orbit as the coast run, which starts from the bit-identical initial state)."
+    - "r_p is reported only for closed orbits (closedOrbitQuantities); the hyperbolic periapsis radius is not provided."
+  documentation_changes: []
+  risks_or_blockers:
+    - "Open for the owner/architect: flight-path angle and mean anomaly need an astrodynamics task (functions with sources) before the analysis module can expose them."
+  review_artifact: ""
+  recommended_next_action: >
+    Coordinator: decide on an astrodynamics task for flight-path angle and mean anomaly; ML-TASK-030
+    can consume computeHistories/compareCoastAndManeuver; Verification Engineer: VI-03 (b) and
+    FR-010 AC3 against independent references.
