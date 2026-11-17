@@ -15,6 +15,7 @@ import type {
 import { buildCoastRequest, buildSimulationRequest } from '@mission-lab/simulation';
 import { createStore } from 'zustand/vanilla';
 import type { StoreApi } from 'zustand/vanilla';
+import { serialiseScenario } from '../persistence/scenario-file';
 import { createBrowserWorkerRunner } from '../worker/worker-runner';
 import type { SimulationRunner } from '../worker/worker-runner';
 import { nextManeuverId } from './maneuver-id';
@@ -39,6 +40,11 @@ export interface ScenarioStoreState {
   readonly resultState: ResultState;
   /** Issues of the last run that validation prevented; cleared per field when it is edited. */
   readonly validationIssues: FieldIssues;
+  /**
+   * The file text of the scenario as last saved, loaded or created (ML-FR-011 AC4). The scenario
+   * has unsaved changes exactly when its file text differs from this (`hasUnsavedChanges`).
+   */
+  readonly savedText: string;
 
   /** Display-only: does not make the result stale. */
   setName: (name: string) => void;
@@ -61,13 +67,27 @@ export interface ScenarioStoreState {
   setManeuverDeltaV_mps: (index: number, component: 0 | 1 | 2, value: number) => void;
   /** Physical: removes the maneuver at `index`. */
   removeManeuver: (index: number) => void;
-  /** Replaces the scenario by a fresh default and resets the result (confirmation: ML-TASK-033). */
+  /** Replaces the scenario by a fresh default and resets the result (the UI confirms first). */
   startNewScenario: () => void;
+  /**
+   * Replaces the scenario by a validated, loaded one and resets the result (ML-FR-011). The caller
+   * has validated it (parseScenarioBytes) and confirmed first when there are unsaved changes.
+   */
+  loadScenario: (scenario: Scenario) => void;
+  /** Records that the given file text of the current scenario was saved (ML-FR-011 AC4). */
+  markSaved: (text: string) => void;
   /** Resolves when this run has settled (finished, failed, or been superseded). */
   run: () => Promise<void>;
 }
 
 export type ScenarioStore = StoreApi<ScenarioStoreState>;
+
+/** Unsaved changes (ML-FR-011 AC4): the scenario's file text differs from the saved text. */
+export function hasUnsavedChanges(
+  state: Pick<ScenarioStoreState, 'scenario' | 'savedText'>,
+): boolean {
+  return serialiseScenario(state.scenario) !== state.savedText;
+}
 
 function withoutKey(issues: FieldIssues, key: string): FieldIssues {
   if (!(key in issues)) {
@@ -86,6 +106,8 @@ function replaceManeuver(
 
 export function createScenarioStore(runner: SimulationRunner): ScenarioStore {
   let lastRunId = 0;
+
+  const initial = newScenario();
 
   return createStore<ScenarioStoreState>()((set, get) => {
     const apply = (event: ResultEvent): void => {
@@ -112,9 +134,10 @@ export function createScenarioStore(runner: SimulationRunner): ScenarioStore {
     };
 
     return {
-      scenario: newScenario(),
+      scenario: initial,
       resultState: INITIAL_RESULT_STATE,
       validationIssues: {},
+      savedText: serialiseScenario(initial),
 
       setName: (name) => {
         if (name !== get().scenario.name) {
@@ -207,11 +230,24 @@ export function createScenarioStore(runner: SimulationRunner): ScenarioStore {
       },
       startNewScenario: () => {
         // A run in flight finds no computing state when it returns, so it is ignored.
+        const fresh = newScenario();
         set({
-          scenario: newScenario(),
+          scenario: fresh,
           resultState: INITIAL_RESULT_STATE,
           validationIssues: {},
+          savedText: serialiseScenario(fresh),
         });
+      },
+      loadScenario: (scenario) => {
+        set({
+          scenario,
+          resultState: INITIAL_RESULT_STATE,
+          validationIssues: {},
+          savedText: serialiseScenario(scenario),
+        });
+      },
+      markSaved: (text) => {
+        set({ savedText: text });
       },
 
       run: async () => {

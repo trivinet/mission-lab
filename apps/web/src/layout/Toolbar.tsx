@@ -1,6 +1,7 @@
 import type { ValidationIssue } from '@mission-lab/contracts';
 import { useStore } from 'zustand';
 import { softWarningCount } from '../editor/sample-warning';
+import { FileControls, UnsavedIndicator } from '../persistence/FileControls';
 import { getScenarioStore } from '../state/scenario-store';
 import { ResultChip } from './ResultStatus';
 
@@ -12,7 +13,7 @@ export function Toolbar({ issues }: Props) {
   const store = getScenarioStore();
   const name = useStore(store, (s) => s.scenario.name);
   const largeRun = useStore(store, (s) => softWarningCount(s.scenario)) !== null;
-  const { run, startNewScenario } = store.getState();
+  const { run } = store.getState();
   const blocked = issues.length > 0;
   return (
     <header className="topbar" role="banner">
@@ -20,6 +21,7 @@ export function Toolbar({ issues }: Props) {
       <span className="scenario-name" data-testid="scenario-name" title="Scenario name">
         {name === '' ? '(unnamed scenario)' : name}
       </span>
+      <UnsavedIndicator />
       <span className="sp" />
       {blocked && (
         <span className="run-blocked" data-testid="run-blocked" id="run-blocked">
@@ -33,9 +35,7 @@ export function Toolbar({ issues }: Props) {
         </span>
       )}
       <ResultChip />
-      <button type="button" data-testid="new-scenario-button" onClick={startNewScenario}>
-        New scenario
-      </button>
+      <FileControls />
       <button
         type="button"
         className="primary"
