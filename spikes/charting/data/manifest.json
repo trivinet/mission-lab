@@ -1,0 +1,101 @@
+{
+  "generatedBy": "spikes/charting/tools/gen-data.mjs",
+  "series": [
+    {
+      "key": "radius_km",
+      "label": "Radius",
+      "unit": "km"
+    },
+    {
+      "key": "altitude_km",
+      "label": "Altitude",
+      "unit": "km"
+    },
+    {
+      "key": "speed_kmps",
+      "label": "Speed",
+      "unit": "km/s"
+    },
+    {
+      "key": "trueAnomaly_deg",
+      "label": "True anomaly",
+      "unit": "deg"
+    },
+    {
+      "key": "a_km",
+      "label": "Semi-major axis",
+      "unit": "km"
+    },
+    {
+      "key": "e",
+      "label": "Eccentricity",
+      "unit": "-"
+    },
+    {
+      "key": "i_deg",
+      "label": "Inclination",
+      "unit": "deg"
+    },
+    {
+      "key": "raan_deg",
+      "label": "RAAN",
+      "unit": "deg"
+    }
+  ],
+  "datasets": {
+    "small": {
+      "duration_s": 6000,
+      "step_s": 60,
+      "burn_t_s": 3000,
+      "deltaV_RSW_mps": [0, 200, 0],
+      "runs": {
+        "coast": {
+          "n": 101,
+          "segLengths": [101],
+          "requestId": "sha256:d1ae7c582e9c4628265961741d64ead2f3705b97357962663eca450c3bf3c2f2"
+        },
+        "maneuvered": {
+          "n": 102,
+          "segLengths": [51, 51],
+          "requestId": "sha256:a9e935fa93aea40e7730e90040452552251e815bf2f2eb657923010b75ede8a5"
+        }
+      }
+    },
+    "n1e4": {
+      "duration_s": 9999,
+      "step_s": 1,
+      "burn_t_s": 5000,
+      "deltaV_RSW_mps": [0, 200, 0],
+      "runs": {
+        "coast": {
+          "n": 10000,
+          "segLengths": [10000],
+          "requestId": "sha256:486c88e8b085408fc3241398e09d30bcce7f78cb1853a3f5b8f48af38ca40b73"
+        },
+        "maneuvered": {
+          "n": 10001,
+          "segLengths": [5001, 5000],
+          "requestId": "sha256:8b77c46ae0344852281c6dafa214a490aa11afeca79d29a3b734ec2c80e24f5c"
+        }
+      }
+    },
+    "n2_5e5": {
+      "duration_s": 249999,
+      "step_s": 1,
+      "burn_t_s": 125000,
+      "deltaV_RSW_mps": [0, 200, 0],
+      "runs": {
+        "coast": {
+          "n": 250000,
+          "segLengths": [250000],
+          "requestId": "sha256:c14676d78514bbfddfa0005c68dac475b75d9046edfa2017e36320a221e40d80"
+        },
+        "maneuvered": {
+          "n": 250001,
+          "segLengths": [125001, 125000],
+          "requestId": "sha256:5e16b2febb8e846562d22e8bcf0d1223721b4777bbef40949f71e6947fffce82"
+        }
+      }
+    }
+  }
+}

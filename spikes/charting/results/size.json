@@ -1,0 +1,42 @@
+{
+  "measuredAt": "2026-11-17T13:23:31.454Z",
+  "unit": "kB = 1000 bytes",
+  "rows": [
+    {
+      "name": "uPlot",
+      "min_kB": 53.6,
+      "gzip_kB": 23.9,
+      "brotli_kB": 21.4
+    },
+    {
+      "name": "ECharts (tree-shaken, as the spike imports it)",
+      "min_kB": 539.5,
+      "gzip_kB": 184.6,
+      "brotli_kB": 156.3
+    },
+    {
+      "name": "ECharts (full import)",
+      "min_kB": 1141.5,
+      "gzip_kB": 383.6,
+      "brotli_kB": 312
+    },
+    {
+      "name": "Plotly basic (plotly.js-basic-dist-min)",
+      "min_kB": 1218.5,
+      "gzip_kB": 405.6,
+      "brotli_kB": 334.8
+    },
+    {
+      "name": "Recharts (React external)",
+      "min_kB": 365.5,
+      "gzip_kB": 108.7,
+      "brotli_kB": 91.1
+    },
+    {
+      "name": "Recharts + react + react-dom (all bundled)",
+      "min_kB": 587.9,
+      "gzip_kB": 177.1,
+      "brotli_kB": 148.8
+    }
+  ]
+}

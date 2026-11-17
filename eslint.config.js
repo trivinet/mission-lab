@@ -90,6 +90,9 @@ export default tseslint.config(
       '**/playwright-report/**',
       '**/test-results/**',
       'tools/boundary-fixtures/**',
+      // ML-TASK-030: throwaway browser/Node spike code, not part of the app or CI (see
+      // spikes/charting/README.md). Plain JS with browser and Node globals, so `no-undef` would fail.
+      'spikes/**',
     ],
   },
   js.configs.recommended,

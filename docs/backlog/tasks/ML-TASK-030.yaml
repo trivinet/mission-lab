@@ -1,6 +1,6 @@
 task_id: ML-TASK-030
 title: "Charting library spike (OD-006) and ADR-010 (proposed)"
-status: in_progress
+status: in_review
 requirement_ids: [ML-FR-009, ML-FR-010, ML-NFR-004, ML-NFR-006, ML-NFR-007, ML-UX-004]
 owner_role: frontend-engineer
 reviewer_role: systems-architect
@@ -42,4 +42,47 @@ deliverables:
   - spikes/charting/, ADR-010 (Proposed), the report section of this file
 human_approval_required: true   # owner approves ADR-010 and the new dependency
 
-report: {}
+report:
+  files_changed:
+    - spikes/charting/ (new; own package.json and package-lock.json, README.md, vite.config.js, four pages, adapters, shell, tools/, results/, data/manifest.json)
+    - docs/architecture/adr/ADR-010-charting-library.md (new, Proposed)
+    - docs/backlog/tasks/ML-TASK-030.yaml (this report)
+    - eslint.config.js (one ignore entry, 'spikes/**'; this file is not in affected_paths, the coordinator allowed the exclusion "if needed" and it was needed, see known_limitations)
+  summary: >
+    Four candidates (uPlot 1.6.32, ECharts 6.1.0, Plotly basic 4.3.0, Recharts 3.10.1) were built
+    as spike pages and run on real engine data (default scenario, a maneuvered run, 10 000 and
+    250 000 samples, 8 series each, split at the maneuver). All four show the gap, marker, axis
+    titles with units, legend, external cursor and coast/maneuvered overlay, and all passed an
+    Object.is read-back of the plotted values (0 mismatches). Medians of 3 repetitions are in
+    ADR-010. Recommendation: uPlot 1.6.32 (250 000 points, 8 charts: 364 ms render, 0.1 ms cursor,
+    36 MB heap, 23.9 kB gzip); ECharts is the runner-up. ADR-010 is Proposed. Nothing was added to
+    apps/web or to the root lockfile.
+  tests_executed:
+    - "pnpm install --frozen-lockfile (repository root): ok, lockfile unchanged"
+    - "pnpm lint: exit 0 (with the 'spikes/**' ignore)"
+    - "pnpm typecheck: exit 0"
+    - "pnpm test: 90 files, 1792 tests passed"
+    - "pnpm format:check: All matched files use Prettier code style!"
+    - "pnpm check:boundaries: 20/20 fixtures reported, exit 0"
+    - "spikes/charting: node tools/gen-data.mjs (3 datasets from engine runs); npx vite build; node tools/smoke.mjs small and n2_5e5 (Object.is read-back 0 mismatches for all four, screenshots inspected); node tools/measure.mjs (3 reps, ladder 1e4 and 250 000, single and panel) and SPIKE_SIZES=small; node tools/size.mjs; node tools/probe.mjs"
+  reference_data_used:
+    - "Real engine runs via @mission-lab/simulation runSimulation (request ids in spikes/charting/data/manifest.json). Derived series (radius, altitude, speed, elements) were computed in the spike generator with the engine's stateToElements; they are plumbing inputs, not reference values."
+    - "npm registry (read 2026-11-17 12:55 UTC) and repository API for version, licence, dates, issues, release counts; ECharts handbook aria page read 2026-11-17; recharts type declarations (accessibilityLayer)."
+  not_verified:
+    - "Other machines, a real GPU, Firefox and Safari; all numbers are one loaded Windows PC, headless Chromium 156, software WebGL."
+    - "Real screen-reader behaviour; only DOM attributes and Tab order were probed. Recharts arrow-key behaviour not exercised."
+    - "Any Content-Security-Policy header; only absence of eval/new Function in the bundles and absence of external requests was checked."
+    - "ECharts getOption() read-back, down-sampled plotting, the 1 000 000-sample hard limit, Recharts panel at 250 000 (timed out at 240 s on the first repetition)."
+    - "The analysis module (ML-TASK-031) does not exist yet; derived series were produced by the spike."
+    - "Heap figures exclude canvas and GPU memory and data buffers; the 0.1 ms cursor figure is the timer resolution floor."
+  known_limitations:
+    - "eslint.config.js was edited (one ignore entry for spikes/**) because the spike's plain JS uses browser and Node globals that the repository's no-undef rule rejects. Prettier is not excluded: the spike is formatted and checked."
+    - "uPlot and Recharts express the maneuver gap as two series on a shared x grid; ECharts and Plotly use one series with a gap element."
+    - "Angle series (true anomaly, RAAN) jump at the 0/2pi wrap in every library; the data layer must decide how angles are plotted (observation recorded in ADR-010)."
+  documentation_changes:
+    - "ADR-010 added (Proposed). tech-baseline.md, proposed-architecture.md and ADR-006 are NOT changed; ADR-010 lists the updates needed if approved."
+  risks_or_blockers:
+    - "Owner decision: approve ADR-010 and the uplot dependency (human_approval_required)."
+    - "uPlot maintenance risk (no npm release since 2025-03-14); accepted explicitly or fall back to ECharts."
+  review_artifact: ""
+  recommended_next_action: "Systems Architect reviews ADR-010; owner approves or picks ECharts; then ML-TASK-032 adds the chosen dependency. Decide the angle-wrap plotting policy in ML-TASK-031/032."
