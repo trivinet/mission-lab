@@ -29,11 +29,17 @@ seconds, once, around the 1 000 000 point). Nothing was done to make the numbers
 
 ## 2. Method
 
+Prerequisite (once): `pnpm exec playwright install chromium`. This installs the Chromium build
+that the pinned Playwright version (1.64.1) uses; the numbers below are for that build (156.0.8078.4).
+
 Reproduce with one command from the repository root:
 
 ```
 pnpm perf:envelope
 ```
+
+The data were measured with the app at commit `cf4c0d5187bb6f5dcce86f8986d850ce6d1561f6` (the
+harness commit; later commits on this branch change only tests and documents, not the app).
 
 Optional environment variables: `PERF_SIZES` (comma-separated total sample counts),
 `PERF_REPS` (default 3), `PERF_RUN_TIMEOUT_MS`, `PERF_OUT_DIR` (raw JSON, default
@@ -55,21 +61,29 @@ Per size N and per repetition (3 repetitions per size):
   request building, worker start, engine, transfer, state update).
 - **Current to first frame**: from `current` until the first animation frame at which the scene
   hook shows N vertices (the Float32 arrays given to the GPU buffers). This is main-thread
-  scene-geometry construction plus the first render; it is not a GPU-completion timestamp.
+  scene-geometry construction plus the first render; it is not a GPU-completion timestamp. It
+  also includes the polling latency of the harness (one animation frame per check) and a fixed
+  cold first render of about 100 ms: at N = 1 000 it is 115.2 ms, which is the fixed-cost
+  baseline (the scene work at that size is negligible). Subtract about that much to see the part
+  that grows with N.
 - **Responsiveness during the run**: Playwright types into the scenario name while the state is
   `computing`; the probe time is the round trip until the toolbar shows the text. It includes
   Playwright's own protocol latency, so it is an upper bound on the page's latency. The longest
   gap between animation frames in the click-to-current window, and the longest `longtask` in the
-  click-to-first-frame window, are also reported.
+  click-to-first-frame window, are also reported. Because that window ends at the first frame, the
+  long-task figure includes the same fixed cold-render cost (91.0 ms at N = 1 000, the baseline).
 - **Playback frame time**: 3 s of playback at 1 s per second after the run; intervals between
-  animation frames (median, 95th percentile, max).
+  animation frames (median, 95th percentile, max). The number of frames in the 3 s window is
+  reported per size (table below, footnote on p95).
 - **Heap**: Chrome DevTools Protocol `JSHeapUsedSize` of the main page after a forced garbage
   collection, before the run and after the run is displayed.
 
 The ladder is ascending and stops at the first size where a repetition fails (error state, tab
 crash or timeout); a failure would be recorded as a result. None occurred.
 
-Raw data, every repetition: `docs/verification/data/performance-envelope-2026-11-17.json`.
+Raw data, every repetition: `docs/verification/data/performance-envelope-2026-11-17.json`. That
+file was copied by hand from the git-ignored `apps/web/perf/out/` (the harness does not write into
+`docs/`); it is the unmodified harness output, apart from Prettier formatting.
 
 ## 3. Results
 
@@ -93,19 +107,24 @@ Median [min to max] of 3 repetitions, milliseconds unless stated. All 18 repetit
 |   500 000 |         18.2 [18.1-20.0] |                 306.0 [300-312] | 14.7 [13.6-15.4] |       431.0 [92.9-436.2] |
 | 1 000 000 |         19.7 [19.2-20.1] |                 503.0 [499-516] | 13.7 [13.7-14.2] |        153.9 [16.7-703.9] |
 
-| N samples | Playback frame median | Playback frame p95 | Playback frame max | Main-page JS heap before to after (MB) |
-| --------: | --------------------: | -----------------: | -----------------: | -------------------------------------: |
-|     1 000 |       16.7 [16.7-16.8] |     17.8 [17.5-22.7] |     25.9 [22.0-34.3] |                           4.5 to 6.3 |
-|    10 000 |       16.8 [16.8-17.3] |     19.1 [17.9-32.0] |     34.1 [31.9-34.7] |                           4.5 to 6.4 |
-|   100 000 |       45.6 [44.5-46.0] |     50.1 [47.5-51.5] |     68.9 [58.2-74.0] |                           4.5 to 6.8 |
-|   250 000 |     100.3 [99.5-100.9] |   108.2 [107.5-113.7] |   116.5 [116.1-118.6] |                           4.5 to 6.9 |
-|   500 000 |     192.4 [191.6-195.3] |   217.5 [212.5-273.7] |   217.5 [214.7-273.7] |                           4.5 to 7.0 |
-| 1 000 000 |     386.1 [380.8-386.9] |   422.3 [407.8-429.4] |   422.3 [407.8-429.4] |                           4.5 to 7.1 |
+| N samples | Frames in 3 s (3 reps) | Playback frame median | Playback frame p95 (note) | Playback frame max | Main-page JS heap before to after (MB) |
+| --------: | ---------------------: | --------------------: | -----------------: | -----------------: | -------------------------------------: |
+|     1 000 | 183, 183, 176 |       16.7 [16.7-16.8] |     17.8 [17.5-22.7] |     25.9 [22.0-34.3] |                           4.5 to 6.3 |
+|    10 000 | 150, 179, 179 |       16.8 [16.8-17.3] |     19.1 [17.9-32.0] |     34.1 [31.9-34.7] |                           4.5 to 6.4 |
+|   100 000 | 69, 68, 70 |       45.6 [44.5-46.0] |     50.1 [47.5-51.5] |     68.9 [58.2-74.0] |                           4.5 to 6.8 |
+|   250 000 | 34, 34, 33 |     100.3 [99.5-100.9] |   108.2 [107.5-113.7] |   116.5 [116.1-118.6] |                           4.5 to 6.9 |
+|   500 000 | 19, 18, 20 |     192.4 [191.6-195.3] |   217.5 [212.5-273.7] |   217.5 [214.7-273.7] |                           4.5 to 7.0 |
+| 1 000 000 | 12, 12, 11 |     386.1 [380.8-386.9] |   422.3 [407.8-429.4] |   422.3 [407.8-429.4] |                           4.5 to 7.1 |
+
+Note on p95: with fewer than about 20 frames in the window a 95th percentile is not meaningful (it
+is the maximum or one frame from it). That applies to 500 000 (18 to 20 frames) and 1 000 000
+(11 to 12 frames), where p95 equals max in the table; use the median there.
 
 The probe maxima are the largest single round trip in each repetition, summarised over the three
-repetitions. The large probe maxima (for example 703.9 ms at 1 000 000, one repetition) fall at
-the moment the result arrives and the main thread builds the scene geometry (the long task
-column); the probe medians stay near the idle round trip throughout.
+repetitions. The large probe maxima (for example 703.9 ms at 1 000 000, one repetition) plausibly
+coincide with the main thread building the scene geometry when the result arrives (the long task
+column), but this is not evidenced: probe timestamps were not recorded, so a probe cannot be
+placed against the long task. The probe medians stay near the idle round trip throughout.
 
 ### What the numbers say (as measured)
 
@@ -117,12 +136,13 @@ column); the probe medians stay near the idle round trip throughout.
    transfer (not copy) of the typed arrays.
 3. **The main thread is blocked for a while after the result arrives**, by scene-geometry
    construction: the longest long task is about 0.1 s at 100 000 and about 0.5 s at 1 000 000.
-   During that time input is not handled (the 703.9 ms probe maximum is an example).
+   During that time input is not handled by definition of a long task; the large probe maxima are consistent with it but not shown to coincide with it (see the note above).
 4. **Rendering is the bottleneck, not the engine.** With software WebGL, one playback frame takes
    about 17 ms up to 10 000 samples, 46 ms at 100 000, 100 ms at 250 000, 192 ms at 500 000 and
-   386 ms at 1 000 000 (about 2.6 frames per second). Frame time grows with N because the whole
-   polyline is drawn every frame. How much of this is the software renderer is not known: no GPU
-   run was made.
+   386 ms at 1 000 000 (about 2.6 frames per second). Frame time grows with N. A plausible
+   cause is that the whole polyline is drawn every frame, but this is a hypothesis: a per-frame
+   O(N) CPU cost in the app (for example in the scene or marker update) was not ruled out, and
+   how much is the software renderer is not known: no GPU run and no profile were made.
 5. **JS heap is not informative.** The main-page JS heap grows only from 4.5 to 7.1 MB, because
    typed-array backing stores are not in `JSHeapUsedSize`. Process memory was not measured. The
    arithmetic size at 1 000 000 samples is 56 MB of engine arrays (7 binary64 numbers per sample,
@@ -132,41 +152,46 @@ column); the probe medians stay near the idle round trip throughout.
 
 ### Supported envelope, as measured (this machine only)
 
-| Region (total samples)  | Observed                                                                                          |
-| ----------------------- | ------------------------------------------------------------------------------------------------- |
-| up to 10 000            | Playback at about 60 frames per second (median 16.8 ms; p95 up to 19 ms; worst frame 34 ms). Run completes in about 0.1 s. |
-| 10 000 to 100 000       | Run completes in under 0.5 s; playback 46 ms per frame (about 22 frames per second).               |
-| 100 000 to 1 000 000    | Run completes in 0.7 to 2.2 s, page responsive while computing; a main-thread pause of 0.2 to 0.5 s when the result appears; playback 100 to 390 ms per frame (under 10 frames per second). Usable, not smooth. |
-| above 1 000 000         | **Not measured.** The engine and validation reject it under the current provisional limit.       |
+**1 000 000 is a hard ceiling that the engine and the page survive; it is not a size that plays
+smoothly.** In the order of use:
+
+| Region (total samples) | Observed                                                                                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| up to about 10 000     | **Smooth.** Playback about 60 frames per second (median 16.8 ms; worst frame 34 ms). Run completes in about 0.1 s.                                                         |
+| up to about 250 000    | **Usable.** Playback 46 ms per frame at 100 000 (about 22 fps) and 100 ms at 250 000 (about 10 fps) with software rendering. Click to first frame 0.4 s to 0.7 s.          |
+| above 250 000          | **Degraded.** 192 ms per frame at 500 000 (about 5 fps) and 386 ms at 1 000 000 (about 2.6 fps); a main-thread pause of 0.3 s to 0.5 s when the result appears; run 1.2 s to 2.2 s. The page stays responsive while computing. |
+| above 1 000 000        | **Not measured.** The engine and validation reject it under the current provisional limit.                                                                                  |
 
 ## 4. Proposed sample limit (Proposed, not decided)
 
-**Proposal: keep the limit at 1 000 000 samples** (the value of `PROVISIONAL_MAX_SAMPLE_COUNT`),
-and record it as the decided limit in part B if the owner agrees.
+**Proposal: keep the limit at 1 000 000 samples** (the value of `PROVISIONAL_MAX_SAMPLE_COUNT`)
+as a hard ceiling, and record it as the decided limit in part B only if the owner agrees.
 
-Reasoning:
+What the data support, and what they do not:
 
-- The complete ladder up to the current value ran without failure, three times at every size,
-  on a machine in normal use. Nothing measured shows the limit is unsafe: the engine takes 1.4 s,
-  the page stays responsive during the run and the data transfer is negligible.
-- The cost at the limit is quality of playback (about 2.6 frames per second with software
-  rendering) and a half-second main-thread pause when the result appears. Those are the true
-  limits of the workspace today and they are stated in the envelope above, so the limit can be
-  kept honest by publishing the envelope rather than by lowering the number.
-- The M1 use cases are far below the limit (30 days at a 10 s step is 259 201 samples), so
-  lowering it would cost users little and raising it has no use case.
-- No evidence supports a higher value: sizes above 1 000 000 were not measured (that needs the
-  limit changed, which is out of scope for part A). Raising it should wait for a measurement
-  above 1 000 000 and for a rendering decision.
+- The ladder stopped at the placeholder: sizes above 1 000 000 are rejected by validation, so
+  nothing above it was run. The data therefore show only that **the limit is not unsafe up to
+  1 000 000** on this machine (18 of 18 runs succeeded; engine 1.4 s; page responsive during the
+  run; transfer negligible). They do not show that 1 000 000 is the right or the optimal value.
+- The M1 use case of 30 days at a 10 s step is 259 201 samples. That is just above the 250 000
+  point (100 ms per frame), so it plays at about 10 frames per second or slightly less with
+  software rendering (an estimate from the neighbouring points, not a separate measurement).
+- Above about 250 000 samples playback degrades, and at the ceiling it is about 2.6 frames per
+  second with a half-second pause when the result appears (see the envelope above).
+- No evidence supports a higher value. Raising it needs a measurement above 1 000 000 (which
+  needs the limit changed, out of scope for part A) and a rendering decision first.
 
-Alternatives for the owner, not recommended on this evidence alone:
+Alternatives for the owner:
 
-- **Lower to 250 000** if the product wants a playback floor of about 10 frames per second under
-  software rendering (100 ms per frame at 250 000; 192 ms at 500 000).
-- **Keep 1 000 000 and add a UI warning** above about 100 000 samples ("playback will be slow").
-  That is new behaviour and needs its own task.
-- **Reduce rendering cost** (not engine cost) by drawing a decimated polyline or a segmented draw
-  range; this is real work and was not attempted (out of scope: performance optimisation).
+- **Main alternative: keep the hard ceiling and add a soft warning above 250 000 samples**
+  ("playback will be slow"). This is new behaviour and needs its own task.
+- **Lower the hard limit.** The highest hard limit the reviewer would defend on this data is
+  **500 000** (192 ms per frame, about 1.2 s to the first frame). 250 000 gives about 10 frames
+  per second under software rendering; 1 000 000 is defensible only as a ceiling with the
+  envelope published.
+- **Reduce rendering cost** (not engine cost), for example by drawing a decimated polyline. This
+  is real work, was not attempted (out of scope: performance optimisation), and its benefit
+  depends on the unconfirmed cause of the frame-time growth.
 
 ## 5. Limitations and what was not measured
 
