@@ -1,0 +1,45 @@
+task_id: ML-TASK-030
+title: "Charting library spike (OD-006) and ADR-010 (proposed)"
+status: in_progress
+requirement_ids: [ML-FR-009, ML-FR-010, ML-NFR-004, ML-NFR-006, ML-NFR-007, ML-UX-004]
+owner_role: frontend-engineer
+reviewer_role: systems-architect
+dependencies: [ML-TASK-026]
+affected_paths:
+  - spikes/charting/                 # throwaway spike code, not part of the app build or CI
+  - docs/architecture/adr/ADR-010-charting-library.md
+  - docs/backlog/tasks/ML-TASK-030.yaml
+objective: >
+  Close open decision OD-006 (ADR-006, proposed-architecture §5): choose the charting library for
+  the M1 time-history plots and the coast-vs-maneuver comparison, on evidence, and propose it as
+  ADR-010 for the owner. (The backlog line says "ADR-008"; that number is taken by the
+  degenerate-elements ADR, so this is ADR-010.)
+scope:
+  - "Shortlist 2–4 candidates that are maintained, permissively licensed and usable from React 19 without a server (for example uPlot, Apache ECharts, Recharts, Plotly basic). Record version, licence, bundle size (min+gzip), last release date and maintenance signals from the npm registry or the project's own site; cite each source and the date read. Do not write any of these from memory."
+  - "Representative data: real engine results through `@mission-lab/simulation` (the default scenario, a maneuvered one, and a large run near the 250 000 soft-warning size), giving 6–10 series (radius, altitude, speed, true anomaly, a, e, i…) split at the maneuver."
+  - "For each candidate, a small spike page in spikes/charting/ (its own package.json or a vite entry outside apps/web; nothing added to apps/web) that renders: two series with a gap at the maneuver (no line across the discontinuity), a vertical maneuver marker, axis titles with units and a legend (FR-009 AC2), a moving time cursor driven from outside (playback t_s), and coast vs maneuvered overlaid with distinct styles (FR-010 AC1)."
+  - "Measure per candidate on the same machine: first render time and cursor update time at about 1e4 and about 2.5e5 points per series, memory if available; keyboard and screen-reader support stated from the library's docs (cited); whether exact values can be read back for the FR-009 AC3 / VI-03 plumbing check (Object.is on plotted values)."
+  - "ADR-010 (status Proposed): context, options with the measured table, decision recommended, consequences (dependency added to apps/web, tech-baseline update needed, CSP/no-network constraints, licence)."
+out_of_scope:
+  - "Adding any dependency to apps/web or the lockfile of the app; the chosen library is added by ML-TASK-032 after the owner approves the ADR."
+  - "Any change to packages/, apps/web/src, CI, or other ADRs."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/architecture/adr/ADR-006-frontend-stack.md (OD-006), ADR-002
+  - docs/architecture/proposed-architecture.md §5–§6; docs/architecture/tech-baseline.md (how versions are pinned and justified)
+  - docs/requirements/m1-requirements.md (FR-009, FR-010, NFR-004, NFR-006, NFR-007, UX-004)
+  - docs/verification/tolerances.md §1 row "Plotted values vs the analysis module's output" (VI-03 plumbing, Object.is)
+  - docs/verification/performance-envelope.md (sizes, machine)
+  - docs/design/design-tokens.md (colours for coast/maneuvered)
+acceptance_criteria:
+  - "Each candidate has a spike that runs with one documented command and shows the five features listed in scope, or the report states which it could not do and why."
+  - "A measurement table (≥ 3 repetitions per point, median) and the cited metadata per candidate are in ADR-010."
+  - "ADR-010 is Proposed, recommends one library with reasons, and lists what changes if approved."
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` still exit 0 on the branch (spikes excluded from them if needed, with the exclusion stated)."
+test_requirements:
+  - "No product tests; the spike's measurements are the evidence."
+deliverables:
+  - spikes/charting/, ADR-010 (Proposed), the report section of this file
+human_approval_required: true   # owner approves ADR-010 and the new dependency
+
+report: {}

@@ -1,0 +1,40 @@
+task_id: ML-TASK-031
+title: "Analysis module in packages/simulation: time histories and coast-vs-maneuver comparison"
+status: in_progress
+requirement_ids: [ML-FR-009, ML-FR-010, ML-NFR-001, ML-NFR-002, ML-NFR-003]
+owner_role: astrodynamics-engineer
+reviewer_role: verification-engineer   # VI-03 correctness and FR-010 AC3 need independent references (later)
+dependencies: [ML-TASK-017, ML-TASK-027]
+affected_paths:
+  - packages/simulation/src/analysis/
+  - packages/simulation/src/index.ts       # exports only
+  - docs/backlog/tasks/ML-TASK-031.yaml
+objective: >
+  Provide, derived only from a SimulationResult, the data the plots and the comparison table need,
+  so the UI computes no physics (proposed-architecture §2 module E, ADR-002).
+scope:
+  - "Time histories per segment (never joined across a maneuver): radius, altitude above the reference sphere, speed, true anomaly, flight-path angle, mean anomaly (ML-SYS-001 §2.2) and the classical elements a, e, i, Ω, ω, ν, using the existing astrodynamics functions (stateToElements with DEGENERACY_THRESHOLDS, closedOrbitQuantities or the equivalents) on each sample. Each series carries t_s, segment index, unit and the quantity id; elements constant between maneuvers appear as flat histories by design (ML-SYS-001 §2.2). Hyperbolic segments: report what is defined and mark what is not (e.g. no period), never throw."
+  - "Comparison (ML-FR-010): given the coast result (no maneuver) and the maneuvered result over the same span, return before/after values and differences for a, e, i, Ω, ω, perigee and apogee radius, period and specific energy, plus the applied Δv (inertial and RSW, magnitude) — 'before' from the state just before the maneuver, 'after' just after (contract R8 event states). How the UI obtains the coast run: a helper that builds the coast request from the scenario (same span, no maneuver) with buildSimulationRequest; the UI runs it through the worker like any run."
+  - "Pure functions, deterministic, no clock or randomness (NFR-003); documented units, frame and source (NFR-002); typed results with failure reasons instead of exceptions."
+  - "Unit tests: plumbing (each history value equals the function applied to that sample, Object.is); segment split at the maneuver; flat element histories on coast; comparison fields for the default plus a tangential burn; hyperbolic segment handling; determinism."
+out_of_scope:
+  - "Independent references and toleranced correctness of VI-03 and FR-010 AC3 (Verification Engineer, later task); you may state expected magnitudes but must not write reference numbers from memory."
+  - "Plots and UI (030, 032); persistence (033); any change to packages/astrodynamics, contracts, conformance, verification, tolerances."
+  - "New dependencies."
+inputs:
+  - AGENTS.md; docs/engineering/coding-standards.md
+  - docs/product/ML-SYS-001.md §2.2; docs/requirements/m1-requirements.md (FR-009, FR-010)
+  - docs/architecture/proposed-architecture.md §2 (module E); ADR-002, ADR-008; contracts-v1 (result layout, R8 event states, events)
+  - docs/verification/tolerances.md §1 and §8 VI-03 (what will be checked and how)
+  - packages/simulation/src (scenario-view.ts, degeneracy-thresholds.ts, run.ts, request.ts)
+acceptance_criteria:
+  - "`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format:check`, `pnpm check:boundaries` exit 0; existing tests unchanged and passing."
+  - "No new physics: histories and comparison call existing astrodynamics functions; reviewable in the diff."
+  - "Every public function documents units, frame, source; every series carries its unit."
+test_requirements:
+  - "Vitest unit tests in packages/simulation/src/analysis."
+deliverables:
+  - packages/simulation/src/analysis/ with tests; index exports; the report section of this file
+human_approval_required: false
+
+report: {}
