@@ -1,5 +1,6 @@
 /** Right column: diagnostics (errors, warnings) and a summary of the shown result. */
 import { useStore } from 'zustand';
+import { ModelPanel } from '../model-panel';
 import { getScenarioStore } from '../state/scenario-store';
 
 export function ResultsColumn() {
@@ -71,6 +72,8 @@ export function ResultsColumn() {
           <p className="note">Stale: from the previous run, not the current inputs.</p>
         )}
       </section>
+
+      <ModelPanel resultState={resultState} />
     </div>
   );
 }
